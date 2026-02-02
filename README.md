@@ -1,8 +1,32 @@
-# SIPCRM - Customer Relationship Management
+# SIPCRM - Multi-Tenant Customer Relationship Management
 
-A modern CRM application built with Next.js 15, TypeScript, and Tailwind CSS for managing SIPUNI integrations and call operations.
+A modern **multi-tenant CRM platform** built with Next.js 15, TypeScript, and Tailwind CSS. Features subdomain-based routing for owner and company portals, complete with Docker and Nginx support.
+
+## Architecture
+
+### Multi-Tenant Subdomain Routing
+
+```
+owner.domain.com      → Owner Portal (Platform Admin)
+company1.domain.com   → Company Portal (company_subdomain=company1)
+company2.domain.com   → Company Portal (company_subdomain=company2)
+*.domain.com          → Dynamic Company Portals
+```
+
+**Nginx** handles subdomain extraction and passes it to **Next.js Middleware** which routes users to appropriate portals based on their subdomain.
+
+### Deployment Options
+
+1. **Docker + Nginx** (Production) - Subdomain-based multi-tenancy
+2. **Standalone Next.js** (Development) - Query parameter testing
 
 ## Features
+
+### Multi-Tenant Support
+- **Owner Portal**: Manage multiple companies from `owner.domain.com`
+- **Company Portals**: Each company has its own subdomain (e.g., `company1.domain.com`)
+- **Automatic Routing**: Nginx + Middleware handle subdomain detection
+- **Isolated Data**: Companies only see their own data
 
 ### Authentication
 - User registration and login
@@ -54,38 +78,66 @@ A modern CRM application built with Next.js 15, TypeScript, and Tailwind CSS for
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- npm or yarn package manager
+- **For Development**: Node.js 18+, npm
+- **For Production**: Docker & Docker Compose
 
-### Installation
+### Option 1: Docker Production Setup (Recommended)
 
-1. Clone the repository:
+Perfect for production with full subdomain support:
+
 ```bash
+# 1. Clone repository
 git clone <repository-url>
 cd SIPCRM-Front
-```
 
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
+# 2. Configure environment
 cp .env.example .env
+nano .env  # Edit with your settings
+
+# 3. Build and start with Docker Compose
+make build up
+
+# Or without make:
+docker-compose up -d --build
+
+# 4. View logs
+make logs
 ```
 
-Edit `.env` and set your API base URL:
-```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-```
+**Access:**
+- Owner Portal: `http://owner.domain.com`
+- Company Portal: `http://company1.domain.com`
 
-4. Run the development server:
+See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for detailed Docker configuration, SSL setup, and DNS configuration.
+
+### Option 2: Development Setup
+
+For local development without Docker:
+
 ```bash
+# 1. Clone and install
+git clone <repository-url>
+cd SIPCRM-Front
+npm install
+
+# 2. Configure environment
+cp .env.example .env.local
+# Edit .env.local with development settings
+
+# 3. Set up local subdomains (optional)
+sudo make setup-hosts
+
+# 4. Run development server
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+**Access with subdomain testing:**
+- Owner Portal: `http://owner.localhost:3000`
+- Company Portal: `http://company1.localhost:3000`
+
+**Or use query parameters:**
+- Owner: `http://localhost:3000?subdomain=owner`
+- Company: `http://localhost:3000?subdomain=company1`
 
 ## Project Structure
 
@@ -139,15 +191,65 @@ The application integrates with the backend API defined in the OpenAPI specifica
 ### Statistics
 - `GET /api/v1/statistics/calls` - Get call statistics
 
-## Building for Production
+## Quick Commands
 
-Build the application:
+### Using Makefile (Docker)
+
 ```bash
-npm run build
+make build          # Build Docker images
+make up             # Start containers
+make down           # Stop containers
+make restart        # Restart containers
+make logs           # View all logs
+make logs-nginx     # View Nginx logs only
+make logs-nextjs    # View Next.js logs only
+make ps             # Show running containers
+make clean          # Remove all containers and images
+make rebuild        # Full rebuild (down + build + up)
+make setup-hosts    # Setup local /etc/hosts for subdomain testing
+make test-subdomains # Test subdomain routing
+make help           # Show all available commands
 ```
 
-Start the production server:
+### Using Docker Compose Directly
+
 ```bash
+docker-compose up -d --build    # Build and start
+docker-compose down             # Stop containers
+docker-compose logs -f          # Follow logs
+docker-compose ps               # List containers
+docker-compose restart nginx    # Restart specific service
+```
+
+### Development Commands
+
+```bash
+npm run dev         # Start development server
+npm run build       # Build for production
+npm run start       # Start production server
+npm run lint        # Run linter
+```
+
+## Building for Production
+
+### Docker (Recommended)
+
+```bash
+# Build and deploy with Docker
+make build up
+
+# Or step by step:
+docker-compose build
+docker-compose up -d
+```
+
+### Standalone
+
+```bash
+# Build the application
+npm run build
+
+# Start the production server
 npm start
 ```
 

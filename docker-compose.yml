@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Next.js Application
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sipcrm-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_OWNER_SUBDOMAIN=${NEXT_PUBLIC_OWNER_SUBDOMAIN:-owner}
+      - NEXT_PUBLIC_BASE_DOMAIN=${NEXT_PUBLIC_BASE_DOMAIN:-domain.com}
+    expose:
+      - "3000"
+    networks:
+      - sipcrm-network
+    depends_on:
+      - nginx
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sipcrm-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - sipcrm-network
+
+networks:
+  sipcrm-network:
+    driver: bridge
