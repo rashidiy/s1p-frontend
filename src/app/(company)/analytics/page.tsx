@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Phone, TrendingUp, CheckSquare, Briefcase, Activity, Users } from 'lucide-react';
+import { Phone, TrendingUp, CheckSquare, Briefcase, Users } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
@@ -16,11 +16,7 @@ export default function AnalyticsPage() {
 
   const canViewTeamData = isAdmin() || isManager();
 
-  useEffect(() => {
-    loadDashboards();
-  }, []);
-
-  const loadDashboards = async () => {
+  const loadDashboards = useCallback(async () => {
     try {
       const myData = await apiClient.getMyDashboard();
       setOperatorData(myData);
@@ -34,11 +30,19 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [canViewTeamData]);
+
+  useEffect(() => {
+    loadDashboards();
+  }, [loadDashboards]);
 
   if (loading) {
     return <div className="p-6">Loading analytics...</div>;
   }
+
+  // Use this_month data for display
+  const myStats = operatorData?.this_month;
+  const teamStats = adminData?.this_month;
 
   return (
     <div className="space-y-6">
@@ -62,10 +66,10 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {operatorData?.calls.total || 0}
+                  {myStats?.calls.total_calls || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {operatorData?.calls.answered || 0} answered
+                  {myStats?.calls.answered_calls || 0} answered
                 </p>
               </CardContent>
             </Card>
@@ -77,10 +81,10 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {operatorData?.leads.total || 0}
+                  {myStats?.leads.total_leads || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {operatorData?.leads.converted || 0} converted
+                  {myStats?.leads.converted_leads || 0} converted
                 </p>
               </CardContent>
             </Card>
@@ -92,10 +96,10 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {operatorData?.deals.total || 0}
+                  {myStats?.deals.total_deals || 0}
                 </div>
                 <p className="text-xs text-green-600">
-                  ${operatorData?.deals.total_value?.toLocaleString() || 0}
+                  ${myStats?.deals.total_value?.toLocaleString() || 0}
                 </p>
               </CardContent>
             </Card>
@@ -107,10 +111,10 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {operatorData?.tasks.completed || 0}
+                  {myStats?.tasks.completed_tasks || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  of {operatorData?.tasks.total || 0} total
+                  of {myStats?.tasks.total_tasks || 0} total
                 </p>
               </CardContent>
             </Card>
@@ -126,25 +130,24 @@ export default function AnalyticsPage() {
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Answer Rate</span>
                   <span className="font-semibold">
-                    {operatorData?.calls.total ?
-                      Math.round((operatorData.calls.answered / operatorData.calls.total) * 100) : 0}%
+                    {Math.round(myStats?.calls.success_rate || 0)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Avg Duration</span>
                   <span className="font-semibold">
-                    {operatorData?.calls.avg_duration ?
-                      `${Math.floor(operatorData.calls.avg_duration / 60)}m ${operatorData.calls.avg_duration % 60}s` :
+                    {myStats?.calls.average_duration ?
+                      `${Math.floor(myStats.calls.average_duration / 60)}m ${myStats.calls.average_duration % 60}s` :
                       '0m 0s'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Inbound</span>
-                  <span className="font-semibold">{operatorData?.calls.inbound || 0}</span>
+                  <span className="font-semibold">{myStats?.calls.inbound_calls || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Outbound</span>
-                  <span className="font-semibold">{operatorData?.calls.outbound || 0}</span>
+                  <span className="font-semibold">{myStats?.calls.outbound_calls || 0}</span>
                 </div>
               </CardContent>
             </Card>
@@ -158,10 +161,10 @@ export default function AnalyticsPage() {
                 <div className="flex items-center justify-center py-6">
                   <div className="text-center">
                     <div className="text-5xl font-bold text-blue-600">
-                      {operatorData?.productivity_score || 0}
+                      {myStats?.productivity_score || 0}
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
-                      Total Activities: {operatorData?.total_activities || 0}
+                      Total Activities: {myStats?.total_activities || 0}
                     </p>
                   </div>
                 </div>
@@ -180,10 +183,10 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {adminData?.total_operators || 0}
+                    {teamStats?.total_operators || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Active operators
+                    {teamStats?.active_operators || 0} active
                   </p>
                 </CardContent>
               </Card>
@@ -195,10 +198,10 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {adminData?.team_calls.total || 0}
+                    {teamStats?.calls.total_calls || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {adminData?.team_calls.answered || 0} answered
+                    {teamStats?.calls.answered_calls || 0} answered
                   </p>
                 </CardContent>
               </Card>
@@ -210,10 +213,10 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {adminData?.team_leads.total || 0}
+                    {teamStats?.leads.total_leads || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {adminData?.team_leads.converted || 0} converted
+                    {teamStats?.leads.converted_leads || 0} converted
                   </p>
                 </CardContent>
               </Card>
@@ -225,10 +228,10 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${adminData?.team_deals.total_value?.toLocaleString() || 0}
+                    ${teamStats?.deals.total_value?.toLocaleString() || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {adminData?.team_deals.won || 0} deals won
+                    {teamStats?.deals.won || 0} deals won
                   </p>
                 </CardContent>
               </Card>
@@ -241,22 +244,22 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {adminData?.top_performers?.map((performer, index) => (
-                    <div key={performer.operator_id} className="flex items-center justify-between">
+                  {teamStats?.top_operators_by_calls?.map((performer, index) => (
+                    <div key={performer.user_id} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
                           {index + 1}
                         </div>
                         <div>
-                          <p className="font-medium">{performer.operator_name}</p>
+                          <p className="font-medium">{performer.name}</p>
                           <p className="text-sm text-gray-500">
-                            {performer.total_calls} calls, {performer.total_leads} leads
+                            {performer.calls.total_calls} calls, {performer.leads.total_leads} leads
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-blue-600">
-                          Score: {performer.performance_score}
+                          Score: {performer.productivity_score}
                         </p>
                       </div>
                     </div>

@@ -101,17 +101,17 @@ export default function TasksPage() {
 
       <div className="space-y-3">
         {data?.items.map((task) => (
-          <Card key={task.id} className={task.is_completed ? 'opacity-60' : ''}>
+          <Card key={task.id} className={task.status === 'completed' ? 'opacity-60' : ''}>
             <CardContent className="flex items-start space-x-4 p-4">
               <Checkbox
-                checked={task.is_completed}
-                onCheckedChange={() => toggleTaskComplete(task.id, task.is_completed)}
+                checked={task.status === 'completed'}
+                onCheckedChange={() => toggleTaskComplete(task.id, task.status === 'completed')}
                 className="mt-1"
               />
               <div className="flex-1 space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className={`font-semibold ${task.is_completed ? 'line-through' : ''}`}>
+                    <h3 className={`font-semibold ${task.status === 'completed' ? 'line-through' : ''}`}>
                       {task.title}
                     </h3>
                     {task.description && (
@@ -124,7 +124,7 @@ export default function TasksPage() {
                         {task.priority}
                       </Badge>
                     )}
-                    {task.due_date && isOverdue(task.due_date) && !task.is_completed && (
+                    {task.due_date && isOverdue(task.due_date) && task.status !== 'completed' && (
                       <AlertCircle className="h-4 w-4 text-red-500" />
                     )}
                   </div>
@@ -133,7 +133,7 @@ export default function TasksPage() {
                   {task.due_date && (
                     <div className="flex items-center">
                       <Calendar className="mr-1 h-3 w-3" />
-                      <span className={isOverdue(task.due_date) && !task.is_completed ? 'text-red-600' : ''}>
+                      <span className={isOverdue(task.due_date) && task.status !== 'completed' ? 'text-red-600' : ''}>
                         {new Date(task.due_date).toLocaleDateString()}
                       </span>
                     </div>
@@ -144,19 +144,9 @@ export default function TasksPage() {
                       <span>{task.assigned_to_name}</span>
                     </div>
                   )}
-                  {task.related_contact_name && (
+                  {task.entity_type && task.entity_id && (
                     <Badge variant="outline" className="text-xs">
-                      Contact: {task.related_contact_name}
-                    </Badge>
-                  )}
-                  {task.related_lead_title && (
-                    <Badge variant="outline" className="text-xs">
-                      Lead: {task.related_lead_title}
-                    </Badge>
-                  )}
-                  {task.related_deal_title && (
-                    <Badge variant="outline" className="text-xs">
-                      Deal: {task.related_deal_title}
+                      {task.entity_type}: {task.entity_id}
                     </Badge>
                   )}
                 </div>

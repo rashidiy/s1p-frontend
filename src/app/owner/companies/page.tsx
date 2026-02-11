@@ -7,11 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Search, Plus, CheckCircle, XCircle } from 'lucide-react';
 import { apiClient } from '@/lib/api';
-import type { CompanyListResponse } from '@/types/api';
+import type { CompanyResponse } from '@/types/api';
 import Link from 'next/link';
 
 export default function CompaniesPage() {
-  const [companies, setCompanies] = useState<CompanyListResponse[]>([]);
+  const [companies, setCompanies] = useState<CompanyResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -21,8 +21,8 @@ export default function CompaniesPage() {
 
   const loadCompanies = async () => {
     try {
-      const data = await apiClient.getCompanies({ page: 1, page_size: 100 });
-      setCompanies(data.items);
+      const data = await apiClient.getOwnerCompanies();
+      setCompanies(data);
     } catch (error) {
       console.error('Failed to load companies:', error);
     } finally {

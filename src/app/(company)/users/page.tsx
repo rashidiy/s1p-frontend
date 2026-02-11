@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,23 +9,19 @@ import { Users, Search, Plus, Mail, Shield } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
-import type { UserResponse, PaginatedResponse } from '@/types/api';
+import type { UserListResponse } from '@/types/api';
 import Link from 'next/link';
 
 export default function UsersPage() {
-  const [data, setData] = useState<PaginatedResponse<UserResponse> | null>(null);
+  const [data, setData] = useState<UserListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const { isAdmin, hasPermission } = useAuthStore();
+  const { hasPermission } = useAuthStore();
 
   const canManageUsers = hasPermission(UserRole.COMPANY_ADMIN);
 
-  useEffect(() => {
-    loadUsers();
-  }, [page, search]);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       const result = await apiClient.getUsers({
         page,
@@ -38,7 +34,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const toggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
@@ -74,6 +74,8 @@ export default function UsersPage() {
     return <div className="p-6">Loading users...</div>;
   }
 
+  const totalPages = data ? Math.ceil(data.total / data.page_size) : 1;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -107,7 +109,7 @@ export default function UsersPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {data?.items.map((user) => (
+        {data?.users.map((user) => (
           <Card key={user.id}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -173,7 +175,7 @@ export default function UsersPage() {
         ))}
       </div>
 
-      {data && data.total_pages > 1 && (
+      {data && totalPages > 1 && (
         <div className="flex items-center justify-center space-x-2">
           <Button
             variant="outline"
@@ -183,19 +185,19 @@ export default function UsersPage() {
             Previous
           </Button>
           <span className="text-sm text-gray-600">
-            Page {page} of {data.total_pages}
+            Page {page} of {totalPages}
           </span>
           <Button
             variant="outline"
-            onClick={() => setPage((p) => Math.min(data.total_pages, p + 1))}
-            disabled={page === data.total_pages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
           >
             Next
           </Button>
         </div>
       )}
 
-      {data?.items.length === 0 && (
+      {data?.users.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-gray-400" />

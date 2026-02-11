@@ -561,6 +561,50 @@ class ApiClient {
   async clearAnalyticsCache() {
     return this.client.delete('/api/v1/company/analytics/cache');
   }
+
+  // ============================================================================
+  // SIPUNI INTEGRATION
+  // ============================================================================
+
+  async getSipuniList() {
+    const response = await this.client.get<API.SipuniResponse[]>('/api/v1/sipuni/');
+    return response.data;
+  }
+
+  async makeInternalCall(data: API.CallNumberRequest) {
+    const response = await this.client.post('/api/v1/sipuni/call/number', data);
+    return response.data;
+  }
+
+  async makeExternalCall(data: API.ExternalCallRequest) {
+    const response = await this.client.post('/api/v1/sipuni/call/external', data);
+    return response.data;
+  }
+
+  async makeCallTree(data: API.CallTreeRequest) {
+    const response = await this.client.post('/api/v1/sipuni/call/tree', data);
+    return response.data;
+  }
+
+  async createSipuni(data: API.SipuniCreateRequest) {
+    const response = await this.client.post<API.SipuniResponse>('/api/v1/sipuni/', data);
+    return response.data;
+  }
+
+  async updateSipuni(data: API.SipuniUpdateRequest) {
+    const { id, ...updateData } = data;
+    const response = await this.client.put<API.SipuniResponse>(`/api/v1/sipuni/${id}`, updateData);
+    return response.data;
+  }
+
+  async deleteSipuni(id: number) {
+    return this.client.delete(`/api/v1/sipuni/${id}`);
+  }
+
+  async regenerateSipuniToken(id: string) {
+    const response = await this.client.post<API.SipuniResponse>(`/api/v1/sipuni/${id}/regenerate-token`);
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

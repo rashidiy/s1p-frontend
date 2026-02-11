@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Phone, TrendingUp, Briefcase, CheckSquare, Users, Activity } from 'lucide-react';
+import { Phone, TrendingUp, Briefcase, CheckSquare, Users } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import type { OperatorDashboard } from '@/types/api';
 import Link from 'next/link';
@@ -12,11 +12,7 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       const data = await apiClient.getMyDashboard();
       setDashboard(data);
@@ -25,11 +21,18 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
 
   if (loading) {
     return <div className="p-6">Loading dashboard...</div>;
   }
+
+  // Use this_month data for display
+  const stats = dashboard?.this_month;
 
   return (
     <div className="space-y-6">
@@ -45,9 +48,9 @@ export default function DashboardPage() {
             <Phone className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.calls.total || 0}</div>
+            <div className="text-2xl font-bold">{stats?.calls.total_calls || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {dashboard?.calls.answered || 0} answered
+              {stats?.calls.answered_calls || 0} answered
             </p>
           </CardContent>
         </Card>
@@ -58,9 +61,9 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.leads.total || 0}</div>
+            <div className="text-2xl font-bold">{stats?.leads.total_leads || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {dashboard?.leads.converted || 0} converted
+              {stats?.leads.converted_leads || 0} converted
             </p>
           </CardContent>
         </Card>
@@ -71,9 +74,9 @@ export default function DashboardPage() {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.deals.total || 0}</div>
+            <div className="text-2xl font-bold">{stats?.deals.total_deals || 0}</div>
             <p className="text-xs text-green-600">
-              ${dashboard?.deals.total_value?.toLocaleString() || 0}
+              ${stats?.deals.total_value?.toLocaleString() || 0}
             </p>
           </CardContent>
         </Card>
@@ -84,9 +87,9 @@ export default function DashboardPage() {
             <CheckSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.tasks.completed || 0}</div>
+            <div className="text-2xl font-bold">{stats?.tasks.completed_tasks || 0}</div>
             <p className="text-xs text-muted-foreground">
-              of {dashboard?.tasks.total || 0} total
+              of {stats?.tasks.total_tasks || 0} total
             </p>
           </CardContent>
         </Card>
@@ -135,25 +138,23 @@ export default function DashboardPage() {
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Productivity Score</span>
               <span className="text-lg font-bold text-blue-600">
-                {dashboard?.productivity_score || 0}
+                {stats?.productivity_score || 0}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Total Activities</span>
-              <span className="font-semibold">{dashboard?.total_activities || 0}</span>
+              <span className="font-semibold">{stats?.total_activities || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Call Answer Rate</span>
               <span className="font-semibold">
-                {dashboard?.calls.total ?
-                  Math.round((dashboard.calls.answered / dashboard.calls.total) * 100) : 0}%
+                {Math.round(stats?.calls.success_rate || 0)}%
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Lead Conversion</span>
               <span className="font-semibold">
-                {dashboard?.leads.total ?
-                  Math.round((dashboard.leads.converted / dashboard.leads.total) * 100) : 0}%
+                {Math.round(stats?.leads.conversion_rate || 0)}%
               </span>
             </div>
           </CardContent>

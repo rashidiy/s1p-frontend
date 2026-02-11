@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       const response = await apiClient.login({ email, password });
-      setUser(response);
+      setUser(response, 'company_user');
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid email or password');

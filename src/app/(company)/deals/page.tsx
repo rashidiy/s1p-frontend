@@ -132,7 +132,7 @@ export default function DealsPage() {
                   <div className="flex items-center text-sm text-gray-600">
                     <DollarSign className="mr-2 h-4 w-4 text-green-600" />
                     <span className="text-lg font-bold text-green-600">
-                      ${deal.value.toLocaleString()}
+                      ${deal.amount.toLocaleString()}
                     </span>
                   </div>
                   {deal.probability && (

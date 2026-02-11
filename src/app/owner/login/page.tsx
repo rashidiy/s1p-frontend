@@ -77,7 +77,7 @@ export default function OwnerLoginPage() {
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
             <div className="text-center text-sm">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/owner/register" className="text-blue-600 hover:underline">
                 Register
               </Link>

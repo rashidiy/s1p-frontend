@@ -769,3 +769,47 @@ export interface SipuniResponse {
   partner_contact?: string | null;
   comment?: string | null;
 }
+
+export interface CallNumberRequest {
+  token: string;
+  phone: string;
+  sip_number: string;
+  reverse?: boolean;
+  antiaon?: boolean;
+}
+
+export interface ExternalCallRequest {
+  token: string;
+  phone1: string;
+  phone2: string;
+  bridge_start?: string;
+  bridge_end?: string;
+}
+
+export interface CallTreeRequest {
+  token: string;
+  phone: string;
+  sip_number: string;
+  tree: string;
+  reverse?: boolean;
+  attempt_duration?: number;
+}
+
+export interface SipuniCreateRequest {
+  company_name: string;
+  cabinet_id: string;
+  security_key: string;
+  partner_name?: string;
+  partner_contact?: string;
+  comment?: string;
+}
+
+export interface SipuniUpdateRequest {
+  id: string;
+  company_name?: string | null;
+  cabinet_id?: string | null;
+  security_key?: string | null;
+  partner_name?: string | null;
+  partner_contact?: string | null;
+  comment?: string | null;
+}

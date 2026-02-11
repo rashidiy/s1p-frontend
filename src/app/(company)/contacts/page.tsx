@@ -107,13 +107,13 @@ export default function ContactsPage() {
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2 pt-2">
-                  {contact.total_leads > 0 && (
+                  {(contact.total_leads ?? 0) > 0 && (
                     <Badge variant="secondary">{contact.total_leads} Leads</Badge>
                   )}
-                  {contact.total_deals > 0 && (
+                  {(contact.total_deals ?? 0) > 0 && (
                     <Badge variant="secondary">{contact.total_deals} Deals</Badge>
                   )}
-                  {contact.total_calls > 0 && (
+                  {(contact.total_calls ?? 0) > 0 && (
                     <Badge variant="outline">{contact.total_calls} Calls</Badge>
                   )}
                 </div>

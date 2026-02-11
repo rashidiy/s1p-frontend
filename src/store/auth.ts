@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UserRole } from '@/types/api';
+import { UserRole } from '@/types/api';
 
 export type UserType = 'owner' | 'company_user';
 
@@ -12,7 +12,7 @@ interface AuthUser {
   role?: UserRole;
   company_id?: string;
   is_active: boolean;
-  created_at: string;
+  created_at?: string;
 }
 
 interface AuthState {

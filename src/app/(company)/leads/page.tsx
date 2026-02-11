@@ -28,7 +28,7 @@ export default function LeadsPage() {
         page,
         page_size: 20,
         search: search || undefined,
-        status: status || undefined,
+        status_filter: status || undefined,
       });
       setData(result);
     } catch (error) {
