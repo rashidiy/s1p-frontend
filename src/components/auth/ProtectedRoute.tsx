@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { Spin } from 'antd';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
 
@@ -10,6 +11,7 @@ interface ProtectedRouteProps {
   requireAuth?: boolean;
   requireOwner?: boolean;
   requireRole?: UserRole;
+  requiredPermission?: string;
 }
 
 export function ProtectedRoute({
@@ -17,21 +19,19 @@ export function ProtectedRoute({
   requireAuth = true,
   requireOwner = false,
   requireRole,
+  requiredPermission,
 }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isOwner, userType, hasPermission, initAuth } = useAuthStore();
+  const { isAuthenticated, isOwner, userType, hasPermission, hasPermissionString, initAuth, mustChangePassword } = useAuthStore();
 
   useEffect(() => {
-    // Initialize auth from localStorage
     initAuth();
   }, [initAuth]);
 
   useEffect(() => {
-    // Skip protection for public routes
     if (!requireAuth) return;
 
-    // Not authenticated - redirect to login
     if (!isAuthenticated) {
       if (requireOwner || pathname.startsWith('/owner')) {
         router.push('/owner/login');
@@ -41,26 +41,36 @@ export function ProtectedRoute({
       return;
     }
 
-    // Check owner requirement
+    if (mustChangePassword) {
+      if (isOwner) {
+        router.push('/owner/set-password');
+      } else {
+        router.push('/set-password');
+      }
+      return;
+    }
+
     if (requireOwner && !isOwner) {
       router.push('/dashboard');
       return;
     }
 
-    // Check if company user trying to access owner routes
     if (pathname.startsWith('/owner') && !isOwner) {
       router.push('/dashboard');
       return;
     }
 
-    // Check if owner trying to access company routes
     if (isOwner && !pathname.startsWith('/owner') && pathname !== '/') {
       router.push('/owner/dashboard');
       return;
     }
 
-    // Check role-based permissions for company users
     if (requireRole && !hasPermission(requireRole)) {
+      router.push('/dashboard');
+      return;
+    }
+
+    if (requiredPermission && !hasPermissionString(requiredPermission)) {
       router.push('/dashboard');
       return;
     }
@@ -72,16 +82,18 @@ export function ProtectedRoute({
     requireAuth,
     requireOwner,
     requireRole,
+    requiredPermission,
     hasPermission,
+    hasPermissionString,
+    mustChangePassword,
     router,
   ]);
 
-  // Show loading state while checking auth
   if (requireAuth && !isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-[#f0f2ff]">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+          <Spin size="large" />
           <p className="mt-4 text-sm text-gray-500">Loading...</p>
         </div>
       </div>

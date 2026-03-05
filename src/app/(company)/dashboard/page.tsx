@@ -1,16 +1,74 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Phone, TrendingUp, Briefcase, CheckSquare, Users } from 'lucide-react';
+import { Button, Spin } from 'antd';
+import {
+  PhoneOutlined,
+  RiseOutlined,
+  FundProjectionScreenOutlined,
+  CheckSquareOutlined,
+  TeamOutlined,
+  InfoCircleOutlined,
+  ArrowRightOutlined,
+  FilterOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import { apiClient } from '@/lib/api';
 import type { OperatorDashboard } from '@/types/api';
+import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
+
+const SPARKLINE_DATA: Record<string, Array<{ v: number }>> = {
+  calls: [{ v: 4 }, { v: 7 }, { v: 5 }, { v: 9 }, { v: 6 }, { v: 11 }, { v: 8 }],
+  leads: [{ v: 2 }, { v: 5 }, { v: 4 }, { v: 7 }, { v: 6 }, { v: 8 }, { v: 10 }],
+  deals: [{ v: 1 }, { v: 3 }, { v: 2 }, { v: 5 }, { v: 4 }, { v: 6 }, { v: 7 }],
+  tasks: [{ v: 3 }, { v: 6 }, { v: 8 }, { v: 5 }, { v: 9 }, { v: 7 }, { v: 10 }],
+};
+
+const statCards = [
+  {
+    key: 'calls',
+    label: 'Total Calls',
+    icon: <PhoneOutlined />,
+    href: '/calls',
+    iconBg: '#FFF0F0',
+    iconColor: '#E84040',
+    sparkColor: '#E84040',
+  },
+  {
+    key: 'leads',
+    label: 'Total Leads',
+    icon: <RiseOutlined />,
+    href: '/leads',
+    iconBg: '#F0FDF4',
+    iconColor: '#10B981',
+    sparkColor: '#10B981',
+  },
+  {
+    key: 'deals',
+    label: 'Total Deals',
+    icon: <FundProjectionScreenOutlined />,
+    href: '/deals',
+    iconBg: '#EFF6FF',
+    iconColor: '#2563EB',
+    sparkColor: '#2563EB',
+  },
+  {
+    key: 'tasks',
+    label: 'Completed Tasks',
+    icon: <CheckSquareOutlined />,
+    href: '/tasks',
+    iconBg: '#FFFBEB',
+    iconColor: '#F59E0B',
+    sparkColor: '#F59E0B',
+  },
+];
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -28,137 +86,307 @@ export default function DashboardPage() {
   }, [loadDashboard]);
 
   if (loading) {
-    return <div className="p-6">Loading dashboard...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Spin size="large" />
+      </div>
+    );
   }
 
-  // Use this_month data for display
   const stats = dashboard?.this_month;
+
+  const getStatValue = (key: string) => {
+    switch (key) {
+      case 'calls':
+        return {
+          value: stats?.calls.total_calls || 0,
+          sub: `${stats?.calls.answered_calls || 0} answered`,
+        };
+      case 'leads':
+        return {
+          value: stats?.leads.total_leads || 0,
+          sub: `${stats?.leads.converted_leads || 0} converted`,
+        };
+      case 'deals':
+        return {
+          value: stats?.deals.total_deals || 0,
+          sub: `$${stats?.deals.total_value?.toLocaleString() || 0}`,
+        };
+      case 'tasks':
+        return {
+          value: stats?.tasks.completed_tasks || 0,
+          sub: `of ${stats?.tasks.total_tasks || 0} total`,
+        };
+      default:
+        return { value: 0, sub: '' };
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">My Dashboard</h1>
-        <p className="text-gray-500">Your personal performance metrics</p>
+      {/* Tab bar row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['Overview', 'Calls', 'Leads'].map((tab, i) => (
+            <button
+              key={tab}
+              style={{
+                padding: '8px 16px',
+                fontSize: 14,
+                fontWeight: 500,
+                borderRadius: 8,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                background: i === 0 ? '#E84040' : 'transparent',
+                color: i === 0 ? '#ffffff' : '#6B7280',
+              }}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Button
+            icon={<PlusOutlined />}
+            style={{ borderColor: '#E5E7EB', color: '#374151', borderRadius: 8 }}
+          >
+            Add Widget
+          </Button>
+          <Button
+            icon={<FilterOutlined />}
+            style={{ borderColor: '#E5E7EB', color: '#374151', borderRadius: 8 }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="primary"
+            style={{ background: '#0F172A', borderColor: '#0F172A', borderRadius: 8 }}
+          >
+            Export
+          </Button>
+        </div>
       </div>
 
+      {/* Stat Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Calls</CardTitle>
-            <Phone className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.calls.total_calls || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.calls.answered_calls || 0} answered
-            </p>
-          </CardContent>
-        </Card>
+        {statCards.map((card) => {
+          const { value, sub } = getStatValue(card.key);
+          return (
+            <div
+              key={card.key}
+              className="crm-card p-5"
+              style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
+              {/* Card header: label + info icon */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span
+                  style={{ fontSize: 13, fontWeight: 500, color: '#6B7280' }}
+                >
+                  {card.label}
+                </span>
+                <InfoCircleOutlined
+                  style={{ color: '#D1D5DB', fontSize: 14 }}
+                />
+              </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Leads</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.leads.total_leads || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.leads.converted_leads || 0} converted
-            </p>
-          </CardContent>
-        </Card>
+              {/* Icon + value + badge row */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                {/* Icon in colored circle */}
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: card.iconBg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: card.iconColor,
+                    fontSize: 20,
+                    flexShrink: 0,
+                  }}
+                >
+                  {card.icon}
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {value}
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <span className="crm-badge-positive">+0%</span>
+                  </div>
+                </div>
+              </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deals</CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.deals.total_deals || 0}</div>
-            <p className="text-xs text-green-600">
-              ${stats?.deals.total_value?.toLocaleString() || 0}
-            </p>
-          </CardContent>
-        </Card>
+              {/* Mini sparkline */}
+              <div style={{ height: 44, marginLeft: -4, marginRight: -4 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={SPARKLINE_DATA[card.key] || SPARKLINE_DATA.calls}>
+                    <Area
+                      type="monotone"
+                      dataKey="v"
+                      stroke={card.sparkColor}
+                      fill={`${card.sparkColor}18`}
+                      strokeWidth={1.5}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        fontSize: 11,
+                        borderRadius: '8px',
+                        border: 'none',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                      }}
+                      formatter={(v: number) => [v, '']}
+                      labelFormatter={() => ''}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tasks</CardTitle>
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.tasks.completed_tasks || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              of {stats?.tasks.total_tasks || 0} total
-            </p>
-          </CardContent>
-        </Card>
+              {/* Sub text + See Details link */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderTop: '1px solid #F3F4F6',
+                  paddingTop: 10,
+                }}
+              >
+                <span style={{ fontSize: 12, color: '#9CA3AF' }}>{sub}</span>
+                <Link
+                  href={card.href}
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: '#E84040',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    textDecoration: 'none',
+                  }}
+                >
+                  See Details <ArrowRightOutlined style={{ fontSize: 10 }} />
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
+      {/* Bottom Section */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and activities</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Link href="/contacts">
-              <Badge className="w-full cursor-pointer justify-start p-3 text-sm" variant="outline">
-                <Users className="mr-2 h-4 w-4" />
-                Manage Contacts
-              </Badge>
-            </Link>
-            <Link href="/leads">
-              <Badge className="w-full cursor-pointer justify-start p-3 text-sm" variant="outline">
-                <TrendingUp className="mr-2 h-4 w-4" />
-                View Leads
-              </Badge>
-            </Link>
-            <Link href="/deals">
-              <Badge className="w-full cursor-pointer justify-start p-3 text-sm" variant="outline">
-                <Briefcase className="mr-2 h-4 w-4" />
-                Track Deals
-              </Badge>
-            </Link>
-            <Link href="/calls">
-              <Badge className="w-full cursor-pointer justify-start p-3 text-sm" variant="outline">
-                <Phone className="mr-2 h-4 w-4" />
-                Call History
-              </Badge>
-            </Link>
-          </CardContent>
-        </Card>
+        {/* Quick Actions */}
+        <div className="crm-card p-6">
+          <h3
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: '#0F172A',
+              margin: 0,
+              marginBottom: 4,
+            }}
+          >
+            Quick Actions
+          </h3>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 16 }}>
+            Common tasks and activities
+          </p>
+          <div className="space-y-2">
+            {[
+              { href: '/contacts', label: 'Manage Contacts', icon: <TeamOutlined /> },
+              { href: '/leads', label: 'View Leads', icon: <RiseOutlined /> },
+              { href: '/deals', label: 'Track Deals', icon: <FundProjectionScreenOutlined /> },
+              { href: '/calls', label: 'Call History', icon: <PhoneOutlined /> },
+            ].map((action) => (
+              <Link key={action.href} href={action.href}>
+                <Button
+                  type="default"
+                  block
+                  className="!h-11 !text-left !flex !items-center !justify-start !gap-2"
+                  icon={action.icon}
+                >
+                  {action.label}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance</CardTitle>
-            <CardDescription>Your productivity metrics</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Productivity Score</span>
-              <span className="text-lg font-bold text-blue-600">
-                {stats?.productivity_score || 0}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Total Activities</span>
-              <span className="font-semibold">{stats?.total_activities || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Call Answer Rate</span>
-              <span className="font-semibold">
-                {Math.round(stats?.calls.success_rate || 0)}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Lead Conversion</span>
-              <span className="font-semibold">
-                {Math.round(stats?.leads.conversion_rate || 0)}%
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Performance */}
+        <div className="crm-card p-6">
+          <h3
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: '#0F172A',
+              margin: 0,
+              marginBottom: 4,
+            }}
+          >
+            Performance
+          </h3>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 16 }}>
+            Your productivity metrics
+          </p>
+          <div className="space-y-4">
+            {[
+              {
+                label: 'Productivity Score',
+                value: stats?.productivity_score || 0,
+                highlight: true,
+              },
+              { label: 'Total Activities', value: stats?.total_activities || 0 },
+              {
+                label: 'Call Answer Rate',
+                value: `${Math.round(stats?.calls.success_rate || 0)}%`,
+              },
+              {
+                label: 'Lead Conversion',
+                value: `${Math.round(stats?.leads.conversion_rate || 0)}%`,
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex justify-between items-center">
+                <span style={{ fontSize: 13, color: '#6B7280' }}>{item.label}</span>
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontSize: item.highlight ? 18 : 14,
+                    color: item.highlight ? '#E84040' : '#0F172A',
+                  }}
+                >
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -8,8 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import { UserRole } from '@/types/api';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Alert } from 'antd';
 import Link from 'next/link';
 
 export default function InviteUserPage() {
@@ -50,11 +52,11 @@ export default function InviteUserPage() {
       <div className="flex items-center space-x-4">
         <Link href="/users">
           <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeftOutlined />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold">Invite User</h1>
+          <h1 className="text-3xl font-bold gradient-text">Invite User</h1>
           <p className="text-gray-500">Send an invitation to join your team</p>
         </div>
       </div>
@@ -67,9 +69,7 @@ export default function InviteUserPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
-                {error}
-              </div>
+              <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="grid grid-cols-2 gap-4">
@@ -135,11 +135,11 @@ export default function InviteUserPage() {
             </div>
 
             <div className="flex space-x-3">
-              <Button type="submit" disabled={isLoading}>
+              <Button htmlType="submit" disabled={isLoading}>
                 {isLoading ? 'Sending...' : 'Send Invitation'}
               </Button>
               <Link href="/users">
-                <Button type="button" variant="outline" disabled={isLoading}>
+                <Button htmlType="button" variant="outline" disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>

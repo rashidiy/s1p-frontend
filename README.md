@@ -1,4 +1,4 @@
-# SIPCRM - Multi-Tenant Customer Relationship Management
+# S1P - Multi-Tenant Customer Relationship Management
 
 A modern **multi-tenant CRM platform** built with Next.js 15, TypeScript, and Tailwind CSS. Features subdomain-based routing for owner and company portals, complete with Docker and Nginx support.
 
@@ -88,7 +88,7 @@ Perfect for production with full subdomain support:
 ```bash
 # 1. Clone repository
 git clone <repository-url>
-cd SIPCRM-Front
+cd s1p-frontend
 
 # 2. Configure environment
 cp .env.example .env
@@ -117,7 +117,7 @@ For local development without Docker:
 ```bash
 # 1. Clone and install
 git clone <repository-url>
-cd SIPCRM-Front
+cd s1p-frontend
 npm install
 
 # 2. Configure environment
@@ -142,7 +142,7 @@ npm run dev
 ## Project Structure
 
 ```
-SIPCRM-Front/
+s1p-frontend/
 ├── src/
 │   ├── app/                 # Next.js app directory
 │   │   ├── dashboard/       # Dashboard page

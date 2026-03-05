@@ -1,6 +1,6 @@
-# SIPtools CRM — Frontend Development Guide
+# S1P CRM — Frontend Development Guide
 
-This document provides everything needed to build a React frontend for the SIPtools multi-tenant call center CRM platform. It covers architecture, Docker setup, authentication flows, API specifications, data schemas, and UX guidance.
+This document provides everything needed to build a React frontend for the S1P multi-tenant call center CRM platform. It covers architecture, Docker setup, authentication flows, API specifications, data schemas, and UX guidance.
 
 ---
 
@@ -20,7 +20,7 @@ This document provides everything needed to build a React frontend for the SIPto
 
 ## 1. Architecture Overview
 
-SIPtools is a **multi-tenant call center CRM** with a three-level hierarchy:
+S1P is a **multi-tenant call center CRM** with a three-level hierarchy:
 
 ```
 Owner (platform admin)
@@ -60,7 +60,7 @@ services:
   # Nginx reverse proxy for subdomain routing
   nginx:
     image: nginx:alpine
-    container_name: siptools-frontend-proxy
+    container_name: s1p-frontend-proxy
     ports:
       - "3000:80"
     volumes:
@@ -69,40 +69,40 @@ services:
       - owner-frontend
       - company-frontend
     networks:
-      - siptools-network
+      - s1p-network
 
   # Owner panel frontend
   owner-frontend:
     build:
       context: ./frontend/owner
       dockerfile: Dockerfile
-    container_name: siptools-owner-frontend
+    container_name: s1p-owner-frontend
     environment:
       REACT_APP_API_URL: http://localhost:8000
       REACT_APP_APP_TYPE: owner
     volumes:
       - ./frontend/owner/src:/app/src
     networks:
-      - siptools-network
+      - s1p-network
 
   # Company panel frontend
   company-frontend:
     build:
       context: ./frontend/company
       dockerfile: Dockerfile
-    container_name: siptools-company-frontend
+    container_name: s1p-company-frontend
     environment:
       REACT_APP_API_URL: http://localhost:8000
       REACT_APP_APP_TYPE: company
     volumes:
       - ./frontend/company/src:/app/src
     networks:
-      - siptools-network
+      - s1p-network
 
 networks:
-  siptools-network:
+  s1p-network:
     external: true
-    name: siptools_siptools-network
+    name: s1p_s1p-network
 ```
 
 ### Nginx Configuration
@@ -333,7 +333,7 @@ Full OpenAPI 3.1.0 specification for the Company API (`/api/v1/auth/*` + `/api/v
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "SIPtools - Company API",
+    "title": "S1P - Company API",
     "version": "0.1.0"
   },
   "paths": {
@@ -10041,7 +10041,7 @@ Full OpenAPI 3.1.0 specification for the Owner API (`/api/v1/owner/*`):
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "SIPtools - Owner API",
+    "title": "S1P - Owner API",
     "version": "0.1.0"
   },
   "paths": {

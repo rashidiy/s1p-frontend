@@ -1,12 +1,13 @@
 version: '3.8'
 
 services:
-  # Next.js Application
+  # Next.js Application (Production)
   nextjs:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sipcrm-frontend
+    profiles: [prod]
+    container_name: s1p-frontend
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -16,12 +17,13 @@ services:
     expose:
       - "3000"
     networks:
-      - sipcrm-network
+      - s1p-network
 
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy (Production)
   nginx:
     image: nginx:alpine
-    container_name: sipcrm-nginx
+    profiles: [prod]
+    container_name: s1p-nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -32,10 +34,28 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/logs:/var/log/nginx
     networks:
-      - sipcrm-network
+      - s1p-network
     depends_on:
       - nextjs
 
+  # Next.js Application (Development)
+  nextjs-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    profiles: [dev]
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 networks:
-  sipcrm-network:
+  s1p-network:
     driver: bridge

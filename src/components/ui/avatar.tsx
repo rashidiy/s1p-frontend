@@ -1,48 +1,41 @@
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+'use client';
 
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+import { Avatar as AntdAvatar } from 'antd';
+import { cn } from '@/lib/utils';
 
-const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-      className
-    )}
-    {...props}
-  />
-))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
+  src?: string;
+}
 
-const AvatarImage = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
-    {...props}
-  />
-))
-AvatarImage.displayName = AvatarPrimitive.Image.displayName
+const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
+  ({ className, children, src, ...props }, ref) => (
+    <AntdAvatar
+      ref={ref as any}
+      src={src}
+      size={40}
+      className={cn(className)}
+      style={{ backgroundColor: '#6366f1' }}
+      {...(props as any)}
+    >
+      {children}
+    </AntdAvatar>
+  )
+);
+Avatar.displayName = 'Avatar';
 
-const AvatarFallback = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
-      className
-    )}
-    {...props}
-  />
-))
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
+const AvatarImage = React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(
+  (_props, _ref) => {
+    return null;
+  }
+);
+AvatarImage.displayName = 'AvatarImage';
 
-export { Avatar, AvatarImage, AvatarFallback }
+const AvatarFallback = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
+  ({ children }, _ref) => {
+    return <>{children}</>;
+  }
+);
+AvatarFallback.displayName = 'AvatarFallback';
+
+export { Avatar, AvatarImage, AvatarFallback };

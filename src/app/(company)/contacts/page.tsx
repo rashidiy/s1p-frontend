@@ -1,13 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { User, Search, Plus, Mail, Phone, Briefcase } from 'lucide-react';
+import { Input, Pagination, Spin, Button, Tag } from 'antd';
+import {
+  UserOutlined,
+  PlusOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  BankOutlined,
+} from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { ContactResponse, PaginatedResponse } from '@/types/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 
 export default function ContactsPage() {
@@ -36,130 +40,86 @@ export default function ContactsPage() {
   };
 
   if (loading) {
-    return <div className="p-6">Loading contacts...</div>;
+    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Contacts</h1>
+          <h1 className="text-3xl font-bold gradient-text">Contacts</h1>
           <p className="text-gray-500">Manage your contact database</p>
         </div>
         <Link href="/contacts/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Contact
-          </Button>
+          <Button type="primary" icon={<PlusOutlined />}>Add Contact</Button>
         </Link>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search contacts..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="pl-10"
-          />
-        </div>
-      </div>
+      <Input.Search
+        placeholder="Search contacts..."
+        value={search}
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        allowClear
+        size="large"
+        className="max-w-lg"
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {data?.items.map((contact) => (
-          <Card key={contact.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                    <User className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">
-                      {contact.first_name} {contact.last_name}
-                    </CardTitle>
-                    {contact.company_name && (
-                      <CardDescription className="flex items-center">
-                        <Briefcase className="mr-1 h-3 w-3" />
-                        {contact.company_name}
-                      </CardDescription>
-                    )}
-                  </div>
-                </div>
+          <div key={contact.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-500 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-crm-indigo-100">
+                <UserOutlined className="text-crm-indigo-600" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {contact.email && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Mail className="mr-2 h-4 w-4" />
-                    <span className="truncate">{contact.email}</span>
-                  </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-gray-900 truncate">
+                  {contact.first_name} {contact.last_name}
+                </h3>
+                {contact.company_name && (
+                  <p className="text-sm text-gray-500 flex items-center gap-1 truncate">
+                    <BankOutlined className="text-xs" /> {contact.company_name}
+                  </p>
                 )}
-                {contact.phone && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Phone className="mr-2 h-4 w-4" />
-                    <span>{contact.phone}</span>
-                  </div>
-                )}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {(contact.total_leads ?? 0) > 0 && (
-                    <Badge variant="secondary">{contact.total_leads} Leads</Badge>
-                  )}
-                  {(contact.total_deals ?? 0) > 0 && (
-                    <Badge variant="secondary">{contact.total_deals} Deals</Badge>
-                  )}
-                  {(contact.total_calls ?? 0) > 0 && (
-                    <Badge variant="outline">{contact.total_calls} Calls</Badge>
-                  )}
-                </div>
-                <Link href={`/contacts/${contact.id}`}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    View Details
-                  </Button>
-                </Link>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="space-y-2">
+              {contact.email && (
+                <div className="flex items-center text-sm text-gray-600 gap-2">
+                  <MailOutlined /> <span className="truncate">{contact.email}</span>
+                </div>
+              )}
+              {contact.phone && (
+                <div className="flex items-center text-sm text-gray-600 gap-2">
+                  <PhoneOutlined /> <span>{contact.phone}</span>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-1 pt-1">
+                {(contact.total_leads ?? 0) > 0 && <Tag color="blue">{contact.total_leads} Leads</Tag>}
+                {(contact.total_deals ?? 0) > 0 && <Tag color="green">{contact.total_deals} Deals</Tag>}
+                {(contact.total_calls ?? 0) > 0 && <Tag>{contact.total_calls} Calls</Tag>}
+              </div>
+              <Link href={`/contacts/${contact.id}`}>
+                <Button block className="!mt-3">View Details</Button>
+              </Link>
+            </div>
+          </div>
         ))}
       </div>
 
       {data && data.total_pages > 1 && (
-        <div className="flex items-center justify-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600">
-            Page {page} of {data.total_pages}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.min(data.total_pages, p + 1))}
-            disabled={page === data.total_pages}
-          >
-            Next
-          </Button>
+        <div className="flex justify-center">
+          <Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} />
         </div>
       )}
 
       {data?.items.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <User className="h-12 w-12 text-gray-400" />
-            <p className="mt-4 text-lg font-medium">No contacts found</p>
-            <p className="text-sm text-gray-500">
-              {search ? 'Try adjusting your search' : 'Get started by adding a contact'}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="glass-card py-12 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={150} height={150} />
+          <p className="mt-4 text-lg font-medium text-gray-700">No contacts found</p>
+          <p className="text-sm text-gray-500">
+            {search ? 'Try adjusting your search' : 'Get started by adding a contact'}
+          </p>
+        </div>
       )}
     </div>
   );

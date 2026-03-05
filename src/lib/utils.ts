@@ -23,6 +23,17 @@ export function formatDateTime(date: string | Date): string {
   }).format(new Date(date))
 }
 
+export function getErrorMessage(err: any, fallback: string = 'Something went wrong'): string {
+  const detail = err?.response?.data?.detail;
+  if (Array.isArray(detail)) {
+    return detail.map((e: any) => e.msg || JSON.stringify(e)).join(', ');
+  }
+  if (typeof detail === 'string') {
+    return detail;
+  }
+  return fallback;
+}
+
 export function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor((seconds % 3600) / 60)

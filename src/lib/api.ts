@@ -101,18 +101,11 @@ class ApiClient {
   // COMPANY USER AUTH
   // ============================================================================
 
-  async register(data: API.RegisterRequest) {
-    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/register', data);
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'company_user');
-    }
-    return response.data;
-  }
-
   async login(data: API.LoginRequest) {
     const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/login', data);
+    if (response.data.must_change_password && response.data.temporary_token) {
+      return response.data;
+    }
     this.setToken(response.data.credentials.access);
     if (typeof window !== 'undefined') {
       localStorage.setItem('refresh_token', response.data.credentials.refresh);
@@ -125,12 +118,32 @@ class ApiClient {
     return this.client.post('/api/v1/auth/refresh', data);
   }
 
-  async sendVerificationCode() {
-    return this.client.get('/api/v1/auth/send_verification');
+  async setPassword(data: API.SetPasswordRequest) {
+    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/set-password', data);
+    this.setToken(response.data.credentials.access);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('refresh_token', response.data.credentials.refresh);
+      this.saveUserData(response.data, 'company_user');
+    }
+    return response.data;
   }
 
-  async confirmVerification() {
-    return this.client.get('/api/v1/auth/confirm_verification');
+  async forgotPassword(data: API.ForgotPasswordRequest) {
+    return this.client.post('/api/v1/auth/forgot-password', data);
+  }
+
+  async resetPassword(data: API.ResetPasswordRequest) {
+    return this.client.post('/api/v1/auth/reset-password', data);
+  }
+
+  async getMyProfile() {
+    const response = await this.client.get<API.UserResponse>('/api/v1/company/users/me');
+    return response.data;
+  }
+
+  async updateMyProfile(data: API.ProfileUpdateRequest) {
+    const response = await this.client.put<API.UserResponse>('/api/v1/company/users/me', data);
+    return response.data;
   }
 
   logout() {
@@ -141,18 +154,11 @@ class ApiClient {
   // OWNER AUTH
   // ============================================================================
 
-  async ownerRegister(data: API.OwnerRegisterRequest) {
-    const response = await this.client.post<API.OwnerWithCredentials>('/api/v1/owner/auth/register', data);
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'owner');
-    }
-    return response.data;
-  }
-
   async ownerLogin(data: API.OwnerLoginRequest) {
     const response = await this.client.post<API.OwnerWithCredentials>('/api/v1/owner/auth/login', data);
+    if (response.data.must_change_password && response.data.temporary_token) {
+      return response.data;
+    }
     this.setToken(response.data.credentials.access);
     if (typeof window !== 'undefined') {
       localStorage.setItem('refresh_token', response.data.credentials.refresh);
@@ -164,6 +170,29 @@ class ApiClient {
   async getOwnerProfile() {
     const response = await this.client.get<API.OwnerResponse>('/api/v1/owner/auth/me');
     return response.data;
+  }
+
+  async updateOwnerProfile(data: API.ProfileUpdateRequest) {
+    const response = await this.client.put<API.OwnerResponse>('/api/v1/owner/auth/me', data);
+    return response.data;
+  }
+
+  async ownerSetPassword(data: API.SetPasswordRequest) {
+    const response = await this.client.post<API.OwnerWithCredentials>('/api/v1/owner/auth/set-password', data);
+    this.setToken(response.data.credentials.access);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('refresh_token', response.data.credentials.refresh);
+      this.saveUserData(response.data, 'owner');
+    }
+    return response.data;
+  }
+
+  async ownerForgotPassword(data: API.ForgotPasswordRequest) {
+    return this.client.post('/api/v1/owner/auth/forgot-password', data);
+  }
+
+  async ownerResetPassword(data: API.ResetPasswordRequest) {
+    return this.client.post('/api/v1/owner/auth/reset-password', data);
   }
 
   // ============================================================================
@@ -203,6 +232,49 @@ class ApiClient {
 
   async deactivateCompany(companyId: string) {
     const response = await this.client.post<API.CompanyResponse>(`/api/v1/owner/companies/${companyId}/deactivate`);
+    return response.data;
+  }
+
+  // ============================================================================
+  // OWNER - INVITE ADMIN
+  // ============================================================================
+
+  async inviteAdmin(companyId: string, data: API.InviteAdminRequest) {
+    const response = await this.client.post<API.UserResponse>(`/api/v1/owner/companies/${companyId}/invite-admin`, data);
+    return response.data;
+  }
+
+  // ============================================================================
+  // OWNER - CONTRACTS
+  // ============================================================================
+
+  async createContract(data: API.ContractCreateRequest) {
+    const response = await this.client.post<API.ContractResponse>('/api/v1/owner/contracts/', data);
+    return response.data;
+  }
+
+  async getContracts(params?: API.ContractFilters) {
+    const response = await this.client.get<API.PaginatedResponse<API.ContractResponse>>('/api/v1/owner/contracts/', { params });
+    return response.data;
+  }
+
+  async getContract(contractId: string) {
+    const response = await this.client.get<API.ContractDetailResponse>(`/api/v1/owner/contracts/${contractId}`);
+    return response.data;
+  }
+
+  async updateContract(contractId: string, data: API.ContractUpdateRequest) {
+    const response = await this.client.put<API.ContractResponse>(`/api/v1/owner/contracts/${contractId}`, data);
+    return response.data;
+  }
+
+  async renewContract(contractId: string, data: API.ContractRenewRequest) {
+    const response = await this.client.post<API.ContractResponse>(`/api/v1/owner/contracts/${contractId}/renew`, data);
+    return response.data;
+  }
+
+  async cancelContract(contractId: string) {
+    const response = await this.client.post<API.ContractResponse>(`/api/v1/owner/contracts/${contractId}/cancel`);
     return response.data;
   }
 
@@ -264,12 +336,46 @@ class ApiClient {
     return response.data;
   }
 
-  async changePassword(data: API.PasswordChangeRequest) {
-    return this.client.post('/api/v1/company/users/me/change-password', data);
+  // ============================================================================
+  // COMPANY - CONTRACT STATUS
+  // ============================================================================
+
+  async getContractStatus() {
+    const response = await this.client.get<API.ContractStatusResponse>('/api/v1/company/contract/status');
+    return response.data;
   }
 
-  async resetPassword(data: API.PasswordResetRequest) {
-    return this.client.post('/api/v1/company/users/reset-password', data);
+  // ============================================================================
+  // COMPANY - PERMISSION GROUPS
+  // ============================================================================
+
+  async getPermissionGroups() {
+    const response = await this.client.get<API.PermissionGroupListResponse>('/api/v1/company/permission-groups/');
+    return response.data;
+  }
+
+  async createPermissionGroup(data: API.PermissionGroupCreateRequest) {
+    const response = await this.client.post<API.PermissionGroupResponse>('/api/v1/company/permission-groups/', data);
+    return response.data;
+  }
+
+  async getPermissionGroup(groupId: string) {
+    const response = await this.client.get<API.PermissionGroupResponse>(`/api/v1/company/permission-groups/${groupId}`);
+    return response.data;
+  }
+
+  async updatePermissionGroup(groupId: string, data: API.PermissionGroupUpdateRequest) {
+    const response = await this.client.put<API.PermissionGroupResponse>(`/api/v1/company/permission-groups/${groupId}`, data);
+    return response.data;
+  }
+
+  async deletePermissionGroup(groupId: string) {
+    return this.client.delete(`/api/v1/company/permission-groups/${groupId}`);
+  }
+
+  async getAvailablePermissions() {
+    const response = await this.client.get<API.AvailablePermission[]>('/api/v1/company/permission-groups/available-permissions');
+    return response.data;
   }
 
   // ============================================================================
@@ -291,9 +397,12 @@ class ApiClient {
     return response.data;
   }
 
-  async getCallRecording(callId: string) {
-    const response = await this.client.get<API.CallRecordingURL>(`/api/v1/company/calls/${callId}/recording`);
-    return response.data;
+  async getCallRecording(callId: string): Promise<string> {
+    // Backend streams audio via StreamingResponse — fetch as blob and return an object URL
+    const response = await this.client.get(`/api/v1/company/recordings/${callId}`, {
+      responseType: 'blob',
+    });
+    return URL.createObjectURL(response.data);
   }
 
   async setCallOutcome(callId: string, data: API.CallOutcomeUpdate) {
@@ -316,6 +425,24 @@ class ApiClient {
 
   async getAutoLinkSuggestions(phoneNumber: string) {
     const response = await this.client.get(`/api/v1/company/calls/auto-link-suggestions/${phoneNumber}`);
+    return response.data;
+  }
+
+  async getSipuniList(): Promise<API.SipuniResponse[]> {
+    const response = await this.client.get('/api/v1/company/calls/sipuni/list');
+    return response.data;
+  }
+
+  async getCallStatistics(params?: {
+    sipuni_id?: string;
+    represent?: string;
+    date_from?: string;
+    date_to?: string;
+    operator_id?: string;
+    direction?: string;
+    outcome?: string;
+  }): Promise<any> {
+    const response = await this.client.get('/api/v1/company/calls/statistics', { params });
     return response.data;
   }
 
@@ -562,49 +689,6 @@ class ApiClient {
     return this.client.delete('/api/v1/company/analytics/cache');
   }
 
-  // ============================================================================
-  // SIPUNI INTEGRATION
-  // ============================================================================
-
-  async getSipuniList() {
-    const response = await this.client.get<API.SipuniResponse[]>('/api/v1/sipuni/');
-    return response.data;
-  }
-
-  async makeInternalCall(data: API.CallNumberRequest) {
-    const response = await this.client.post('/api/v1/sipuni/call/number', data);
-    return response.data;
-  }
-
-  async makeExternalCall(data: API.ExternalCallRequest) {
-    const response = await this.client.post('/api/v1/sipuni/call/external', data);
-    return response.data;
-  }
-
-  async makeCallTree(data: API.CallTreeRequest) {
-    const response = await this.client.post('/api/v1/sipuni/call/tree', data);
-    return response.data;
-  }
-
-  async createSipuni(data: API.SipuniCreateRequest) {
-    const response = await this.client.post<API.SipuniResponse>('/api/v1/sipuni/', data);
-    return response.data;
-  }
-
-  async updateSipuni(data: API.SipuniUpdateRequest) {
-    const { id, ...updateData } = data;
-    const response = await this.client.put<API.SipuniResponse>(`/api/v1/sipuni/${id}`, updateData);
-    return response.data;
-  }
-
-  async deleteSipuni(id: number) {
-    return this.client.delete(`/api/v1/sipuni/${id}`);
-  }
-
-  async regenerateSipuniToken(id: string) {
-    const response = await this.client.post<API.SipuniResponse>(`/api/v1/sipuni/${id}/regenerate-token`);
-    return response.data;
-  }
 }
 
 export const apiClient = new ApiClient();

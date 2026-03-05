@@ -1,10 +1,19 @@
 // ============================================================================
-// COMPREHENSIVE API TYPES - Multi-Tenant CRM Platform
-// Generated from OpenAPI 3.1.0 specification
+// API TYPES - Re-exported from auto-generated OpenAPI types + frontend-only types
+//
+// Generated types come from: src/types/generated.ts (via openapi-typescript)
+// To regenerate: npm run sync:api (requires backend running on localhost:8000)
 // ============================================================================
 
+import type { components } from './generated';
+
 // ============================================================================
-// ENUMS
+// HELPER: Extract schema type from generated components
+// ============================================================================
+type Schema<T extends keyof components['schemas']> = components['schemas'][T];
+
+// ============================================================================
+// ENUMS (generated as union types — keep TS enums for backward compatibility)
 // ============================================================================
 
 export enum ProviderEnum {
@@ -34,22 +43,140 @@ export enum UserRole {
   COMPANY_OPERATOR = 'company_operator',
 }
 
-export type RepresentEnum = 'day' | 'week' | 'month' | 'year';
-
-// ============================================================================
-// AUTH & TOKENS
-// ============================================================================
-
-export interface BearerToken {
-  type: string;
-  access: string;
-  refresh: string;
+export enum ContractStatusEnum {
+  ACTIVE = 'active',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+  PENDING = 'pending',
 }
 
-export interface LoginRequest {
-  email: string;
-  password: string;
+export enum BillingPeriodEnum {
+  MONTHLY = 'monthly',
+  QUARTERLY = 'quarterly',
+  YEARLY = 'yearly',
 }
+
+export enum PaymentStatusEnum {
+  PAID = 'paid',
+  PENDING = 'pending',
+  OVERDUE = 'overdue',
+  FAILED = 'failed',
+}
+
+// ============================================================================
+// RE-EXPORTED GENERATED TYPES (from OpenAPI spec)
+// ============================================================================
+
+// Auth & Tokens
+export type BearerToken = Schema<'BearerToken'>;
+export type LoginRequest = Schema<'LoginRequest'>;
+// Extended: backend returns temporary_token for must_change_password flow but it's not in the OpenAPI spec
+export type AuthorizedResponse = Schema<'AuthorizedResponse'> & {
+  temporary_token?: string;
+};
+export type SetPasswordRequest = Schema<'SetPasswordRequest'>;
+export type ForgotPasswordRequest = Schema<'ForgotPasswordRequest'>;
+export type ResetPasswordRequest = Schema<'ResetPasswordRequest'>;
+export type ProfileUpdateRequest = Schema<'ProfileUpdateRequest'>;
+export type InviteAdminRequest = Schema<'InviteAdminRequest'>;
+export type RefreshTokenRequest = Schema<'RefreshTokenRequest'>;
+
+// Owner
+export type OwnerLoginRequest = Schema<'OwnerLoginRequest'>;
+export type OwnerResponse = Schema<'OwnerResponse'>;
+// Extended: backend returns credentials as BearerToken + temporary_token, but OpenAPI spec types credentials as generic dict
+export type OwnerWithCredentials = Omit<Schema<'OwnerWithCredentials'>, 'credentials'> & {
+  credentials: BearerToken;
+  temporary_token?: string;
+};
+
+// Company
+export type CompanyCreateRequest = Schema<'CompanyCreateRequest'>;
+export type CompanyResponse = Schema<'CompanyResponse'>;
+export type CompanyDetailResponse = Schema<'CompanyDetailResponse'>;
+export type CompanyUpdateRequest = Schema<'CompanyUpdateRequest'>;
+
+// Users
+export type UserInviteRequest = Schema<'UserInviteRequest'>;
+export type UserResponse = Schema<'UserResponse'>;
+export type UserDetailResponse = Schema<'UserDetailResponse'>;
+export type UserUpdateRequest = Schema<'UserUpdateRequest'>;
+export type UserListResponse = Schema<'UserListResponse'>;
+
+// Calls
+export type CallRequest = Schema<'CallRequest'>;
+export type CallResponse = Schema<'CallResponse'>;
+export type CallEventResponse = Schema<'CallEventResponse'>;
+export type CallOutcomeUpdate = Schema<'CallOutcomeUpdate'>;
+export type CallLinkRequest = Schema<'CallLinkRequest'>;
+export type CallNumberRequest = Schema<'CallNumberRequest'>;
+export type CallTreeRequest = Schema<'CallTreeRequest'>;
+
+// Contacts
+export type ContactCreateRequest = Schema<'ContactCreateRequest'>;
+export type ContactResponse = Schema<'ContactResponse'>;
+export type ContactUpdateRequest = Schema<'ContactUpdateRequest'>;
+
+// Leads
+export type LeadCreateRequest = Schema<'LeadCreateRequest'>;
+export type LeadResponse = Schema<'LeadResponse'>;
+export type LeadUpdateRequest = Schema<'LeadUpdateRequest'>;
+
+// Deals
+export type DealCreateRequest = Schema<'DealCreateRequest'>;
+export type DealResponse = Schema<'DealResponse'>;
+export type DealUpdateRequest = Schema<'DealUpdateRequest'>;
+
+// Tasks
+export type TaskCreateRequest = Schema<'TaskCreateRequest'>;
+export type TaskResponse = Schema<'TaskResponse'>;
+export type TaskUpdateRequest = Schema<'TaskUpdateRequest'>;
+
+// Notes
+export type NoteCreateRequest = Schema<'NoteCreateRequest'>;
+export type NoteResponse = Schema<'NoteResponse'>;
+export type NoteUpdateRequest = Schema<'NoteUpdateRequest'>;
+
+// Analytics
+export type CallStats = Schema<'CallStats'>;
+export type LeadStats = Schema<'LeadStats'>;
+export type DealStats = Schema<'DealStats'>;
+export type TaskStats = Schema<'TaskStats'>;
+export type OperatorAnalytics = Schema<'OperatorAnalytics'>;
+export type OperatorPerformance = Schema<'OperatorPerformance'>;
+export type TeamAnalytics = Schema<'TeamAnalytics'>;
+export type ConversionFunnel = Schema<'ConversionFunnel'>;
+export type PipelineHealth = Schema<'PipelineHealth'>;
+export type OperatorDashboard = Schema<'OperatorDashboard'>;
+export type AdminDashboard = Schema<'AdminDashboard'>;
+export type CompanyPerformance = Schema<'CompanyPerformance'>;
+export type PlatformAnalytics = Schema<'PlatformAnalytics'>;
+export type OwnerDashboard = Schema<'OwnerDashboard'>;
+
+// Contracts
+export type ContractCreateRequest = Schema<'ContractCreateRequest'>;
+export type ContractResponse = Schema<'ContractResponse'>;
+export type ContractDetailResponse = Schema<'ContractDetailResponse'>;
+export type ContractUpdateRequest = Schema<'ContractUpdateRequest'>;
+export type ContractRenewRequest = Schema<'ContractRenewRequest'>;
+export type ContractStatusResponse = Schema<'ContractStatusResponse'>;
+
+// Permission Groups
+export type PermissionGroupCreateRequest = Schema<'PermissionGroupCreateRequest'>;
+export type PermissionGroupResponse = Schema<'PermissionGroupResponse'>;
+export type PermissionGroupUpdateRequest = Schema<'PermissionGroupUpdateRequest'>;
+export type PermissionGroupListResponse = Schema<'PermissionGroupListResponse'>;
+
+// Validation
+export type ValidationError = Schema<'ValidationError'>;
+export type HTTPValidationError = Schema<'HTTPValidationError'>;
+
+// Pagination (generated)
+export type PaginatedResponse<T = unknown> = Omit<Schema<'PaginatedResponse'>, 'items'> & { items: T[] };
+
+// ============================================================================
+// FRONTEND-ONLY TYPES (not in OpenAPI spec)
+// ============================================================================
 
 export interface RegisterRequest {
   first_name: string;
@@ -57,23 +184,6 @@ export interface RegisterRequest {
   email: string;
   password: string;
 }
-
-export interface AuthorizedResponse {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  is_active: boolean;
-  credentials: BearerToken;
-}
-
-export interface RefreshTokenRequest {
-  refresh_token: string;
-}
-
-// ============================================================================
-// OWNER
-// ============================================================================
 
 export interface OwnerRegisterRequest {
   email: string;
@@ -83,585 +193,20 @@ export interface OwnerRegisterRequest {
   password: string;
 }
 
-export interface OwnerLoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface OwnerResponse {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name?: string | null;
-  phone?: string | null;
-  is_active: boolean;
-  email_verified: boolean;
-  created_at: string;
-}
-
-export interface OwnerWithCredentials extends OwnerResponse {
-  credentials: Record<string, any>;
-}
-
-// ============================================================================
-// COMPANY
-// ============================================================================
-
-export interface CompanyCreateRequest {
-  name: string;
-  subdomain?: string | null;
-  provider_type: string;
-  provider_config: Record<string, any>;
-  settings?: Record<string, any> | null;
-}
-
-export interface CompanyResponse {
-  id: string;
-  name: string;
-  provider_type: string;
-  is_active: boolean;
-  webhook_url?: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CompanyDetailResponse extends CompanyResponse {
-  provider_config: Record<string, any>;
-  settings?: Record<string, any> | null;
-  webhook_token: string;
-}
-
-export interface CompanyUpdateRequest {
-  name?: string | null;
-  settings?: Record<string, any> | null;
-  is_active?: boolean | null;
-}
-
-// ============================================================================
-// USERS
-// ============================================================================
-
-export interface UserInviteRequest {
-  email: string;
-  first_name: string;
-  last_name?: string | null;
-  phone?: string | null;
-  role?: string;
-  permissions?: string[] | null;
-}
-
-export interface UserResponse {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name?: string | null;
-  phone?: string | null;
-  company_id?: string | null;
-  role: string;
-  permissions: string[];
-  is_active: boolean;
-  is_suspended: boolean;
-  email_verified: boolean;
-  language: string;
-  created_at: string;
-}
-
-export interface UserDetailResponse extends UserResponse {
-  total_calls?: number | null;
-  total_leads?: number | null;
-  total_deals?: number | null;
-  total_tasks?: number | null;
-}
-
-export interface UserUpdateRequest {
-  first_name?: string | null;
-  last_name?: string | null;
-  phone?: string | null;
-  is_active?: boolean | null;
-  is_suspended?: boolean | null;
-  role?: string | null;
-  permissions?: string[] | null;
-}
-
-export interface UserListResponse {
-  users: UserResponse[];
-  total: number;
-  page: number;
-  page_size: number;
-}
-
-export interface PasswordChangeRequest {
-  old_password: string;
-  new_password: string;
-}
-
-export interface PasswordResetRequest {
-  email: string;
-  temporary_password: string;
-  new_password: string;
-}
-
-// ============================================================================
-// CALLS
-// ============================================================================
-
-export interface CallRequest {
-  phone_1: string;
-  phone_2: string;
-  operator_id?: string | null;
-  order_id?: string | null;
-  utm_source?: string | null;
-  utm_medium?: string | null;
-  utm_campaign?: string | null;
-}
-
-export interface CallResponse {
-  success: boolean;
-  call_id: string;
-  message?: string | null;
-  error?: string | null;
-}
-
-export interface CallEventResponse {
-  id: string;
-  company_id: string;
-  provider_type: ProviderEnum;
-  provider_call_id: string;
-  phone_1?: string | null;
-  phone_2?: string | null;
-  operator_id?: string | null;
-  direction?: CallDirectionEnum | null;
-  state?: CallStatusEnum | null;
-  attempts: number;
-  waiting_sec?: number | null;
-  billing_sec?: number | null;
-  record_url?: string | null;
-  call_start_timestamp?: number | null;
-  call_end_timestamp?: number | null;
-  contact_id?: string | null;
-  lead_id?: string | null;
-  deal_id?: string | null;
-  outcome?: string | null;
-  disposition_notes?: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type RepresentEnum = 'day' | 'week' | 'month' | 'year';
 
 export interface CallRecordingURL {
   url: string;
   expires_in: number;
 }
 
-export interface CallOutcomeUpdate {
-  outcome: string;
-  disposition_notes?: string | null;
+export interface AvailablePermission {
+  key: string;
+  label: string;
+  category: string;
 }
 
-export interface CallLinkRequest {
-  contact_id?: string | null;
-  lead_id?: string | null;
-  deal_id?: string | null;
-}
-
-// ============================================================================
-// CONTACTS
-// ============================================================================
-
-export interface ContactCreateRequest {
-  first_name: string;
-  last_name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  company_name?: string | null;
-  position?: string | null;
-  source?: string | null;
-  custom_fields?: Record<string, any> | null;
-  tags?: string[] | null;
-}
-
-export interface ContactResponse {
-  id: string;
-  company_id: string;
-  first_name: string;
-  last_name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  company_name?: string | null;
-  position?: string | null;
-  source?: string | null;
-  custom_fields?: Record<string, any> | null;
-  created_by: string;
-  assigned_to?: string | null;
-  tags?: string[] | null;
-  created_at: string;
-  updated_at: string;
-  total_leads?: number;
-  total_deals?: number;
-  total_calls?: number;
-}
-
-export interface ContactUpdateRequest {
-  first_name?: string | null;
-  last_name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  company_name?: string | null;
-  position?: string | null;
-  source?: string | null;
-  custom_fields?: Record<string, any> | null;
-  tags?: string[] | null;
-}
-
-// ============================================================================
-// LEADS
-// ============================================================================
-
-export interface LeadCreateRequest {
-  title: string;
-  contact_id?: string | null;
-  source?: string | null;
-  description?: string | null;
-  estimated_value?: number | null;
-  currency?: string | null;
-  custom_fields?: Record<string, any> | null;
-  assigned_to?: string | null;
-  tags?: string[] | null;
-}
-
-export interface LeadResponse {
-  id: string;
-  company_id: string;
-  title: string;
-  contact_id?: string | null;
-  source?: string | null;
-  description?: string | null;
-  estimated_value?: number | null;
-  currency?: string | null;
-  custom_fields?: Record<string, any> | null;
-  status?: string | null;
-  pipeline_stage?: string | null;
-  assigned_to?: string | null;
-  tags?: string[] | null;
-  created_at: string;
-  updated_at: string;
-  contact_name?: string | null;
-  assigned_to_name?: string | null;
-}
-
-export interface LeadUpdateRequest {
-  title?: string | null;
-  contact_id?: string | null;
-  assigned_to?: string | null;
-  source?: string | null;
-  description?: string | null;
-  estimated_value?: number | null;
-  currency?: string | null;
-  custom_fields?: Record<string, any> | null;
-  tags?: string[] | null;
-}
-
-// ============================================================================
-// DEALS
-// ============================================================================
-
-export interface DealCreateRequest {
-  title: string;
-  contact_id?: string | null;
-  lead_id?: string | null;
-  amount: number;
-  currency?: string | null;
-  probability?: number | null;
-  expected_close_date?: string | null;
-  description?: string | null;
-  custom_fields?: Record<string, any> | null;
-  assigned_to?: string | null;
-  tags?: string[] | null;
-}
-
-export interface DealResponse {
-  id: string;
-  company_id: string;
-  title: string;
-  contact_id?: string | null;
-  lead_id?: string | null;
-  amount: number;
-  currency?: string | null;
-  probability?: number | null;
-  expected_close_date?: string | null;
-  description?: string | null;
-  custom_fields?: Record<string, any> | null;
-  stage?: string | null;
-  assigned_to?: string | null;
-  tags?: string[] | null;
-  closed_date?: string | null;
-  created_at: string;
-  updated_at: string;
-  contact_name?: string | null;
-  assigned_to_name?: string | null;
-  weighted_value?: number;
-}
-
-export interface DealUpdateRequest {
-  title?: string | null;
-  contact_id?: string | null;
-  lead_id?: string | null;
-  assigned_to?: string | null;
-  amount?: number | null;
-  currency?: string | null;
-  probability?: number | null;
-  expected_close_date?: string | null;
-  description?: string | null;
-  custom_fields?: Record<string, any> | null;
-  tags?: string[] | null;
-}
-
-// ============================================================================
-// TASKS
-// ============================================================================
-
-export interface TaskCreateRequest {
-  title: string;
-  description?: string | null;
-  due_date?: string | null;
-  entity_type?: string | null;
-  entity_id?: string | null;
-  assigned_to?: string | null;
-}
-
-export interface TaskResponse {
-  id: string;
-  company_id: string;
-  title: string;
-  description?: string | null;
-  due_date?: string | null;
-  entity_type?: string | null;
-  entity_id?: string | null;
-  status?: string | null;
-  priority?: string | null;
-  assigned_to?: string | null;
-  created_by?: string | null;
-  completed_at?: string | null;
-  created_at: string;
-  updated_at: string;
-  assigned_to_name?: string | null;
-}
-
-export interface TaskUpdateRequest {
-  title?: string | null;
-  description?: string | null;
-  due_date?: string | null;
-  assigned_to?: string | null;
-  entity_type?: string | null;
-  entity_id?: string | null;
-}
-
-// ============================================================================
-// NOTES
-// ============================================================================
-
-export interface NoteCreateRequest {
-  content: string;
-  entity_type: string;
-  entity_id: string;
-}
-
-export interface NoteResponse {
-  id: string;
-  company_id: string;
-  content: string;
-  entity_type: string;
-  entity_id: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  created_by_name?: string | null;
-}
-
-export interface NoteUpdateRequest {
-  content?: string | null;
-}
-
-// ============================================================================
-// ANALYTICS
-// ============================================================================
-
-export interface CallStats {
-  total_calls: number;
-  answered_calls: number;
-  missed_calls: number;
-  outbound_calls: number;
-  inbound_calls: number;
-  total_duration: number;
-  average_duration: number;
-  success_rate: number;
-}
-
-export interface LeadStats {
-  total_leads: number;
-  new_leads: number;
-  contacted_leads: number;
-  qualified_leads: number;
-  converted_leads: number;
-  lost_leads: number;
-  conversion_rate: number;
-}
-
-export interface DealStats {
-  total_deals: number;
-  prospecting: number;
-  negotiation: number;
-  won: number;
-  lost: number;
-  total_value: number;
-  won_value: number;
-  average_deal_size: number;
-  win_rate: number;
-}
-
-export interface TaskStats {
-  total_tasks: number;
-  pending_tasks: number;
-  completed_tasks: number;
-  overdue_tasks: number;
-  completion_rate: number;
-}
-
-export interface OperatorAnalytics {
-  period: string;
-  date_from: string;
-  date_to: string;
-  calls: CallStats;
-  leads: LeadStats;
-  deals: DealStats;
-  tasks: TaskStats;
-  total_activities: number;
-  productivity_score: number;
-}
-
-export interface OperatorPerformance {
-  user_id: string;
-  name: string;
-  email: string;
-  calls: CallStats;
-  leads: LeadStats;
-  deals: DealStats;
-  tasks: TaskStats;
-  productivity_score: number;
-}
-
-export interface TeamAnalytics {
-  period: string;
-  date_from: string;
-  date_to: string;
-  total_operators: number;
-  active_operators: number;
-  calls: CallStats;
-  leads: LeadStats;
-  deals: DealStats;
-  tasks: TaskStats;
-  total_revenue: number;
-  revenue_growth: number;
-  top_operators_by_calls: OperatorPerformance[];
-  top_operators_by_deals: OperatorPerformance[];
-  top_operators_by_revenue: OperatorPerformance[];
-}
-
-export interface ConversionFunnel {
-  total_leads: number;
-  contacted: number;
-  qualified: number;
-  deals_created: number;
-  deals_won: number;
-  contact_rate: number;
-  qualification_rate: number;
-  deal_rate: number;
-  win_rate: number;
-  overall_conversion: number;
-}
-
-export interface PipelineHealth {
-  total_value: number;
-  weighted_value: number;
-  by_stage: Record<string, any>;
-  stuck_deals: number;
-  forecast: number;
-}
-
-export interface OperatorDashboard {
-  today: OperatorAnalytics;
-  this_week: OperatorAnalytics;
-  this_month: OperatorAnalytics;
-  upcoming_tasks: number;
-  pending_leads: number;
-  active_deals: number;
-  recent_calls: any[];
-  recent_tasks: any[];
-}
-
-export interface AdminDashboard {
-  today: TeamAnalytics;
-  this_week: TeamAnalytics;
-  this_month: TeamAnalytics;
-  this_year: TeamAnalytics;
-  conversion_funnel: ConversionFunnel;
-  pipeline_health: PipelineHealth;
-  peak_call_hours: any[];
-  calls_trend: any[];
-  revenue_trend: any[];
-}
-
-export interface CompanyPerformance {
-  company_id: string;
-  company_name: string;
-  total_users: number;
-  active_users: number;
-  total_calls: number;
-  total_leads: number;
-  total_deals: number;
-  total_revenue: number;
-  growth_rate: number;
-}
-
-export interface PlatformAnalytics {
-  period: string;
-  date_from: string;
-  date_to: string;
-  total_companies: number;
-  active_companies: number;
-  total_users: number;
-  active_users: number;
-  total_calls: number;
-  total_leads: number;
-  total_deals: number;
-  total_revenue: number;
-  new_companies: number;
-  new_users: number;
-  revenue_growth: number;
-  top_companies: CompanyPerformance[];
-}
-
-export interface OwnerDashboard {
-  today: PlatformAnalytics;
-  this_week: PlatformAnalytics;
-  this_month: PlatformAnalytics;
-  this_year: PlatformAnalytics;
-  system_health: Record<string, any>;
-  growth_trend: any[];
-  churn_analysis: Record<string, any>;
-}
-
-// ============================================================================
-// PAGINATION & FILTERING
-// ============================================================================
-
-export interface PaginatedResponse<T = any> {
-  items: T[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}
-
+// Pagination & Filtering helpers (query params, not response schemas)
 export interface PaginationParams {
   page?: number;
   page_size?: number;
@@ -732,32 +277,17 @@ export interface UserFilters extends PaginationParams, SearchParams {
   is_active?: boolean;
 }
 
-// ============================================================================
-// VALIDATION
-// ============================================================================
-
-export interface ValidationError {
-  loc: (string | number)[];
-  msg: string;
-  type: string;
-}
-
-export interface HTTPValidationError {
-  detail?: ValidationError[];
+export interface ContractFilters extends PaginationParams {
+  company_id?: string;
+  status?: string;
+  payment_status?: string;
 }
 
 // ============================================================================
-// LEGACY/DEPRECATED (for backwards compatibility)
+// LEGACY TYPES (still used by integrations/statistics pages)
 // ============================================================================
 
-export interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  is_active: boolean;
-}
-
+/** @deprecated Use the new provider-agnostic call API instead */
 export interface SipuniResponse {
   id: string;
   company_name: string;
@@ -770,31 +300,7 @@ export interface SipuniResponse {
   comment?: string | null;
 }
 
-export interface CallNumberRequest {
-  token: string;
-  phone: string;
-  sip_number: string;
-  reverse?: boolean;
-  antiaon?: boolean;
-}
-
-export interface ExternalCallRequest {
-  token: string;
-  phone1: string;
-  phone2: string;
-  bridge_start?: string;
-  bridge_end?: string;
-}
-
-export interface CallTreeRequest {
-  token: string;
-  phone: string;
-  sip_number: string;
-  tree: string;
-  reverse?: boolean;
-  attempt_duration?: number;
-}
-
+/** @deprecated Use the new provider-agnostic call API instead */
 export interface SipuniCreateRequest {
   company_name: string;
   cabinet_id: string;
@@ -802,14 +308,4 @@ export interface SipuniCreateRequest {
   partner_name?: string;
   partner_contact?: string;
   comment?: string;
-}
-
-export interface SipuniUpdateRequest {
-  id: string;
-  company_name?: string | null;
-  cabinet_id?: string | null;
-  security_key?: string | null;
-  partner_name?: string | null;
-  partner_contact?: string | null;
-  comment?: string | null;
 }

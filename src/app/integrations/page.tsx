@@ -15,7 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Building2, Edit, Trash2, RefreshCw, Copy } from 'lucide-react';
+import { PlusOutlined, BankOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { SipuniResponse, SipuniCreateRequest } from '@/types/api';
 
@@ -132,29 +133,29 @@ export default function IntegrationsPage() {
       <div className="p-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Integrations</h1>
+            <h1 className="text-3xl font-bold gradient-text">Integrations</h1>
             <p className="text-muted-foreground mt-2">
               Manage your SIPUNI integrations
             </p>
           </div>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+            <PlusOutlined style={{ marginRight: 8 }} />
             Add Integration
           </Button>
         </div>
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex items-center justify-center h-64"><Spin size="large" /></div>
         ) : integrations.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">No integrations yet</h3>
+              <BankOutlined style={{ fontSize: 48, color: 'var(--muted-foreground)' }} />
+              <h3 className="text-lg font-medium mb-2 mt-4">No integrations yet</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Get started by adding your first SIPUNI integration
               </p>
               <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+                <PlusOutlined style={{ marginRight: 8 }} />
                 Add Integration
               </Button>
             </CardContent>
@@ -167,7 +168,7 @@ export default function IntegrationsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 text-primary p-2 rounded-lg">
-                        <Building2 className="h-5 w-5" />
+                        <BankOutlined style={{ fontSize: 20 }} />
                       </div>
                       <div>
                         <CardTitle className="text-lg">
@@ -206,7 +207,7 @@ export default function IntegrationsPage() {
                           variant="ghost"
                           onClick={() => handleCopyToken(integration.token)}
                         >
-                          <Copy className="h-3 w-3" />
+                          <CopyOutlined />
                         </Button>
                       </div>
                     </div>
@@ -223,7 +224,7 @@ export default function IntegrationsPage() {
                         className="flex-1"
                         onClick={() => openEditDialog(integration)}
                       >
-                        <Edit className="h-3 w-3 mr-1" />
+                        <EditOutlined style={{ marginRight: 4 }} />
                         Edit
                       </Button>
                       <Button
@@ -232,7 +233,7 @@ export default function IntegrationsPage() {
                         className="flex-1"
                         onClick={() => handleDelete(integration.id)}
                       >
-                        <Trash2 className="h-3 w-3 mr-1" />
+                        <DeleteOutlined style={{ marginRight: 4 }} />
                         Delete
                       </Button>
                     </div>
@@ -321,7 +322,7 @@ export default function IntegrationsPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Create</Button>
+                <Button htmlType="submit">Create</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -402,7 +403,7 @@ export default function IntegrationsPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Update</Button>
+                <Button htmlType="submit">Update</Button>
               </DialogFooter>
             </form>
           </DialogContent>

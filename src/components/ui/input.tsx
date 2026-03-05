@@ -1,25 +1,47 @@
-import * as React from "react"
+'use client';
 
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+import { Input as AntdInput } from 'antd';
+import { cn } from '@/lib/utils';
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, onChange, value, defaultValue, placeholder, disabled, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e);
+    };
+
+    if (type === 'password') {
+      return (
+        <AntdInput.Password
+          ref={ref as any}
+          className={cn('glass-input', className)}
+          onChange={handleChange}
+          value={value}
+          defaultValue={defaultValue as string}
+          placeholder={placeholder}
+          disabled={disabled}
+          {...props}
+        />
+      );
+    }
+
     return (
-      <input
+      <AntdInput
+        ref={ref as any}
         type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
-        )}
-        ref={ref}
+        className={cn('glass-input', className)}
+        onChange={handleChange}
+        value={value}
+        defaultValue={defaultValue as string}
+        placeholder={placeholder}
+        disabled={disabled}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
+Input.displayName = 'Input';
 
-export { Input }
+export { Input };

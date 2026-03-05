@@ -1,4 +1,4 @@
-# SIPCRM - Multi-Tenant CRM Platform Requirements
+# S1P - Multi-Tenant CRM Platform Requirements
 
 ## 📋 PROJECT OVERVIEW
 

@@ -6,22 +6,22 @@
 HOSTS_FILE="/etc/hosts"
 BACKUP_FILE="/etc/hosts.backup.$(date +%Y%m%d_%H%M%S)"
 
-echo "Setting up local hosts for SIPCRM subdomain testing..."
+echo "Setting up local hosts for S1P subdomain testing..."
 
 # Backup hosts file
 echo "Creating backup: $BACKUP_FILE"
 cp $HOSTS_FILE $BACKUP_FILE
 
 # Check if entries already exist
-if grep -q "# SIPCRM Local Development" $HOSTS_FILE; then
-    echo "SIPCRM entries already exist in hosts file"
+if grep -q "# S1P Local Development" $HOSTS_FILE; then
+    echo "S1P entries already exist in hosts file"
     echo "Remove manually or restore from backup if needed"
     exit 1
 fi
 
 # Add entries
 echo "" >> $HOSTS_FILE
-echo "# SIPCRM Local Development" >> $HOSTS_FILE
+echo "# S1P Local Development" >> $HOSTS_FILE
 echo "127.0.0.1  owner.localhost" >> $HOSTS_FILE
 echo "127.0.0.1  company1.localhost" >> $HOSTS_FILE
 echo "127.0.0.1  company2.localhost" >> $HOSTS_FILE

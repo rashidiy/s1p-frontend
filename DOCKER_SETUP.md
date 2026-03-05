@@ -1,6 +1,6 @@
-# Docker Setup Guide for SIPCRM
+# Docker Setup Guide for S1P
 
-This guide explains how to run the SIPCRM frontend with Docker and Nginx for multi-tenant subdomain support.
+This guide explains how to run the S1P frontend with Docker and Nginx for multi-tenant subdomain support.
 
 ## Architecture
 
@@ -41,7 +41,7 @@ NEXT_PUBLIC_BASE_DOMAIN=domain.com
 
 ### 2. Update Nginx Configuration
 
-Edit `nginx/conf.d/sipcrm.conf` and replace `domain.com` with your actual domain:
+Edit `nginx/conf.d/s1p.conf` and replace `domain.com` with your actual domain:
 
 ```nginx
 server_name *.yourdomain.com yourdomain.com;
@@ -147,7 +147,7 @@ certbot certonly --manual \
   -d *.domain.com
 ```
 
-3. Uncomment HTTPS server block in `nginx/conf.d/sipcrm.conf`
+3. Uncomment HTTPS server block in `nginx/conf.d/s1p.conf`
 
 4. Update certificate paths:
 ```nginx
@@ -166,7 +166,7 @@ docker-compose exec nginx nginx -s reload
    - `nginx/ssl/domain.com.crt` (certificate)
    - `nginx/ssl/domain.com.key` (private key)
 
-2. Uncomment HTTPS server block in `nginx/conf.d/sipcrm.conf`
+2. Uncomment HTTPS server block in `nginx/conf.d/s1p.conf`
 
 3. Restart Nginx:
 ```bash
@@ -226,7 +226,7 @@ const subdomain = cookies().get('company_subdomain');
 ```bash
 # On your server
 git clone <your-repo>
-cd SIPCRM-Front
+cd s1p-frontend
 
 # Configure environment
 cp .env.example .env
@@ -399,7 +399,7 @@ docker-compose restart nginx
 
 ### 1. Enable Nginx Caching
 
-Add to `nginx/conf.d/sipcrm.conf`:
+Add to `nginx/conf.d/s1p.conf`:
 
 ```nginx
 proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=1g inactive=60m;
@@ -425,7 +425,7 @@ module.exports = {
 
 ### 3. Enable HTTP/2
 
-Uncomment in `nginx/conf.d/sipcrm.conf`:
+Uncomment in `nginx/conf.d/s1p.conf`:
 
 ```nginx
 listen 443 ssl http2;

@@ -5,27 +5,47 @@ import type { NextRequest } from 'next/server';
 const OWNER_SUBDOMAIN = process.env.NEXT_PUBLIC_OWNER_SUBDOMAIN || 'owner';
 
 export function middleware(request: NextRequest) {
-  // Get subdomain from nginx header or extract from host
+  // Get host (may include port, e.g. owner.localhost:3000)
+  const host = request.headers.get('host') || '';
+
+  // Normalize host for parsing (strip port)
+  const [hostname] = host.split(':');
+
+  // Disallow bare localhost/127.0.0.1 usage without a subdomain
+  // This forces using e.g. owner.localhost:3000 or company1.localhost:3000
+  if (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1'
+  ) {
+    return new NextResponse(
+      'Direct access via localhost is not allowed. Please use a subdomain like owner.localhost:3000 or company1.localhost:3000.',
+      { status: 400 }
+    );
+  }
+
+  // Get subdomain from nginx header or extract from hostname
   let subdomain = request.headers.get('x-subdomain');
 
-  // Fallback: extract subdomain from host if header not present (for development)
+  // Fallback: extract subdomain from hostname if header not present
   if (!subdomain) {
-    const host = request.headers.get('host') || '';
-    const parts = host.split('.');
+    const parts = hostname.split('.');
 
     // Check if we have a subdomain (e.g., owner.domain.com or company1.domain.com)
     if (parts.length >= 3) {
       subdomain = parts[0];
-    } else if (host.includes('localhost') || host.includes('127.0.0.1')) {
-      // For local development, check query param or default
-      subdomain = request.nextUrl.searchParams.get('subdomain') || OWNER_SUBDOMAIN;
+    }
+
+    // For hosts like owner.localhost or company1.localhost (dev with /etc/hosts),
+    // treat the first label as subdomain and the rest as base "localhost"
+    if (!subdomain && parts.length === 2 && parts[1] === 'localhost') {
+      subdomain = parts[0];
     }
   }
 
   const { pathname } = request.nextUrl;
 
   // Allow public routes without subdomain check
-  const publicRoutes = ['/login', '/register', '/_next', '/static', '/favicon.ico', '/health'];
+  const publicRoutes = ['/login', '/register', '/set-password', '/forgot-password', '/_next', '/static', '/favicon.ico', '/health'];
   if (publicRoutes.some(route => pathname.startsWith(route))) {
     return NextResponse.next();
   }
