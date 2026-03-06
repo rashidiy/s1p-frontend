@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
-import { Button } from '@/components/ui/button';
-import { Alert } from 'antd';
+import { Alert, Button } from 'antd';
 import { ToolOutlined } from '@ant-design/icons';
 
 export default function OwnerRegisterPage() {

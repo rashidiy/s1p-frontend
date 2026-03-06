@@ -1,15 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { BarChartOutlined, RiseOutlined, FallOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { apiClient } from '@/lib/api';
 import type { SipuniResponse, RepresentEnum } from '@/types/api';
+import { Button, Select } from 'antd';
+
 
 type IconComponentType = typeof BarChartOutlined;
 
@@ -108,7 +105,7 @@ export default function StatisticsPage() {
   ];
 
   return (
-    <AppLayout>
+    
       <div className="p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold gradient-text">Statistics</h1>
@@ -119,34 +116,27 @@ export default function StatisticsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
-            <Label>Integration</Label>
-            <Select value={selectedIntegration} onValueChange={setSelectedIntegration}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select integration" />
-              </SelectTrigger>
-              <SelectContent>
-                {integrations.map((integration) => (
-                  <SelectItem key={integration.id} value={integration.id}>
-                    {integration.company_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium">Integration</label>
+            <Select
+                  value={selectedIntegration}
+                  onChange={setSelectedIntegration}
+                  placeholder="Select integration"
+                  style={{ width: "100%" }}
+                  options={integrations.map((integration) => ({
+                    value: integration.id,
+                    label: integration.company_name,
+                  }))}
+                />
           </div>
 
           <div className="space-y-2">
-            <Label>Time Range</Label>
-            <Select value={timeRange} onValueChange={(value) => setTimeRange(value as RepresentEnum)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="day">Daily</SelectItem>
-                <SelectItem value="week">Weekly</SelectItem>
-                <SelectItem value="month">Monthly</SelectItem>
-                <SelectItem value="year">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium">Time Range</label>
+            <Select
+                  value={timeRange}
+                  onChange={(value) => setTimeRange(value as RepresentEnum)}
+                  style={{ width: "100%" }}
+                  options={[{ value: "day", label: "Daily" }, { value: "week", label: "Weekly" }, { value: "month", label: "Monthly" }, { value: "year", label: "Yearly" }]}
+                />
           </div>
         </div>
 
@@ -163,8 +153,8 @@ export default function StatisticsPage() {
           {statsCards.map((stat) => {
             const IconComponent = stat.icon;
             return (
-              <Card key={stat.title}>
-                <CardContent className="pt-6">
+              <div key={stat.title} className="glass-card p-0">
+                <div className="p-6 pt-0 pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className={`p-2 rounded-lg ${
                       stat.trend === 'up' ? 'bg-green-50 text-green-600' :
@@ -185,21 +175,21 @@ export default function StatisticsPage() {
                     <p className="text-sm text-muted-foreground">{stat.title}</p>
                     <p className="text-2xl font-bold mt-1">{stat.value}</p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Call Volume Trend</CardTitle>
-              <CardDescription>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Volume Trend</h3>
+              <p className="text-sm text-muted-foreground">
                 Call volume over the selected time period
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div className="p-6 pt-0">
               {stats?.daily_breakdown?.length > 0 ? (
                 <ResponsiveContainer width="100%" height={256}>
                   <LineChart data={stats.daily_breakdown}>
@@ -217,17 +207,17 @@ export default function StatisticsPage() {
                   {stats ? 'No chart data available' : 'Load statistics to view chart'}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Call Distribution</CardTitle>
-              <CardDescription>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Distribution</h3>
+              <p className="text-sm text-muted-foreground">
                 Breakdown by call type
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div className="p-6 pt-0">
               <div className="space-y-4">
                 {(() => {
                   const inbound = stats?.inbound ?? stats?.incoming ?? 0;
@@ -261,17 +251,17 @@ export default function StatisticsPage() {
                   );
                 })()}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Contact Numbers</CardTitle>
-              <CardDescription>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Top Contact Numbers</h3>
+              <p className="text-sm text-muted-foreground">
                 Most frequently called numbers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div className="p-6 pt-0">
               <div className="space-y-3">
                 {[
                   { number: '+1 (555) 123-4567', calls: 45 },
@@ -286,17 +276,17 @@ export default function StatisticsPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-              <CardDescription>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Performance Metrics</h3>
+              <p className="text-sm text-muted-foreground">
                 Key performance indicators
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div className="p-6 pt-0">
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -326,10 +316,10 @@ export default function StatisticsPage() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
-    </AppLayout>
+    
   );
 }

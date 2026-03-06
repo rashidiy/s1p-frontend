@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Button, Input, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
@@ -127,12 +121,12 @@ export default function LeadDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
           <h1 className="text-3xl font-bold gradient-text">{lead.title}</h1>
-          {lead.status && <Badge className={statusColor}>{lead.status}</Badge>}
+          {lead.status && <Tag className={statusColor}>{lead.status}</Tag>}
         </div>
         <div className="flex gap-2">
           {lead.status !== 'converted' && hasPermissionString('leads.write') && (
@@ -142,13 +136,13 @@ export default function LeadDetailPage() {
             </Button>
           )}
           {hasPermissionString('leads.write') && !editing && (
-            <Button variant="outline" onClick={() => setEditing(true)}>
+            <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
               Edit
             </Button>
           )}
           {hasPermissionString('leads.delete') && (
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button type="primary" danger  onClick={handleDelete}>
               Delete
             </Button>
           )}
@@ -157,30 +151,30 @@ export default function LeadDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Lead Information</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Lead Information</h3>
+            </div>
+            <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Title</Label>
+                    <label className="text-sm font-medium">Title</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea
+                    <label className="text-sm font-medium">Description</label>
+                    <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Estimated Value</Label>
+                      <label className="text-sm font-medium">Estimated Value</label>
                       <Input
                         type="number"
                         value={editForm.estimated_value}
@@ -188,7 +182,7 @@ export default function LeadDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Source</Label>
+                      <label className="text-sm font-medium">Source</label>
                       <Input
                         value={editForm.source}
                         onChange={(e) => setEditForm({ ...editForm, source: e.target.value })}
@@ -200,7 +194,7 @@ export default function LeadDetailPage() {
                       <SaveOutlined style={{ marginRight: 8 }} />
                       Save
                     </Button>
-                    <Button variant="outline" onClick={() => setEditing(false)}>
+                    <Button type="default"  onClick={() => setEditing(false)}>
                       <CloseOutlined style={{ marginRight: 8 }} />
                       Cancel
                     </Button>
@@ -234,11 +228,11 @@ export default function LeadDetailPage() {
                       <span className="font-medium">{lead.assigned_to_name}</span>
                     </div>
                   )}
-                  {lead.source && <Badge variant="outline">{lead.source}</Badge>}
+                  {lead.source && <Tag bordered>{lead.source}</Tag>}
                   {lead.tags && lead.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {lead.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                        <Tag key={tag} >{tag}</Tag>
                       ))}
                     </div>
                   )}
@@ -247,16 +241,16 @@ export default function LeadDetailPage() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Notes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
-                <Textarea
+                <Input.TextArea
                   placeholder="Add a note..."
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
@@ -278,19 +272,19 @@ export default function LeadDetailPage() {
               {notes.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Details</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Status</span>
-                <Badge className={statusColor}>{lead.status || 'N/A'}</Badge>
+                <Tag className={statusColor}>{lead.status || 'N/A'}</Tag>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Created</span>
@@ -300,8 +294,8 @@ export default function LeadDetailPage() {
                 <span className="text-gray-500">Updated</span>
                 <span>{new Date(lead.updated_at).toLocaleDateString()}</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

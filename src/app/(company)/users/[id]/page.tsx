@@ -2,11 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeftOutlined,
   EditOutlined,
@@ -18,7 +13,7 @@ import {
   SafetyOutlined,
   CalendarOutlined,
 } from '@ant-design/icons';
-import { Spin, Tag, Alert, Select as AntSelect } from 'antd';
+import { Alert, Button, Input, Select, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
@@ -147,7 +142,7 @@ export default function UserDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
@@ -175,15 +170,13 @@ export default function UserDetailPage() {
         {canManageUsers && (
           <div className="flex gap-2">
             {!editing && (
-              <Button variant="outline" onClick={() => setEditing(true)}>
+              <Button type="default"  onClick={() => setEditing(true)}>
                 <EditOutlined style={{ marginRight: 8 }} />
                 Edit
               </Button>
             )}
-            <Button
-              variant={user.is_active ? 'destructive' : 'default'}
-              onClick={handleToggleStatus}
-            >
+            <Button type="primary" danger={user.is_active}
+              onClick={handleToggleStatus}>
               {user.is_active ? 'Deactivate' : 'Activate'}
             </Button>
           </div>
@@ -205,23 +198,23 @@ export default function UserDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Information</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">User Information</h3>
+            </div>
+            <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>First Name</Label>
+                      <label className="text-sm font-medium">First Name</label>
                       <Input
                         value={editForm.first_name}
                         onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Last Name</Label>
+                      <label className="text-sm font-medium">Last Name</label>
                       <Input
                         value={editForm.last_name}
                         onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
@@ -229,7 +222,7 @@ export default function UserDetailPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Phone</Label>
+                    <label className="text-sm font-medium">Phone</label>
                     <Input
                       value={editForm.phone}
                       onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
@@ -237,8 +230,8 @@ export default function UserDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Role</Label>
-                    <AntSelect
+                    <label className="text-sm font-medium">Role</label>
+                    <Select
                       style={{ width: '100%' }}
                       value={editForm.role || undefined}
                       onChange={(val) => setEditForm({ ...editForm, role: val })}
@@ -254,7 +247,7 @@ export default function UserDetailPage() {
                       <SaveOutlined style={{ marginRight: 8 }} />
                       {saving ? 'Saving...' : 'Save'}
                     </Button>
-                    <Button variant="outline" onClick={() => { setEditing(false); loadUser(); }}>
+                    <Button type="default"  onClick={() => { setEditing(false); loadUser(); }}>
                       <CloseOutlined style={{ marginRight: 8 }} />
                       Cancel
                     </Button>
@@ -297,43 +290,43 @@ export default function UserDetailPage() {
                   {user.email_verified !== undefined && (
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-gray-500">Email verified:</span>
-                      <Badge variant={user.email_verified ? 'default' : 'outline'}>
+                      <Tag color={user.email_verified ? 'blue' : undefined}>
                         {user.email_verified ? 'Yes' : 'No'}
-                      </Badge>
+                      </Tag>
                     </div>
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Permissions</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Permissions</h3>
+            </div>
+            <div className="p-6 pt-0">
               {user.permissions && user.permissions.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
                   {user.permissions.map((perm) => (
-                    <Badge key={perm} variant="secondary" className="text-xs">
+                    <Tag key={perm}  className="text-xs">
                       {perm}
-                    </Badge>
+                    </Tag>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-gray-500">Using role defaults</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Account Status</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">Status</span>
                 <Tag color={user.is_active ? 'green' : 'default'}>
@@ -352,8 +345,8 @@ export default function UserDetailPage() {
                   <span className="font-medium uppercase">{user.language}</span>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

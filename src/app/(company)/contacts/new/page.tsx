@@ -2,13 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { apiClient } from '@/lib/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Select as AntSelect } from 'antd';
+import { Alert, Button, Input, Select } from 'antd';
 import Link from 'next/link';
 
 export default function NewContactPage() {
@@ -54,7 +50,7 @@ export default function NewContactPage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/contacts">
-          <Button variant="ghost" size="icon">
+          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
             <ArrowLeftOutlined />
           </Button>
         </Link>
@@ -64,12 +60,12 @@ export default function NewContactPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
-          <CardDescription>Enter the details for the new contact</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0 max-w-2xl">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Contact Information</h3>
+          <p className="text-sm text-muted-foreground">Enter the details for the new contact</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
@@ -77,7 +73,7 @@ export default function NewContactPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first_name">First Name *</Label>
+                <label htmlFor="first_name" className="text-sm font-medium">First Name *</label>
                 <Input
                   id="first_name"
                   name="first_name"
@@ -88,7 +84,7 @@ export default function NewContactPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="last_name">Last Name</Label>
+                <label htmlFor="last_name" className="text-sm font-medium">Last Name</label>
                 <Input
                   id="last_name"
                   name="last_name"
@@ -101,7 +97,7 @@ export default function NewContactPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
                 <Input
                   id="email"
                   name="email"
@@ -111,7 +107,7 @@ export default function NewContactPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <label htmlFor="phone" className="text-sm font-medium">Phone</label>
                 <Input
                   id="phone"
                   name="phone"
@@ -124,7 +120,7 @@ export default function NewContactPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="company_name">Company</Label>
+                <label htmlFor="company_name" className="text-sm font-medium">Company</label>
                 <Input
                   id="company_name"
                   name="company_name"
@@ -134,7 +130,7 @@ export default function NewContactPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="position">Position</Label>
+                <label htmlFor="position" className="text-sm font-medium">Position</label>
                 <Input
                   id="position"
                   name="position"
@@ -146,7 +142,7 @@ export default function NewContactPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="source">Source</Label>
+              <label htmlFor="source" className="text-sm font-medium">Source</label>
               <Input
                 id="source"
                 name="source"
@@ -157,8 +153,8 @@ export default function NewContactPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Tags</Label>
-              <AntSelect
+              <label className="text-sm font-medium">Tags</label>
+              <Select
                 mode="tags"
                 style={{ width: '100%' }}
                 placeholder="Add tags..."
@@ -173,14 +169,14 @@ export default function NewContactPage() {
                 {isLoading ? 'Creating...' : 'Create Contact'}
               </Button>
               <Link href="/contacts">
-                <Button htmlType="button" variant="outline" disabled={isLoading}>
+                <Button type="default" htmlType="button"  disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

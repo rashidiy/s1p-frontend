@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Spin, Alert } from 'antd';
+import { Alert, Progress, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
@@ -36,13 +33,13 @@ export default function ContractStatusPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold gradient-text">Contract</h1>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+        <div className="glass-card p-0">
+          <div className="p-6 pt-0 flex flex-col items-center justify-center py-12">
             <FileTextOutlined style={{ fontSize: 48, color: '#9ca3af' }} />
             <p className="mt-4 text-lg font-medium">No Active Contract</p>
             <p className="text-sm text-gray-500">Please contact the platform administrator</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -67,61 +64,61 @@ export default function ContractStatusPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Plan</CardDescription>
-            <CardTitle className="text-2xl">{contract.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge className={statusColor}>{contract.status.replace('_', ' ')}</Badge>
-          </CardContent>
-        </Card>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Plan</p>
+            <h3 className="text-2xl font-semibold leading-none tracking-tight text-2xl">{contract.name}</h3>
+          </div>
+          <div className="p-6 pt-0">
+            <Tag className={statusColor}>{contract.status.replace('_', ' ')}</Tag>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Billing Period</CardDescription>
-            <CardTitle className="text-xl capitalize">
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Billing Period</p>
+            <h3 className="text-2xl font-semibold leading-none tracking-tight text-xl capitalize">
               {BILLING_PERIOD_LABELS[contract.billing_period] || contract.billing_period}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge className={paymentColor}>
+            </h3>
+          </div>
+          <div className="p-6 pt-0">
+            <Tag className={paymentColor}>
               {PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}
-            </Badge>
-          </CardContent>
-        </Card>
+            </Tag>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Days Until Expiry</CardDescription>
-            <CardTitle className="text-2xl flex items-center gap-2">
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Days Until Expiry</p>
+            <h3 className="text-2xl font-semibold leading-none tracking-tight text-2xl flex items-center gap-2">
               <CalendarOutlined />
               {contract.days_until_expiry ?? '—'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div className="p-6 pt-0">
             <p className="text-xs text-gray-500">
               {new Date(contract.start_date).toLocaleDateString()} — {new Date(contract.end_date).toLocaleDateString()}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* User Limits */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="glass-card p-0">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <TeamOutlined />
             User Limits
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </h3>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Total Users</span>
               <span className="font-medium">{totalUsers} / {maxUsers}</span>
             </div>
-            <Progress value={userUsage} />
+            <Progress percent={userUsage} showInfo={false} size="small" />
           </div>
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center p-3 bg-purple-50 rounded-lg">
@@ -137,18 +134,18 @@ export default function ContractStatusPage() {
               <p className="text-xs text-gray-500 mt-1">Operators</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Contract Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="glass-card p-0">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <SafetyOutlined />
             Contract Details
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h3>
+        </div>
+        <div className="p-6 pt-0">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-gray-500">Auto Renew</span>
@@ -167,8 +164,8 @@ export default function ContractStatusPage() {
               <p className="font-medium">{new Date(contract.end_date).toLocaleDateString()}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

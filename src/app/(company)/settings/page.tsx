@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   SafetyOutlined,
   FileTextOutlined,
@@ -59,38 +58,38 @@ export default function SettingsPage() {
       <div className="grid gap-4">
         {visibleLinks.map((link) => (
           <Link key={link.href} href={link.href}>
-            <Card className="glass-card hover:shadow-md transition-all cursor-pointer border-0">
-              <CardContent className="p-5">
+            <div className="glass-card p-0 glass-card hover:shadow-md transition-all cursor-pointer border-0">
+              <div className="p-6 pt-0 p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${link.bg}`}>
                       {link.icon}
                     </div>
                     <div>
-                      <CardTitle className="text-base">{link.title}</CardTitle>
-                      <CardDescription className="mt-0.5">{link.description}</CardDescription>
+                      <h3 className="text-2xl font-semibold leading-none tracking-tight text-base">{link.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-0.5">{link.description}</p>
                     </div>
                   </div>
                   <RightOutlined className="text-gray-400" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </Link>
         ))}
       </div>
 
       {!isAdmin && (
-        <Card className="glass-card border-amber-200 bg-amber-50/50">
-          <CardHeader>
-            <CardTitle className="text-sm text-amber-700 flex items-center gap-2">
+        <div className="glass-card p-0 glass-card border-amber-200 bg-amber-50/50">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm text-amber-700 flex items-center gap-2">
               <LockOutlined />
               Admin-only settings
-            </CardTitle>
-            <CardDescription className="text-amber-600 text-xs">
+            </h3>
+            <p className="text-sm text-muted-foreground text-amber-600 text-xs">
               Permission groups and contract settings are only accessible to Company Admins.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

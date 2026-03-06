@@ -2,16 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert } from 'antd';
+import { Alert, Button, Input, Select } from 'antd';
 import Link from 'next/link';
 
 export default function NewCompanyPage() {
@@ -50,7 +44,7 @@ export default function NewCompanyPage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/owner/companies">
-          <Button variant="ghost" size="icon">
+          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
             <ArrowLeftOutlined />
           </Button>
         </Link>
@@ -60,19 +54,19 @@ export default function NewCompanyPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Company Information</CardTitle>
-          <CardDescription>Enter the details for the new company</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0 max-w-2xl">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Company Information</h3>
+          <p className="text-sm text-muted-foreground">Enter the details for the new company</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Company Name *</Label>
+              <label htmlFor="name" className="text-sm font-medium">Company Name *</label>
               <Input
                 id="name"
                 name="name"
@@ -84,7 +78,7 @@ export default function NewCompanyPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subdomain">Subdomain</Label>
+              <label htmlFor="subdomain" className="text-sm font-medium">Subdomain</label>
               <Input
                 id="subdomain"
                 name="subdomain"
@@ -98,21 +92,18 @@ export default function NewCompanyPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="provider_type">Provider Type *</Label>
-              <Select value={providerType} onValueChange={setProviderType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sipuni">SIPUNI</SelectItem>
-                  <SelectItem value="binotel">Binotel</SelectItem>
-                </SelectContent>
-              </Select>
+              <label htmlFor="provider_type" className="text-sm font-medium">Provider Type *</label>
+              <Select
+                  value={providerType}
+                  onChange={setProviderType}
+                  style={{ width: "100%" }}
+                  options={[{ value: "sipuni", label: "SIPUNI" }, { value: "binotel", label: "Binotel" }]}
+                />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="provider_config">Provider Configuration</Label>
-              <Textarea
+              <label htmlFor="provider_config" className="text-sm font-medium">Provider Configuration</label>
+              <Input.TextArea
                 id="provider_config"
                 name="provider_config"
                 placeholder='{"api_key": "your-key", "account_id": "123"}'
@@ -129,14 +120,14 @@ export default function NewCompanyPage() {
                 {isLoading ? 'Creating...' : 'Create Company'}
               </Button>
               <Link href="/owner/companies">
-                <Button htmlType="button" variant="outline" disabled={isLoading}>
+                <Button type="default" htmlType="button"  disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

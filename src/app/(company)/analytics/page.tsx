@@ -1,10 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Spin, Tabs } from 'antd';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -121,82 +119,82 @@ export default function AnalyticsPage() {
         <p className="text-gray-500">Performance metrics and insights</p>
       </div>
 
-      <Tabs defaultValue="my" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="my">My Performance</TabsTrigger>
-          {canViewTeamData && <TabsTrigger value="team">Team Overview</TabsTrigger>}
-        </TabsList>
-
-        <TabsContent value="my" className="space-y-4">
+      <Tabs
+        defaultActiveKey="my"
+        items={[
+          {
+            key: 'my',
+            label: 'My Performance',
+            children: (<div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Calls</CardTitle>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                 <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
-              </CardHeader>
-              <CardContent>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.calls.total_calls || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {myStats?.calls.answered_calls || 0} answered
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Leads</CardTitle>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Leads</h3>
                 <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
-              </CardHeader>
-              <CardContent>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.leads.total_leads || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {myStats?.leads.converted_leads || 0} converted
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Deals</CardTitle>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Deals</h3>
                 <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
-              </CardHeader>
-              <CardContent>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.deals.total_deals || 0}
                 </div>
                 <p className="text-xs text-green-600">
                   ${myStats?.deals.total_value?.toLocaleString() || 0}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Tasks</CardTitle>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Tasks</h3>
                 <CheckSquareOutlined style={{ color: 'var(--muted-foreground)' }} />
-              </CardHeader>
-              <CardContent>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.tasks.completed_tasks || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   of {myStats?.tasks.total_tasks || 0} total
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Call Statistics</CardTitle>
-                <CardDescription>Your calling performance</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Statistics</h3>
+                <p className="text-sm text-muted-foreground">Your calling performance</p>
+              </div>
+              <div className="p-6 pt-0 space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Answer Rate</span>
                   <span className="font-semibold">
@@ -219,15 +217,15 @@ export default function AnalyticsPage() {
                   <span className="text-sm text-gray-600">Outbound</span>
                   <span className="font-semibold">{myStats?.calls.outbound_calls || 0}</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Score</CardTitle>
-                <CardDescription>Overall productivity</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Performance Score</h3>
+                <p className="text-sm text-muted-foreground">Overall productivity</p>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="flex items-center justify-center py-6">
                   <div className="text-center">
                     <div className="text-5xl font-bold text-blue-600">
@@ -238,8 +236,8 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
           {/* Charts Section */}
           <div className="grid gap-4 md:grid-cols-2">
@@ -312,78 +310,80 @@ export default function AnalyticsPage() {
               )}
             </div>
           </div>
-        </TabsContent>
-
-        {canViewTeamData && (
-          <TabsContent value="team" className="space-y-4">
+        </div>),
+          },
+          ...(canViewTeamData ? [{
+            key: 'team',
+            label: 'Team Overview',
+            children: (<div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+              <div className="glass-card p-0">
+                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Members</h3>
                   <TeamOutlined style={{ color: 'var(--muted-foreground)' }} />
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.total_operators || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {teamStats?.active_operators || 0} active
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Calls</CardTitle>
+              <div className="glass-card p-0">
+                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                   <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.calls.total_calls || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {teamStats?.calls.answered_calls || 0} answered
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Team Leads</CardTitle>
+              <div className="glass-card p-0">
+                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Leads</h3>
                   <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.leads.total_leads || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {teamStats?.leads.converted_leads || 0} converted
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+              <div className="glass-card p-0">
+                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Revenue</h3>
                   <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     ${teamStats?.deals.total_value?.toLocaleString() || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {teamStats?.deals.won || 0} deals won
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Performers</CardTitle>
-                <CardDescription>Operators ranked by performance</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Top Performers</h3>
+                <p className="text-sm text-muted-foreground">Operators ranked by performance</p>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="space-y-4">
                   {teamStats?.top_operators_by_calls?.map((performer, index) => (
                     <div key={performer.user_id} className="flex items-center justify-between">
@@ -406,11 +406,12 @@ export default function AnalyticsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-      </Tabs>
+              </div>
+            </div>
+          </div>),
+          }] : []),
+        ]}
+      />
     </div>
   );
 }

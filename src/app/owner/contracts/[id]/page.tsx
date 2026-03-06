@@ -2,13 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ArrowLeftOutlined, FileTextOutlined, DollarOutlined, CalendarOutlined, TeamOutlined, PhoneOutlined, ReloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Button, Input, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractDetailResponse } from '@/types/api';
@@ -80,22 +75,22 @@ export default function ContractDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
           <FileTextOutlined style={{ fontSize: 24, color: '#2563eb' }} />
           <h1 className="text-3xl font-bold gradient-text">{contract.name}</h1>
-          <Badge className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Badge>
+          <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
         </div>
         <div className="flex gap-2">
           {contract.status === 'active' && (
             <>
-              <Button variant="outline" onClick={() => setShowRenew(true)}>
+              <Button type="default"  onClick={() => setShowRenew(true)}>
                 <ReloadOutlined style={{ marginRight: 8 }} />
                 Renew
               </Button>
-              <Button variant="destructive" onClick={handleCancel} disabled={processing}>
+              <Button type="primary" danger  onClick={handleCancel} disabled={processing}>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
                 Cancel
               </Button>
@@ -105,18 +100,18 @@ export default function ContractDetailPage() {
       </div>
 
       {showRenew && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Renew Contract</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">Renew Contract</h3>
+          </div>
+          <div className="p-6 pt-0 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>New End Date *</Label>
+                <label className="text-sm font-medium">New End Date *</label>
                 <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label>New Amount (optional)</Label>
+                <label className="text-sm font-medium">New Amount (optional)</label>
                 <Input type="number" value={renewAmount} onChange={(e) => setRenewAmount(e.target.value)} placeholder="Keep current" />
               </div>
             </div>
@@ -124,18 +119,18 @@ export default function ContractDetailPage() {
               <Button onClick={handleRenew} disabled={processing || !renewDate}>
                 {processing ? 'Renewing...' : 'Confirm Renewal'}
               </Button>
-              <Button variant="outline" onClick={() => setShowRenew(false)}>Cancel</Button>
+              <Button type="default"  onClick={() => setShowRenew(false)}>Cancel</Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Amount</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Amount</p>
+          </div>
+          <div className="p-6 pt-0">
             <div className="flex items-center gap-1">
               <DollarOutlined style={{ fontSize: 20, color: '#16a34a' }} />
               <span className="text-2xl font-bold">{contract.price}</span>
@@ -143,52 +138,52 @@ export default function ContractDetailPage() {
             <p className="text-xs text-gray-500">
               {contract.currency} / {BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase()}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Days Remaining</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Days Remaining</p>
+          </div>
+          <div className="p-6 pt-0">
             <div className="flex items-center gap-1">
               <CalendarOutlined style={{ fontSize: 20 }} />
               <span className="text-2xl font-bold">{contract.days_remaining}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Users</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Users</p>
+          </div>
+          <div className="p-6 pt-0">
             <div className="flex items-center gap-1">
               <TeamOutlined style={{ fontSize: 20 }} />
               <span className="text-2xl font-bold">{contract.current_users} / {contract.max_users}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Calls This Month</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">Calls This Month</p>
+          </div>
+          <div className="p-6 pt-0">
             <div className="flex items-center gap-1">
               <PhoneOutlined style={{ fontSize: 20 }} />
               <span className="text-2xl font-bold">{contract.current_calls_this_month} / {contract.max_calls_per_month}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Contract Details</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">Contract Details</h3>
+          </div>
+          <div className="p-6 pt-0">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Company</span>
@@ -196,11 +191,11 @@ export default function ContractDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Status</span>
-                <Badge className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Badge>
+                <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Payment</span>
-                <Badge className={paymentColor}>{PAYMENT_STATUS_LABELS[contract.payment_status]}</Badge>
+                <Tag className={paymentColor}>{PAYMENT_STATUS_LABELS[contract.payment_status]}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Billing Period</span>
@@ -219,14 +214,14 @@ export default function ContractDetailPage() {
                 <span>{new Date(contract.end_date).toLocaleDateString()}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment History</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">Payment History</h3>
+          </div>
+          <div className="p-6 pt-0">
             {contract.payment_history && contract.payment_history.length > 0 ? (
               <div className="space-y-3">
                 {contract.payment_history.map((payment: any, idx: number) => (
@@ -235,17 +230,17 @@ export default function ContractDetailPage() {
                       <p className="font-medium">${payment.amount}</p>
                       <p className="text-xs text-gray-500">{new Date(payment.date || payment.created_at).toLocaleDateString()}</p>
                     </div>
-                    <Badge variant={payment.status === 'paid' ? 'default' : 'secondary'}>
+                    <Tag color={payment.status === 'paid' ? 'blue' : undefined}>
                       {payment.status}
-                    </Badge>
+                    </Tag>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-gray-500 text-center py-4">No payment history</p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -61,7 +58,7 @@ export default function OwnerSetPasswordPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
         <div className="space-y-2">
-          <Label htmlFor="password">New Password</Label>
+          <label htmlFor="password" className="text-sm font-medium">New Password</label>
           <Input
             id="password"
             type="password"
@@ -75,7 +72,7 @@ export default function OwnerSetPasswordPage() {
           </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</label>
           <Input
             id="confirmPassword"
             type="password"

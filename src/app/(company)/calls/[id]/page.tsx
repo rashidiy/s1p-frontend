@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Spin, Tag, Select as AntSelect, message } from 'antd';
+import { Button, Input, Select, Spin, Tag, message } from 'antd';
 import { ArrowLeftOutlined, PhoneOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
@@ -197,7 +191,7 @@ export default function CallDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/calls')}>
+        <Button size="small" type="text"   onClick={() => router.push('/calls')}>
           <ArrowLeftOutlined style={{ marginRight: 4 }} />
           Back to Calls
         </Button>
@@ -213,11 +207,11 @@ export default function CallDetailPage() {
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Call Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Call Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Information</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               <div className="flex items-center gap-3">
                 <span className="font-medium text-lg">{call.phone_1 || 'Unknown'}</span>
                 {call.direction === 'inbound' ? (
@@ -266,9 +260,7 @@ export default function CallDetailPage() {
 
               {call.has_recording && !recordingUrl && (
                 <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <Button size="small" type="default"
                     onClick={async () => {
                       try {
                         const rec = await apiClient.getCallRecording(callId);
@@ -280,15 +272,15 @@ export default function CallDetailPage() {
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Set Call Outcome */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Set Call Outcome</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Set Call Outcome</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               {callAny.outcome && (
                 <div>
                   <span className="text-sm text-gray-500 mr-2">Current outcome:</span>
@@ -298,8 +290,8 @@ export default function CallDetailPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label>Outcome</Label>
-                <AntSelect
+                <label className="text-sm font-medium">Outcome</label>
+                <Select
                   value={outcome || undefined}
                   onChange={(v) => setOutcome(v)}
                   placeholder="Select outcome..."
@@ -313,8 +305,8 @@ export default function CallDetailPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Disposition Notes</Label>
-                <Textarea
+                <label className="text-sm font-medium">Disposition Notes</label>
+                <Input.TextArea
                   value={dispositionNotes}
                   onChange={(e) => setDispositionNotes(e.target.value)}
                   placeholder="Notes about the call..."
@@ -324,15 +316,15 @@ export default function CallDetailPage() {
               <Button onClick={handleSaveOutcome} disabled={!outcome || savingOutcome}>
                 {savingOutcome ? 'Saving...' : 'Save Outcome'}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Link to CRM Entity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Link to CRM Entity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Link to CRM Entity</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               <div className="flex flex-wrap gap-2">
                 {call.contact_id && (
                   <Link href={`/contacts/${call.contact_id}`}>
@@ -356,8 +348,8 @@ export default function CallDetailPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div className="space-y-2">
-                  <Label>Entity Type</Label>
-                  <AntSelect
+                  <label className="text-sm font-medium">Entity Type</label>
+                  <Select
                     value={linkType}
                     onChange={(v) => { setLinkType(v); setLinkEntityId(''); setLinkSearchResults([]); }}
                     style={{ width: '100%' }}
@@ -369,8 +361,8 @@ export default function CallDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Search Entity</Label>
-                  <AntSelect
+                  <label className="text-sm font-medium">Search Entity</label>
+                  <Select
                     showSearch
                     value={linkEntityId || undefined}
                     placeholder={`Search ${linkType}s...`}
@@ -388,15 +380,15 @@ export default function CallDetailPage() {
                   {linking ? 'Linking...' : 'Link'}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Auto-Link Suggestions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Auto-Link Suggestions</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Auto-Link Suggestions</h3>
+            </div>
+            <div className="p-6 pt-0">
               {suggestions ? (
                 <div className="space-y-3">
                   {suggestions.contacts?.length > 0 && (
@@ -405,7 +397,7 @@ export default function CallDetailPage() {
                       {suggestions.contacts.map((c: any) => (
                         <div key={c.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{c.first_name || ''} {c.last_name || ''} {c.phone ? `(${c.phone})` : ''}</span>
-                          <Button size="sm" variant="outline" onClick={() => handleLinkSuggestion('contact', c.id)}>
+                          <Button size="small" type="default"   onClick={() => handleLinkSuggestion('contact', c.id)}>
                             <LinkOutlined style={{ marginRight: 4 }} /> Link
                           </Button>
                         </div>
@@ -418,7 +410,7 @@ export default function CallDetailPage() {
                       {suggestions.leads.map((l: any) => (
                         <div key={l.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{l.title || 'Untitled Lead'}</span>
-                          <Button size="sm" variant="outline" onClick={() => handleLinkSuggestion('lead', l.id)}>
+                          <Button size="small" type="default"   onClick={() => handleLinkSuggestion('lead', l.id)}>
                             <LinkOutlined style={{ marginRight: 4 }} /> Link
                           </Button>
                         </div>
@@ -431,7 +423,7 @@ export default function CallDetailPage() {
                       {suggestions.deals.map((d: any) => (
                         <div key={d.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{d.title || 'Untitled Deal'}</span>
-                          <Button size="sm" variant="outline" onClick={() => handleLinkSuggestion('deal', d.id)}>
+                          <Button size="small" type="default"   onClick={() => handleLinkSuggestion('deal', d.id)}>
                             <LinkOutlined style={{ marginRight: 4 }} /> Link
                           </Button>
                         </div>
@@ -445,18 +437,18 @@ export default function CallDetailPage() {
               ) : (
                 <p className="text-sm text-gray-500 text-center py-4">No suggestions found</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
           {/* Call Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Call Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Summary</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Outcome</span>
                 {callAny.outcome ? (
@@ -504,36 +496,36 @@ export default function CallDetailPage() {
                   <span className="text-sm text-gray-400">None</span>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* UTM Tracking */}
           {(callAny.utm_source || callAny.utm_medium || callAny.utm_campaign) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>UTM Tracking</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">UTM Tracking</h3>
+              </div>
+              <div className="p-6 pt-0 space-y-3">
                 {callAny.utm_source && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Source</span>
-                    <Badge variant="outline">{callAny.utm_source}</Badge>
+                    <Tag bordered>{callAny.utm_source}</Tag>
                   </div>
                 )}
                 {callAny.utm_medium && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Medium</span>
-                    <Badge variant="outline">{callAny.utm_medium}</Badge>
+                    <Tag bordered>{callAny.utm_medium}</Tag>
                   </div>
                 )}
                 {callAny.utm_campaign && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Campaign</span>
-                    <Badge variant="outline">{callAny.utm_campaign}</Badge>
+                    <Tag bordered>{callAny.utm_campaign}</Tag>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       </div>
