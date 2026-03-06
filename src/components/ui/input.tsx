@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, onChange, value, defaultValue, placeholder, disabled, ...props }, ref) => {
+  ({ className, type, onChange, value, defaultValue, placeholder, disabled, size: _size, ...props }, ref) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange?.(e);
     };

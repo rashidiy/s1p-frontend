@@ -5,14 +5,6 @@ const nextConfig = {
   // Enable standalone output for Docker
   output: 'standalone',
 
-  // Skip type checking and linting during build (types need cleanup)
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Allow images from any domain (configure based on your needs)
   images: {
     remotePatterns: [

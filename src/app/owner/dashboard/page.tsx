@@ -66,8 +66,8 @@ export default function OwnerDashboardPage() {
             <span className="text-sm font-medium opacity-90">Total Companies</span>
             <BankOutlined className="text-2xl opacity-80" />
           </div>
-          <div className="text-3xl font-bold">{dashboard?.total_companies || 0}</div>
-          <p className="text-sm opacity-75 mt-1">{dashboard?.active_companies || 0} active</p>
+          <div className="text-3xl font-bold">{dashboard?.this_month?.total_companies || 0}</div>
+          <p className="text-sm opacity-75 mt-1">{dashboard?.this_month?.active_companies || 0} active</p>
         </div>
 
         <div className="bg-gradient-blue rounded-2xl p-5 text-white shadow-lg">
@@ -75,7 +75,7 @@ export default function OwnerDashboardPage() {
             <span className="text-sm font-medium opacity-90">Total Users</span>
             <TeamOutlined className="text-2xl opacity-80" />
           </div>
-          <div className="text-3xl font-bold">{dashboard?.total_users || 0}</div>
+          <div className="text-3xl font-bold">{dashboard?.this_month?.total_users || 0}</div>
           <p className="text-sm opacity-75 mt-1">Across all companies</p>
         </div>
 
@@ -84,33 +84,33 @@ export default function OwnerDashboardPage() {
             <span className="text-sm font-medium opacity-90">Total Calls (30d)</span>
             <ThunderboltOutlined className="text-2xl opacity-80" />
           </div>
-          <div className="text-3xl font-bold">{dashboard?.total_calls_30d || 0}</div>
-          <p className="text-sm opacity-75 mt-1">Last 30 days</p>
+          <div className="text-3xl font-bold">{dashboard?.this_month?.total_calls || 0}</div>
+          <p className="text-sm opacity-75 mt-1">This month</p>
         </div>
 
         <div className="bg-gradient-orange rounded-2xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium opacity-90">Revenue (MRR)</span>
+            <span className="text-sm font-medium opacity-90">Revenue</span>
             <RiseOutlined className="text-2xl opacity-80" />
           </div>
-          <div className="text-3xl font-bold">${dashboard?.platform_revenue?.toLocaleString() || 0}</div>
-          <p className="text-sm opacity-75 mt-1">Monthly recurring</p>
+          <div className="text-3xl font-bold">${dashboard?.this_month?.total_revenue?.toLocaleString() || 0}</div>
+          <p className="text-sm opacity-75 mt-1">This month</p>
         </div>
       </div>
 
       {/* Bottom Section */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold mb-1">Recent Companies</h3>
-          <p className="text-sm text-gray-500 mb-4">Latest registered companies</p>
+          <h3 className="text-lg font-semibold mb-1">Top Companies</h3>
+          <p className="text-sm text-gray-500 mb-4">Best performing companies</p>
           <div className="space-y-3">
-            {dashboard?.recent_companies?.map((company) => (
-              <div key={company.id} className="flex items-center justify-between p-3 rounded-xl bg-white/50">
+            {dashboard?.this_month?.top_companies?.map((company: { company_id: string; company_name: string; total_calls: number }) => (
+              <div key={company.company_id} className="flex items-center justify-between p-3 rounded-xl bg-white/50">
                 <div>
-                  <p className="font-medium text-gray-900">{company.name}</p>
-                  <p className="text-sm text-gray-500">{company.subdomain}</p>
+                  <p className="font-medium text-gray-900">{company.company_name}</p>
+                  <p className="text-sm text-gray-500">{company.total_calls} calls</p>
                 </div>
-                <Link href={`/owner/companies/${company.id}`}>
+                <Link href={`/owner/companies/${company.company_id}`}>
                   <Button size="small">View</Button>
                 </Link>
               </div>
@@ -123,10 +123,10 @@ export default function OwnerDashboardPage() {
           <p className="text-sm text-gray-500 mb-4">System-wide metrics</p>
           <div className="space-y-4">
             {[
-              { label: 'Total Leads', value: dashboard?.total_leads || 0 },
-              { label: 'Total Deals', value: dashboard?.total_deals || 0 },
-              { label: 'Total Contacts', value: dashboard?.total_contacts || 0 },
-              { label: 'Avg Deal Value', value: `$${dashboard?.avg_deal_value?.toFixed(2) || '0.00'}` },
+              { label: 'Total Leads', value: dashboard?.this_month?.total_leads || 0 },
+              { label: 'Total Deals', value: dashboard?.this_month?.total_deals || 0 },
+              { label: 'New Companies', value: dashboard?.this_month?.new_companies || 0 },
+              { label: 'New Users', value: dashboard?.this_month?.new_users || 0 },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">{item.label}</span>

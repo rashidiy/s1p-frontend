@@ -8,8 +8,8 @@ import { cookies } from 'next/headers';
  * Get current subdomain (server-side)
  * Use in Server Components and Server Actions
  */
-export function getSubdomain(): string | null {
-  const cookieStore = cookies();
+export async function getSubdomain(): Promise<string | null> {
+  const cookieStore = await cookies();
   const subdomain = cookieStore.get('company_subdomain')?.value;
   return subdomain || null;
 }

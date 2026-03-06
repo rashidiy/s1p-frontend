@@ -87,7 +87,6 @@ export default function TaskDetailPage() {
         entity_id: editForm.entity_id || null,
         assigned_to: editForm.assigned_to || null,
         priority: editForm.priority || null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
       setEditing(false);
       loadTask();
