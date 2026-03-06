@@ -17,6 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/users': 'Team',
   '/settings/permission-groups': 'Permission Groups',
   '/settings/contract': 'Contract Settings',
+  '/settings/telegram': 'Telegram',
   '/settings': 'Settings',
   '/profile': 'Profile',
 };

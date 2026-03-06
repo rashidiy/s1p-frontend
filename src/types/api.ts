@@ -284,6 +284,29 @@ export interface ContractFilters extends PaginationParams {
 }
 
 // ============================================================================
+// TELEGRAM CONFIGURATION
+// ============================================================================
+
+export interface TelegramConfig {
+  id: string;
+  company_id: string;
+  chat_id: string | null;
+  bot_enabled: boolean;
+  notify_completed_calls: boolean;
+  notify_missed_calls: boolean;
+  notify_new_leads: boolean;
+  notify_deal_stage_change: boolean;
+}
+
+export interface UpdateTelegramConfig {
+  bot_enabled?: boolean;
+  notify_completed_calls?: boolean;
+  notify_missed_calls?: boolean;
+  notify_new_leads?: boolean;
+  notify_deal_stage_change?: boolean;
+}
+
+// ============================================================================
 // LEGACY TYPES (still used by integrations/statistics pages)
 // ============================================================================
 

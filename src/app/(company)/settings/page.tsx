@@ -9,6 +9,7 @@ import {
   RightOutlined,
   UserOutlined,
   LockOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
@@ -36,6 +37,14 @@ const settingsLinks = [
     title: 'Contract & Billing',
     description: 'View your active contract, usage limits, and billing status',
     bg: 'bg-cyan-50',
+    adminOnly: true,
+  },
+  {
+    href: '/settings/telegram',
+    icon: <SendOutlined style={{ fontSize: 22, color: '#0ea5e9' }} />,
+    title: 'Telegram Bot',
+    description: 'Connect and configure Telegram bot notifications',
+    bg: 'bg-sky-50',
     adminOnly: true,
   },
 ];

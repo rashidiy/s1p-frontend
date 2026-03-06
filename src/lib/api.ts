@@ -689,6 +689,29 @@ class ApiClient {
     return this.client.delete('/api/v1/company/analytics/cache');
   }
 
+  // ============================================================================
+  // COMPANY - TELEGRAM CONFIGURATION
+  // ============================================================================
+
+  async getTelegramConfig(): Promise<API.TelegramConfig> {
+    const response = await this.client.get<API.TelegramConfig>('/api/v1/company/telegram/config');
+    return response.data;
+  }
+
+  async updateTelegramConfig(data: API.UpdateTelegramConfig): Promise<API.TelegramConfig> {
+    const response = await this.client.put<API.TelegramConfig>('/api/v1/company/telegram/config', data);
+    return response.data;
+  }
+
+  async connectTelegram(chatId: string): Promise<API.TelegramConfig> {
+    const response = await this.client.post<API.TelegramConfig>('/api/v1/company/telegram/connect', { chat_id: chatId });
+    return response.data;
+  }
+
+  async disconnectTelegram(): Promise<void> {
+    await this.client.delete('/api/v1/company/telegram/disconnect');
+  }
+
 }
 
 export const apiClient = new ApiClient();

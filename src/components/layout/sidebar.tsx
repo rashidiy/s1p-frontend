@@ -16,6 +16,7 @@ import {
   UserOutlined,
   SafetyOutlined,
   FileTextOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
@@ -57,6 +58,7 @@ const adminNavigation: NavItem[] = [
   { name: 'Team', href: '/users', icon: <TeamOutlined /> },
   { name: 'Permission Groups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
   { name: 'Contract', href: '/settings/contract', icon: <FileTextOutlined /> },
+  { name: 'Telegram', href: '/settings/telegram', icon: <SendOutlined /> },
   { name: 'Settings', href: '/settings', icon: <SettingOutlined /> },
 ];
 
