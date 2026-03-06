@@ -12,7 +12,7 @@ import { Alert } from 'antd';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { BILLING_PERIOD_OPTIONS } from '@/lib/constants';
-import type { CompanyResponse, BillingPeriodEnum } from '@/types/api';
+import type { CompanyResponse } from '@/types/api';
 
 export default function NewContractPage() {
   const router = useRouter();
@@ -23,11 +23,13 @@ export default function NewContractPage() {
   const [form, setForm] = useState({
     company_id: '',
     name: '',
-    billing_period: 'monthly' as BillingPeriodEnum,
+    billing_period: 'monthly' as 'monthly' | 'yearly',
     price: '',
     currency: 'USD',
-    max_users: '10',
-    max_calls_per_month: '1000',
+    max_admins: '1',
+    max_managers: '5',
+    max_operators: '10',
+    max_storage_gb: '10',
     start_date: '',
     end_date: '',
   });
@@ -57,10 +59,14 @@ export default function NewContractPage() {
         billing_period: form.billing_period,
         price: parseFloat(form.price),
         currency: form.currency,
-        max_users: parseInt(form.max_users),
-        max_calls_per_month: parseInt(form.max_calls_per_month),
+        max_admins: parseInt(form.max_admins),
+        max_managers: parseInt(form.max_managers),
+        max_operators: parseInt(form.max_operators),
+        max_storage_gb: parseInt(form.max_storage_gb),
         start_date: form.start_date,
         end_date: form.end_date,
+        grace_period_days: 30,
+        auto_renew: false,
       });
       router.push(`/owner/contracts/${contract.id}`);
     } catch (err: any) {
@@ -117,7 +123,7 @@ export default function NewContractPage() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Billing Period *</Label>
-                <Select value={form.billing_period} onValueChange={(v) => setForm({ ...form, billing_period: v as BillingPeriodEnum })}>
+                <Select value={form.billing_period} onValueChange={(v) => setForm({ ...form, billing_period: v as 'monthly' | 'yearly' })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -149,19 +155,38 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Max Users</Label>
+                <Label>Max Admins</Label>
                 <Input
                   type="number"
-                  value={form.max_users}
-                  onChange={(e) => setForm({ ...form, max_users: e.target.value })}
+                  value={form.max_admins}
+                  onChange={(e) => setForm({ ...form, max_admins: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Max Calls/Month</Label>
+                <Label>Max Managers</Label>
                 <Input
                   type="number"
-                  value={form.max_calls_per_month}
-                  onChange={(e) => setForm({ ...form, max_calls_per_month: e.target.value })}
+                  value={form.max_managers}
+                  onChange={(e) => setForm({ ...form, max_managers: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Max Operators</Label>
+                <Input
+                  type="number"
+                  value={form.max_operators}
+                  onChange={(e) => setForm({ ...form, max_operators: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Max Storage (GB)</Label>
+                <Input
+                  type="number"
+                  value={form.max_storage_gb}
+                  onChange={(e) => setForm({ ...form, max_storage_gb: e.target.value })}
                 />
               </div>
             </div>

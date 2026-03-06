@@ -433,6 +433,21 @@ class ApiClient {
     return response.data;
   }
 
+  async createSipuni(data: API.SipuniCreateRequest): Promise<API.SipuniResponse> {
+    const response = await this.client.post<API.SipuniResponse>('/api/v1/company/calls/sipuni/', data);
+    return response.data;
+  }
+
+  async updateSipuni(data: { id: string } & Partial<API.SipuniCreateRequest>): Promise<API.SipuniResponse> {
+    const { id, ...updateData } = data;
+    const response = await this.client.put<API.SipuniResponse>(`/api/v1/company/calls/sipuni/${id}`, updateData);
+    return response.data;
+  }
+
+  async deleteSipuni(id: number | string): Promise<void> {
+    await this.client.delete(`/api/v1/company/calls/sipuni/${id}`);
+  }
+
   async getCallStatistics(params?: {
     sipuni_id?: string;
     represent?: string;

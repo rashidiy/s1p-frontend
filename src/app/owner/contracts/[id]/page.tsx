@@ -45,8 +45,8 @@ export default function ContractDetailPage() {
     setProcessing(true);
     try {
       await apiClient.renewContract(contractId, {
-        end_date: renewDate,
-        amount: renewAmount ? parseFloat(renewAmount) : undefined,
+        new_end_date: renewDate,
+        price: renewAmount ? parseFloat(renewAmount) : undefined,
       });
       setShowRenew(false);
       loadContract();
@@ -153,7 +153,7 @@ export default function ContractDetailPage() {
           <CardContent>
             <div className="flex items-center gap-1">
               <CalendarOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.days_remaining}</span>
+              <span className="text-2xl font-bold">{contract.days_until_expiry ?? '\u2014'}</span>
             </div>
           </CardContent>
         </Card>
@@ -165,19 +165,19 @@ export default function ContractDetailPage() {
           <CardContent>
             <div className="flex items-center gap-1">
               <TeamOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.current_users} / {contract.max_users}</span>
+              <span className="text-2xl font-bold">{contract.current_admins + contract.current_managers + contract.current_operators} / {contract.max_admins + contract.max_managers + contract.max_operators}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Calls This Month</CardDescription>
+            <CardDescription>Storage</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-1">
               <PhoneOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.current_calls_this_month} / {contract.max_calls_per_month}</span>
+              <span className="text-2xl font-bold">{contract.max_storage_gb} GB</span>
             </div>
           </CardContent>
         </Card>
@@ -224,26 +224,25 @@ export default function ContractDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Payment History</CardTitle>
+            <CardTitle>Payment Info</CardTitle>
           </CardHeader>
           <CardContent>
-            {contract.payment_history && contract.payment_history.length > 0 ? (
-              <div className="space-y-3">
-                {contract.payment_history.map((payment: any, idx: number) => (
-                  <div key={idx} className="flex justify-between items-center text-sm border-b pb-2">
-                    <div>
-                      <p className="font-medium">${payment.amount}</p>
-                      <p className="text-xs text-gray-500">{new Date(payment.date || payment.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <Badge variant={payment.status === 'paid' ? 'default' : 'secondary'}>
-                      {payment.status}
-                    </Badge>
-                  </div>
-                ))}
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Next Payment</span>
+                <span>{contract.next_payment_date ? new Date(contract.next_payment_date).toLocaleDateString() : '\u2014'}</span>
               </div>
-            ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No payment history</p>
-            )}
+              <div className="flex justify-between">
+                <span className="text-gray-500">Grace Period</span>
+                <span>{contract.grace_period_days} days</span>
+              </div>
+              {contract.notes && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Notes</span>
+                  <span>{contract.notes}</span>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

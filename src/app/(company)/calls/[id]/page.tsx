@@ -271,8 +271,8 @@ export default function CallDetailPage() {
                     size="sm"
                     onClick={async () => {
                       try {
-                        const rec = await apiClient.getCallRecording(callId);
-                        window.open(rec.url, '_blank');
+                        const recUrl = await apiClient.getCallRecording(callId);
+                        window.open(recUrl, '_blank');
                       } catch {}
                     }}
                   >

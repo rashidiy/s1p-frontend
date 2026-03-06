@@ -69,12 +69,12 @@ export default function IntegrationsPage() {
     try {
       await apiClient.updateSipuni({
         id: selectedIntegration.id,
-        company_name: formData.company_name || null,
-        cabinet_id: formData.cabinet_id || null,
-        security_key: formData.security_key || null,
-        partner_name: formData.partner_name || null,
-        partner_contact: formData.partner_contact || null,
-        comment: formData.comment || null,
+        company_name: formData.company_name || undefined,
+        cabinet_id: formData.cabinet_id || undefined,
+        security_key: formData.security_key || undefined,
+        partner_name: formData.partner_name || undefined,
+        partner_contact: formData.partner_contact || undefined,
+        comment: formData.comment || undefined,
       });
       setIsEditDialogOpen(false);
       setSelectedIntegration(null);
@@ -316,7 +316,7 @@ export default function IntegrationsPage() {
               </div>
               <DialogFooter>
                 <Button
-                  type="button"
+                  htmlType="button"
                   variant="outline"
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
@@ -397,7 +397,7 @@ export default function IntegrationsPage() {
               </div>
               <DialogFooter>
                 <Button
-                  type="button"
+                  htmlType="button"
                   variant="outline"
                   onClick={() => setIsEditDialogOpen(false)}
                 >
