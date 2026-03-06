@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 
@@ -50,7 +47,7 @@ export default function OwnerForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <label htmlFor="email" className="text-sm font-medium">Email</label>
             <Input
               id="email"
               type="email"

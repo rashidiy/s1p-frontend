@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from 'antd';
+import { Button, Input, Alert } from 'antd';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -50,7 +47,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <label htmlFor="email" className="text-sm font-medium leading-none">Email</label>
           <Input
             id="email"
             type="email"
@@ -58,25 +55,26 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="glass-input"
           />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <label htmlFor="password" className="text-sm font-medium leading-none">Password</label>
             <Link href="/forgot-password" className="text-sm text-crm-indigo-500 hover:underline">
               Forgot password?
             </Link>
           </div>
-          <Input
+          <Input.Password
             id="password"
-            type="password"
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="glass-input"
           />
         </div>
-        <Button htmlType="submit" className="w-full" disabled={loading}>
+        <Button type="primary" htmlType="submit" className="w-full" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign in'}
         </Button>
         <p className="text-sm text-center text-gray-500">

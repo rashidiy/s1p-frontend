@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
-import { Button } from '@/components/ui/button';
-import { Alert } from 'antd';
+import { Button, Alert } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
 
 export default function RegisterPage() {
@@ -33,7 +32,7 @@ export default function RegisterPage() {
         </div>
 
         <Link href="/login">
-          <Button className="w-full">Go to Login</Button>
+          <Button type="primary" className="w-full">Go to Login</Button>
         </Link>
       </div>
     </AuthLayout>

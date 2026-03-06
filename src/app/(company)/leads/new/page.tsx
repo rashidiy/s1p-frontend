@@ -2,16 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiClient } from '@/lib/api';
 import type { ContactResponse, UserResponse } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Select as AntSelect } from 'antd';
+import { Alert, Button, Input, Select, Select } from 'antd';
 import Link from 'next/link';
 
 export default function NewLeadPage() {
@@ -76,7 +70,7 @@ export default function NewLeadPage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/leads">
-          <Button variant="ghost" size="icon">
+          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
             <ArrowLeftOutlined />
           </Button>
         </Link>
@@ -86,19 +80,19 @@ export default function NewLeadPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Lead Information</CardTitle>
-          <CardDescription>Enter the details for the new lead</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0 max-w-2xl">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Lead Information</h3>
+          <p className="text-sm text-muted-foreground">Enter the details for the new lead</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <label htmlFor="title" className="text-sm font-medium">Title *</label>
               <Input
                 id="title"
                 name="title"
@@ -110,8 +104,8 @@ export default function NewLeadPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Contact</Label>
-              <AntSelect
+              <label className="text-sm font-medium">Contact</label>
+              <Select
                 showSearch
                 allowClear
                 style={{ width: '100%' }}
@@ -129,7 +123,7 @@ export default function NewLeadPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="source">Source</Label>
+              <label htmlFor="source" className="text-sm font-medium">Source</label>
               <Input
                 id="source"
                 name="source"
@@ -140,8 +134,8 @@ export default function NewLeadPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
+              <label htmlFor="description" className="text-sm font-medium">Description</label>
+              <Input.TextArea
                 id="description"
                 name="description"
                 placeholder="Customer needs..."
@@ -151,7 +145,7 @@ export default function NewLeadPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="estimated_value">Estimated Value</Label>
+                <label htmlFor="estimated_value" className="text-sm font-medium">Estimated Value</label>
                 <Input
                   id="estimated_value"
                   name="estimated_value"
@@ -163,23 +157,19 @@ export default function NewLeadPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Currency</Label>
-                <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="UZS">UZS</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Currency</label>
+                <Select
+                  value={currency}
+                  onChange={setCurrency}
+                  style={{ width: "100%" }}
+                  options={[{ value: "USD", label: "USD" }, { value: "EUR", label: "EUR" }, { value: "UZS", label: "UZS" }]}
+                />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Assigned To</Label>
-              <AntSelect
+              <label className="text-sm font-medium">Assigned To</label>
+              <Select
                 allowClear
                 style={{ width: '100%' }}
                 placeholder="Select user..."
@@ -198,14 +188,14 @@ export default function NewLeadPage() {
                 {isLoading ? 'Creating...' : 'Create Lead'}
               </Button>
               <Link href="/leads">
-                <Button htmlType="button" variant="outline" disabled={isLoading}>
+                <Button type="default" htmlType="button"  disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

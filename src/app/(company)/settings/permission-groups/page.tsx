@@ -1,14 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Button, Input, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
 
@@ -118,14 +112,14 @@ export default function PermissionGroupsPage() {
       </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? 'Edit Group' : 'Create Group'}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">{editingId ? 'Edit Group' : 'Create Group'}</h3>
+          </div>
+          <div className="p-6 pt-0 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Name</Label>
+                <label className="text-sm font-medium">Name</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -134,7 +128,7 @@ export default function PermissionGroupsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Description</Label>
+                <label className="text-sm font-medium">Description</label>
                 <Input
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -144,7 +138,7 @@ export default function PermissionGroupsPage() {
             </div>
 
             <div className="space-y-3">
-              <Label>Permissions</Label>
+              <label className="text-sm font-medium">Permissions</label>
               {Object.entries(permsByCategory).map(([category, perms]) => (
                 <div key={category} className="border rounded-lg p-3">
                   <h4 className="font-medium text-sm mb-2 capitalize">{category}</h4>
@@ -180,69 +174,69 @@ export default function PermissionGroupsPage() {
                 <SaveOutlined style={{ marginRight: 8 }} />
                 {saving ? 'Saving...' : 'Save'}
               </Button>
-              <Button variant="outline" onClick={() => setShowForm(false)}>
+              <Button type="default"  onClick={() => setShowForm(false)}>
                 <CloseOutlined style={{ marginRight: 8 }} />
                 Cancel
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
-          <Card key={group.id}>
-            <CardHeader>
+          <div key={group.id} className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   <SafetyOutlined style={{ fontSize: 20, color: '#2563eb' }} />
                   <div>
-                    <CardTitle className="text-lg">{group.name}</CardTitle>
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight text-lg">{group.name}</h3>
                     {group.description && (
-                      <CardDescription>{group.description}</CardDescription>
+                      <p className="text-sm text-muted-foreground">{group.description}</p>
                     )}
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <SafetyOutlined />
                 <span>{group.permissions.length} permissions</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {group.permissions.slice(0, 5).map((p) => (
-                  <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>
+                  <Tag key={p}  className="text-xs">{p}</Tag>
                 ))}
                 {group.permissions.length > 5 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Tag bordered className="text-xs">
                     +{group.permissions.length - 5} more
-                  </Badge>
+                  </Tag>
                 )}
               </div>
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => handleEdit(group)}>
+                <Button size="small" type="default"   onClick={() => handleEdit(group)}>
                   <EditOutlined style={{ marginRight: 4 }} />
                   Edit
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(group.id)}>
+                <Button size="small" type="primary" danger   onClick={() => handleDelete(group.id)}>
                   <DeleteOutlined style={{ marginRight: 4 }} />
                   Delete
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
       {groups.length === 0 && !showForm && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+        <div className="glass-card p-0">
+          <div className="p-6 pt-0 flex flex-col items-center justify-center py-12">
             <SafetyOutlined style={{ fontSize: 48, color: '#9ca3af' }} />
             <p className="mt-4 text-lg font-medium">No permission groups</p>
             <p className="text-sm text-gray-500">Create groups to manage user permissions</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );

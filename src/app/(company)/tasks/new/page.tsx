@@ -2,16 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiClient } from '@/lib/api';
 import type { UserResponse } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Select as AntSelect } from 'antd';
+import { Alert, Button, Input, Select, Select } from 'antd';
 import Link from 'next/link';
 
 export default function NewTaskPage() {
@@ -66,7 +60,7 @@ export default function NewTaskPage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/tasks">
-          <Button variant="ghost" size="icon">
+          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
             <ArrowLeftOutlined />
           </Button>
         </Link>
@@ -76,19 +70,19 @@ export default function NewTaskPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Task Information</CardTitle>
-          <CardDescription>Enter the details for the new task</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0 max-w-2xl">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Task Information</h3>
+          <p className="text-sm text-muted-foreground">Enter the details for the new task</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <label htmlFor="title" className="text-sm font-medium">Title *</label>
               <Input
                 id="title"
                 name="title"
@@ -100,8 +94,8 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
+              <label htmlFor="description" className="text-sm font-medium">Description</label>
+              <Input.TextArea
                 id="description"
                 name="description"
                 placeholder="Call customer about..."
@@ -110,22 +104,17 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Priority</label>
+              <Select
+                  value={priority}
+                  onChange={setPriority}
+                  style={{ width: "100%" }}
+                  options={[{ value: "low", label: "Low" }, { value: "medium", label: "Medium" }, { value: "high", label: "High" }, { value: "urgent", label: "Urgent" }]}
+                />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="due_date">Due Date</Label>
+              <label htmlFor="due_date" className="text-sm font-medium">Due Date</label>
               <Input
                 id="due_date"
                 name="due_date"
@@ -135,8 +124,8 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Assigned To</Label>
-              <AntSelect
+              <label className="text-sm font-medium">Assigned To</label>
+              <Select
                 allowClear
                 style={{ width: '100%' }}
                 placeholder="Select user..."
@@ -151,24 +140,21 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Linked Entity Type</Label>
-              <Select value={entityType} onValueChange={setEntityType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select entity type..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="contact">Contact</SelectItem>
-                  <SelectItem value="lead">Lead</SelectItem>
-                  <SelectItem value="deal">Deal</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Linked Entity Type</label>
+              <Select
+                  value={entityType}
+                  onChange={setEntityType}
+                  placeholder="Select entity type..."
+                  style={{ width: "100%" }}
+                  options={[{ value: "contact", label: "Contact" }, { value: "lead", label: "Lead" }, { value: "deal", label: "Deal" }]}
+                />
             </div>
 
             {entityType && (
               <div className="space-y-2">
-                <Label htmlFor="entity_id">
+                <label htmlFor="entity_id" className="text-sm font-medium">
                   {entityType.charAt(0).toUpperCase() + entityType.slice(1)} ID
-                </Label>
+                </label>
                 <Input
                   id="entity_id"
                   name="entity_id"
@@ -184,14 +170,14 @@ export default function NewTaskPage() {
                 {isLoading ? 'Creating...' : 'Create Task'}
               </Button>
               <Link href="/tasks">
-                <Button htmlType="button" variant="outline" disabled={isLoading}>
+                <Button type="default" htmlType="button"  disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

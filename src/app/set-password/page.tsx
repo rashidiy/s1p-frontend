@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from 'antd';
+import { Button, Input, Alert } from 'antd';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -60,31 +57,31 @@ export default function SetPasswordPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
         <div className="space-y-2">
-          <Label htmlFor="password">New Password</Label>
-          <Input
+          <label htmlFor="password" className="text-sm font-medium leading-none">New Password</label>
+          <Input.Password
             id="password"
-            type="password"
             placeholder="Create a strong password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="glass-input"
           />
           <p className="text-xs text-gray-400">
             At least 8 characters, one uppercase letter, and one number
           </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
+          <label htmlFor="confirmPassword" className="text-sm font-medium leading-none">Confirm Password</label>
+          <Input.Password
             id="confirmPassword"
-            type="password"
             placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            className="glass-input"
           />
         </div>
-        <Button htmlType="submit" className="w-full" disabled={loading}>
+        <Button type="primary" htmlType="submit" className="w-full" disabled={loading}>
           {loading ? 'Setting password...' : 'Set Password'}
         </Button>
       </form>

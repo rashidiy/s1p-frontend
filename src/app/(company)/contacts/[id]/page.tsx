@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeftOutlined, MailOutlined, PhoneOutlined, FundProjectionScreenOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { Spin, Modal } from 'antd';
+import { Button, Input, Modal, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { ContactResponse, NoteResponse } from '@/types/api';
@@ -139,7 +133,7 @@ export default function ContactDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
@@ -149,13 +143,13 @@ export default function ContactDetailPage() {
         </div>
         <div className="flex gap-2">
           {hasPermissionString('contacts.write') && !editing && (
-            <Button variant="outline" onClick={() => setEditing(true)}>
+            <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
               Edit
             </Button>
           )}
           {hasPermissionString('contacts.delete') && (
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button type="primary" danger  onClick={handleDelete}>
               Delete
             </Button>
           )}
@@ -164,57 +158,57 @@ export default function ContactDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Contact Information</h3>
+            </div>
+            <div className="p-6 pt-0">
               {editing ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>First Name</Label>
+                    <label className="text-sm font-medium">First Name</label>
                     <Input
                       value={editForm.first_name}
                       onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Last Name</Label>
+                    <label className="text-sm font-medium">Last Name</label>
                     <Input
                       value={editForm.last_name}
                       onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Email</Label>
+                    <label className="text-sm font-medium">Email</label>
                     <Input
                       value={editForm.email}
                       onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Phone</Label>
+                    <label className="text-sm font-medium">Phone</label>
                     <Input
                       value={editForm.phone}
                       onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Company</Label>
+                    <label className="text-sm font-medium">Company</label>
                     <Input
                       value={editForm.company_name}
                       onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Position</Label>
+                    <label className="text-sm font-medium">Position</label>
                     <Input
                       value={editForm.position}
                       onChange={(e) => setEditForm({ ...editForm, position: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Source</Label>
+                    <label className="text-sm font-medium">Source</label>
                     <Input
                       value={editForm.source}
                       onChange={(e) => setEditForm({ ...editForm, source: e.target.value })}
@@ -225,7 +219,7 @@ export default function ContactDetailPage() {
                       <SaveOutlined style={{ marginRight: 8 }} />
                       Save
                     </Button>
-                    <Button variant="outline" onClick={() => setEditing(false)}>
+                    <Button type="default"  onClick={() => setEditing(false)}>
                       <CloseOutlined style={{ marginRight: 8 }} />
                       Cancel
                     </Button>
@@ -243,8 +237,7 @@ export default function ContactDetailPage() {
                     <div className="flex items-center gap-3">
                       <PhoneOutlined style={{ color: '#9ca3af' }} />
                       <span>{contact.phone}</span>
-                      <Button
-                        size="sm"
+                      <Button size="small"
                         onClick={() => { setCallPhone(contact.phone || ''); setCallModalVisible(true); }}
                         className="ml-2"
                       >
@@ -263,13 +256,13 @@ export default function ContactDetailPage() {
                   {contact.source && (
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-500">Source:</span>
-                      <Badge variant="outline">{contact.source}</Badge>
+                      <Tag bordered>{contact.source}</Tag>
                     </div>
                   )}
                   {contact.tags && contact.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {contact.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                        <Tag key={tag} >{tag}</Tag>
                       ))}
                     </div>
                   )}
@@ -278,17 +271,17 @@ export default function ContactDetailPage() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Notes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Notes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
-                <Textarea
+                <Input.TextArea
                   placeholder="Add a note..."
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
@@ -310,37 +303,37 @@ export default function ContactDetailPage() {
               {notes.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Summary</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Leads</span>
-                <Badge variant="secondary">{contact.total_leads ?? 0}</Badge>
+                <Tag >{contact.total_leads ?? 0}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Deals</span>
-                <Badge variant="secondary">{contact.total_deals ?? 0}</Badge>
+                <Tag >{contact.total_deals ?? 0}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Calls</span>
-                <Badge variant="outline">{contact.total_calls ?? 0}</Badge>
+                <Tag bordered>{contact.total_calls ?? 0}</Tag>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Activity Timeline</h3>
+            </div>
+            <div className="p-6 pt-0">
               {activity.length > 0 ? (
                 <div className="space-y-3">
                   {activity.map((item: any, idx: number) => (
@@ -358,8 +351,8 @@ export default function ContactDetailPage() {
               ) : (
                 <p className="text-sm text-gray-500 text-center py-4">No activity yet</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -371,11 +364,10 @@ export default function ContactDetailPage() {
       >
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Phone Number</Label>
+            <label className="text-sm font-medium">Phone Number</label>
             <Input value={callPhone} onChange={(e) => setCallPhone(e.target.value)} placeholder="+1234567890" />
           </div>
-          <Button
-            disabled={calling || !callPhone}
+          <Button disabled={calling || !callPhone}
             onClick={async () => {
               setCalling(true);
               try {

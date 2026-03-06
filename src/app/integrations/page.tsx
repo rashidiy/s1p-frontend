@@ -1,22 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { PlusOutlined, BankOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Button, Input, Modal, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { SipuniResponse, SipuniCreateRequest } from '@/types/api';
 
@@ -129,7 +115,7 @@ export default function IntegrationsPage() {
   };
 
   return (
-    <AppLayout>
+
       <div className="p-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -147,8 +133,8 @@ export default function IntegrationsPage() {
         {loading ? (
           <div className="flex items-center justify-center h-64"><Spin size="large" /></div>
         ) : integrations.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16">
+          <div className="glass-card p-0">
+            <div className="p-6 pt-0 flex flex-col items-center justify-center py-16">
               <BankOutlined style={{ fontSize: 48, color: 'var(--muted-foreground)' }} />
               <h3 className="text-lg font-medium mb-2 mt-4">No integrations yet</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -158,31 +144,31 @@ export default function IntegrationsPage() {
                 <PlusOutlined style={{ marginRight: 8 }} />
                 Add Integration
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {integrations.map((integration) => (
-              <Card key={integration.id}>
-                <CardHeader>
+              <div key={integration.id} className="glass-card p-0">
+                <div className="flex flex-col space-y-1.5 p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 text-primary p-2 rounded-lg">
                         <BankOutlined style={{ fontSize: 20 }} />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">
+                        <h3 className="text-2xl font-semibold leading-none tracking-tight text-lg">
                           {integration.company_name}
-                        </CardTitle>
-                        <CardDescription className="mt-1">
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
                           Cabinet: {integration.cabinet_id}
-                        </CardDescription>
+                        </p>
                       </div>
                     </div>
-                    <Badge variant="success">Active</Badge>
+                    <Tag color="green">Active</Tag>
                   </div>
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div className="p-6 pt-0">
                   <div className="space-y-3">
                     {integration.partner_name && (
                       <div>
@@ -202,9 +188,7 @@ export default function IntegrationsPage() {
                         <code className="flex-1 text-xs bg-muted px-2 py-1 rounded truncate">
                           {integration.token.substring(0, 20)}...
                         </code>
-                        <Button
-                          size="sm"
-                          variant="ghost"
+                        <Button size="small" type="text"
                           onClick={() => handleCopyToken(integration.token)}
                         >
                           <CopyOutlined />
@@ -218,18 +202,14 @@ export default function IntegrationsPage() {
                       </div>
                     )}
                     <div className="flex gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <Button size="small" type="default"
                         className="flex-1"
                         onClick={() => openEditDialog(integration)}
                       >
                         <EditOutlined style={{ marginRight: 4 }} />
                         Edit
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <Button size="small" type="default"
                         className="flex-1"
                         onClick={() => handleDelete(integration.id)}
                       >
@@ -238,25 +218,24 @@ export default function IntegrationsPage() {
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
 
         {/* Create Dialog */}
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogContent className="max-w-md">
-            <form onSubmit={handleCreate}>
-              <DialogHeader>
-                <DialogTitle>Add Integration</DialogTitle>
-                <DialogDescription>
+        <Modal open={isCreateDialogOpen} onCancel={() => setIsCreateDialogOpen(false)} footer={null} destroyOnClose>
+          <form onSubmit={handleCreate}>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold">Add Integration</h3>
+                <p className="text-sm text-muted-foreground">
                   Connect a new SIPUNI account to your CRM
-                </DialogDescription>
-              </DialogHeader>
+                </p>
+              </div>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="company_name">Company Name *</Label>
+                  <label htmlFor="company_name" className="text-sm font-medium">Company Name *</label>
                   <Input
                     id="company_name"
                     name="company_name"
@@ -266,7 +245,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="cabinet_id">Cabinet ID *</Label>
+                  <label htmlFor="cabinet_id" className="text-sm font-medium">Cabinet ID *</label>
                   <Input
                     id="cabinet_id"
                     name="cabinet_id"
@@ -276,7 +255,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="security_key">Security Key *</Label>
+                  <label htmlFor="security_key" className="text-sm font-medium">Security Key *</label>
                   <Input
                     id="security_key"
                     name="security_key"
@@ -287,7 +266,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="partner_name">Partner Name</Label>
+                  <label htmlFor="partner_name" className="text-sm font-medium">Partner Name</label>
                   <Input
                     id="partner_name"
                     name="partner_name"
@@ -296,7 +275,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="partner_contact">Partner Contact</Label>
+                  <label htmlFor="partner_contact" className="text-sm font-medium">Partner Contact</label>
                   <Input
                     id="partner_contact"
                     name="partner_contact"
@@ -305,7 +284,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="comment">Comment</Label>
+                  <label htmlFor="comment" className="text-sm font-medium">Comment</label>
                   <Input
                     id="comment"
                     name="comment"
@@ -314,33 +293,29 @@ export default function IntegrationsPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
-                <Button
-                  htmlType="button"
-                  variant="outline"
+              <div className="flex justify-end gap-2 mt-4">
+                <Button type="default"
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
                   Cancel
                 </Button>
                 <Button htmlType="submit">Create</Button>
-              </DialogFooter>
+              </div>
             </form>
-          </DialogContent>
-        </Dialog>
+        </Modal>
 
         {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-md">
-            <form onSubmit={handleEdit}>
-              <DialogHeader>
-                <DialogTitle>Edit Integration</DialogTitle>
-                <DialogDescription>
+        <Modal open={isEditDialogOpen} onCancel={() => setIsEditDialogOpen(false)} footer={null} destroyOnClose>
+          <form onSubmit={handleEdit}>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold">Edit Integration</h3>
+                <p className="text-sm text-muted-foreground">
                   Update integration details
-                </DialogDescription>
-              </DialogHeader>
+                </p>
+              </div>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit_company_name">Company Name</Label>
+                  <label htmlFor="edit_company_name" className="text-sm font-medium">Company Name</label>
                   <Input
                     id="edit_company_name"
                     name="company_name"
@@ -349,7 +324,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_cabinet_id">Cabinet ID</Label>
+                  <label htmlFor="edit_cabinet_id" className="text-sm font-medium">Cabinet ID</label>
                   <Input
                     id="edit_cabinet_id"
                     name="cabinet_id"
@@ -358,7 +333,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_security_key">Security Key</Label>
+                  <label htmlFor="edit_security_key" className="text-sm font-medium">Security Key</label>
                   <Input
                     id="edit_security_key"
                     name="security_key"
@@ -368,7 +343,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_partner_name">Partner Name</Label>
+                  <label htmlFor="edit_partner_name" className="text-sm font-medium">Partner Name</label>
                   <Input
                     id="edit_partner_name"
                     name="partner_name"
@@ -377,7 +352,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_partner_contact">Partner Contact</Label>
+                  <label htmlFor="edit_partner_contact" className="text-sm font-medium">Partner Contact</label>
                   <Input
                     id="edit_partner_contact"
                     name="partner_contact"
@@ -386,7 +361,7 @@ export default function IntegrationsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_comment">Comment</Label>
+                  <label htmlFor="edit_comment" className="text-sm font-medium">Comment</label>
                   <Input
                     id="edit_comment"
                     name="comment"
@@ -395,20 +370,17 @@ export default function IntegrationsPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
-                <Button
-                  htmlType="button"
-                  variant="outline"
+              <div className="flex justify-end gap-2 mt-4">
+                <Button type="default"
                   onClick={() => setIsEditDialogOpen(false)}
                 >
                   Cancel
                 </Button>
                 <Button htmlType="submit">Update</Button>
-              </DialogFooter>
+              </div>
             </form>
-          </DialogContent>
-        </Dialog>
+        </Modal>
       </div>
-    </AppLayout>
+
   );
 }

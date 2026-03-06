@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -52,7 +49,7 @@ export default function OwnerLoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <label htmlFor="email" className="text-sm font-medium">Email</label>
           <Input
             id="email"
             name="email"
@@ -64,7 +61,7 @@ export default function OwnerLoginPage() {
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <label htmlFor="password" className="text-sm font-medium">Password</label>
             <Link href="/owner/forgot-password" className="text-sm text-crm-indigo-500 hover:underline">
               Forgot password?
             </Link>

@@ -2,13 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert } from 'antd';
+import { Alert, Button, Input, Select } from 'antd';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { BILLING_PERIOD_OPTIONS } from '@/lib/constants';
@@ -79,39 +74,39 @@ export default function NewContractPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+        <Button size="small" type="text"   onClick={() => router.back()}>
           <ArrowLeftOutlined style={{ marginRight: 4 }} />
           Back
         </Button>
         <h1 className="text-3xl font-bold gradient-text">New Contract</h1>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Contract Details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Contract Details</h3>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="space-y-2">
-              <Label>Company *</Label>
-              <Select value={form.company_id} onValueChange={(v) => setForm({ ...form, company_id: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select company" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Company *</label>
+              <Select
+                value={form.company_id}
+                onChange={(v) => setForm({ ...form, company_id: v })}
+                placeholder="Select company"
+                style={{ width: "100%" }}
+                options={companies.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                }))}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Name *</Label>
+              <label className="text-sm font-medium">Name *</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -122,20 +117,19 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Billing Period *</Label>
-                <Select value={form.billing_period} onValueChange={(v) => setForm({ ...form, billing_period: v as 'monthly' | 'yearly' })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BILLING_PERIOD_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Billing Period *</label>
+                <Select
+                  value={form.billing_period}
+                  onChange={(v) => setForm({ ...form, billing_period: v as 'monthly' | 'yearly' })}
+                  style={{ width: "100%" }}
+                  options={BILLING_PERIOD_OPTIONS.map((o) => ({
+                    value: o.value,
+                    label: o.label,
+                  }))}
+                />
               </div>
               <div className="space-y-2">
-                <Label>Price *</Label>
+                <label className="text-sm font-medium">Price *</label>
                 <Input
                   type="number"
                   value={form.price}
@@ -145,7 +139,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Currency</Label>
+                <label className="text-sm font-medium">Currency</label>
                 <Input
                   value={form.currency}
                   onChange={(e) => setForm({ ...form, currency: e.target.value })}
@@ -155,7 +149,7 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Max Admins</Label>
+                <label className="text-sm font-medium">Max Admins</label>
                 <Input
                   type="number"
                   value={form.max_admins}
@@ -163,7 +157,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Max Managers</Label>
+                <label className="text-sm font-medium">Max Managers</label>
                 <Input
                   type="number"
                   value={form.max_managers}
@@ -174,7 +168,7 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Max Operators</Label>
+                <label className="text-sm font-medium">Max Operators</label>
                 <Input
                   type="number"
                   value={form.max_operators}
@@ -182,7 +176,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Max Storage (GB)</Label>
+                <label className="text-sm font-medium">Max Storage (GB)</label>
                 <Input
                   type="number"
                   value={form.max_storage_gb}
@@ -193,7 +187,7 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Start Date *</Label>
+                <label className="text-sm font-medium">Start Date *</label>
                 <Input
                   type="date"
                   value={form.start_date}
@@ -202,7 +196,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>End Date *</Label>
+                <label className="text-sm font-medium">End Date *</label>
                 <Input
                   type="date"
                   value={form.end_date}
@@ -216,13 +210,13 @@ export default function NewContractPage() {
               <Button htmlType="submit" disabled={loading}>
                 {loading ? 'Creating...' : 'Create Contract'}
               </Button>
-              <Button variant="outline" htmlType="button" onClick={() => router.back()}>
+              <Button type="default"  htmlType="button" onClick={() => router.back()}>
                 Cancel
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

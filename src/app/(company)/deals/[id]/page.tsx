@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, TrophyOutlined, CloseCircleOutlined, RiseOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Button, Input, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
@@ -137,34 +131,34 @@ export default function DealDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
           <h1 className="text-3xl font-bold gradient-text">{deal.title}</h1>
-          {deal.stage && <Badge className={stageColor}>{deal.stage}</Badge>}
+          {deal.stage && <Tag className={stageColor}>{deal.stage}</Tag>}
         </div>
         <div className="flex gap-2">
           {!isClosedDeal && hasPermissionString('deals.write') && (
             <>
-              <Button variant="default" onClick={handleWin} className="bg-green-600 hover:bg-green-700">
+              <Button type="primary"  onClick={handleWin} className="bg-green-600 hover:bg-green-700">
                 <TrophyOutlined style={{ marginRight: 8 }} />
                 Won
               </Button>
-              <Button variant="destructive" onClick={handleLose}>
+              <Button type="primary" danger  onClick={handleLose}>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
                 Lost
               </Button>
             </>
           )}
           {hasPermissionString('deals.write') && !editing && (
-            <Button variant="outline" onClick={() => setEditing(true)}>
+            <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
               Edit
             </Button>
           )}
           {hasPermissionString('deals.delete') && (
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button type="primary" danger  onClick={handleDelete}>
               Delete
             </Button>
           )}
@@ -173,30 +167,30 @@ export default function DealDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Deal Information</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Deal Information</h3>
+            </div>
+            <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Title</Label>
+                    <label className="text-sm font-medium">Title</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea
+                    <label className="text-sm font-medium">Description</label>
+                    <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label>Amount</Label>
+                      <label className="text-sm font-medium">Amount</label>
                       <Input
                         type="number"
                         value={editForm.amount}
@@ -204,7 +198,7 @@ export default function DealDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Probability (%)</Label>
+                      <label className="text-sm font-medium">Probability (%)</label>
                       <Input
                         type="number"
                         min="0"
@@ -214,7 +208,7 @@ export default function DealDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Expected Close Date</Label>
+                      <label className="text-sm font-medium">Expected Close Date</label>
                       <Input
                         type="date"
                         value={editForm.expected_close_date}
@@ -227,7 +221,7 @@ export default function DealDetailPage() {
                       <SaveOutlined style={{ marginRight: 8 }} />
                       Save
                     </Button>
-                    <Button variant="outline" onClick={() => setEditing(false)}>
+                    <Button type="default"  onClick={() => setEditing(false)}>
                       <CloseOutlined style={{ marginRight: 8 }} />
                       Cancel
                     </Button>
@@ -281,22 +275,22 @@ export default function DealDetailPage() {
                   {deal.tags && deal.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {deal.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                        <Tag key={tag} >{tag}</Tag>
                       ))}
                     </div>
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Notes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
-                <Textarea
+                <Input.TextArea
                   placeholder="Add a note..."
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
@@ -318,19 +312,19 @@ export default function DealDetailPage() {
               {notes.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Details</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Stage</span>
-                <Badge className={stageColor}>{deal.stage || 'N/A'}</Badge>
+                <Tag className={stageColor}>{deal.stage || 'N/A'}</Tag>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Amount</span>
@@ -344,8 +338,8 @@ export default function DealDetailPage() {
                 <span className="text-gray-500">Updated</span>
                 <span>{new Date(deal.updated_at).toLocaleDateString()}</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

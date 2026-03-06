@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, CheckOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
-import { Spin, Tag, Alert, Select as AntSelect } from 'antd';
+import { Alert, Button, Input, Select, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
@@ -138,7 +132,7 @@ export default function TaskDetailPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/tasks">
-            <Button variant="ghost" size="sm">
+            <Button size="small" type="text">
               <ArrowLeftOutlined style={{ marginRight: 4 }} />
               Back
             </Button>
@@ -150,7 +144,7 @@ export default function TaskDetailPage() {
         </div>
         <div className="flex gap-2">
           {!editing && (
-            <Button variant="outline" onClick={() => setEditing(true)}>
+            <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
               Edit
             </Button>
@@ -160,43 +154,44 @@ export default function TaskDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Task Details</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Task Details</h3>
+            </div>
+            <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Title</Label>
+                    <label className="text-sm font-medium">Title</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea
+                    <label className="text-sm font-medium">Description</label>
+                    <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Priority</Label>
-                    <Select value={editForm.priority} onValueChange={(val) => setEditForm({ ...editForm, priority: val })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select priority..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <label className="text-sm font-medium">Priority</label>
+                    <Select
+                      value={editForm.priority}
+                      onChange={(val) => setEditForm({ ...editForm, priority: val })}
+                      placeholder="Select priority..."
+                      style={{ width: "100%" }}
+                      options={[
+                        { value: "low", label: "Low" },
+                        { value: "medium", label: "Medium" },
+                        { value: "high", label: "High" },
+                        { value: "urgent", label: "Urgent" },
+                      ]}
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label>Due Date</Label>
+                    <label className="text-sm font-medium">Due Date</label>
                     <Input
                       type="datetime-local"
                       value={editForm.due_date}
@@ -204,8 +199,8 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Assigned To</Label>
-                    <AntSelect
+                    <label className="text-sm font-medium">Assigned To</label>
+                    <Select
                       allowClear
                       style={{ width: '100%' }}
                       placeholder="Select user..."
@@ -218,21 +213,22 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Entity Type</Label>
-                    <Select value={editForm.entity_type} onValueChange={(val) => setEditForm({ ...editForm, entity_type: val })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select entity type..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="contact">Contact</SelectItem>
-                        <SelectItem value="lead">Lead</SelectItem>
-                        <SelectItem value="deal">Deal</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <label className="text-sm font-medium">Entity Type</label>
+                    <Select
+                      value={editForm.entity_type}
+                      onChange={(val) => setEditForm({ ...editForm, entity_type: val })}
+                      placeholder="Select entity type..."
+                      style={{ width: "100%" }}
+                      options={[
+                        { value: "contact", label: "Contact" },
+                        { value: "lead", label: "Lead" },
+                        { value: "deal", label: "Deal" },
+                      ]}
+                    />
                   </div>
                   {editForm.entity_type && (
                     <div className="space-y-2">
-                      <Label>{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} ID</Label>
+                      <label className="text-sm font-medium">{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} ID</label>
                       <Input
                         value={editForm.entity_id}
                         onChange={(e) => setEditForm({ ...editForm, entity_id: e.target.value })}
@@ -245,7 +241,7 @@ export default function TaskDetailPage() {
                       <SaveOutlined style={{ marginRight: 8 }} />
                       {saving ? 'Saving...' : 'Save'}
                     </Button>
-                    <Button variant="outline" onClick={() => { setEditing(false); loadTask(); }}>
+                    <Button type="default"  onClick={() => { setEditing(false); loadTask(); }}>
                       <CloseOutlined style={{ marginRight: 8 }} />
                       Cancel
                     </Button>
@@ -276,15 +272,15 @@ export default function TaskDetailPage() {
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {task.entity_type && task.entity_id && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Linked Entity</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="glass-card p-0">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Linked Entity</h3>
+              </div>
+              <div className="p-6 pt-0">
                 <div className="flex items-center gap-3">
                   <LinkOutlined style={{ color: '#6366f1' }} />
                   <Link
@@ -294,17 +290,17 @@ export default function TaskDetailPage() {
                     View {task.entity_type}: {task.entity_id}
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Summary</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Priority</span>
                 {task.priority ? (
@@ -342,34 +338,30 @@ export default function TaskDetailPage() {
               <div className="text-sm text-gray-500 pt-2">
                 Created: {new Date(task.created_at).toLocaleDateString()}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
+          <div className="glass-card p-0">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Actions</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-3">
+              <Button type="default"
                 className="w-full"
                 onClick={handleComplete}
-                disabled={completing || task.status === 'completed'}
-                variant={task.status === 'completed' ? 'outline' : 'default'}
-              >
+                disabled={completing || task.status === 'completed'}>
                 <CheckOutlined style={{ marginRight: 8 }} />
                 {completing ? 'Completing...' : task.status === 'completed' ? 'Already Completed' : 'Mark Complete'}
               </Button>
-              <Button
+              <Button type="primary" danger
                 className="w-full"
-                variant="destructive"
                 onClick={handleDelete}
-                disabled={deleting}
-              >
+                disabled={deleting}>
                 <DeleteOutlined style={{ marginRight: 8 }} />
                 {deleting ? 'Deleting...' : 'Delete Task'}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

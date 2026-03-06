@@ -2,13 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAddOutlined, SaveOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
-import { Spin, Alert } from 'antd';
+import { Alert, Button, Input, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { CompanyDetailResponse, UserResponse } from '@/types/api';
 
@@ -101,7 +96,7 @@ export default function CompanyDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.back()}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
@@ -109,19 +104,17 @@ export default function CompanyDetailPage() {
             <BankOutlined style={{ fontSize: 24, color: '#2563eb' }} />
             <h1 className="text-3xl font-bold gradient-text">{company.name}</h1>
           </div>
-          <Badge variant={company.is_active ? 'default' : 'secondary'}>
+          <Tag color={company.is_active ? 'blue' : undefined}>
             {company.is_active ? 'Active' : 'Inactive'}
-          </Badge>
+          </Tag>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowInvite(true)}>
+          <Button type="default"  onClick={() => setShowInvite(true)}>
             <UserAddOutlined style={{ marginRight: 8 }} />
             Invite Admin
           </Button>
-          <Button
-            variant={company.is_active ? 'destructive' : 'default'}
-            onClick={handleToggleActive}
-          >
+          <Button type="primary" danger={company.is_active}
+            onClick={handleToggleActive}>
             {company.is_active ? 'Deactivate' : 'Activate'}
           </Button>
         </div>
@@ -139,16 +132,16 @@ export default function CompanyDetailPage() {
       )}
 
       {showInvite && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Invite Company Admin</CardTitle>
-            <CardDescription>Send an invitation to a new admin for this company</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">Invite Company Admin</h3>
+            <p className="text-sm text-muted-foreground">Send an invitation to a new admin for this company</p>
+          </div>
+          <div className="p-6 pt-0">
             <form onSubmit={handleInviteAdmin} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email *</Label>
+                  <label className="text-sm font-medium">Email *</label>
                   <Input
                     type="email"
                     value={inviteForm.email}
@@ -157,7 +150,7 @@ export default function CompanyDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>First Name *</Label>
+                  <label className="text-sm font-medium">First Name *</label>
                   <Input
                     value={inviteForm.first_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, first_name: e.target.value })}
@@ -165,14 +158,14 @@ export default function CompanyDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Last Name</Label>
+                  <label className="text-sm font-medium">Last Name</label>
                   <Input
                     value={inviteForm.last_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, last_name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
+                  <label className="text-sm font-medium">Phone</label>
                   <Input
                     value={inviteForm.phone}
                     onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
@@ -183,32 +176,32 @@ export default function CompanyDetailPage() {
                 <Button htmlType="submit" disabled={inviting}>
                   {inviting ? 'Inviting...' : 'Send Invite'}
                 </Button>
-                <Button variant="outline" htmlType="button" onClick={() => setShowInvite(false)}>
+                <Button type="default"  htmlType="button" onClick={() => setShowInvite(false)}>
                   Cancel
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
             <div className="flex items-center justify-between">
-              <CardTitle>Company Details</CardTitle>
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Company Details</h3>
               {!editing && (
-                <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                <Button size="small" type="text"   onClick={() => setEditing(true)}>
                   <EditOutlined />
                 </Button>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="p-6 pt-0">
             {editing ? (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Company Name</Label>
+                  <label className="text-sm font-medium">Company Name</label>
                   <Input
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
@@ -219,7 +212,7 @@ export default function CompanyDetailPage() {
                     <SaveOutlined style={{ marginRight: 8 }} />
                     Save
                   </Button>
-                  <Button variant="outline" onClick={() => setEditing(false)}>
+                  <Button type="default"  onClick={() => setEditing(false)}>
                     <CloseOutlined style={{ marginRight: 8 }} />
                     Cancel
                   </Button>
@@ -241,9 +234,9 @@ export default function CompanyDetailPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Status</span>
-                  <Badge variant={company.is_active ? 'default' : 'secondary'}>
+                  <Tag color={company.is_active ? 'blue' : undefined}>
                     {company.is_active ? 'Active' : 'Inactive'}
-                  </Badge>
+                  </Tag>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Created</span>
@@ -251,14 +244,14 @@ export default function CompanyDetailPage() {
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Provider Configuration</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="glass-card p-0">
+          <div className="flex flex-col space-y-1.5 p-6">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">Provider Configuration</h3>
+          </div>
+          <div className="p-6 pt-0">
             <div className="space-y-3 text-sm">
               {Object.entries(company.provider_config || {}).map(([key, value]) => (
                 <div key={key} className="flex justify-between">
@@ -272,15 +265,15 @@ export default function CompanyDetailPage() {
                 <p className="text-gray-500">No provider configuration</p>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {company.webhook_url && (
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Webhook</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+          <div className="glass-card p-0 lg:col-span-2">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Webhook</h3>
+            </div>
+            <div className="p-6 pt-0 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">URL</span>
                 <span className="font-mono text-xs">{company.webhook_url}</span>
@@ -289,8 +282,8 @@ export default function CompanyDetailPage() {
                 <span className="text-gray-500">Token</span>
                 <span className="font-mono text-xs">{company.webhook_token}</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -1,14 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { Alert, Spin } from 'antd';
+import { Alert, Button, Input, Spin } from 'antd';
 import type { OwnerResponse } from '@/types/api';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -121,12 +117,12 @@ export default function OwnerProfilePage() {
     <div className="max-w-2xl space-y-6">
       <h1 className="text-3xl font-bold gradient-text">Owner Profile</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Update your personal details</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Personal Information</h3>
+          <p className="text-sm text-muted-foreground">Update your personal details</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleSaveProfile} className="space-y-4">
             {message && (
               <Alert type="success" message={message} showIcon className="!rounded-xl" />
@@ -136,7 +132,7 @@ export default function OwnerProfilePage() {
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>First Name</Label>
+                <label className="text-sm font-medium">First Name</label>
                 <Input
                   value={profileForm.first_name}
                   onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
@@ -144,7 +140,7 @@ export default function OwnerProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Last Name</Label>
+                <label className="text-sm font-medium">Last Name</label>
                 <Input
                   value={profileForm.last_name}
                   onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
@@ -152,11 +148,11 @@ export default function OwnerProfilePage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Email</Label>
+              <label className="text-sm font-medium">Email</label>
               <Input value={profile?.email || ''} disabled />
             </div>
             <div className="space-y-2">
-              <Label>Phone</Label>
+              <label className="text-sm font-medium">Phone</label>
               <Input
                 value={profileForm.phone}
                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
@@ -166,15 +162,15 @@ export default function OwnerProfilePage() {
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Change Password</CardTitle>
-          <CardDescription>Update your password</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card p-0">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
+          <p className="text-sm text-muted-foreground">Update your password</p>
+        </div>
+        <div className="p-6 pt-0">
           <form onSubmit={handleChangePassword} className="space-y-4">
             {passwordMessage && (
               <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" />
@@ -183,7 +179,7 @@ export default function OwnerProfilePage() {
               <Alert type="error" message={passwordError} showIcon className="!rounded-xl" />
             )}
             <div className="space-y-2">
-              <Label>Current Password</Label>
+              <label className="text-sm font-medium">Current Password</label>
               <Input
                 type="password"
                 value={passwordForm.old_password}
@@ -192,7 +188,7 @@ export default function OwnerProfilePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>New Password</Label>
+              <label className="text-sm font-medium">New Password</label>
               <Input
                 type="password"
                 value={passwordForm.new_password}
@@ -204,7 +200,7 @@ export default function OwnerProfilePage() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label>Confirm New Password</Label>
+              <label className="text-sm font-medium">Confirm New Password</label>
               <Input
                 type="password"
                 value={passwordForm.confirm_password}
@@ -216,8 +212,8 @@ export default function OwnerProfilePage() {
               {changingPassword ? 'Changing...' : 'Change Password'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
