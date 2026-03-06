@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
             children: (<div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="glass-card p-0">
-              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-row items-center justify-between p-6 pb-2">
                 <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                 <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="glass-card p-0">
-              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-row items-center justify-between p-6 pb-2">
                 <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Leads</h3>
                 <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="glass-card p-0">
-              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-row items-center justify-between p-6 pb-2">
                 <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Deals</h3>
                 <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="glass-card p-0">
-              <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-row items-center justify-between p-6 pb-2">
                 <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Tasks</h3>
                 <CheckSquareOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
@@ -318,7 +318,7 @@ export default function AnalyticsPage() {
             children: (<div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className="glass-card p-0">
-                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex flex-row items-center justify-between p-6 pb-2">
                   <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Members</h3>
                   <TeamOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
@@ -333,7 +333,7 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="glass-card p-0">
-                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex flex-row items-center justify-between p-6 pb-2">
                   <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                   <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
@@ -348,7 +348,7 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="glass-card p-0">
-                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex flex-row items-center justify-between p-6 pb-2">
                   <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Leads</h3>
                   <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
@@ -363,7 +363,7 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="glass-card p-0">
-                <div className="flex flex-col space-y-1.5 p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex flex-row items-center justify-between p-6 pb-2">
                   <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Revenue</h3>
                   <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>

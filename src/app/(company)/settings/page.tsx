@@ -67,7 +67,7 @@ export default function SettingsPage() {
       <div className="grid gap-4">
         {visibleLinks.map((link) => (
           <Link key={link.href} href={link.href}>
-            <div className="glass-card p-0 glass-card hover:shadow-md transition-all cursor-pointer border-0">
+            <div className="glass-card p-0 hover:shadow-md transition-all cursor-pointer border-0">
               <div className="p-6 pt-0 p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -88,7 +88,7 @@ export default function SettingsPage() {
       </div>
 
       {!isAdmin && (
-        <div className="glass-card p-0 glass-card border-amber-200 bg-amber-50/50">
+        <div className="glass-card p-0 border-amber-200 bg-amber-50/50">
           <div className="flex flex-col space-y-1.5 p-6">
             <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm text-amber-700 flex items-center gap-2">
               <LockOutlined />

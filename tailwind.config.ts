@@ -98,23 +98,9 @@ const config = {
         'gradient-teal': 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
         'gradient-orange': 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
       },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 } satisfies Config
 
 export default config

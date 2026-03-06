@@ -115,7 +115,6 @@ export default function IntegrationsPage() {
   };
 
   return (
-
       <div className="p-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -381,6 +380,5 @@ export default function IntegrationsPage() {
             </form>
         </Modal>
       </div>
-
   );
 }

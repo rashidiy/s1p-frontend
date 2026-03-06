@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import type { UserResponse } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select, Select } from 'antd';
+import { Alert, Button, Input, Select } from 'antd';
 import Link from 'next/link';
 
 export default function NewTaskPage() {
