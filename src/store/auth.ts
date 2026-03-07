@@ -26,7 +26,7 @@ interface AuthState {
   permissions: string[];
   mustChangePassword: boolean;
 
-  setUser: (user: AuthUser | null, userType: UserType | null) => void;
+  setUser: (user: (AuthUser & { credentials?: { access?: string }; permissions?: string[] }) | null, userType: UserType | null) => void;
   logout: () => void;
   initAuth: () => void;
 
@@ -75,14 +75,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     let permissions: string[] = [];
     if (user) {
       // From login response: decode JWT for permissions
-      const credentials = (user as any)?.credentials;
-      if (credentials?.access) {
-        const parsed = parseJwtPermissions(credentials.access);
+      if (user.credentials?.access) {
+        const parsed = parseJwtPermissions(user.credentials.access);
         permissions = parsed.permissions;
       }
       // From /me endpoint response: use permissions array directly
-      else if (Array.isArray((user as any)?.permissions)) {
-        permissions = (user as any).permissions;
+      else if (Array.isArray(user.permissions)) {
+        permissions = user.permissions;
       }
     }
     set({
