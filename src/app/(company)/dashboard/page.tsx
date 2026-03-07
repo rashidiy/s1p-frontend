@@ -69,6 +69,7 @@ const statCards = [
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
   const { user } = useAuthStore();
   const t = useTranslations('dashboard');
   const tActions = useTranslations('actions');
@@ -136,9 +137,10 @@ export default function DashboardPage() {
         }}
       >
         <div style={{ display: 'flex', gap: 4 }}>
-          {[{ key: 'overview', label: t('overview') }, { key: 'calls', label: t('totalCalls') }, { key: 'leads', label: t('totalLeads') }].map((tab, i) => (
+          {[{ key: 'overview', label: t('overview') }, { key: 'calls', label: t('totalCalls') }, { key: 'leads', label: t('totalLeads') }].map((tab) => (
             <button
               key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
               style={{
                 padding: '8px 16px',
                 fontSize: 14,
@@ -147,8 +149,8 @@ export default function DashboardPage() {
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: i === 0 ? '#E84040' : 'transparent',
-                color: i === 0 ? '#ffffff' : '#6B7280',
+                background: activeTab === tab.key ? '#E84040' : 'transparent',
+                color: activeTab === tab.key ? '#ffffff' : '#6B7280',
               }}
             >
               {tab.label}
@@ -240,9 +242,6 @@ export default function DashboardPage() {
                     }}
                   >
                     {value}
-                  </div>
-                  <div style={{ marginTop: 4 }}>
-                    <span className="crm-badge-positive">+0%</span>
                   </div>
                 </div>
               </div>

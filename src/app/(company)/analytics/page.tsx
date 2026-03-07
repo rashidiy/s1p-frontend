@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined } from '@ant-design/icons';
-import { Spin, Tabs } from 'antd';
+import { Alert, Spin, Tabs } from 'antd';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -17,6 +17,7 @@ const OUTCOME_CHART_COLORS: Record<string, string> = {
   busy: '#ef4444', not_interested: '#dc2626', other: '#94a3b8',
 };
 
+// TODO: Replace with real API data from a call trends endpoint (e.g. apiClient.getCallTrends())
 const SAMPLE_TREND_DATA = [
   { date: 'Mon', total: 42, inbound: 28, outbound: 14 },
   { date: 'Tue', total: 58, inbound: 35, outbound: 23 },
@@ -27,6 +28,7 @@ const SAMPLE_TREND_DATA = [
   { date: 'Sun', total: 15, inbound: 10, outbound: 5 },
 ];
 
+// TODO: Replace with real API data from team performance endpoint (e.g. apiClient.getTeamPerformance())
 const SAMPLE_TEAM_DATA = [
   { name: 'Alice', calls: 28, answered: 22 },
   { name: 'Bob', calls: 35, answered: 29 },
@@ -118,6 +120,14 @@ export default function AnalyticsPage() {
         <h1 className="text-3xl font-bold gradient-text">Analytics</h1>
         <p className="text-gray-500">Performance metrics and insights</p>
       </div>
+
+      <Alert
+        message="Demo Data"
+        description="Call trends and team performance charts use sample data. These will be connected to real API endpoints in a future update."
+        type="info"
+        showIcon
+        banner
+      />
 
       <Tabs
         defaultActiveKey="my"
