@@ -23,13 +23,14 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isOwner, userType, hasPermission, hasPermissionString, initAuth, mustChangePassword } = useAuthStore();
+  const { isAuthenticated, isInitializing, isOwner, userType, hasPermission, hasPermissionString, initAuth, mustChangePassword } = useAuthStore();
 
   useEffect(() => {
     initAuth();
   }, [initAuth]);
 
   useEffect(() => {
+    if (isInitializing) return; // Wait for session check to complete
     if (!requireAuth) return;
 
     if (!isAuthenticated) {
@@ -75,6 +76,7 @@ export function ProtectedRoute({
       return;
     }
   }, [
+    isInitializing,
     isAuthenticated,
     isOwner,
     userType,
@@ -89,7 +91,7 @@ export function ProtectedRoute({
     router,
   ]);
 
-  if (requireAuth && !isAuthenticated) {
+  if (isInitializing || (requireAuth && !isAuthenticated)) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#f0f2ff]">
         <div className="text-center">

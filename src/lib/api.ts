@@ -9,6 +9,7 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -36,18 +37,19 @@ class ApiClient {
           originalRequest._retry = true;
 
           try {
+            // Try refresh — cookies carry the refresh token; localStorage is fallback for legacy sessions
+            // Use bare axios to avoid triggering this interceptor recursively
             const refreshToken = this.getRefreshToken();
-            if (refreshToken) {
-              const response = await this.refreshToken({ refresh_token: refreshToken });
-              this.setToken(response.data.access);
+            const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`,
+              refreshToken ? { refresh_token: refreshToken } : {},
+              { withCredentials: true }
+            );
+            if (response.data.access) {
               originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
-              return this.client(originalRequest);
             }
+            return this.client(originalRequest);
           } catch (refreshError) {
             this.clearTokens();
-            if (typeof window !== 'undefined') {
-              window.location.href = '/login';
-            }
             return Promise.reject(refreshError);
           }
         }
@@ -75,12 +77,6 @@ class ApiClient {
     return null;
   }
 
-  private setToken(token: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', token);
-    }
-  }
-
   private clearTokens() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('access_token');
@@ -90,9 +86,8 @@ class ApiClient {
     }
   }
 
-  private saveUserData(data: any, userType: 'owner' | 'company_user') {
+  private saveUserType(userType: 'owner' | 'company_user') {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('user_type', userType);
     }
   }
@@ -106,25 +101,15 @@ class ApiClient {
     if (response.data.must_change_password && response.data.temporary_token) {
       return response.data;
     }
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'company_user');
-    }
+    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    this.saveUserType('company_user');
     return response.data;
-  }
-
-  async refreshToken(data: API.RefreshTokenRequest) {
-    return this.client.post('/api/v1/auth/refresh', data);
   }
 
   async setPassword(data: API.SetPasswordRequest) {
     const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/set-password', data);
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'company_user');
-    }
+    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    this.saveUserType('company_user');
     return response.data;
   }
 
@@ -159,11 +144,8 @@ class ApiClient {
     if (response.data.must_change_password && response.data.temporary_token) {
       return response.data;
     }
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'owner');
-    }
+    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    this.saveUserType('owner');
     return response.data;
   }
 
@@ -179,11 +161,8 @@ class ApiClient {
 
   async ownerSetPassword(data: API.SetPasswordRequest) {
     const response = await this.client.post<API.OwnerWithCredentials>('/api/v1/owner/auth/set-password', data);
-    this.setToken(response.data.credentials.access);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refresh_token', response.data.credentials.refresh);
-      this.saveUserData(response.data, 'owner');
-    }
+    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    this.saveUserType('owner');
     return response.data;
   }
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { UserRole } from '@/types/api';
+import { apiClient } from '@/lib/api';
 
 export type UserType = 'owner' | 'company_user';
 
@@ -19,6 +20,7 @@ interface AuthState {
   user: AuthUser | null;
   userType: UserType | null;
   isAuthenticated: boolean;
+  isInitializing: boolean;
   isOwner: boolean;
   isCompanyUser: boolean;
   permissions: string[];
@@ -63,6 +65,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   userType: null,
   isAuthenticated: false,
+  isInitializing: true,
   isOwner: false,
   isCompanyUser: false,
   permissions: [],
@@ -70,17 +73,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setUser: (user, userType) => {
     let permissions: string[] = [];
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        const parsed = parseJwtPermissions(token);
+    if (user) {
+      // From login response: decode JWT for permissions
+      const credentials = (user as any)?.credentials;
+      if (credentials?.access) {
+        const parsed = parseJwtPermissions(credentials.access);
         permissions = parsed.permissions;
+      }
+      // From /me endpoint response: use permissions array directly
+      else if (Array.isArray((user as any)?.permissions)) {
+        permissions = (user as any).permissions;
       }
     }
     set({
       user,
       userType,
       isAuthenticated: !!user,
+      isInitializing: false,
       isOwner: userType === 'owner',
       isCompanyUser: userType === 'company_user',
       permissions,
@@ -90,6 +99,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: () => {
     if (typeof window !== 'undefined') {
+      // Clean up any legacy tokens and session hints
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -100,6 +110,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       userType: null,
       isAuthenticated: false,
+      isInitializing: false,
       isOwner: false,
       isCompanyUser: false,
       permissions: [],
@@ -107,32 +118,67 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  initAuth: () => {
-    if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('user');
-      const userType = localStorage.getItem('user_type') as UserType | null;
-      const token = localStorage.getItem('access_token');
+  initAuth: async () => {
+    if (typeof window === 'undefined') return;
+    // Skip if already initialized
+    if (!get().isInitializing) return;
 
-      if (userStr && userType) {
-        try {
-          const user = JSON.parse(userStr);
-          let permissions: string[] = [];
-          if (token) {
-            const parsed = parseJwtPermissions(token);
-            permissions = parsed.permissions;
-          }
-          set({
-            user,
-            userType,
-            isAuthenticated: true,
-            isOwner: userType === 'owner',
-            isCompanyUser: userType === 'company_user',
-            permissions,
-          });
-        } catch (e) {
-          console.error('Failed to parse user from localStorage', e);
-        }
+    try {
+      const userType = localStorage.getItem('user_type') as UserType | null;
+
+      if (userType === 'owner') {
+        const profile = await apiClient.getOwnerProfile();
+        set({
+          user: {
+            id: profile.id,
+            email: profile.email,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            phone: profile.phone,
+            is_active: profile.is_active,
+            created_at: profile.created_at,
+          },
+          userType: 'owner',
+          isAuthenticated: true,
+          isInitializing: false,
+          isOwner: true,
+          isCompanyUser: false,
+          permissions: [],
+        });
+      } else {
+        // Default: try company user endpoint
+        const profile = await apiClient.getMyProfile();
+        set({
+          user: {
+            id: profile.id,
+            email: profile.email,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            phone: profile.phone,
+            role: profile.role as UserRole,
+            company_id: profile.company_id ?? undefined,
+            is_active: profile.is_active,
+            created_at: profile.created_at,
+          },
+          userType: 'company_user',
+          isAuthenticated: true,
+          isInitializing: false,
+          isOwner: false,
+          isCompanyUser: true,
+          permissions: profile.permissions || [],
+        });
       }
+    } catch {
+      // Session invalid (401) or no session — user not authenticated
+      set({
+        user: null,
+        userType: null,
+        isAuthenticated: false,
+        isInitializing: false,
+        isOwner: false,
+        isCompanyUser: false,
+        permissions: [],
+      });
     }
   },
 
