@@ -14,7 +14,8 @@
     "permissionGroups": "Группы доступа",
     "contract": "Договор",
     "companies": "Компании",
-    "contracts": "Договоры"
+    "contracts": "Договоры",
+    "telegram": "Telegram"
   },
   "auth": {
     "login": "Вход",

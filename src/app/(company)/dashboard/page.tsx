@@ -14,6 +14,7 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import type { OperatorDashboard } from '@/types/api';
 import { useAuthStore } from '@/store/auth';
@@ -29,7 +30,7 @@ const SPARKLINE_DATA: Record<string, Array<{ v: number }>> = {
 const statCards = [
   {
     key: 'calls',
-    label: 'Total Calls',
+    labelKey: 'totalCalls' as const,
     icon: <PhoneOutlined />,
     href: '/calls',
     iconBg: '#FFF0F0',
@@ -38,7 +39,7 @@ const statCards = [
   },
   {
     key: 'leads',
-    label: 'Total Leads',
+    labelKey: 'totalLeads' as const,
     icon: <RiseOutlined />,
     href: '/leads',
     iconBg: '#F0FDF4',
@@ -47,7 +48,7 @@ const statCards = [
   },
   {
     key: 'deals',
-    label: 'Total Deals',
+    labelKey: 'totalDeals' as const,
     icon: <FundProjectionScreenOutlined />,
     href: '/deals',
     iconBg: '#EFF6FF',
@@ -56,7 +57,7 @@ const statCards = [
   },
   {
     key: 'tasks',
-    label: 'Completed Tasks',
+    labelKey: 'completedTasks' as const,
     icon: <CheckSquareOutlined />,
     href: '/tasks',
     iconBg: '#FFFBEB',
@@ -69,6 +70,8 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
+  const t = useTranslations('dashboard');
+  const tActions = useTranslations('actions');
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -100,12 +103,12 @@ export default function DashboardPage() {
       case 'calls':
         return {
           value: stats?.calls.total_calls || 0,
-          sub: `${stats?.calls.answered_calls || 0} answered`,
+          sub: t('answered', { count: stats?.calls.answered_calls || 0 }),
         };
       case 'leads':
         return {
           value: stats?.leads.total_leads || 0,
-          sub: `${stats?.leads.converted_leads || 0} converted`,
+          sub: t('convertedCount', { count: stats?.leads.converted_leads || 0 }),
         };
       case 'deals':
         return {
@@ -115,7 +118,7 @@ export default function DashboardPage() {
       case 'tasks':
         return {
           value: stats?.tasks.completed_tasks || 0,
-          sub: `of ${stats?.tasks.total_tasks || 0} total`,
+          sub: t('ofTotal', { count: stats?.tasks.total_tasks || 0 }),
         };
       default:
         return { value: 0, sub: '' };
@@ -133,9 +136,9 @@ export default function DashboardPage() {
         }}
       >
         <div style={{ display: 'flex', gap: 4 }}>
-          {['Overview', 'Calls', 'Leads'].map((tab, i) => (
+          {[{ key: 'overview', label: t('overview') }, { key: 'calls', label: t('totalCalls') }, { key: 'leads', label: t('totalLeads') }].map((tab, i) => (
             <button
-              key={tab}
+              key={tab.key}
               style={{
                 padding: '8px 16px',
                 fontSize: 14,
@@ -148,7 +151,7 @@ export default function DashboardPage() {
                 color: i === 0 ? '#ffffff' : '#6B7280',
               }}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -157,19 +160,19 @@ export default function DashboardPage() {
             icon={<PlusOutlined />}
             style={{ borderColor: '#E5E7EB', color: '#374151', borderRadius: 8 }}
           >
-            Add Widget
+            {tActions('addWidget')}
           </Button>
           <Button
             icon={<FilterOutlined />}
             style={{ borderColor: '#E5E7EB', color: '#374151', borderRadius: 8 }}
           >
-            Filter
+            {tActions('filter')}
           </Button>
           <Button
             type="primary"
             style={{ background: '#0F172A', borderColor: '#0F172A', borderRadius: 8 }}
           >
-            Export
+            {tActions('export')}
           </Button>
         </div>
       </div>
@@ -195,7 +198,7 @@ export default function DashboardPage() {
                 <span
                   style={{ fontSize: 13, fontWeight: 500, color: '#6B7280' }}
                 >
-                  {card.label}
+                  {t(card.labelKey)}
                 </span>
                 <InfoCircleOutlined
                   style={{ color: '#D1D5DB', fontSize: 14 }}
@@ -292,7 +295,7 @@ export default function DashboardPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  See Details <ArrowRightOutlined style={{ fontSize: 10 }} />
+                  {tActions('seeDetails')} <ArrowRightOutlined style={{ fontSize: 10 }} />
                 </Link>
               </div>
             </div>
@@ -313,17 +316,17 @@ export default function DashboardPage() {
               marginBottom: 4,
             }}
           >
-            Quick Actions
+            {t('quickActions')}
           </h3>
           <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 16 }}>
-            Common tasks and activities
+            {t('commonTasks')}
           </p>
           <div className="space-y-2">
             {[
-              { href: '/contacts', label: 'Manage Contacts', icon: <TeamOutlined /> },
-              { href: '/leads', label: 'View Leads', icon: <RiseOutlined /> },
-              { href: '/deals', label: 'Track Deals', icon: <FundProjectionScreenOutlined /> },
-              { href: '/calls', label: 'Call History', icon: <PhoneOutlined /> },
+              { href: '/contacts', label: t('manageContacts'), icon: <TeamOutlined /> },
+              { href: '/leads', label: t('viewLeads'), icon: <RiseOutlined /> },
+              { href: '/deals', label: t('trackDeals'), icon: <FundProjectionScreenOutlined /> },
+              { href: '/calls', label: t('callHistory'), icon: <PhoneOutlined /> },
             ].map((action) => (
               <Link key={action.href} href={action.href}>
                 <Button
@@ -350,25 +353,25 @@ export default function DashboardPage() {
               marginBottom: 4,
             }}
           >
-            Performance
+            {t('performance')}
           </h3>
           <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 16 }}>
-            Your productivity metrics
+            {t('yourProductivityMetrics')}
           </p>
           <div className="space-y-4">
             {[
               {
-                label: 'Productivity Score',
+                label: t('productivityScore'),
                 value: stats?.productivity_score || 0,
                 highlight: true,
               },
-              { label: 'Total Activities', value: stats?.total_activities || 0 },
+              { label: t('totalActivities'), value: stats?.total_activities || 0 },
               {
-                label: 'Call Answer Rate',
+                label: t('callAnswerRate'),
                 value: `${Math.round(stats?.calls.success_rate || 0)}%`,
               },
               {
-                label: 'Lead Conversion',
+                label: t('leadConversion'),
                 value: `${Math.round(stats?.leads.conversion_rate || 0)}%`,
               },
             ].map((item) => (

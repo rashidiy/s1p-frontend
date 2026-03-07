@@ -14,7 +14,8 @@
     "permissionGroups": "Ruxsat guruhlari",
     "contract": "Shartnoma",
     "companies": "Kompaniyalar",
-    "contracts": "Shartnomalar"
+    "contracts": "Shartnomalar",
+    "telegram": "Telegram"
   },
   "auth": {
     "login": "Kirish",

@@ -14,7 +14,8 @@
     "permissionGroups": "Permission Groups",
     "contract": "Contract",
     "companies": "Companies",
-    "contracts": "Contracts"
+    "contracts": "Contracts",
+    "telegram": "Telegram"
   },
   "auth": {
     "login": "Login",

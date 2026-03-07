@@ -1,40 +1,42 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Sidebar } from '@/components/layout/sidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
 
-const PAGE_TITLES: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/contacts': 'Contacts',
-  '/leads': 'Leads',
-  '/deals': 'Deals',
-  '/tasks': 'Tasks',
-  '/calls': 'Calls',
-  '/analytics': 'Analytics',
-  '/users': 'Team',
-  '/settings/permission-groups': 'Permission Groups',
-  '/settings/contract': 'Contract Settings',
-  '/settings/telegram': 'Telegram',
-  '/settings': 'Settings',
-  '/profile': 'Profile',
+const PAGE_TITLE_KEYS: Record<string, { ns: string; key: string }> = {
+  '/dashboard': { ns: 'nav', key: 'dashboard' },
+  '/contacts': { ns: 'nav', key: 'contacts' },
+  '/leads': { ns: 'nav', key: 'leads' },
+  '/deals': { ns: 'nav', key: 'deals' },
+  '/tasks': { ns: 'nav', key: 'tasks' },
+  '/calls': { ns: 'nav', key: 'calls' },
+  '/analytics': { ns: 'nav', key: 'analytics' },
+  '/users': { ns: 'nav', key: 'team' },
+  '/settings/permission-groups': { ns: 'nav', key: 'permissionGroups' },
+  '/settings/contract': { ns: 'nav', key: 'contract' },
+  '/settings/telegram': { ns: 'nav', key: 'telegram' },
+  '/settings': { ns: 'nav', key: 'settings' },
+  '/profile': { ns: 'nav', key: 'profile' },
 };
 
-function getPageTitle(pathname: string): string {
+function usePageTitle(pathname: string): string {
+  const tNav = useTranslations('nav');
   let bestMatch = '';
-  let title = 'Dashboard';
-  for (const [route, name] of Object.entries(PAGE_TITLES)) {
+  let titleKey = PAGE_TITLE_KEYS['/dashboard'];
+  for (const [route, key] of Object.entries(PAGE_TITLE_KEYS)) {
     if (
       (pathname === route || pathname.startsWith(route + '/')) &&
       route.length > bestMatch.length
     ) {
       bestMatch = route;
-      title = name;
+      titleKey = key;
     }
   }
-  return title;
+  return tNav(titleKey.key);
 }
 
 export default function CompanyLayout({
@@ -43,7 +45,8 @@ export default function CompanyLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const pageTitle = getPageTitle(pathname);
+  const pageTitle = usePageTitle(pathname);
+  const tActions = useTranslations('actions');
 
   return (
     <ProtectedRoute requireAuth>
@@ -88,7 +91,7 @@ export default function CompanyLayout({
                   borderRadius: 8,
                 }}
               >
-                Customize Widget
+                {tActions('customizeWidget')}
               </Button>
             </div>
           </header>
