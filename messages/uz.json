@@ -186,7 +186,9 @@
     "tryAdjustingFilters": "Filtrlarni o'zgartirib ko'ring",
     "setOutcome": "Natijani belgilash...",
     "unknown": "Noma'lum",
-    "myCalls": "Faqat mening qo'ng'iroqlarim"
+    "myCalls": "Faqat mening qo'ng'iroqlarim",
+    "comingSoon": "Tez kunda",
+    "comingSoonDescription": "Bu funksiya tez kunda ishga tushadi. Yangiliklar bilan tanishing!"
   },
   "errors": {
     "sessionExpired": "Sessiya muddati tugadi",

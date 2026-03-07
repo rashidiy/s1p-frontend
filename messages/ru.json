@@ -186,7 +186,9 @@
     "tryAdjustingFilters": "Попробуйте изменить фильтры",
     "setOutcome": "Указать результат...",
     "unknown": "Неизвестно",
-    "myCalls": "Только мои звонки"
+    "myCalls": "Только мои звонки",
+    "comingSoon": "Скоро будет",
+    "comingSoonDescription": "Эта функция скоро будет доступна. Следите за обновлениями!"
   },
   "errors": {
     "sessionExpired": "Сессия истекла",

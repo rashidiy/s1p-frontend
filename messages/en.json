@@ -186,7 +186,9 @@
     "tryAdjustingFilters": "Try adjusting your filters",
     "setOutcome": "Set outcome...",
     "unknown": "Unknown",
-    "myCalls": "My Calls Only"
+    "myCalls": "My Calls Only",
+    "comingSoon": "Coming Soon",
+    "comingSoonDescription": "This feature is coming soon. Stay tuned!"
   },
   "errors": {
     "sessionExpired": "Session expired",
