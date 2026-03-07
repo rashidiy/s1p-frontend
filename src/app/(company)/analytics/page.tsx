@@ -17,7 +17,10 @@ const OUTCOME_CHART_COLORS: Record<string, string> = {
   busy: '#ef4444', not_interested: '#dc2626', other: '#94a3b8',
 };
 
-// TODO: Replace with real API data from a call trends endpoint (e.g. apiClient.getCallTrends())
+// TODO [Phase 2]: Replace with real API call once backend provides direction-split trend data.
+// Backend currently has GET /api/v1/company/analytics/team/dashboard → AdminDashboard.calls_trend
+// which returns [{date, calls}] (total only). Need a new endpoint or extend calls_trend to include
+// inbound/outbound breakdown: GET /api/v1/company/calls/trends?split_by=direction
 const SAMPLE_TREND_DATA = [
   { date: 'Mon', total: 42, inbound: 28, outbound: 14 },
   { date: 'Tue', total: 58, inbound: 35, outbound: 23 },
@@ -28,7 +31,9 @@ const SAMPLE_TREND_DATA = [
   { date: 'Sun', total: 15, inbound: 10, outbound: 5 },
 ];
 
-// TODO: Replace with real API data from team performance endpoint (e.g. apiClient.getTeamPerformance())
+// TODO [Phase 2]: Replace with real API call once backend provides per-operator call stats.
+// Need: GET /api/v1/company/analytics/team/operators → [{name, total_calls, answered_calls}]
+// AdminDashboard.top_operators_by_calls exists but uses company-wide stats, not per-operator.
 const SAMPLE_TEAM_DATA = [
   { name: 'Alice', calls: 28, answered: 22 },
   { name: 'Bob', calls: 35, answered: 29 },
@@ -36,6 +41,7 @@ const SAMPLE_TEAM_DATA = [
   { name: 'Dave', calls: 42, answered: 38 },
 ];
 
+// Fallback when getCallOutcomesSummary returns no data
 const SAMPLE_OUTCOME_DATA = [
   { name: 'Interested', value: 24, color: '#22c55e' },
   { name: 'No Answer', value: 18, color: '#f97316' },
@@ -122,11 +128,11 @@ export default function AnalyticsPage() {
       </div>
 
       <Alert
-        message="Demo Data"
-        description="Call trends and team performance charts use sample data. These will be connected to real API endpoints in a future update."
-        type="info"
+        message="Some charts use demo data"
+        description="Call Volume Trends and Team Performance charts display sample data — the backend API endpoints for direction-split trends and per-operator stats are not yet available (Phase 2). The stat cards, Call Outcome Distribution, and Top Performers sections use real data from your account."
+        type="warning"
         showIcon
-        banner
+        closable
       />
 
       <Tabs
