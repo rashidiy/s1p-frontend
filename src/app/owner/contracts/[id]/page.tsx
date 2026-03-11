@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, FileTextOutlined, DollarOutlined, CalendarOutlined, TeamOutlined, PhoneOutlined, ReloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Button, Input, Tag, message } from 'antd';
+import { Button, Input, Tag, message, Modal } from 'antd';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractDetailResponse } from '@/types/api';
@@ -54,18 +54,25 @@ export default function ContractDetailPage() {
     }
   };
 
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this contract?')) return;
-    setProcessing(true);
-    try {
-      await apiClient.cancelContract(contractId);
-      loadContract();
-    } catch (error) {
-      console.error('Failed to cancel contract:', error);
-      message.error('Failed to cancel contract');
-    } finally {
-      setProcessing(false);
-    }
+  const handleCancel = () => {
+    Modal.confirm({
+      title: 'Are you sure you want to cancel this contract?',
+      okText: 'Yes, cancel',
+      cancelText: 'No',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setProcessing(true);
+        try {
+          await apiClient.cancelContract(contractId);
+          loadContract();
+        } catch (error) {
+          console.error('Failed to cancel contract:', error);
+          message.error('Failed to cancel contract');
+        } finally {
+          setProcessing(false);
+        }
+      },
+    });
   };
 
   if (loading) return (

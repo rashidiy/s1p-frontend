@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Alert, Button } from 'antd';
 import { ToolOutlined } from '@ant-design/icons';
+import { useTranslations } from 'next-intl';
 
 export default function OwnerRegisterPage() {
+  const t = useTranslations('auth');
+
   return (
     <AuthLayout
-      title="Owner Registration"
-      subtitle="Platform administrator accounts"
+      title={t('ownerRegistration')}
+      subtitle={t('ownerRegistrationSubtitle')}
       icon={<ToolOutlined style={{ fontSize: 28 }} />}
     >
       <div className="space-y-5">
@@ -18,23 +21,23 @@ export default function OwnerRegisterPage() {
           showIcon
           icon={<ToolOutlined />}
           className="!rounded-xl"
-          message="CLI-only registration"
-          description="Owner (platform administrator) accounts can only be created via the server CLI. There is no web registration endpoint for owners."
+          message={t('cliOnlyRegistration')}
+          description={t('cliOnlyRegistrationDescription')}
         />
 
         <div className="text-sm text-gray-500 space-y-3">
-          <p className="font-medium text-gray-700">To create an owner account, run on the server:</p>
+          <p className="font-medium text-gray-700">{t('toCreateOwnerAccount')}</p>
           <pre className="bg-gray-900 rounded-xl p-4 text-xs font-mono text-green-400 overflow-x-auto border border-gray-800">
             <span className="text-gray-500 select-none">$ </span>make createsuperuser
           </pre>
-          <p>Or inside the Docker container:</p>
+          <p>{t('orInsideDocker')}</p>
           <pre className="bg-gray-900 rounded-xl p-4 text-xs font-mono text-green-400 overflow-x-auto border border-gray-800">
             <span className="text-gray-500 select-none">$ </span>python manage.py createsuperuser
           </pre>
         </div>
 
         <Link href="/owner/login">
-          <Button type="primary" className="w-full" size="large">Go to Owner Login</Button>
+          <Button type="primary" className="w-full" size="large">{t('goToOwnerLogin')}</Button>
         </Link>
       </div>
     </AuthLayout>

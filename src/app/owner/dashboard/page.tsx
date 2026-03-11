@@ -14,11 +14,13 @@ import type { OwnerDashboard } from '@/types/api';
 import { WelcomeCharacter } from '@/components/illustrations';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function OwnerDashboardPage() {
   const [dashboard, setDashboard] = useState<OwnerDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
+  const t = useTranslations();
 
   useEffect(() => {
     loadDashboard();
@@ -30,7 +32,7 @@ export default function OwnerDashboardPage() {
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
-      message.error('Failed to load dashboard');
+      message.error(t('errors.failedToLoadDashboard'));
     } finally {
       setLoading(false);
     }
@@ -69,13 +71,16 @@ export default function OwnerDashboardPage() {
       {/* Welcome Banner */}
       <div className="glass-card p-5 sm:p-7 flex items-center justify-between overflow-hidden">
         <div>
-          <p className="text-sm font-medium text-gray-400 mb-1">Good to see you back</p>
+          <p className="text-sm font-medium text-gray-400 mb-1">{t('dashboard.goodToSeeYouBack')}</p>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Welcome, <span className="gradient-text">{user?.first_name || 'Owner'}</span>
+            {t.rich('dashboard.welcome', {
+              name: user?.first_name || 'Owner',
+              gradient: (chunks) => <span className="gradient-text">{chunks}</span>,
+            })}
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">Platform overview and company management</p>
+          <p className="text-gray-500 mt-1 text-sm">{t('dashboard.platformOverview')}</p>
           <Link href="/owner/companies/new" className="mt-4 inline-block">
-            <Button type="primary" icon={<PlusOutlined />} size="large">Add Company</Button>
+            <Button type="primary" icon={<PlusOutlined />} size="large">{t('dashboard.addCompany')}</Button>
           </Link>
         </div>
         <WelcomeCharacter width={120} height={120} className="hidden md:block" />
@@ -84,10 +89,10 @@ export default function OwnerDashboardPage() {
       {/* Stat Cards */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Total Companies', value: dashboard?.this_month?.total_companies || 0, sub: `${dashboard?.this_month?.active_companies || 0} active`, icon: <BankOutlined />, color: '#6366f1', href: '/owner/companies' },
-          { label: 'Total Users', value: dashboard?.this_month?.total_users || 0, sub: 'Across all companies', icon: <TeamOutlined />, color: '#3b82f6', href: '/owner/companies' },
-          { label: 'Total Calls (30d)', value: dashboard?.this_month?.total_calls || 0, sub: 'This month', icon: <ThunderboltOutlined />, color: '#14b8a6', href: '/owner/companies' },
-          { label: 'Revenue', value: `$${dashboard?.this_month?.total_revenue?.toLocaleString() || 0}`, sub: 'This month', icon: <RiseOutlined />, color: '#f97316', href: '/owner/contracts' },
+          { label: t('dashboard.totalCompanies'), value: dashboard?.this_month?.total_companies || 0, sub: t('dashboard.activeCount', { count: dashboard?.this_month?.active_companies || 0 }), icon: <BankOutlined />, color: '#6366f1', href: '/owner/companies' },
+          { label: t('dashboard.totalUsers'), value: dashboard?.this_month?.total_users || 0, sub: t('dashboard.acrossAllCompanies'), icon: <TeamOutlined />, color: '#3b82f6', href: '/owner/companies' },
+          { label: t('dashboard.totalCalls30d'), value: dashboard?.this_month?.total_calls || 0, sub: t('dashboard.last30Days'), icon: <ThunderboltOutlined />, color: '#14b8a6', href: '/owner/companies' },
+          { label: t('dashboard.revenueMRR'), value: `$${dashboard?.this_month?.total_revenue?.toLocaleString() || 0}`, sub: t('dashboard.monthlyRecurring'), icon: <RiseOutlined />, color: '#f97316', href: '/owner/contracts' },
         ].map((card) => (
           <Link key={card.label} href={card.href}>
             <div className="glass-card p-5 group hover:shadow-lg transition-all duration-200 cursor-pointer">
@@ -109,11 +114,11 @@ export default function OwnerDashboardPage() {
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Top Companies</h3>
-              <p className="text-sm text-gray-400">Best performing companies</p>
+              <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.topCompanies')}</h3>
+              <p className="text-sm text-gray-400">{t('dashboard.bestPerforming')}</p>
             </div>
             <Link href="/owner/companies">
-              <Button type="link" size="small" className="!text-gray-400 !text-xs">View all</Button>
+              <Button type="link" size="small" className="!text-gray-400 !text-xs">{t('actions.viewAll')}</Button>
             </Link>
           </div>
           {dashboard?.this_month?.top_companies?.length ? (
@@ -126,7 +131,7 @@ export default function OwnerDashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 text-sm truncate">{company.company_name}</p>
-                      <p className="text-xs text-gray-400">{company.total_calls} calls</p>
+                      <p className="text-xs text-gray-400">{t('dashboard.callsCount', { count: company.total_calls })}</p>
                     </div>
                   </div>
                 </Link>
@@ -137,23 +142,23 @@ export default function OwnerDashboardPage() {
               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-3">
                 <BankOutlined className="text-xl text-gray-300" />
               </div>
-              <p className="text-sm font-medium text-gray-400">No companies yet</p>
-              <p className="text-xs text-gray-300 mt-1">Companies will appear here once created</p>
+              <p className="text-sm font-medium text-gray-400">{t('dashboard.noCompaniesYet')}</p>
+              <p className="text-xs text-gray-300 mt-1">{t('dashboard.companiesWillAppear')}</p>
             </div>
           )}
         </div>
 
         <div className="glass-card p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Platform Analytics</h3>
-            <p className="text-sm text-gray-400">System-wide metrics</p>
+            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.platformAnalytics')}</h3>
+            <p className="text-sm text-gray-400">{t('dashboard.systemWideMetrics')}</p>
           </div>
           <div className="space-y-4">
             {[
-              { label: 'Total Leads', value: dashboard?.this_month?.total_leads || 0, color: '#6366f1' },
-              { label: 'Total Deals', value: dashboard?.this_month?.total_deals || 0, color: '#14b8a6' },
-              { label: 'New Companies', value: dashboard?.this_month?.new_companies || 0, color: '#f97316' },
-              { label: 'New Users', value: dashboard?.this_month?.new_users || 0, color: '#3b82f6' },
+              { label: t('dashboard.totalLeads'), value: dashboard?.this_month?.total_leads || 0, color: '#6366f1' },
+              { label: t('dashboard.totalDeals'), value: dashboard?.this_month?.total_deals || 0, color: '#14b8a6' },
+              { label: t('dashboard.newCompanies'), value: dashboard?.this_month?.new_companies || 0, color: '#f97316' },
+              { label: t('dashboard.newUsers'), value: dashboard?.this_month?.new_users || 0, color: '#3b82f6' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.color }} />

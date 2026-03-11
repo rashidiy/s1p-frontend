@@ -66,7 +66,18 @@
     "noTemporaryToken": "Временный токен не найден. Пожалуйста, войдите снова.",
     "failedToSetPassword": "Не удалось установить пароль",
     "enterYourPassword": "Введите ваш пароль",
-    "manageRelationships": "Управляйте отношениями с клиентами легко и эффективно"
+    "manageRelationships": "Управляйте отношениями с клиентами легко и эффективно",
+    "impersonationFailed": "Токен доступа недействителен или истек",
+    "accessingCompany": "Подключение к компании...",
+    "settingUpSession": "Настройка сессии",
+    "pleaseWait": "Подождите, выполняется вход",
+    "ownerRegistration": "Регистрация владельца",
+    "ownerRegistrationSubtitle": "Аккаунты администратора платформы",
+    "cliOnlyRegistration": "Регистрация только через CLI",
+    "cliOnlyRegistrationDescription": "Аккаунты владельца (администратора платформы) можно создать только через CLI сервера. Веб-регистрация для владельцев недоступна.",
+    "toCreateOwnerAccount": "Для создания аккаунта владельца выполните на сервере:",
+    "orInsideDocker": "Или внутри Docker-контейнера:",
+    "goToOwnerLogin": "Перейти к входу владельца"
   },
   "actions": {
     "create": "Создать",
@@ -85,6 +96,7 @@
     "refresh": "Обновить",
     "view": "Просмотр",
     "viewDetails": "Подробнее",
+    "viewAll": "Смотреть все",
     "seeDetails": "Подробнее",
     "addWidget": "Добавить виджет",
     "customizeWidget": "Настроить виджет",
@@ -133,7 +145,47 @@
     "prospecting": "Поиск",
     "qualification": "Квалификация",
     "proposal": "Предложение",
-    "negotiation": "Переговоры"
+    "negotiation": "Переговоры",
+    "cancelled": "Отменено",
+    "busy": "Занято",
+    "noAnswer": "Нет ответа",
+    "congestion": "Перегрузка",
+    "unavailable": "Недоступен"
+  },
+  "priorities": {
+    "low": "Низкий",
+    "medium": "Средний",
+    "high": "Высокий",
+    "urgent": "Срочный"
+  },
+  "directions": {
+    "inbound": "Входящий",
+    "outbound": "Исходящий",
+    "internal": "Внутренний"
+  },
+  "roles": {
+    "owner": "Владелец",
+    "company_admin": "Администратор",
+    "company_manager": "Менеджер",
+    "company_operator": "Оператор"
+  },
+  "billing": {
+    "monthly": "Ежемесячно",
+    "yearly": "Ежегодно"
+  },
+  "contractStatuses": {
+    "active": "Активный",
+    "warning": "Предупреждение",
+    "grace_period": "Льготный период",
+    "expired": "Истек",
+    "suspended": "Приостановлен",
+    "cancelled": "Отменен"
+  },
+  "paymentStatuses": {
+    "paid": "Оплачено",
+    "pending": "Ожидает",
+    "overdue": "Просрочено",
+    "failed": "Ошибка"
   },
   "dashboard": {
     "totalCalls": "Всего звонков",
@@ -157,7 +209,7 @@
     "answered": "{count} отвечено",
     "convertedCount": "{count} конвертировано",
     "ofTotal": "из {count} всего",
-    "welcome": "Добро пожаловать, {name}",
+    "welcome": "Добро пожаловать, <gradient>{name}</gradient>",
     "platformOverview": "Обзор платформы и управление компаниями",
     "totalCompanies": "Всего компаний",
     "totalUsers": "Всего пользователей",
@@ -172,7 +224,16 @@
     "systemWideMetrics": "Общесистемные метрики",
     "totalContacts": "Всего контактов",
     "avgDealValue": "Средняя сумма сделки",
-    "addCompany": "Добавить компанию"
+    "addCompany": "Добавить компанию",
+    "goodToSeeYouBack": "Рады вас видеть снова",
+    "topCompanies": "Лучшие компании",
+    "bestPerforming": "Лучшие по показателям компании",
+    "companiesWillAppear": "Компании появятся здесь после создания",
+    "activeCount": "{count} активных",
+    "newCompanies": "Новые компании",
+    "newUsers": "Новые пользователи",
+    "callsCount": "{count} звонков",
+    "noCompaniesYet": "Компаний пока нет"
   },
   "common": {
     "loading": "Загрузка",
@@ -188,7 +249,10 @@
     "unknown": "Неизвестно",
     "myCalls": "Только мои звонки",
     "comingSoon": "Скоро будет",
-    "comingSoonDescription": "Эта функция скоро будет доступна. Следите за обновлениями!"
+    "comingSoonDescription": "Эта функция скоро будет доступна. Следите за обновлениями!",
+    "unexpectedError": "Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова или обратитесь в поддержку.",
+    "goHome": "На главную",
+    "pageNotFoundDescription": "Страница, которую вы ищете, не существует или была перемещена."
   },
   "errors": {
     "sessionExpired": "Сессия истекла",
@@ -201,7 +265,14 @@
     "failedToUpdateProfile": "Не удалось обновить профиль",
     "failedToChangePassword": "Не удалось изменить пароль",
     "profileUpdated": "Профиль успешно обновлен",
-    "passwordChanged": "Пароль успешно изменен"
+    "passwordChanged": "Пароль успешно изменен",
+    "validationError": "Ошибка валидации",
+    "sessionExpiredMessage": "Сессия истекла. Войдите снова.",
+    "accessDeniedDetail": "У вас нет прав для выполнения этого действия.",
+    "notFoundDetail": "Запрашиваемый ресурс не найден.",
+    "conflictError": "Конфликт",
+    "conflictDetail": "Запись с такими данными уже существует.",
+    "failedToLoadDashboard": "Не удалось загрузить панель"
   },
   "fields": {
     "firstName": "Имя",
