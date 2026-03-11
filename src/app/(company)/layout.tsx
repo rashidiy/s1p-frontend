@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Sidebar } from '@/components/layout/sidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from 'antd';
-import { BellOutlined, MenuOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 
 const PAGE_TITLE_KEYS: Record<string, { ns: string; key: string }> = {
   '/dashboard': { ns: 'nav', key: 'dashboard' },
@@ -72,13 +72,6 @@ export default function CompanyLayout({
                 className="hamburger-btn"
               />
               <h1 className="app-header-title">{pageTitle}</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                icon={<BellOutlined />}
-                type="text"
-                className="header-icon-btn"
-              />
             </div>
           </header>
 

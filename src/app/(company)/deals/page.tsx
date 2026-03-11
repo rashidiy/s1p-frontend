@@ -15,9 +15,18 @@ const stageColors: Record<string, string> = {
 export default function DealsPage() {
   const [data, setData] = useState<PaginatedResponse<DealResponse> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [stage, setStage] = useState<string>('');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => { loadDeals(); }, [page, search, stage]);
 
@@ -70,7 +79,7 @@ export default function DealsPage() {
       <p className="page-subtitle">Track your active opportunities</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input.Search placeholder="Search deals..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
+        <Input.Search placeholder="Search deals..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder="All Stages" allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: 'Prospecting', value: 'prospecting' }, { label: 'Qualification', value: 'qualification' }, { label: 'Proposal', value: 'proposal' }, { label: 'Negotiation', value: 'negotiation' }, { label: 'Won', value: 'won' }, { label: 'Lost', value: 'lost' }]}
         />

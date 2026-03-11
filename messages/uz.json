@@ -331,7 +331,16 @@
     "serverEnvVars": "Server muhit o'zgaruvchilari",
     "serverEnvVarsDescription": "Quyidagi sozlamalar serverda muhit o'zgaruvchilari orqali sozlangan. Ularni veb-interfeys orqali o'zgartirib bo'lmaydi -- .env faylini tahrirlang va o'zgarishlarni qo'llash uchun serverni qayta ishga tushiring.",
     "ownerProfile": "Egasi profili",
-    "myProfileTitle": "Mening profilim"
+    "myProfileTitle": "Mening profilim",
+    "appearance": "Ko'rinish",
+    "appearanceDescription": "Afzal mavzuni tanlang",
+    "light": "Yorug'",
+    "dark": "Qorong'i",
+    "systemTheme": "Tizim",
+    "language": "Til",
+    "languageDescription": "Afzal tilni tanlang",
+    "telegramBot": "Telegram bot",
+    "telegramBotDescription": "Telegram bot bildirishnomalarini ulash va sozlash"
   },
   "companies": {
     "title": "Kompaniyalar",

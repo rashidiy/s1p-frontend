@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, MailOutlined, PhoneOutlined, FundProjectionScreenOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Tag, message } from 'antd';
+import { Button, Input, Modal, Tag, message, App } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { ContactResponse, NoteResponse } from '@/types/api';
@@ -116,15 +116,23 @@ export default function ContactDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this contact?')) return;
-    try {
-      await apiClient.deleteContact(contactId);
-      router.push('/contacts');
-    } catch (error) {
-      console.error('Failed to delete contact:', error);
-      message.error('Failed to delete contact');
-    }
+  const handleDelete = () => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to delete this contact? This action cannot be undone.',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await apiClient.deleteContact(contactId);
+          router.push('/contacts');
+        } catch (error) {
+          console.error('Failed to delete contact:', error);
+          message.error('Failed to delete contact');
+        }
+      },
+    });
   };
 
   if (loading) {

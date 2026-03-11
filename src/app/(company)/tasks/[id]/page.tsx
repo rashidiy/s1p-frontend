@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, CheckOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select, Tag, message } from 'antd';
+import { Alert, Button, Input, Modal, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
@@ -105,16 +105,24 @@ export default function TaskDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this task?')) return;
-    setDeleting(true);
-    try {
-      await apiClient.deleteTask(id);
-      router.push('/tasks');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to delete task');
-      setDeleting(false);
-    }
+  const handleDelete = () => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to delete this task? This action cannot be undone.',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setDeleting(true);
+        try {
+          await apiClient.deleteTask(id);
+          router.push('/tasks');
+        } catch (err: any) {
+          setError(err.response?.data?.detail || 'Failed to delete task');
+          setDeleting(false);
+        }
+      },
+    });
   };
 
   if (loading) {

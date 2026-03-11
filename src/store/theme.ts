@@ -30,6 +30,17 @@ export const useThemeStore = create<ThemeState>()(
         }
       },
     }),
-    { name: 's1p-theme' }
+    {
+      name: 's1p-theme',
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const resolved = resolveTheme(state.mode);
+          state.resolved = resolved;
+          if (typeof document !== 'undefined') {
+            document.documentElement.classList.toggle('dark', resolved === 'dark');
+          }
+        }
+      },
+    }
   )
 );

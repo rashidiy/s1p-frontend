@@ -1,64 +1,124 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   SafetyOutlined,
   FileTextOutlined,
-  SettingOutlined,
   RightOutlined,
   UserOutlined,
   LockOutlined,
   SendOutlined,
 } from '@ant-design/icons';
+import { Button } from 'antd';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
+import { useThemeStore } from '@/store/theme';
+import { locales, type Locale } from '@/i18n/config';
 
-const settingsLinks = [
-  {
-    href: '/profile',
-    icon: <UserOutlined style={{ fontSize: 22, color: '#6366f1' }} />,
-    title: 'My Profile',
-    description: 'Update your personal information and password',
-    bg: 'bg-indigo-50',
-    adminOnly: false,
-  },
-  {
-    href: '/settings/permission-groups',
-    icon: <SafetyOutlined style={{ fontSize: 22, color: '#7c3aed' }} />,
-    title: 'Permission Groups',
-    description: 'Manage role-based permission groups for your team',
-    bg: 'bg-purple-50',
-    adminOnly: true,
-  },
-  {
-    href: '/settings/contract',
-    icon: <FileTextOutlined style={{ fontSize: 22, color: '#0891b2' }} />,
-    title: 'Contract & Billing',
-    description: 'View your active contract, usage limits, and billing status',
-    bg: 'bg-cyan-50',
-    adminOnly: true,
-  },
-  {
-    href: '/settings/telegram',
-    icon: <SendOutlined style={{ fontSize: 22, color: '#0ea5e9' }} />,
-    title: 'Telegram Bot',
-    description: 'Connect and configure Telegram bot notifications',
-    bg: 'bg-sky-50',
-    adminOnly: true,
-  },
-];
+const LOCALE_LABELS: Record<Locale, string> = {
+  ru: 'RU',
+  en: 'EN',
+  uz: 'UZ',
+};
 
 export default function SettingsPage() {
   const { hasPermission } = useAuthStore();
   const isAdmin = hasPermission(UserRole.COMPANY_ADMIN);
+  const t = useTranslations('settings');
+  const { mode, setMode } = useThemeStore();
+  const locale = useLocale() as Locale;
+  const router = useRouter();
+
+  const handleLocaleChange = (newLocale: string) => {
+    document.cookie = `locale=${newLocale};path=/;max-age=31536000;samesite=lax`;
+    router.refresh();
+  };
+
+  const settingsLinks = [
+    {
+      href: '/profile',
+      icon: <UserOutlined style={{ fontSize: 22, color: '#6366f1' }} />,
+      title: t('myProfile'),
+      description: t('myProfileDescription'),
+      bg: 'bg-indigo-50',
+      adminOnly: false,
+    },
+    {
+      href: '/settings/permission-groups',
+      icon: <SafetyOutlined style={{ fontSize: 22, color: '#7c3aed' }} />,
+      title: t('permissionGroups'),
+      description: t('permissionGroupsDescription'),
+      bg: 'bg-purple-50',
+      adminOnly: true,
+    },
+    {
+      href: '/settings/contract',
+      icon: <FileTextOutlined style={{ fontSize: 22, color: '#0891b2' }} />,
+      title: t('contractBilling'),
+      description: t('contractBillingDescription'),
+      bg: 'bg-cyan-50',
+      adminOnly: true,
+    },
+    {
+      href: '/settings/telegram',
+      icon: <SendOutlined style={{ fontSize: 22, color: '#0ea5e9' }} />,
+      title: t('telegramBot'),
+      description: t('telegramBotDescription'),
+      bg: 'bg-sky-50',
+      adminOnly: true,
+    },
+  ];
 
   const visibleLinks = settingsLinks.filter((l) => !l.adminOnly || isAdmin);
+
+  const themeModes = [
+    { key: 'light' as const, label: t('light') },
+    { key: 'dark' as const, label: t('dark') },
+    { key: 'system' as const, label: t('systemTheme') },
+  ];
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">Manage your account, team permissions, and billing.</p>
+          <p className="page-subtitle">{t('subtitle')}</p>
+        </div>
+      </div>
+
+      {/* Appearance */}
+      <div className="glass-card p-5">
+        <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t('appearance')}</h3>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{t('appearanceDescription')}</p>
+        <div className="flex gap-2 mt-3">
+          {themeModes.map((tm) => (
+            <Button
+              key={tm.key}
+              type={mode === tm.key ? 'primary' : 'default'}
+              onClick={() => setMode(tm.key)}
+            >
+              {tm.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Language */}
+      <div className="glass-card p-5">
+        <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t('language')}</h3>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{t('languageDescription')}</p>
+        <div className="flex gap-2 mt-3">
+          {locales.map((loc) => (
+            <Button
+              key={loc}
+              type={locale === loc ? 'primary' : 'default'}
+              onClick={() => handleLocaleChange(loc)}
+            >
+              {LOCALE_LABELS[loc]}
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -87,10 +147,10 @@ export default function SettingsPage() {
         <div className="glass-card p-5 border border-amber-200 bg-amber-50/50">
           <h3 className="text-sm font-semibold text-amber-700 flex items-center gap-2">
             <LockOutlined />
-            Admin-only settings
+            {t('adminOnlySettings')}
           </h3>
           <p className="text-xs text-amber-600 mt-1">
-            Permission groups and contract settings are only accessible to Company Admins.
+            {t('adminOnlyDescription')}
           </p>
         </div>
       )}
