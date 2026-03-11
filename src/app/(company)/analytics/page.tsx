@@ -10,6 +10,7 @@ import {
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
+import { useTranslations } from 'next-intl';
 
 const OUTCOME_CHART_COLORS: Record<string, string> = {
   interested: '#22c55e', appointment_scheduled: '#16a34a', follow_up: '#06b6d4',
@@ -51,6 +52,10 @@ const SAMPLE_OUTCOME_DATA = [
 ];
 
 export default function AnalyticsPage() {
+  const t = useTranslations('analytics');
+  const tErrors = useTranslations('errors');
+  const tDashboard = useTranslations('dashboard');
+
   const [operatorData, setOperatorData] = useState<OperatorDashboard | null>(null);
   const [adminData, setAdminData] = useState<AdminDashboard | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,7 +80,7 @@ export default function AnalyticsPage() {
       }
     } catch (error) {
       console.error('Failed to load dashboards:', error);
-      message.error('Failed to load dashboards');
+      message.error(tErrors('failedToLoadAnalytics'));
     } finally {
       setLoading(false);
     }
@@ -103,7 +108,7 @@ export default function AnalyticsPage() {
 
       setChartData(prev => ({ ...prev, outcomeDistribution: outcomeData }));
     } catch {
-      message.error('Failed to load chart data');
+      message.error(tErrors('failedToLoadChartData'));
       setChartData({
         callTrends: SAMPLE_TREND_DATA,
         teamPerformance: SAMPLE_TEAM_DATA,
@@ -149,12 +154,12 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">Performance metrics and insights</p>
+          <p className="page-subtitle">{t('subtitle')}</p>
         </div>
       </div>
 
       <Alert
-        message="Some charts use demo data"
+        message={t('sampleDataNote')}
         description="Call Volume Trends and Team Performance charts display sample data — the backend API endpoints for direction-split trends and per-operator stats are not yet available (Phase 2). The stat cards, Call Outcome Distribution, and Top Performers sections use real data from your account."
         type="warning"
         showIcon
@@ -166,12 +171,12 @@ export default function AnalyticsPage() {
         items={[
           {
             key: 'my',
-            label: 'My Performance',
+            label: t('myPerformance'),
             children: (<div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('totalCalls')}</h3>
                 <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
@@ -179,14 +184,14 @@ export default function AnalyticsPage() {
                   {myStats?.calls.total_calls || 0}
                 </div>
                 <p className="text-xs text-gray-400">
-                  {myStats?.calls.answered_calls || 0} answered
+                  {myStats?.calls.answered_calls || 0} {t('answered')}
                 </p>
               </div>
             </div>
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Leads</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('totalLeads')}</h3>
                 <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
@@ -194,14 +199,14 @@ export default function AnalyticsPage() {
                   {myStats?.leads.total_leads || 0}
                 </div>
                 <p className="text-xs text-gray-400">
-                  {myStats?.leads.converted_leads || 0} converted
+                  {myStats?.leads.converted_leads || 0} {t('converted')}
                 </p>
               </div>
             </div>
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Deals</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('totalDeals')}</h3>
                 <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
@@ -216,7 +221,7 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Tasks</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('totalTasks')}</h3>
                 <CheckSquareOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
@@ -224,7 +229,7 @@ export default function AnalyticsPage() {
                   {myStats?.tasks.completed_tasks || 0}
                 </div>
                 <p className="text-xs text-gray-400">
-                  of {myStats?.tasks.total_tasks || 0} total
+                  {tDashboard('ofTotal', { count: myStats?.tasks.total_tasks || 0 })}
                 </p>
               </div>
             </div>
@@ -233,18 +238,18 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-base font-semibold leading-none tracking-tight">Call Statistics</h3>
-                <p className="text-sm text-gray-400">Your calling performance</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">{t('callStatistics')}</h3>
+                <p className="text-sm text-gray-400">{t('yourCallingPerformance')}</p>
               </div>
               <div className="p-6 pt-0 space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Answer Rate</span>
+                  <span className="text-sm text-gray-600">{t('answerRate')}</span>
                   <span className="font-semibold">
                     {Math.round(myStats?.calls.success_rate || 0)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Avg Duration</span>
+                  <span className="text-sm text-gray-600">{t('avgDuration')}</span>
                   <span className="font-semibold">
                     {myStats?.calls.average_duration ?
                       `${Math.floor(myStats.calls.average_duration / 60)}m ${myStats.calls.average_duration % 60}s` :
@@ -252,11 +257,11 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Inbound</span>
+                  <span className="text-sm text-gray-600">{t('inbound')}</span>
                   <span className="font-semibold">{myStats?.calls.inbound_calls || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Outbound</span>
+                  <span className="text-sm text-gray-600">{t('outbound')}</span>
                   <span className="font-semibold">{myStats?.calls.outbound_calls || 0}</span>
                 </div>
               </div>
@@ -264,8 +269,8 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-base font-semibold leading-none tracking-tight">Performance Score</h3>
-                <p className="text-sm text-gray-400">Overall productivity</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">{t('performanceScore')}</h3>
+                <p className="text-sm text-gray-400">{t('overallProductivity')}</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="flex items-center justify-center py-6">
@@ -274,7 +279,7 @@ export default function AnalyticsPage() {
                       {myStats?.productivity_score || 0}
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
-                      Total Activities: {myStats?.total_activities || 0}
+                      {tDashboard('totalActivities')}: {myStats?.total_activities || 0}
                     </p>
                   </div>
                 </div>
@@ -285,7 +290,7 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Chart 1: Call Trends Line Chart */}
             <div className="glass-card p-6 lg:col-span-2">
-              <h3 className="text-lg font-semibold gradient-text mb-4">Call Volume Trends</h3>
+              <h3 className="text-lg font-semibold gradient-text mb-4">{t('callVolumeTrends')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[300px]"><Spin /></div>
               ) : (
@@ -296,9 +301,9 @@ export default function AnalyticsPage() {
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
                     <Legend />
-                    <Line type="monotone" dataKey="total" stroke="#6366f1" name="Total" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="inbound" stroke="#22c55e" name="Inbound" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="outbound" stroke="#f97316" name="Outbound" strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="total" stroke="#6366f1" name={t('totalCalls')} strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="inbound" stroke="#22c55e" name={t('inbound')} strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="outbound" stroke="#f97316" name={t('outbound')} strokeWidth={2} dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               )}
@@ -306,7 +311,7 @@ export default function AnalyticsPage() {
 
             {/* Chart 2: Team Performance Bar Chart */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold gradient-text mb-4">Team Performance</h3>
+              <h3 className="text-lg font-semibold gradient-text mb-4">{t('teamPerformance')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[280px]"><Spin /></div>
               ) : (
@@ -317,8 +322,8 @@ export default function AnalyticsPage() {
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
                     <Legend />
-                    <Bar dataKey="calls" fill="#6366f1" name="Total Calls" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="answered" fill="#22c55e" name="Answered" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="calls" fill="#6366f1" name={t('totalCalls')} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="answered" fill="#22c55e" name={t('answered')} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -326,7 +331,7 @@ export default function AnalyticsPage() {
 
             {/* Chart 3: Outcome Distribution Pie Chart */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold gradient-text mb-4">Call Outcome Distribution</h3>
+              <h3 className="text-lg font-semibold gradient-text mb-4">{t('callOutcomeDistribution')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[280px]"><Spin /></div>
               ) : (
@@ -356,12 +361,12 @@ export default function AnalyticsPage() {
           },
           ...(canViewTeamData ? [{
             key: 'team',
-            label: 'Team Overview',
+            label: t('teamOverview'),
             children: (<div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Team Members</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('teamMembers')}</h3>
                   <TeamOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
@@ -369,14 +374,14 @@ export default function AnalyticsPage() {
                     {teamStats?.total_operators || 0}
                   </div>
                   <p className="text-xs text-gray-400">
-                    {teamStats?.active_operators || 0} active
+                    {teamStats?.active_operators || 0} {t('active')}
                   </p>
                 </div>
               </div>
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('totalCalls')}</h3>
                   <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
@@ -384,14 +389,14 @@ export default function AnalyticsPage() {
                     {teamStats?.calls.total_calls || 0}
                   </div>
                   <p className="text-xs text-gray-400">
-                    {teamStats?.calls.answered_calls || 0} answered
+                    {teamStats?.calls.answered_calls || 0} {t('answered')}
                   </p>
                 </div>
               </div>
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Team Leads</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('teamLeads')}</h3>
                   <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
@@ -399,14 +404,14 @@ export default function AnalyticsPage() {
                     {teamStats?.leads.total_leads || 0}
                   </div>
                   <p className="text-xs text-gray-400">
-                    {teamStats?.leads.converted_leads || 0} converted
+                    {teamStats?.leads.converted_leads || 0} {t('converted')}
                   </p>
                 </div>
               </div>
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Revenue</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">{t('revenue')}</h3>
                   <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
@@ -414,7 +419,7 @@ export default function AnalyticsPage() {
                     ${teamStats?.deals.total_value?.toLocaleString() || 0}
                   </div>
                   <p className="text-xs text-gray-400">
-                    {teamStats?.deals.won || 0} deals won
+                    {t('dealsWon', { count: teamStats?.deals.won || 0 })}
                   </p>
                 </div>
               </div>
@@ -422,8 +427,8 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-base font-semibold leading-none tracking-tight">Top Performers</h3>
-                <p className="text-sm text-gray-400">Operators ranked by performance</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">{t('topPerformers')}</h3>
+                <p className="text-sm text-gray-400">{t('operatorsRankedByPerformance')}</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="space-y-4">
@@ -436,13 +441,13 @@ export default function AnalyticsPage() {
                         <div>
                           <p className="font-medium">{performer.name}</p>
                           <p className="text-sm text-gray-500">
-                            {performer.calls.total_calls} calls, {performer.leads.total_leads} leads
+                            {performer.calls.total_calls} {t('totalCalls').toLowerCase()}, {performer.leads.total_leads} {t('totalLeads').toLowerCase()}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-blue-600">
-                          Score: {performer.productivity_score}
+                          {t('performanceScore')}: {performer.productivity_score}
                         </p>
                       </div>
                     </div>

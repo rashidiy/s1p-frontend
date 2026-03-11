@@ -7,10 +7,17 @@ import { apiClient } from '@/lib/api';
 import type { TaskResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const priorityColors: Record<string, string> = { high: 'red', medium: 'orange', low: 'green' };
 
 export default function TasksPage() {
+  const t = useTranslations('tasks');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tStatuses = useTranslations('statuses');
+  const tCommon = useTranslations('common');
+
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState('');
@@ -32,12 +39,12 @@ export default function TasksPage() {
     try {
       const result = await apiClient.getTasks({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load tasks:', error); message.error('Failed to load tasks'); }
+    } catch (error) { console.error('Failed to load tasks:', error); message.error(tErrors('failedToLoadTasks')); }
     finally { setLoading(false); }
   };
 
   const toggleTaskComplete = async (taskId: string, isCompleted: boolean) => {
-    try { if (!isCompleted) await apiClient.completeTask(taskId); loadTasks(); } catch { message.error('Failed to update task'); }
+    try { if (!isCompleted) await apiClient.completeTask(taskId); loadTasks(); } catch { message.error(tErrors('failedToUpdateTask')); }
   };
 
   const isOverdue = (dueDate?: string | null) => dueDate ? new Date(dueDate) < new Date() : false;
@@ -73,14 +80,14 @@ export default function TasksPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/tasks/new"><Button type="primary" icon={<PlusOutlined />}>Add Task</Button></Link>
+        <Link href="/tasks/new"><Button type="primary" icon={<PlusOutlined />}>{t('addTask')}</Button></Link>
       </div>
-      <p className="page-subtitle">Manage your to-do list</p>
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input.Search placeholder="Search tasks..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
-        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder="All Statuses" allowClear className="w-full sm:w-[180px]" size="large"
-          options={[{ label: 'Pending', value: 'pending' }, { label: 'In Progress', value: 'in_progress' }, { label: 'Completed', value: 'completed' }]}
+        <Input.Search placeholder={t('searchTasks')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
+        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
+          options={[{ label: tStatuses('pending'), value: 'pending' }, { label: tStatuses('inProgress'), value: 'in_progress' }, { label: tStatuses('completed'), value: 'completed' }]}
         />
       </div>
 
@@ -113,7 +120,7 @@ export default function TasksPage() {
                 {task.entity_type && task.entity_id && <Tag>{task.entity_type}: {task.entity_id}</Tag>}
               </div>
             </div>
-            <Link href={`/tasks/${task.id}`}><Button type="text" size="small">View</Button></Link>
+            <Link href={`/tasks/${task.id}`}><Button type="text" size="small">{tActions('view')}</Button></Link>
           </div>
         ))}
       </div>
@@ -123,9 +130,9 @@ export default function TasksPage() {
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="confused" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">No tasks found</h3>
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noTasksFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search || status ? 'Try adjusting your filters' : 'Create your first task to stay organized'}
+            {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
           </p>
         </div>
       )}

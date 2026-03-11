@@ -16,6 +16,7 @@ import {
 import { Alert, Button, Input, Modal, Select, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
 import type { UserDetailResponse } from '@/types/api';
 
@@ -38,6 +39,14 @@ export default function UserDetailPage() {
   const { hasPermission } = useAuthStore();
   const userId = params.id as string;
   const canManageUsers = hasPermission(UserRole.COMPANY_ADMIN);
+  const t = useTranslations('users');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tRoles = useTranslations('roles');
+  const tSettings = useTranslations('settings');
+  const tContractStatuses = useTranslations('contractStatuses');
 
   const [user, setUser] = useState<UserDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,7 +79,7 @@ export default function UserDetailPage() {
       });
     } catch (err) {
       console.error('Failed to load user:', err);
-      setError('Failed to load user details');
+      setError(tErrors('failedToLoadUser'));
     } finally {
       setLoading(false);
     }
@@ -87,11 +96,11 @@ export default function UserDetailPage() {
         phone: editForm.phone || null,
         role: editForm.role || null,
       });
-      setSuccessMsg('User updated successfully');
+      setSuccessMsg(t('userUpdated'));
       setEditing(false);
       loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update user');
+      setError(err.response?.data?.detail || tErrors('failedToUpdateUser'));
     } finally {
       setSaving(false);
     }
@@ -100,10 +109,10 @@ export default function UserDetailPage() {
   const handleToggleStatus = () => {
     if (!user) return;
     Modal.confirm({
-      title: 'Are you sure?',
-      content: `${user.is_active ? 'Deactivate' : 'Activate'} this user?`,
-      okText: user.is_active ? 'Deactivate' : 'Activate',
-      cancelText: 'Cancel',
+      title: tCommon('areYouSure'),
+      content: user.is_active ? t('confirmDeactivate') : t('confirmActivate'),
+      okText: user.is_active ? tActions('deactivate') : tActions('activate'),
+      cancelText: tActions('cancel'),
       okButtonProps: user.is_active ? { danger: true } : {},
       onOk: async () => {
         try {
@@ -112,10 +121,10 @@ export default function UserDetailPage() {
           } else {
             await apiClient.activateUser(userId);
           }
-          setSuccessMsg(`User ${user.is_active ? 'deactivated' : 'activated'} successfully`);
+          setSuccessMsg(t('userStatusUpdated'));
           loadUser();
         } catch (err: any) {
-          setError(err.response?.data?.detail || 'Failed to update user status');
+          setError(err.response?.data?.detail || tErrors('failedToUpdateUserStatus'));
         }
       },
     });
@@ -133,7 +142,7 @@ export default function UserDetailPage() {
   }
 
   if (!user) {
-    return <div className="p-6 text-gray-500">User not found</div>;
+    return <div className="p-6 text-gray-500">{tCommon('noDataFound')}</div>;
   }
 
   const initials = `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase() || '?';
@@ -152,7 +161,7 @@ export default function UserDetailPage() {
         <div className="flex items-center gap-4 flex-wrap">
           <Button size="small" type="text"   onClick={() => router.push('/users')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
@@ -165,7 +174,7 @@ export default function UserDetailPage() {
                   {formatRole(user.role)}
                 </Tag>
                 <Tag color={user.is_active ? 'green' : 'default'}>
-                  {user.is_active ? 'Active' : 'Inactive'}
+                  {user.is_active ? t('active') : t('inactive')}
                 </Tag>
               </div>
             </div>
@@ -177,12 +186,12 @@ export default function UserDetailPage() {
             {!editing && (
               <Button type="default"  onClick={() => setEditing(true)}>
                 <EditOutlined style={{ marginRight: 8 }} />
-                Edit
+                {tActions('edit')}
               </Button>
             )}
             <Button type="primary" danger={user.is_active}
               onClick={handleToggleStatus}>
-              {user.is_active ? 'Deactivate' : 'Activate'}
+              {user.is_active ? tActions('deactivate') : tActions('activate')}
             </Button>
           </div>
         )}
@@ -205,21 +214,21 @@ export default function UserDetailPage() {
         <div className="lg:col-span-2">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">User Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('userInformation')}</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">First Name</label>
+                      <label className="text-sm font-medium">{tFields('firstName')}</label>
                       <Input
                         value={editForm.first_name}
                         onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Last Name</label>
+                      <label className="text-sm font-medium">{tFields('lastName')}</label>
                       <Input
                         value={editForm.last_name}
                         onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
@@ -227,7 +236,7 @@ export default function UserDetailPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Phone</label>
+                    <label className="text-sm font-medium">{tFields('phone')}</label>
                     <Input
                       value={editForm.phone}
                       onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
@@ -235,26 +244,26 @@ export default function UserDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Role</label>
+                    <label className="text-sm font-medium">{tFields('role')}</label>
                     <Select
                       style={{ width: '100%' }}
                       value={editForm.role || undefined}
                       onChange={(val) => setEditForm({ ...editForm, role: val })}
                       options={[
-                        { value: UserRole.COMPANY_ADMIN, label: 'Admin' },
-                        { value: UserRole.COMPANY_MANAGER, label: 'Manager' },
-                        { value: UserRole.COMPANY_OPERATOR, label: 'Operator' },
+                        { value: UserRole.COMPANY_ADMIN, label: tRoles('company_admin') },
+                        { value: UserRole.COMPANY_MANAGER, label: tRoles('company_manager') },
+                        { value: UserRole.COMPANY_OPERATOR, label: tRoles('company_operator') },
                       ]}
                     />
                   </div>
                   <div className="flex gap-2">
                     <Button onClick={handleSave} disabled={saving}>
                       <SaveOutlined style={{ marginRight: 8 }} />
-                      {saving ? 'Saving...' : 'Save'}
+                      {saving ? tActions('saving') : tActions('save')}
                     </Button>
                     <Button type="default"  onClick={() => { setEditing(false); loadUser(); }}>
                       <CloseOutlined style={{ marginRight: 8 }} />
-                      Cancel
+                      {tActions('cancel')}
                     </Button>
                   </div>
                 </div>
@@ -263,7 +272,7 @@ export default function UserDetailPage() {
                   <div className="flex items-center gap-3">
                     <MailOutlined className="text-gray-400" />
                     <div>
-                      <div className="text-xs text-gray-500">Email</div>
+                      <div className="text-xs text-gray-500">{tFields('email')}</div>
                       <div className="font-medium">{user.email}</div>
                     </div>
                   </div>
@@ -271,7 +280,7 @@ export default function UserDetailPage() {
                     <div className="flex items-center gap-3">
                       <PhoneOutlined className="text-gray-400" />
                       <div>
-                        <div className="text-xs text-gray-500">Phone</div>
+                        <div className="text-xs text-gray-500">{tFields('phone')}</div>
                         <div className="font-medium">{user.phone}</div>
                       </div>
                     </div>
@@ -279,14 +288,14 @@ export default function UserDetailPage() {
                   <div className="flex items-center gap-3">
                     <TeamOutlined className="text-gray-400" />
                     <div>
-                      <div className="text-xs text-gray-500">Role</div>
+                      <div className="text-xs text-gray-500">{tFields('role')}</div>
                       <div className="font-medium">{formatRole(user.role)}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <CalendarOutlined className="text-gray-400" />
                     <div>
-                      <div className="text-xs text-gray-500">Joined</div>
+                      <div className="text-xs text-gray-500">{tFields('joined')}</div>
                       <div className="font-medium">
                         {new Date(user.created_at).toLocaleDateString()}
                       </div>
@@ -294,7 +303,7 @@ export default function UserDetailPage() {
                   </div>
                   {user.email_verified !== undefined && (
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="text-gray-500">Email verified:</span>
+                      <span className="text-gray-500">{tFields('email')}:</span>
                       <Tag color={user.email_verified ? 'blue' : undefined}>
                         {user.email_verified ? 'Yes' : 'No'}
                       </Tag>
@@ -310,7 +319,7 @@ export default function UserDetailPage() {
         <div className="space-y-4">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Permissions</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tSettings('permissions')}</h3>
             </div>
             <div className="p-6 pt-0">
               {user.permissions && user.permissions.length > 0 ? (
@@ -322,31 +331,31 @@ export default function UserDetailPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Using role defaults</p>
+                <p className="text-sm text-gray-500">{tCommon('noDataFound')}</p>
               )}
             </div>
           </div>
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Account Status</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tFields('status')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Status</span>
+                <span className="text-gray-500">{tFields('status')}</span>
                 <Tag color={user.is_active ? 'green' : 'default'}>
-                  {user.is_active ? 'Active' : 'Inactive'}
+                  {user.is_active ? t('active') : t('inactive')}
                 </Tag>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Suspended</span>
+                <span className="text-gray-500">{tContractStatuses('suspended')}</span>
                 <Tag color={user.is_suspended ? 'red' : 'green'}>
                   {user.is_suspended ? 'Yes' : 'No'}
                 </Tag>
               </div>
               {user.language && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Language</span>
+                  <span className="text-gray-500">{tSettings('language')}</span>
                   <span className="font-medium uppercase">{user.language}</span>
                 </div>
               )}

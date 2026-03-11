@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Alert, Progress, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
@@ -12,6 +13,10 @@ export default function ContractStatusPage() {
   const [contract, setContract] = useState<ContractStatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const t = useTranslations('settings');
+  const tFields = useTranslations('fields');
+  const tErrors = useTranslations('errors');
+  const tRoles = useTranslations('roles');
 
   useEffect(() => {
     loadContractStatus();
@@ -22,7 +27,7 @@ export default function ContractStatusPage() {
       const data = await apiClient.getContractStatus();
       setContract(data);
     } catch (err) {
-      setError('No active contract found or access denied');
+      setError(t('noActiveContract'));
     } finally {
       setLoading(false);
     }
@@ -60,13 +65,13 @@ export default function ContractStatusPage() {
       <div className="space-y-6">
         <div className="page-header">
           <div>
-            <p className="page-subtitle">View your active contract and billing status</p>
+            <p className="page-subtitle">{t('contractSubtitle')}</p>
           </div>
         </div>
         <div className="glass-card py-12 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="thinking" />
-          <p className="mt-4 text-lg font-medium text-gray-700">No Active Contract</p>
-          <p className="text-sm text-gray-500">Please contact the platform administrator</p>
+          <p className="mt-4 text-lg font-medium text-gray-700">{t('noActiveContract')}</p>
+          <p className="text-sm text-gray-500">{t('viewContractStatus')}</p>
         </div>
       </div>
     );
@@ -82,7 +87,7 @@ export default function ContractStatusPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">View your active contract, usage limits, and billing status</p>
+          <p className="page-subtitle">{t('viewContractStatus')}</p>
         </div>
       </div>
 
@@ -98,7 +103,7 @@ export default function ContractStatusPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-gray-400">Plan</p>
+            <p className="text-sm text-gray-400">{tFields('plan')}</p>
             <h3 className="text-base font-semibold leading-none tracking-tight text-2xl">{contract.name}</h3>
           </div>
           <div className="p-6 pt-0">
@@ -108,7 +113,7 @@ export default function ContractStatusPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-gray-400">Billing Period</p>
+            <p className="text-sm text-gray-400">{tFields('billingPeriod')}</p>
             <h3 className="text-base font-semibold leading-none tracking-tight text-xl capitalize">
               {BILLING_PERIOD_LABELS[contract.billing_period] || contract.billing_period}
             </h3>
@@ -122,7 +127,7 @@ export default function ContractStatusPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-gray-400">Days Until Expiry</p>
+            <p className="text-sm text-gray-400">{tFields('daysUntilExpiry')}</p>
             <h3 className="text-base font-semibold leading-none tracking-tight text-2xl flex items-center gap-2">
               <CalendarOutlined />
               {contract.days_until_expiry ?? '—'}
@@ -141,13 +146,13 @@ export default function ContractStatusPage() {
         <div className="flex flex-col space-y-1.5 p-6">
           <h3 className="text-base font-semibold leading-none tracking-tight flex items-center gap-2">
             <TeamOutlined />
-            User Limits
+            {tFields('userLimits')}
           </h3>
         </div>
         <div className="p-6 pt-0 space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Total Users</span>
+              <span>{tFields('currentUsers')}</span>
               <span className="font-medium">{totalUsers} / {maxUsers}</span>
             </div>
             <Progress percent={userUsage} showInfo={false} size="small" />
@@ -155,15 +160,15 @@ export default function ContractStatusPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div className="text-center p-3 bg-purple-50 rounded-lg">
               <p className="font-bold text-purple-700">{contract.current_admins}/{contract.max_admins}</p>
-              <p className="text-xs text-gray-500 mt-1">Admins</p>
+              <p className="text-xs text-gray-500 mt-1">{tRoles('company_admin')}s</p>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-lg">
               <p className="font-bold text-blue-700">{contract.current_managers}/{contract.max_managers}</p>
-              <p className="text-xs text-gray-500 mt-1">Managers</p>
+              <p className="text-xs text-gray-500 mt-1">{tRoles('company_manager')}s</p>
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <p className="font-bold text-green-700">{contract.current_operators}/{contract.max_operators}</p>
-              <p className="text-xs text-gray-500 mt-1">Operators</p>
+              <p className="text-xs text-gray-500 mt-1">{tRoles('company_operator')}s</p>
             </div>
           </div>
         </div>
@@ -174,25 +179,25 @@ export default function ContractStatusPage() {
         <div className="flex flex-col space-y-1.5 p-6">
           <h3 className="text-base font-semibold leading-none tracking-tight flex items-center gap-2">
             <SafetyOutlined />
-            Contract Details
+            {tFields('plan')}
           </h3>
         </div>
         <div className="p-6 pt-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-500">Auto Renew</span>
+              <span className="text-gray-500">{tFields('status')}</span>
               <p className="font-medium">{contract.auto_renew ? 'Yes' : 'No'}</p>
             </div>
             <div>
-              <span className="text-gray-500">Storage</span>
+              <span className="text-gray-500">{tFields('plan')}</span>
               <p className="font-medium">{contract.max_storage_gb} GB</p>
             </div>
             <div>
-              <span className="text-gray-500">Start Date</span>
+              <span className="text-gray-500">{tFields('startDate')}</span>
               <p className="font-medium">{new Date(contract.start_date).toLocaleDateString()}</p>
             </div>
             <div>
-              <span className="text-gray-500">End Date</span>
+              <span className="text-gray-500">{tFields('endDate')}</span>
               <p className="font-medium">{new Date(contract.end_date).toLocaleDateString()}</p>
             </div>
           </div>

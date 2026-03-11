@@ -7,12 +7,20 @@ import { apiClient } from '@/lib/api';
 import type { LeadResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const statusColors: Record<string, string> = {
   new: 'blue', contacted: 'gold', qualified: 'green', converted: 'purple', lost: 'red',
 };
 
 export default function LeadsPage() {
+  const t = useTranslations('leads');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tStatuses = useTranslations('statuses');
+  const tFields = useTranslations('fields');
+
   const [data, setData] = useState<PaginatedResponse<LeadResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState('');
@@ -34,7 +42,7 @@ export default function LeadsPage() {
     try {
       const result = await apiClient.getLeads({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load leads:', error); message.error('Failed to load leads'); }
+    } catch (error) { console.error('Failed to load leads:', error); message.error(tErrors('failedToLoadLeads')); }
     finally { setLoading(false); }
   };
 
@@ -74,14 +82,14 @@ export default function LeadsPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/leads/new"><Button type="primary" icon={<PlusOutlined />}>Add Lead</Button></Link>
+        <Link href="/leads/new"><Button type="primary" icon={<PlusOutlined />}>{t('addLead')}</Button></Link>
       </div>
-      <p className="page-subtitle">Manage your sales pipeline</p>
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input.Search placeholder="Search leads..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
-        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder="All Statuses" allowClear className="w-full sm:w-[180px]" size="large"
-          options={[{ label: 'New', value: 'new' }, { label: 'Contacted', value: 'contacted' }, { label: 'Qualified', value: 'qualified' }, { label: 'Converted', value: 'converted' }, { label: 'Lost', value: 'lost' }]}
+        <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
+        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
+          options={[{ label: tStatuses('new'), value: 'new' }, { label: tStatuses('contacted'), value: 'contacted' }, { label: tStatuses('qualified'), value: 'qualified' }, { label: tStatuses('converted'), value: 'converted' }, { label: tStatuses('lost'), value: 'lost' }]}
         />
       </div>
 
@@ -97,12 +105,12 @@ export default function LeadsPage() {
             </div>
             <div className="space-y-2">
               {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}
-              {lead.pipeline_stage && <p className="text-sm text-gray-600">Stage: <span className="font-medium">{lead.pipeline_stage}</span></p>}
-              {lead.assigned_to_name && <p className="text-sm text-gray-600">Assigned: <span className="font-medium">{lead.assigned_to_name}</span></p>}
+              {lead.pipeline_stage && <p className="text-sm text-gray-600">{tFields('stage')}: <span className="font-medium">{lead.pipeline_stage}</span></p>}
+              {lead.assigned_to_name && <p className="text-sm text-gray-600">{tFields('assigned')}: <span className="font-medium">{lead.assigned_to_name}</span></p>}
               {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
               <div className="flex gap-2 pt-2">
-                <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>View</Button></Link>
-                {lead.status !== 'converted' && <Button type="primary" onClick={async () => { try { await apiClient.convertLead(lead.id, true); loadLeads(); } catch (err) { message.error('Failed to convert lead'); } }}>Convert</Button>}
+                <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
+                {lead.status !== 'converted' && <Button type="primary" onClick={async () => { try { await apiClient.convertLead(lead.id, true); loadLeads(); } catch (err) { message.error(tErrors('failedToConvertLead')); } }}>{tActions('convert')}</Button>}
               </div>
             </div>
           </div>
@@ -114,9 +122,9 @@ export default function LeadsPage() {
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="no-results" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">No leads found</h3>
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noLeadsFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search || status ? 'Try adjusting your filters' : 'Create your first lead to start tracking opportunities'}
+            {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
           </p>
         </div>
       )}

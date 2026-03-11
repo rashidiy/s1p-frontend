@@ -7,12 +7,19 @@ import { apiClient } from '@/lib/api';
 import type { DealResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const stageColors: Record<string, string> = {
   prospecting: 'blue', qualification: 'gold', proposal: 'orange', negotiation: 'purple', won: 'green', lost: 'red',
 };
 
 export default function DealsPage() {
+  const t = useTranslations('deals');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tStatuses = useTranslations('statuses');
+  const tCommon = useTranslations('common');
+
   const [data, setData] = useState<PaginatedResponse<DealResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState('');
@@ -34,7 +41,7 @@ export default function DealsPage() {
     try {
       const result = await apiClient.getDeals({ page, page_size: 20, search: search || undefined, stage: stage || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load deals:', error); message.error('Failed to load deals'); }
+    } catch (error) { console.error('Failed to load deals:', error); message.error(tErrors('failedToLoadDeals')); }
     finally { setLoading(false); }
   };
 
@@ -74,14 +81,14 @@ export default function DealsPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>Add Deal</Button></Link>
+        <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>{t('addDeal')}</Button></Link>
       </div>
-      <p className="page-subtitle">Track your active opportunities</p>
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input.Search placeholder="Search deals..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
-        <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder="All Stages" allowClear className="w-full sm:w-[180px]" size="large"
-          options={[{ label: 'Prospecting', value: 'prospecting' }, { label: 'Qualification', value: 'qualification' }, { label: 'Proposal', value: 'proposal' }, { label: 'Negotiation', value: 'negotiation' }, { label: 'Won', value: 'won' }, { label: 'Lost', value: 'lost' }]}
+        <Input.Search placeholder={t('searchDeals')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
+        <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder={t('allStages')} allowClear className="w-full sm:w-[180px]" size="large"
+          options={[{ label: tStatuses('prospecting'), value: 'prospecting' }, { label: tStatuses('qualification'), value: 'qualification' }, { label: tStatuses('proposal'), value: 'proposal' }, { label: tStatuses('negotiation'), value: 'negotiation' }, { label: tStatuses('won'), value: 'won' }, { label: tStatuses('lost'), value: 'lost' }]}
         />
       </div>
 
@@ -100,11 +107,11 @@ export default function DealsPage() {
                 <span className="flex items-center gap-1 text-lg font-bold text-green-600"><DollarOutlined /> ${deal.amount.toLocaleString()}</span>
                 {deal.probability && <span className="text-sm text-gray-600 flex items-center gap-1"><RiseOutlined /> {deal.probability}%</span>}
               </div>
-              {deal.expected_close_date && <p className="text-sm text-gray-600">Close: {new Date(deal.expected_close_date).toLocaleDateString()}</p>}
-              {deal.assigned_to_name && <p className="text-sm text-gray-600">Owner: <span className="font-medium">{deal.assigned_to_name}</span></p>}
+              {deal.expected_close_date && <p className="text-sm text-gray-600">{new Date(deal.expected_close_date).toLocaleDateString()}</p>}
+              {deal.assigned_to_name && <p className="text-sm text-gray-600">{t('owner')}: <span className="font-medium">{deal.assigned_to_name}</span></p>}
               <div className="flex gap-2 pt-2">
-                <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>View</Button></Link>
-                {deal.stage !== 'won' && deal.stage !== 'lost' && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error('Failed to mark deal as won'); } }}>Win</Button>}
+                <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
+                {deal.stage !== 'won' && deal.stage !== 'lost' && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>}
               </div>
             </div>
           </div>
@@ -116,9 +123,9 @@ export default function DealsPage() {
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="no-deals" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">No deals found</h3>
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noDealsFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search || stage ? 'Try adjusting your filters' : 'Create your first deal to start tracking revenue'}
+            {search || stage ? tCommon('tryAdjustingFilters') : t('getStarted')}
           </p>
         </div>
       )}

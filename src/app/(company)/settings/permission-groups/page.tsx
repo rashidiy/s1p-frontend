@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
 import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
 
@@ -19,6 +20,11 @@ export default function PermissionGroupsPage() {
     permissions: [] as string[],
   });
   const [saving, setSaving] = useState(false);
+  const t = useTranslations('settings');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tFields = useTranslations('fields');
 
   useEffect(() => {
     loadData();
@@ -34,7 +40,7 @@ export default function PermissionGroupsPage() {
       setAvailablePerms(permsData);
     } catch (error) {
       console.error('Failed to load permission groups:', error);
-      message.error('Failed to load permission groups');
+      message.error(tErrors('failedToLoadPermissionGroups'));
     } finally {
       setLoading(false);
     }
@@ -68,7 +74,7 @@ export default function PermissionGroupsPage() {
       loadData();
     } catch (error) {
       console.error('Failed to save permission group:', error);
-      message.error('Failed to save permission group');
+      message.error(tErrors('failedToSavePermissionGroup'));
     } finally {
       setSaving(false);
     }
@@ -76,10 +82,10 @@ export default function PermissionGroupsPage() {
 
   const handleDelete = (groupId: string) => {
     Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Are you sure you want to delete this permission group? This action cannot be undone.',
-      okText: 'Delete',
-      cancelText: 'Cancel',
+      title: tCommon('areYouSure'),
+      content: t('confirmDeleteGroup'),
+      okText: tActions('delete'),
+      cancelText: tActions('cancel'),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
@@ -87,7 +93,7 @@ export default function PermissionGroupsPage() {
           loadData();
         } catch (error) {
           console.error('Failed to delete permission group:', error);
-          message.error('Failed to delete permission group');
+          message.error(tErrors('failedToDeletePermissionGroup'));
         }
       },
     });
@@ -143,23 +149,23 @@ export default function PermissionGroupsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">Manage user permission templates</p>
+          <p className="page-subtitle">{t('permissionGroupsDescription')}</p>
         </div>
         <Button onClick={handleCreate}>
           <PlusOutlined style={{ marginRight: 8 }} />
-          New Group
+          {t('newGroup')}
         </Button>
       </div>
 
       {showForm && (
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-base font-semibold leading-none tracking-tight">{editingId ? 'Edit Group' : 'Create Group'}</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">{editingId ? tActions('edit') : tActions('create')}</h3>
           </div>
           <div className="p-6 pt-0 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-medium">{tFields('name')}</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -168,17 +174,17 @@ export default function PermissionGroupsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium">{tFields('description')}</label>
                 <Input
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Optional description"
+                  placeholder={tFields('description')}
                 />
               </div>
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-medium">Permissions</label>
+              <label className="text-sm font-medium">{t('permissions')}</label>
               {Object.entries(permsByCategory).map(([category, perms]) => (
                 <div key={category} className="border rounded-lg p-3">
                   <h4 className="font-medium text-sm mb-2 capitalize">{category}</h4>
@@ -205,18 +211,18 @@ export default function PermissionGroupsPage() {
                 </div>
               ))}
               {availablePerms.length === 0 && (
-                <p className="text-sm text-gray-500">No permissions available</p>
+                <p className="text-sm text-gray-500">{tCommon('noDataFound')}</p>
               )}
             </div>
 
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={saving || !formData.name}>
                 <SaveOutlined style={{ marginRight: 8 }} />
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? tActions('saving') : tActions('save')}
               </Button>
               <Button type="default"  onClick={() => setShowForm(false)}>
                 <CloseOutlined style={{ marginRight: 8 }} />
-                Cancel
+                {tActions('cancel')}
               </Button>
             </div>
           </div>
@@ -242,7 +248,7 @@ export default function PermissionGroupsPage() {
             <div className="p-6 pt-0 space-y-3">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <SafetyOutlined />
-                <span>{group.permissions.length} permissions</span>
+                <span>{group.permissions.length} {t('permissions').toLowerCase()}</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {group.permissions.slice(0, 5).map((p) => (
@@ -257,11 +263,11 @@ export default function PermissionGroupsPage() {
               <div className="flex gap-2 pt-2">
                 <Button size="small" type="default"   onClick={() => handleEdit(group)}>
                   <EditOutlined style={{ marginRight: 4 }} />
-                  Edit
+                  {tActions('edit')}
                 </Button>
                 <Button size="small" type="primary" danger   onClick={() => handleDelete(group.id)}>
                   <DeleteOutlined style={{ marginRight: 4 }} />
-                  Delete
+                  {tActions('delete')}
                 </Button>
               </div>
             </div>
@@ -272,8 +278,8 @@ export default function PermissionGroupsPage() {
       {groups.length === 0 && !showForm && (
         <div className="glass-card py-12 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="setup" />
-          <p className="mt-4 text-lg font-medium text-gray-700">No permission groups</p>
-          <p className="text-sm text-gray-500">Create groups to manage user permissions</p>
+          <p className="mt-4 text-lg font-medium text-gray-700">{tCommon('noDataFound')}</p>
+          <p className="text-sm text-gray-500">{t('permissionGroupsDescription')}</p>
         </div>
       )}
     </div>

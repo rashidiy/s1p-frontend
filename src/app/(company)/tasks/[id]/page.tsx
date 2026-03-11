@@ -7,6 +7,7 @@ import { Alert, Button, Input, Modal, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const priorityColors: Record<string, string> = {
   low: 'green', medium: 'blue', high: 'orange', urgent: 'red',
@@ -19,6 +20,16 @@ export default function TaskDetailPage() {
   const params = useParams()!;
   const router = useRouter();
   const id = params.id as string;
+
+  const t = useTranslations('tasks');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tPriorities = useTranslations('priorities');
+  const tStatuses = useTranslations('statuses');
+  const tEntities = useTranslations('entities');
+  const tDashboard = useTranslations('dashboard');
 
   const [task, setTask] = useState<TaskResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +68,7 @@ export default function TaskDetailPage() {
         priority: data.priority || '',
       });
     } catch {
-      setError('Failed to load task');
+      setError(tErrors('failedToLoadTask'));
     } finally {
       setLoading(false);
     }
@@ -68,7 +79,7 @@ export default function TaskDetailPage() {
       const result = await apiClient.getUsers({});
       setUsers(result.users || []);
     } catch {
-      message.error('Failed to load users');
+      message.error(tErrors('failedToLoadUsers'));
     }
   };
 
@@ -87,7 +98,7 @@ export default function TaskDetailPage() {
       setEditing(false);
       loadTask();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update task');
+      setError(err.response?.data?.detail || tErrors('failedToUpdateTask'));
     } finally {
       setSaving(false);
     }
@@ -99,7 +110,7 @@ export default function TaskDetailPage() {
       await apiClient.completeTask(id);
       loadTask();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to complete task');
+      setError(err.response?.data?.detail || tErrors('failedToUpdateTask'));
     } finally {
       setCompleting(false);
     }
@@ -107,10 +118,10 @@ export default function TaskDetailPage() {
 
   const handleDelete = () => {
     Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Are you sure you want to delete this task? This action cannot be undone.',
-      okText: 'Delete',
-      cancelText: 'Cancel',
+      title: tCommon('areYouSure'),
+      content: t('confirmDeleteTask'),
+      okText: tActions('delete'),
+      cancelText: tActions('cancel'),
       okButtonProps: { danger: true },
       onOk: async () => {
         setDeleting(true);
@@ -118,7 +129,7 @@ export default function TaskDetailPage() {
           await apiClient.deleteTask(id);
           router.push('/tasks');
         } catch (err: any) {
-          setError(err.response?.data?.detail || 'Failed to delete task');
+          setError(err.response?.data?.detail || tErrors('failedToDeleteTask'));
           setDeleting(false);
         }
       },
@@ -162,7 +173,7 @@ export default function TaskDetailPage() {
   }
 
   if (!task) {
-    return <div className="p-6">Task not found</div>;
+    return <div className="p-6">{tErrors('notFoundDetail')}</div>;
   }
 
   return (
@@ -176,7 +187,7 @@ export default function TaskDetailPage() {
           <Link href="/tasks">
             <Button size="small" type="text">
               <ArrowLeftOutlined style={{ marginRight: 4 }} />
-              Back
+              {tActions('back')}
             </Button>
           </Link>
           {task.status && (
@@ -187,7 +198,7 @@ export default function TaskDetailPage() {
           {!editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
-              Edit
+              {tActions('edit')}
             </Button>
           )}
         </div>
@@ -197,42 +208,42 @@ export default function TaskDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Task Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('taskInformation')}</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Title</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('title')}</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Description</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('description')}</label>
                     <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Priority</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('priority')}</label>
                     <Select
                       value={editForm.priority}
                       onChange={(val) => setEditForm({ ...editForm, priority: val })}
-                      placeholder="Select priority..."
+                      placeholder={tFields('priority')}
                       style={{ width: "100%" }}
                       options={[
-                        { value: "low", label: "Low" },
-                        { value: "medium", label: "Medium" },
-                        { value: "high", label: "High" },
-                        { value: "urgent", label: "Urgent" },
+                        { value: "low", label: tPriorities('low') },
+                        { value: "medium", label: tPriorities('medium') },
+                        { value: "high", label: tPriorities('high') },
+                        { value: "urgent", label: tPriorities('urgent') },
                       ]}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Due Date</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('dueDate')}</label>
                     <Input
                       type="datetime-local"
                       value={editForm.due_date}
@@ -240,11 +251,11 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Assigned To</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('assignedTo')}</label>
                     <Select
                       allowClear
                       style={{ width: '100%' }}
-                      placeholder="Select user..."
+                      placeholder={tFields('assignedTo')}
                       value={editForm.assigned_to || undefined}
                       onChange={(val) => setEditForm({ ...editForm, assigned_to: val || '' })}
                       options={users.map(u => ({
@@ -254,56 +265,56 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Entity Type</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('entityType')}</label>
                     <Select
                       value={editForm.entity_type}
                       onChange={(val) => setEditForm({ ...editForm, entity_type: val })}
-                      placeholder="Select entity type..."
+                      placeholder={tFields('entityType')}
                       style={{ width: "100%" }}
                       options={[
-                        { value: "contact", label: "Contact" },
-                        { value: "lead", label: "Lead" },
-                        { value: "deal", label: "Deal" },
+                        { value: "contact", label: tEntities('contact') },
+                        { value: "lead", label: tEntities('lead') },
+                        { value: "deal", label: tEntities('deal') },
                       ]}
                     />
                   </div>
                   {editForm.entity_type && (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} ID</label>
+                      <label className="text-sm font-medium text-gray-700">{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} {tFields('entityId')}</label>
                       <Input
                         value={editForm.entity_id}
                         onChange={(e) => setEditForm({ ...editForm, entity_id: e.target.value })}
-                        placeholder={`Enter ${editForm.entity_type} ID...`}
+                        placeholder={`${tFields('entityId')}...`}
                       />
                     </div>
                   )}
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>Save</Button>
-                    <Button type="default" onClick={() => { setEditing(false); loadTask(); }} icon={<CloseOutlined />}>Cancel</Button>
+                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="default" onClick={() => { setEditing(false); loadTask(); }} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {task.description && (
                     <div>
-                      <span className="text-sm text-gray-500">Description</span>
+                      <span className="text-sm text-gray-500">{tFields('description')}</span>
                       <p className="mt-1">{task.description}</p>
                     </div>
                   )}
                   {task.due_date && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">Due Date</span>
+                      <span className="text-sm text-gray-500">{tFields('dueDate')}</span>
                       <span>{new Date(task.due_date).toLocaleString()}</span>
                     </div>
                   )}
                   {task.assigned_to_name && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">Assigned To</span>
+                      <span className="text-sm text-gray-500">{tFields('assignedTo')}</span>
                       <span>{task.assigned_to_name}</span>
                     </div>
                   )}
                   {!task.description && !task.due_date && !task.assigned_to_name && (
-                    <p className="text-sm text-gray-500 text-center py-4">No additional details</p>
+                    <p className="text-sm text-gray-500 text-center py-4">{tCommon('noDataFound')}</p>
                   )}
                 </div>
               )}
@@ -313,7 +324,7 @@ export default function TaskDetailPage() {
           {task.entity_type && task.entity_id && (
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-base font-semibold leading-none tracking-tight">Linked Entity</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight">{tFields('linkedEntity')}</h3>
               </div>
               <div className="p-6 pt-0">
                 <div className="flex items-center gap-3">
@@ -322,7 +333,7 @@ export default function TaskDetailPage() {
                     href={`/${task.entity_type}s/${task.entity_id}`}
                     className="text-indigo-600 hover:underline"
                   >
-                    View {task.entity_type}: {task.entity_id}
+                    {tActions('view')} {task.entity_type}: {task.entity_id}
                   </Link>
                 </div>
               </div>
@@ -333,52 +344,52 @@ export default function TaskDetailPage() {
         <div className="space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Summary</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tCommon('summary')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Priority</span>
+                <span className="text-sm text-gray-500">{tFields('priority')}</span>
                 {task.priority ? (
                   <Tag color={priorityColors[task.priority] || 'default'}>{task.priority}</Tag>
                 ) : (
-                  <span className="text-sm text-gray-400">Not set</span>
+                  <span className="text-sm text-gray-400">{tCommon('noDataFound')}</span>
                 )}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Status</span>
+                <span className="text-sm text-gray-500">{tFields('status')}</span>
                 {task.status ? (
                   <Tag color={statusColors[task.status] || 'default'}>{task.status.replace('_', ' ')}</Tag>
                 ) : (
-                  <span className="text-sm text-gray-400">Unknown</span>
+                  <span className="text-sm text-gray-400">{tCommon('unknown')}</span>
                 )}
               </div>
               {task.due_date && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Due Date</span>
+                  <span className="text-sm text-gray-500">{tFields('dueDate')}</span>
                   <span className="text-sm">{new Date(task.due_date).toLocaleDateString()}</span>
                 </div>
               )}
               {task.assigned_to_name && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Assigned To</span>
+                  <span className="text-sm text-gray-500">{tFields('assignedTo')}</span>
                   <span className="text-sm">{task.assigned_to_name}</span>
                 </div>
               )}
               {task.completed_at && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Completed At</span>
+                  <span className="text-sm text-gray-500">{tStatuses('completed')}</span>
                   <span className="text-sm">{new Date(task.completed_at).toLocaleString()}</span>
                 </div>
               )}
               <div className="text-sm text-gray-500 pt-2">
-                Created: {new Date(task.created_at).toLocaleDateString()}
+                {tFields('created')}: {new Date(task.created_at).toLocaleDateString()}
               </div>
             </div>
           </div>
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Actions</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tDashboard('quickActions')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <Button type="default"
@@ -386,14 +397,14 @@ export default function TaskDetailPage() {
                 onClick={handleComplete}
                 disabled={completing || task.status === 'completed'}>
                 <CheckOutlined style={{ marginRight: 8 }} />
-                {completing ? 'Completing...' : task.status === 'completed' ? 'Already Completed' : 'Mark Complete'}
+                {completing ? `${tStatuses('completed')}...` : task.status === 'completed' ? tStatuses('completed') : tStatuses('completed')}
               </Button>
               <Button type="primary" danger
                 className="w-full"
                 onClick={handleDelete}
                 disabled={deleting}>
                 <DeleteOutlined style={{ marginRight: 8 }} />
-                {deleting ? 'Deleting...' : 'Delete Task'}
+                {deleting ? `${tActions('delete')}...` : t('deleteTask')}
               </Button>
             </div>
           </div>

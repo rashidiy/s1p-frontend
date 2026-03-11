@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { apiClient } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
 import type { TelegramConfig, UpdateTelegramConfig } from '@/types/api';
 import { toast } from 'sonner';
@@ -57,6 +58,11 @@ export default function TelegramSettingsPage() {
   const [chatIdInput, setChatIdInput] = useState('');
   const [pendingChanges, setPendingChanges] = useState<UpdateTelegramConfig>({});
   const [hasChanges, setHasChanges] = useState(false);
+  const t = useTranslations('settings');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tFields = useTranslations('fields');
 
   useEffect(() => {
     fetchConfig();
@@ -71,7 +77,7 @@ export default function TelegramSettingsPage() {
       setPendingChanges({});
       setHasChanges(false);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load Telegram configuration'));
+      setError(getErrorMessage(err, tErrors('failedToLoadTelegramConfig')));
     } finally {
       setLoading(false);
     }
@@ -90,9 +96,9 @@ export default function TelegramSettingsPage() {
       setConfig(data);
       setPendingChanges({});
       setHasChanges(false);
-      toast.success('Telegram settings saved');
+      toast.success(t('settingsSaved'));
     } catch (err) {
-      toast.error(getErrorMessage(err, 'Failed to save settings'));
+      toast.error(getErrorMessage(err, tErrors('failedToSaveSettings')));
     } finally {
       setSaving(false);
     }
@@ -101,7 +107,7 @@ export default function TelegramSettingsPage() {
   const handleConnect = async () => {
     const trimmed = chatIdInput.trim();
     if (!trimmed) {
-      toast.error('Please enter a Chat ID');
+      toast.error(t('enterChatId'));
       return;
     }
     try {
@@ -109,9 +115,9 @@ export default function TelegramSettingsPage() {
       const data = await apiClient.connectTelegram(trimmed);
       setConfig(data);
       setChatIdInput('');
-      toast.success('Telegram connected successfully');
+      toast.success(t('telegramConnected'));
     } catch (err) {
-      toast.error(getErrorMessage(err, 'Failed to connect Telegram'));
+      toast.error(getErrorMessage(err, tErrors('failedToConnectTelegram')));
     } finally {
       setConnecting(false);
     }
@@ -119,18 +125,18 @@ export default function TelegramSettingsPage() {
 
   const handleDisconnect = () => {
     Modal.confirm({
-      title: 'Disconnect Telegram',
-      content: 'Are you sure you want to disconnect the Telegram bot? You will stop receiving all notifications.',
-      okText: 'Disconnect',
+      title: t('disconnectTelegram'),
+      content: t('confirmDisconnect'),
+      okText: tActions('disconnect'),
       okButtonProps: { danger: true },
-      cancelText: 'Cancel',
+      cancelText: tActions('cancel'),
       onOk: async () => {
         try {
           await apiClient.disconnectTelegram();
           await fetchConfig();
-          toast.success('Telegram disconnected');
+          toast.success(t('telegramDisconnected'));
         } catch (err) {
-          toast.error(getErrorMessage(err, 'Failed to disconnect Telegram'));
+          toast.error(getErrorMessage(err, tErrors('failedToDisconnectTelegram')));
         }
       },
     });
@@ -162,17 +168,17 @@ export default function TelegramSettingsPage() {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="page-header">
             <div>
-              <p className="page-subtitle">Configure Telegram bot notifications for your team.</p>
+              <p className="page-subtitle">{t('telegramSubtitle')}</p>
             </div>
           </div>
           <Alert
             type="error"
-            message="Error"
+            message={tCommon('somethingWentWrong')}
             description={error}
             showIcon
             action={
               <Button size="small" onClick={fetchConfig}>
-                Retry
+                {tCommon('tryAgain')}
               </Button>
             }
           />
@@ -188,7 +194,7 @@ export default function TelegramSettingsPage() {
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="page-header">
           <div>
-            <p className="page-subtitle">Configure Telegram bot notifications for your team.</p>
+            <p className="page-subtitle">{t('telegramSubtitle')}</p>
           </div>
         </div>
 
@@ -204,7 +210,7 @@ export default function TelegramSettingsPage() {
 
               <div>
                 <Title level={5} style={{ marginTop: 0 }}>
-                  <InfoCircleOutlined /> How to connect
+                  <InfoCircleOutlined /> {t('connectTelegram')}
                 </Title>
                 <Paragraph type="secondary" style={{ marginBottom: 4 }}>
                   Follow these steps to connect the S1P bot to your Telegram group:
@@ -227,11 +233,11 @@ export default function TelegramSettingsPage() {
 
               <div>
                 <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                  Chat ID
+                  {tFields('chatId')}
                 </Text>
                 <Space.Compact style={{ width: '100%' }}>
                   <Input
-                    placeholder="Enter Telegram Chat ID (e.g. -1001234567890)"
+                    placeholder={t('enterChatId')}
                     value={chatIdInput}
                     onChange={(e) => setChatIdInput(e.target.value)}
                     onPressEnter={handleConnect}
@@ -243,7 +249,7 @@ export default function TelegramSettingsPage() {
                     loading={connecting}
                     onClick={handleConnect}
                   >
-                    Connect
+                    {tActions('connect')}
                   </Button>
                 </Space.Compact>
               </div>
@@ -260,7 +266,7 @@ export default function TelegramSettingsPage() {
                     Connected
                   </Tag>
                   <Text type="secondary">
-                    Chat ID: <Text code>{config.chat_id}</Text>
+                    {tFields('chatId')}: <Text code>{config.chat_id}</Text>
                   </Text>
                 </Space>
                 <Button
@@ -268,7 +274,7 @@ export default function TelegramSettingsPage() {
                   icon={<DisconnectOutlined />}
                   onClick={handleDisconnect}
                 >
-                  Disconnect
+                  {tActions('disconnect')}
                 </Button>
               </div>
             </Card>
@@ -291,7 +297,7 @@ export default function TelegramSettingsPage() {
             </Card>
 
             {/* Notification Preferences */}
-            <Card title="Notification Preferences">
+            <Card title={t('notifications')}>
               <Space direction="vertical" size={0} style={{ width: '100%' }}>
                 {NOTIFICATION_TOGGLES.map((toggle, index) => (
                   <div key={toggle.key}>
@@ -325,7 +331,7 @@ export default function TelegramSettingsPage() {
                   onClick={handleSave}
                   size="large"
                 >
-                  Save Changes
+                  {tActions('saveChanges')}
                 </Button>
               </div>
             )}

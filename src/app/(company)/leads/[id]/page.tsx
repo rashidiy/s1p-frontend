@@ -8,8 +8,15 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
 import type { LeadResponse, NoteResponse } from '@/types/api';
+import { useTranslations } from 'next-intl';
 
 export default function LeadDetailPage() {
+  const t = useTranslations('leads');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+
   const params = useParams()!;
   const router = useRouter();
   const { hasPermissionString } = useAuthStore();
@@ -45,7 +52,7 @@ export default function LeadDetailPage() {
       });
     } catch (error) {
       console.error('Failed to load lead:', error);
-      message.error('Failed to load lead');
+      message.error(tErrors('failedToLoadLead'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +64,7 @@ export default function LeadDetailPage() {
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
-      message.error('Failed to load notes');
+      message.error(tErrors('failedToLoadNotes'));
     }
   };
 
@@ -73,16 +80,16 @@ export default function LeadDetailPage() {
       loadLead();
     } catch (error) {
       console.error('Failed to update lead:', error);
-      message.error('Failed to update lead');
+      message.error(tErrors('failedToUpdateLead'));
     }
   };
 
   const handleConvert = () => {
     Modal.confirm({
-      title: 'Convert Lead',
-      content: 'Convert this lead to a deal?',
-      okText: 'Convert',
-      cancelText: 'Cancel',
+      title: t('convertLead'),
+      content: t('convertLeadConfirm'),
+      okText: tActions('convert'),
+      cancelText: tActions('cancel'),
       onOk: async () => {
         setConverting(true);
         try {
@@ -90,7 +97,7 @@ export default function LeadDetailPage() {
           loadLead();
         } catch (error) {
           console.error('Failed to convert lead:', error);
-          message.error('Failed to convert lead');
+          message.error(tErrors('failedToConvertLead'));
         } finally {
           setConverting(false);
         }
@@ -110,16 +117,16 @@ export default function LeadDetailPage() {
       loadNotes();
     } catch (error) {
       console.error('Failed to add note:', error);
-      message.error('Failed to add note');
+      message.error(tErrors('failedToAddNote'));
     }
   };
 
   const handleDelete = () => {
     Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Are you sure you want to delete this lead? This action cannot be undone.',
-      okText: 'Delete',
-      cancelText: 'Cancel',
+      title: tCommon('areYouSure'),
+      content: t('confirmDeleteLead'),
+      okText: tActions('delete'),
+      cancelText: tActions('cancel'),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
@@ -127,7 +134,7 @@ export default function LeadDetailPage() {
           router.push('/leads');
         } catch (error) {
           console.error('Failed to delete lead:', error);
-          message.error('Failed to delete lead');
+          message.error(tErrors('failedToDeleteLead'));
         }
       },
     });
@@ -159,7 +166,7 @@ export default function LeadDetailPage() {
       </div>
     </div>
   );
-  if (!lead) return <div className="p-6">Lead not found</div>;
+  if (!lead) return <div className="p-6">{tErrors('notFound')}</div>;
 
   const statusColor = LEAD_STATUS_COLORS[lead.status?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
 
@@ -169,7 +176,7 @@ export default function LeadDetailPage() {
         <div className="flex items-center gap-4 flex-wrap">
           <Button size="small" type="text"   onClick={() => router.push('/leads')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
           {lead.status && <Tag className={statusColor}>{lead.status}</Tag>}
         </div>
@@ -177,18 +184,18 @@ export default function LeadDetailPage() {
           {lead.status !== 'converted' && hasPermissionString('leads.write') && (
             <Button onClick={handleConvert} disabled={converting}>
               <RightCircleOutlined style={{ marginRight: 8 }} />
-              {converting ? 'Converting...' : 'Convert to Deal'}
+              {converting ? tActions('changing') : t('convertLead')}
             </Button>
           )}
           {hasPermissionString('leads.write') && !editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
-              Edit
+              {tActions('edit')}
             </Button>
           )}
           {hasPermissionString('leads.delete') && (
             <Button type="primary" danger  onClick={handleDelete}>
-              Delete
+              {tActions('delete')}
             </Button>
           )}
         </div>
@@ -198,32 +205,32 @@ export default function LeadDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Lead Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('leadInformation')}</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Title</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('title')}</label>
                     <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} size="large" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Description</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('description')}</label>
                     <Input.TextArea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={3} />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Estimated Value</label>
+                      <label className="text-sm font-medium text-gray-700">{tFields('estimatedValue')}</label>
                       <Input type="number" value={editForm.estimated_value} onChange={(e) => setEditForm({ ...editForm, estimated_value: e.target.value })} size="large" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Source</label>
+                      <label className="text-sm font-medium text-gray-700">{tFields('source')}</label>
                       <Input value={editForm.source} onChange={(e) => setEditForm({ ...editForm, source: e.target.value })} size="large" />
                     </div>
                   </div>
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>Save</Button>
-                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>Cancel</Button>
+                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>
               ) : (
@@ -244,13 +251,13 @@ export default function LeadDetailPage() {
                   )}
                   {lead.pipeline_stage && (
                     <div className="text-sm">
-                      <span className="text-gray-500">Pipeline Stage: </span>
+                      <span className="text-gray-500">{tFields('stage')}: </span>
                       <span className="font-medium">{lead.pipeline_stage}</span>
                     </div>
                   )}
                   {lead.assigned_to_name && (
                     <div className="text-sm">
-                      <span className="text-gray-500">Assigned to: </span>
+                      <span className="text-gray-500">{tFields('assignedTo')}: </span>
                       <span className="font-medium">{lead.assigned_to_name}</span>
                     </div>
                   )}
@@ -263,7 +270,7 @@ export default function LeadDetailPage() {
                     </div>
                   )}
                   <div className="text-sm text-gray-500 pt-2">
-                    Created: {new Date(lead.created_at).toLocaleDateString()}
+                    {tFields('created')}: {new Date(lead.created_at).toLocaleDateString()}
                   </div>
                 </div>
               )}
@@ -272,12 +279,12 @@ export default function LeadDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Notes</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tFields('notes')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
                 <Input.TextArea
-                  placeholder="Add a note..."
+                  placeholder={t('writeNote')}
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   className="flex-1"
@@ -296,7 +303,7 @@ export default function LeadDetailPage() {
                 </div>
               ))}
               {notes.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
+                <p className="text-sm text-gray-500 text-center py-4">{tCommon('noNotesYet')}</p>
               )}
             </div>
           </div>
@@ -305,19 +312,19 @@ export default function LeadDetailPage() {
         <div>
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tCommon('details')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Status</span>
+                <span className="text-gray-500">{tFields('status')}</span>
                 <Tag className={statusColor}>{lead.status || 'N/A'}</Tag>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Created</span>
+                <span className="text-gray-500">{tFields('created')}</span>
                 <span>{new Date(lead.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Updated</span>
+                <span className="text-gray-500">{tFields('updated')}</span>
                 <span>{new Date(lead.updated_at).toLocaleDateString()}</span>
               </div>
             </div>

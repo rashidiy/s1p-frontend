@@ -7,6 +7,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { UserRole } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, Select } from 'antd';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 export default function InviteUserPage() {
@@ -14,6 +15,11 @@ export default function InviteUserPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [role, setRole] = useState<string>(UserRole.COMPANY_OPERATOR);
+  const t = useTranslations('users');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tRoles = useTranslations('roles');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +42,7 @@ export default function InviteUserPage() {
       });
       router.push('/users');
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to invite user'));
+      setError(getErrorMessage(err, tErrors('failedToInviteUser')));
     } finally {
       setIsLoading(false);
     }
@@ -49,17 +55,17 @@ export default function InviteUserPage() {
           <Link href="/users">
             <Button size="small" type="text">
               <ArrowLeftOutlined style={{ marginRight: 4 }} />
-              Back
+              {tActions('back')}
             </Button>
           </Link>
-          <p className="page-subtitle">Send an invitation to join your team</p>
+          <p className="page-subtitle">{t('inviteUserSubtitle')}</p>
         </div>
       </div>
 
       <div className="glass-card p-0 max-w-3xl mx-auto">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-base font-semibold leading-none tracking-tight">User Information</h3>
-          <p className="text-sm text-gray-400">Enter the details for the new team member</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">{t('userInformation')}</h3>
+          <p className="text-sm text-gray-400">{t('enterUserDetails')}</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -69,7 +75,7 @@ export default function InviteUserPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="first_name" className="text-sm font-medium">First Name *</label>
+                <label htmlFor="first_name" className="text-sm font-medium">{tFields('firstName')} *</label>
                 <Input
                   id="first_name"
                   name="first_name"
@@ -79,7 +85,7 @@ export default function InviteUserPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="last_name" className="text-sm font-medium">Last Name</label>
+                <label htmlFor="last_name" className="text-sm font-medium">{tFields('lastName')}</label>
                 <Input
                   id="last_name"
                   name="last_name"
@@ -90,7 +96,7 @@ export default function InviteUserPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">Email *</label>
+              <label htmlFor="email" className="text-sm font-medium">{tFields('email')} *</label>
               <Input
                 id="email"
                 name="email"
@@ -102,7 +108,7 @@ export default function InviteUserPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="phone" className="text-sm font-medium">Phone</label>
+              <label htmlFor="phone" className="text-sm font-medium">{tFields('phone')}</label>
               <Input
                 id="phone"
                 name="phone"
@@ -113,25 +119,25 @@ export default function InviteUserPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="role" className="text-sm font-medium">Role *</label>
+              <label htmlFor="role" className="text-sm font-medium">{tFields('role')} *</label>
               <Select
                   value={role}
                   onChange={setRole}
                   style={{ width: "100%" }}
-                  options={[{ value: UserRole.COMPANY_OPERATOR, label: "Operator" }, { value: UserRole.COMPANY_MANAGER, label: "Manager" }, { value: UserRole.COMPANY_ADMIN, label: "Admin" }]}
+                  options={[{ value: UserRole.COMPANY_OPERATOR, label: tRoles('company_operator') }, { value: UserRole.COMPANY_MANAGER, label: tRoles('company_manager') }, { value: UserRole.COMPANY_ADMIN, label: tRoles('company_admin') }]}
                 />
               <p className="text-xs text-gray-500">
-                Operators can handle calls and basic tasks. Managers can view team analytics. Admins have full access.
+                {t('operatorDescription')}
               </p>
             </div>
 
             <div className="flex space-x-3">
               <Button type="primary" htmlType="submit" disabled={isLoading}>
-                {isLoading ? 'Sending...' : 'Send Invitation'}
+                {isLoading ? tActions('saving') : tActions('sendInvitation')}
               </Button>
               <Link href="/users">
                 <Button type="default" htmlType="button"  disabled={isLoading}>
-                  Cancel
+                  {tActions('cancel')}
                 </Button>
               </Link>
             </div>

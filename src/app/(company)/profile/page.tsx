@@ -5,17 +5,18 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { Alert, Button, Input, message as antMessage } from 'antd';
 import type { UserResponse } from '@/types/api';
+import { useTranslations } from 'next-intl';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-const ROLE_LABELS: Record<string, string> = {
-  company_admin: 'Admin',
-  company_manager: 'Manager',
-  company_operator: 'Operator',
-  owner: 'Owner',
-};
-
 export default function ProfilePage() {
+  const t = useTranslations('profile');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tAuth = useTranslations('auth');
+  const tRoles = useTranslations('roles');
+
   const { user, setUser } = useAuthStore();
   const [profile, setProfile] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ export default function ProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
-      antMessage.error('Failed to load profile');
+      antMessage.error(tErrors('failedToLoadProfile'));
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ export default function ProfilePage() {
     try {
       const updated = await apiClient.updateMyProfile(profileForm);
       setProfile(updated);
-      setMessage('Profile updated successfully');
+      setMessage(tErrors('profileUpdated'));
       // Update stored user data
       if (typeof window !== 'undefined') {
         const userStr = localStorage.getItem('user');
@@ -83,7 +84,7 @@ export default function ProfilePage() {
         }
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update profile');
+      setError(err.response?.data?.detail || tErrors('failedToUpdateProfile'));
     } finally {
       setSaving(false);
     }
@@ -95,12 +96,12 @@ export default function ProfilePage() {
     setPasswordMessage('');
 
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('passwordMismatch'));
       return;
     }
 
     if (!PASSWORD_REGEX.test(passwordForm.new_password)) {
-      setPasswordError('Password must be at least 8 characters, contain at least one uppercase letter and one number');
+      setPasswordError(tAuth('passwordRequirementsError'));
       return;
     }
 
@@ -110,10 +111,10 @@ export default function ProfilePage() {
         old_password: passwordForm.old_password,
         new_password: passwordForm.new_password,
       });
-      setPasswordMessage('Password changed successfully');
+      setPasswordMessage(tErrors('passwordChanged'));
       setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
     } catch (err: any) {
-      setPasswordError(err.response?.data?.detail || 'Failed to change password');
+      setPasswordError(err.response?.data?.detail || tErrors('failedToChangePassword'));
     } finally {
       setChangingPassword(false);
     }
@@ -142,14 +143,14 @@ export default function ProfilePage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">Update your personal details and password</p>
+          <p className="page-subtitle">{t('subtitle')}</p>
         </div>
       </div>
 
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-base font-semibold leading-none tracking-tight">Personal Information</h3>
-          <p className="text-sm text-gray-400">Update your personal details</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">{t('personalDetails')}</h3>
+          <p className="text-sm text-gray-400">{t('updatePersonalDetails')}</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleSaveProfile} className="space-y-4">
@@ -161,7 +162,7 @@ export default function ProfilePage() {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">First Name</label>
+                <label className="text-sm font-medium">{tFields('firstName')}</label>
                 <Input
                   value={profileForm.first_name}
                   onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
@@ -169,7 +170,7 @@ export default function ProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Last Name</label>
+                <label className="text-sm font-medium">{tFields('lastName')}</label>
                 <Input
                   value={profileForm.last_name}
                   onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
@@ -177,22 +178,22 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">{tFields('email')}</label>
               <Input value={profile?.email || ''} disabled />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Phone</label>
+              <label className="text-sm font-medium">{tFields('phone')}</label>
               <Input
                 value={profileForm.phone}
                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Role</label>
-              <Input value={ROLE_LABELS[profile?.role || ''] || profile?.role || ''} disabled />
+              <label className="text-sm font-medium">{tFields('role')}</label>
+              <Input value={profile?.role ? tRoles(profile.role as any) : ''} disabled />
             </div>
             <Button type="primary" htmlType="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? tActions('saving') : tActions('saveChanges')}
             </Button>
           </form>
         </div>
@@ -200,8 +201,8 @@ export default function ProfilePage() {
 
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-base font-semibold leading-none tracking-tight">Change Password</h3>
-          <p className="text-sm text-gray-400">Update your password</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">{t('changePassword')}</h3>
+          <p className="text-sm text-gray-400">{t('updatePassword')}</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleChangePassword} className="space-y-4">
@@ -212,7 +213,7 @@ export default function ProfilePage() {
               <Alert type="error" message={passwordError} showIcon className="!rounded-xl" />
             )}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Current Password</label>
+              <label className="text-sm font-medium">{tFields('currentPassword')}</label>
               <Input
                 type="password"
                 value={passwordForm.old_password}
@@ -221,7 +222,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">New Password</label>
+              <label className="text-sm font-medium">{tFields('newPassword')}</label>
               <Input
                 type="password"
                 value={passwordForm.new_password}
@@ -229,11 +230,11 @@ export default function ProfilePage() {
                 required
               />
               <p className="text-xs text-gray-400">
-                At least 8 characters, one uppercase letter, and one number
+                {tAuth('passwordRequirements')}
               </p>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm New Password</label>
+              <label className="text-sm font-medium">{tFields('confirmNewPassword')}</label>
               <Input
                 type="password"
                 value={passwordForm.confirm_password}
@@ -242,7 +243,7 @@ export default function ProfilePage() {
               />
             </div>
             <Button type="primary" htmlType="submit" disabled={changingPassword}>
-              {changingPassword ? 'Changing...' : 'Change Password'}
+              {changingPassword ? tActions('changing') : t('changePassword')}
             </Button>
           </form>
         </div>

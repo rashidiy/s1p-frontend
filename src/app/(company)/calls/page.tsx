@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import {
   CALL_DIRECTION_LABELS,
   CALL_DIRECTION_COLORS,
@@ -36,6 +37,10 @@ const OUTCOME_OPTIONS = [
 
 export default function CallsPage() {
   const router = useRouter();
+  const t = useTranslations('calls');
+  const tFields = useTranslations('fields');
+  const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
   const [data, setData] = useState<PaginatedResponse<CallEventResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -52,7 +57,7 @@ export default function CallsPage() {
     try {
       const result = await apiClient.getCallHistory({ page, page_size: 20, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load call history:', error); message.error('Failed to load call history'); }
+    } catch (error) { console.error('Failed to load call history:', error); message.error(tErrors('failedToLoadCalls')); }
     finally { setLoading(false); }
   };
 
@@ -62,7 +67,7 @@ export default function CallsPage() {
       window.open(blobUrl, '_blank');
     } catch (err) {
       console.error('Failed to load recording:', err);
-      message.error('Failed to load recording');
+      message.error(tErrors('failedToLoadRecording'));
     }
   };
 
@@ -81,31 +86,31 @@ export default function CallsPage() {
 
   return (
     <div className="space-y-6">
-      <p className="page-subtitle">View and filter call records</p>
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       <div className="glass-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Direction</label>
-            <Select value={direction || undefined} onChange={(v) => { setDirection(v || ''); setPage(1); }} placeholder="All" allowClear style={{ width: '100%' }}
+            <label className="text-xs text-gray-500 block mb-1">{tFields('direction')}</label>
+            <Select value={direction || undefined} onChange={(v) => { setDirection(v || ''); setPage(1); }} placeholder={t('allDirections')} allowClear style={{ width: '100%' }}
               options={CALL_DIRECTION_OPTIONS.map((o) => ({ label: o.label, value: o.value }))} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Outcome</label>
-            <Select value={outcome || undefined} onChange={(v) => { setOutcome(v || ''); setPage(1); }} placeholder="All" allowClear style={{ width: '100%' }}
+            <label className="text-xs text-gray-500 block mb-1">{tFields('outcome')}</label>
+            <Select value={outcome || undefined} onChange={(v) => { setOutcome(v || ''); setPage(1); }} placeholder={t('allOutcomes')} allowClear style={{ width: '100%' }}
               options={OUTCOME_OPTIONS} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">From</label>
+            <label className="text-xs text-gray-500 block mb-1">{tFields('from')}</label>
             <DatePicker className="w-full" format="YYYY-MM-DD" value={dateFrom ? dayjs(dateFrom) : null} onChange={(date) => { setDateFrom(date ? date.format('YYYY-MM-DD') : ''); setPage(1); }} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">To</label>
+            <label className="text-xs text-gray-500 block mb-1">{tFields('to')}</label>
             <DatePicker className="w-full" format="YYYY-MM-DD" value={dateTo ? dayjs(dateTo) : null} onChange={(date) => { setDateTo(date ? date.format('YYYY-MM-DD') : ''); setPage(1); }} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Filter</label>
-            <Checkbox checked={myCalls} onChange={(e) => { setMyCalls(e.target.checked); setPage(1); }} className="mt-1">My Calls Only</Checkbox>
+            <label className="text-xs text-gray-500 block mb-1">{t('filter')}</label>
+            <Checkbox checked={myCalls} onChange={(e) => { setMyCalls(e.target.checked); setPage(1); }} className="mt-1">{t('myCalls')}</Checkbox>
           </div>
         </div>
       </div>
@@ -136,7 +141,7 @@ export default function CallsPage() {
                   <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction)}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm sm:text-base">{call.phone_1 || 'Unknown'} &rarr; {call.phone_2 || 'Unknown'}</span>
+                      <span className="font-medium text-sm sm:text-base">{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
                       {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_LABELS[call.direction] || call.direction}</Tag>}
                       {call.state && <Tag>{CALL_STATUS_LABELS[call.state] || call.state}</Tag>}
                     </div>
@@ -150,7 +155,7 @@ export default function CallsPage() {
                 <div className="flex items-center gap-2 pl-8 sm:pl-0 shrink-0">
                   <Select
                     size="small"
-                    placeholder="Set outcome..."
+                    placeholder={tCommon('setOutcome')}
                     value={call.outcome || undefined}
                     className="w-[140px] sm:w-[160px]"
                     onClick={(e) => e.stopPropagation()}
@@ -158,7 +163,7 @@ export default function CallsPage() {
                       try {
                         await apiClient.setCallOutcome(String(call.id), { outcome: value });
                         loadCallHistory();
-                      } catch (err) { console.error(err); message.error('Failed to set call outcome'); }
+                      } catch (err) { console.error(err); message.error(tErrors('failedToSetOutcome')); }
                     }}
                     options={OUTCOME_OPTIONS}
                   />
@@ -170,9 +175,9 @@ export default function CallsPage() {
         ) : (
           <div className="py-16 flex flex-col items-center justify-center">
             <EmptyStateCharacter width={160} height={160} variant="no-calls" />
-            <h3 className="mt-5 text-lg font-semibold text-gray-800">No calls found</h3>
+            <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noCallsFound')}</h3>
             <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-              Calls will appear here as they come in. Try adjusting your filters if you expected results.
+              {tCommon('tryAdjustingFilters')}
             </p>
           </div>
         )}

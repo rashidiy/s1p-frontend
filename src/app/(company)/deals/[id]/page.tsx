@@ -8,12 +8,20 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
 import type { DealResponse, NoteResponse } from '@/types/api';
+import { useTranslations } from 'next-intl';
 
 export default function DealDetailPage() {
   const params = useParams()!;
   const router = useRouter();
   const { hasPermissionString } = useAuthStore();
   const dealId = params.id as string;
+
+  const t = useTranslations('deals');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const tEntities = useTranslations('entities');
 
   const [deal, setDeal] = useState<DealResponse | null>(null);
   const [notes, setNotes] = useState<NoteResponse[]>([]);
@@ -47,7 +55,7 @@ export default function DealDetailPage() {
       });
     } catch (error) {
       console.error('Failed to load deal:', error);
-      message.error('Failed to load deal');
+      message.error(tErrors('failedToLoadDeal'));
     } finally {
       setLoading(false);
     }
@@ -59,7 +67,7 @@ export default function DealDetailPage() {
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
-      message.error('Failed to load notes');
+      message.error(tErrors('failedToLoadNotes'));
     }
   };
 
@@ -76,19 +84,19 @@ export default function DealDetailPage() {
       loadDeal();
     } catch (error) {
       console.error('Failed to update deal:', error);
-      message.error('Failed to update deal');
+      message.error(tErrors('failedToUpdateDeal'));
     }
   };
 
   const handleWin = () => {
     setReasonInput('');
     Modal.confirm({
-      title: 'Mark Deal as Won',
+      title: t('markAsWon'),
       content: (
         <div className="mt-2">
-          <label className="text-sm text-gray-600">Win reason (optional):</label>
+          <label className="text-sm text-gray-600">{t('winReason')}:</label>
           <Input
-            placeholder="Enter reason..."
+            placeholder={t('winReason')}
             className="mt-1"
             onChange={(e) => {
               // Store in a closure-accessible ref via DOM
@@ -98,8 +106,8 @@ export default function DealDetailPage() {
           />
         </div>
       ),
-      okText: 'Mark as Won',
-      cancelText: 'Cancel',
+      okText: t('markAsWon'),
+      cancelText: tActions('cancel'),
       onOk: async () => {
         const input = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
         const reason = input?.value || undefined;
@@ -108,7 +116,7 @@ export default function DealDetailPage() {
           loadDeal();
         } catch (error) {
           console.error('Failed to mark deal as won:', error);
-          message.error('Failed to mark deal as won');
+          message.error(tErrors('failedToMarkDealAsWon'));
         }
       },
     });
@@ -117,12 +125,12 @@ export default function DealDetailPage() {
   const handleLose = () => {
     setReasonInput('');
     Modal.confirm({
-      title: 'Mark Deal as Lost',
+      title: t('markAsLost'),
       content: (
         <div className="mt-2">
-          <label className="text-sm text-gray-600">Loss reason (optional):</label>
+          <label className="text-sm text-gray-600">{t('lossReason')}:</label>
           <Input
-            placeholder="Enter reason..."
+            placeholder={t('lossReason')}
             className="mt-1"
             onChange={(e) => {
               const modal = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
@@ -131,9 +139,9 @@ export default function DealDetailPage() {
           />
         </div>
       ),
-      okText: 'Mark as Lost',
+      okText: t('markAsLost'),
       okButtonProps: { danger: true },
-      cancelText: 'Cancel',
+      cancelText: tActions('cancel'),
       onOk: async () => {
         const input = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
         const reason = input?.value || undefined;
@@ -142,7 +150,7 @@ export default function DealDetailPage() {
           loadDeal();
         } catch (error) {
           console.error('Failed to mark deal as lost:', error);
-          message.error('Failed to mark deal as lost');
+          message.error(tErrors('failedToMarkDealAsLost'));
         }
       },
     });
@@ -160,16 +168,16 @@ export default function DealDetailPage() {
       loadNotes();
     } catch (error) {
       console.error('Failed to add note:', error);
-      message.error('Failed to add note');
+      message.error(tErrors('failedToAddNote'));
     }
   };
 
   const handleDelete = () => {
     Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Are you sure you want to delete this deal? This action cannot be undone.',
-      okText: 'Delete',
-      cancelText: 'Cancel',
+      title: tCommon('areYouSure'),
+      content: t('confirmDeleteDeal'),
+      okText: tActions('delete'),
+      cancelText: tActions('cancel'),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
@@ -177,7 +185,7 @@ export default function DealDetailPage() {
           router.push('/deals');
         } catch (error) {
           console.error('Failed to delete deal:', error);
-          message.error('Failed to delete deal');
+          message.error(tErrors('failedToDeleteDeal'));
         }
       },
     });
@@ -209,7 +217,7 @@ export default function DealDetailPage() {
       </div>
     </div>
   );
-  if (!deal) return <div className="p-6">Deal not found</div>;
+  if (!deal) return <div className="p-6">{tErrors('notFoundDetail')}</div>;
 
   const stageColor = DEAL_STAGE_COLORS[deal.stage?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
   const isClosedDeal = deal.stage === 'won' || deal.stage === 'lost';
@@ -220,7 +228,7 @@ export default function DealDetailPage() {
         <div className="flex items-center gap-4 flex-wrap">
           <Button size="small" type="text"   onClick={() => router.push('/deals')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
           {deal.stage && <Tag className={stageColor}>{deal.stage}</Tag>}
         </div>
@@ -229,23 +237,23 @@ export default function DealDetailPage() {
             <>
               <Button type="primary"  onClick={handleWin} className="bg-green-600 hover:bg-green-700">
                 <TrophyOutlined style={{ marginRight: 8 }} />
-                Won
+                {t('won')}
               </Button>
               <Button type="primary" danger  onClick={handleLose}>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
-                Lost
+                {t('lost')}
               </Button>
             </>
           )}
           {hasPermissionString('deals.write') && !editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
-              Edit
+              {tActions('edit')}
             </Button>
           )}
           {hasPermissionString('deals.delete') && (
             <Button type="primary" danger  onClick={handleDelete}>
-              Delete
+              {tActions('delete')}
             </Button>
           )}
         </div>
@@ -255,13 +263,13 @@ export default function DealDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Deal Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('dealInformation')}</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Title</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('title')}</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
@@ -269,7 +277,7 @@ export default function DealDetailPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Description</label>
+                    <label className="text-sm font-medium text-gray-700">{tFields('description')}</label>
                     <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -278,7 +286,7 @@ export default function DealDetailPage() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Amount</label>
+                      <label className="text-sm font-medium text-gray-700">{tFields('amount')}</label>
                       <Input
                         type="number"
                         value={editForm.amount}
@@ -287,7 +295,7 @@ export default function DealDetailPage() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Probability (%)</label>
+                      <label className="text-sm font-medium text-gray-700">{tFields('probability')}</label>
                       <Input
                         type="number"
                         min="0"
@@ -298,7 +306,7 @@ export default function DealDetailPage() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Expected Close Date</label>
+                      <label className="text-sm font-medium text-gray-700">{tFields('expectedCloseDate')}</label>
                       <Input
                         type="date"
                         value={editForm.expected_close_date}
@@ -308,8 +316,8 @@ export default function DealDetailPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>Save</Button>
-                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>Cancel</Button>
+                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>
               ) : (
@@ -325,10 +333,10 @@ export default function DealDetailPage() {
                   {deal.probability != null && (
                     <div className="flex items-center gap-2">
                       <RiseOutlined style={{ color: '#9ca3af' }} />
-                      <span className="font-medium">{deal.probability}% probability</span>
+                      <span className="font-medium">{deal.probability}%</span>
                       {deal.weighted_value != null && (
                         <span className="text-sm text-gray-500">
-                          (Weighted: ${deal.weighted_value.toLocaleString()})
+                          (${deal.weighted_value.toLocaleString()})
                         </span>
                       )}
                     </div>
@@ -341,19 +349,19 @@ export default function DealDetailPage() {
                   )}
                   {deal.assigned_to_name && (
                     <div className="text-sm">
-                      <span className="text-gray-500">Owner: </span>
+                      <span className="text-gray-500">{t('owner')}: </span>
                       <span className="font-medium">{deal.assigned_to_name}</span>
                     </div>
                   )}
                   {deal.expected_close_date && (
                     <div className="text-sm">
-                      <span className="text-gray-500">Expected Close: </span>
+                      <span className="text-gray-500">{tFields('expectedCloseDate')}: </span>
                       <span>{new Date(deal.expected_close_date).toLocaleDateString()}</span>
                     </div>
                   )}
                   {deal.closed_date && (
                     <div className="text-sm">
-                      <span className="text-gray-500">Closed: </span>
+                      <span className="text-gray-500">{tFields('close')}: </span>
                       <span>{new Date(deal.closed_date).toLocaleDateString()}</span>
                     </div>
                   )}
@@ -371,12 +379,12 @@ export default function DealDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Notes</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{tEntities('notes')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
                 <Input.TextArea
-                  placeholder="Add a note..."
+                  placeholder={t('writeNote')}
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   className="flex-1"
@@ -395,7 +403,7 @@ export default function DealDetailPage() {
                 </div>
               ))}
               {notes.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
+                <p className="text-sm text-gray-500 text-center py-4">{tCommon('noNotesYet')}</p>
               )}
             </div>
           </div>
@@ -404,23 +412,23 @@ export default function DealDetailPage() {
         <div>
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('details')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Stage</span>
+                <span className="text-gray-500">{tFields('stage')}</span>
                 <Tag className={stageColor}>{deal.stage || 'N/A'}</Tag>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Amount</span>
+                <span className="text-gray-500">{tFields('amount')}</span>
                 <span className="font-medium">${deal.amount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Created</span>
+                <span className="text-gray-500">{tFields('created')}</span>
                 <span>{new Date(deal.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Updated</span>
+                <span className="text-gray-500">{tFields('updated')}</span>
                 <span>{new Date(deal.updated_at).toLocaleDateString()}</span>
               </div>
             </div>

@@ -13,8 +13,14 @@ import { apiClient } from '@/lib/api';
 import type { ContactResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function ContactsPage() {
+  const t = useTranslations('contacts');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+
   const [data, setData] = useState<PaginatedResponse<ContactResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState('');
@@ -43,7 +49,7 @@ export default function ContactsPage() {
       setData(result);
     } catch (error) {
       console.error('Failed to load contacts:', error);
-      message.error('Failed to load contacts');
+      message.error(tErrors('failedToLoadContacts'));
     } finally {
       setLoading(false);
     }
@@ -82,13 +88,13 @@ export default function ContactsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <Link href="/contacts/new">
-          <Button type="primary" icon={<PlusOutlined />}>Add Contact</Button>
+          <Button type="primary" icon={<PlusOutlined />}>{t('addContact')}</Button>
         </Link>
       </div>
-      <p className="page-subtitle">Manage your contact database</p>
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       <Input.Search
-        placeholder="Search contacts..."
+        placeholder={t('searchContacts')}
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
         allowClear
@@ -126,12 +132,12 @@ export default function ContactsPage() {
                 </div>
               )}
               <div className="flex flex-wrap gap-1 pt-1">
-                {(contact.total_leads ?? 0) > 0 && <Tag color="blue">{contact.total_leads} Leads</Tag>}
-                {(contact.total_deals ?? 0) > 0 && <Tag color="green">{contact.total_deals} Deals</Tag>}
-                {(contact.total_calls ?? 0) > 0 && <Tag>{contact.total_calls} Calls</Tag>}
+                {(contact.total_leads ?? 0) > 0 && <Tag color="blue">{t('leadsCount', { count: contact.total_leads })}</Tag>}
+                {(contact.total_deals ?? 0) > 0 && <Tag color="green">{t('dealsCount', { count: contact.total_deals })}</Tag>}
+                {(contact.total_calls ?? 0) > 0 && <Tag>{t('callsCount', { count: contact.total_calls })}</Tag>}
               </div>
               <Link href={`/contacts/${contact.id}`}>
-                <Button block className="!mt-3">View Details</Button>
+                <Button block className="!mt-3">{tActions('viewDetails')}</Button>
               </Link>
             </div>
           </div>
@@ -147,9 +153,9 @@ export default function ContactsPage() {
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter width={160} height={160} variant="no-contacts" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">No contacts found</h3>
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noContactsFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search ? 'Try adjusting your search criteria' : 'Add your first contact to start building your database'}
+            {search ? tCommon('tryAdjustingSearch') : t('getStarted')}
           </p>
         </div>
       )}
