@@ -30,7 +30,7 @@ export default function LoginPage() {
       apiClient.getMyProfile().then((profile) => {
         setUser({
           id: profile.id,
-          email: profile.email,
+          email: profile.email ?? null,
           first_name: profile.first_name,
           last_name: profile.last_name,
           phone: profile.phone,

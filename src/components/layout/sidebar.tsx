@@ -128,7 +128,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const profileMenuContent = (
     <div style={{ width: 220, padding: '4px 0' }}>
       <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-        <p style={{ fontSize: 13, color: '#666', margin: 0 }}>{user?.email}</p>
+        <p style={{ fontSize: 13, color: '#666', margin: 0 }}>{user?.email || user?.phone || ''}</p>
       </div>
       <Link
         href={isOwner ? '/owner/profile' : '/profile'}
@@ -205,7 +205,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
                   {user.first_name} {user.last_name}
                 </div>
                 <div className="sidebar-profile-email">
-                  {user.email}
+                  {user.email || user.phone || ''}
                 </div>
               </div>
             </div>

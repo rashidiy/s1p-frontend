@@ -269,13 +269,15 @@ export default function UserDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <MailOutlined className="text-gray-400" />
-                    <div>
-                      <div className="text-xs text-gray-500">{tFields('email')}</div>
-                      <div className="font-medium">{user.email}</div>
+                  {user.email && (
+                    <div className="flex items-center gap-3">
+                      <MailOutlined className="text-gray-400" />
+                      <div>
+                        <div className="text-xs text-gray-500">{tFields('email')}</div>
+                        <div className="font-medium">{user.email}</div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   {user.phone && (
                     <div className="flex items-center gap-3">
                       <PhoneOutlined className="text-gray-400" />
