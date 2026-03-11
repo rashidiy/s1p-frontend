@@ -11,21 +11,21 @@ import { CALL_DIRECTION_LABELS, CALL_STATUS_LABELS } from '@/lib/constants';
 import type { CallEventResponse } from '@/types/api';
 import Link from 'next/link';
 
-const OUTCOME_OPTIONS = [
-  { value: 'interested', label: 'Interested', group: 'positive' },
-  { value: 'appointment_scheduled', label: 'Appointment Scheduled', group: 'positive' },
-  { value: 'follow_up', label: 'Follow Up', group: 'positive' },
-  { value: 'sale_made', label: 'Sale Made', group: 'positive' },
-  { value: 'no_answer', label: 'No Answer', group: 'neutral' },
-  { value: 'left_voicemail', label: 'Left Voicemail', group: 'neutral' },
-  { value: 'busy', label: 'Busy', group: 'neutral' },
-  { value: 'callback_requested', label: 'Callback Requested', group: 'neutral' },
-  { value: 'information_provided', label: 'Information Provided', group: 'neutral' },
-  { value: 'not_interested', label: 'Not Interested', group: 'negative' },
-  { value: 'wrong_number', label: 'Wrong Number', group: 'negative' },
-  { value: 'do_not_call', label: 'Do Not Call', group: 'negative' },
-  { value: 'customer_complaint', label: 'Customer Complaint', group: 'negative' },
-  { value: 'other', label: 'Other', group: 'other' },
+const OUTCOME_KEYS = [
+  { value: 'interested', key: 'interested', group: 'positive' },
+  { value: 'appointment_scheduled', key: 'appointmentScheduled', group: 'positive' },
+  { value: 'follow_up', key: 'followUp', group: 'positive' },
+  { value: 'sale_made', key: 'saleMade', group: 'positive' },
+  { value: 'no_answer', key: 'noAnswer', group: 'neutral' },
+  { value: 'left_voicemail', key: 'leftVoicemail', group: 'neutral' },
+  { value: 'busy', key: 'busy', group: 'neutral' },
+  { value: 'callback_requested', key: 'callbackRequested', group: 'neutral' },
+  { value: 'information_provided', key: 'informationProvided', group: 'neutral' },
+  { value: 'not_interested', key: 'notInterested', group: 'negative' },
+  { value: 'wrong_number', key: 'wrongNumber', group: 'negative' },
+  { value: 'do_not_call', key: 'doNotCall', group: 'negative' },
+  { value: 'customer_complaint', key: 'customerComplaint', group: 'negative' },
+  { value: 'other', key: 'other', group: 'other' },
 ];
 
 const outcomeColors: Record<string, string> = {
@@ -329,7 +329,7 @@ export default function CallDetailPage() {
                 <div>
                   <span className="text-sm text-gray-500 mr-2">{tFields('outcome')}:</span>
                   <Tag color={outcomeColors[call.outcome] || 'default'}>
-                    {OUTCOME_OPTIONS.find(o => o.value === call.outcome)?.label || call.outcome}
+                    {(() => { const ok = OUTCOME_KEYS.find(o => o.value === call.outcome); return ok ? t(ok.key) : call.outcome; })()}
                   </Tag>
                 </div>
               )}
@@ -341,10 +341,10 @@ export default function CallDetailPage() {
                   placeholder={tCommon('setOutcome')}
                   style={{ width: '100%' }}
                   options={[
-                    { label: t('positive'), options: OUTCOME_OPTIONS.filter(o => o.group === 'positive').map(o => ({ value: o.value, label: o.label })) },
-                    { label: t('neutral'), options: OUTCOME_OPTIONS.filter(o => o.group === 'neutral').map(o => ({ value: o.value, label: o.label })) },
-                    { label: t('negative'), options: OUTCOME_OPTIONS.filter(o => o.group === 'negative').map(o => ({ value: o.value, label: o.label })) },
-                    { label: 'Other', options: OUTCOME_OPTIONS.filter(o => o.group === 'other').map(o => ({ value: o.value, label: o.label })) },
+                    { label: t('positive'), options: OUTCOME_KEYS.filter(o => o.group === 'positive').map(o => ({ value: o.value, label: t(o.key) })) },
+                    { label: t('neutral'), options: OUTCOME_KEYS.filter(o => o.group === 'neutral').map(o => ({ value: o.value, label: t(o.key) })) },
+                    { label: t('negative'), options: OUTCOME_KEYS.filter(o => o.group === 'negative').map(o => ({ value: o.value, label: t(o.key) })) },
+                    { label: t('other'), options: OUTCOME_KEYS.filter(o => o.group === 'other').map(o => ({ value: o.value, label: t(o.key) })) },
                   ]}
                 />
               </div>
@@ -497,7 +497,7 @@ export default function CallDetailPage() {
                 <span className="text-sm text-gray-500">{tFields('outcome')}</span>
                 {call.outcome ? (
                   <Tag color={outcomeColors[call.outcome] || 'default'}>
-                    {OUTCOME_OPTIONS.find(o => o.value === call.outcome)?.label || call.outcome}
+                    {(() => { const ok = OUTCOME_KEYS.find(o => o.value === call.outcome); return ok ? t(ok.key) : call.outcome; })()}
                   </Tag>
                 ) : (
                   <span className="text-gray-400">{'\u2014'}</span>
@@ -547,7 +547,7 @@ export default function CallDetailPage() {
           {(call.utm_source || call.utm_medium || call.utm_campaign) && (
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-base font-semibold leading-none tracking-tight">UTM Tracking</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight">{t('utmTracking')}</h3>
               </div>
               <div className="p-6 pt-0 space-y-3">
                 {call.utm_source && (
@@ -558,13 +558,13 @@ export default function CallDetailPage() {
                 )}
                 {call.utm_medium && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Medium</span>
+                    <span className="text-sm text-gray-500">{t('medium')}</span>
                     <Tag bordered>{call.utm_medium}</Tag>
                   </div>
                 )}
                 {call.utm_campaign && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Campaign</span>
+                    <span className="text-sm text-gray-500">{t('campaign')}</span>
                     <Tag bordered>{call.utm_campaign}</Tag>
                   </div>
                 )}

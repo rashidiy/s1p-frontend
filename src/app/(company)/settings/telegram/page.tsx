@@ -20,33 +20,11 @@ import { getErrorMessage } from '@/lib/utils';
 
 const { Title, Text, Paragraph } = Typography;
 
-interface NotificationToggle {
-  key: keyof UpdateTelegramConfig;
-  label: string;
-  description: string;
-}
-
-const NOTIFICATION_TOGGLES: NotificationToggle[] = [
-  {
-    key: 'notify_completed_calls',
-    label: 'Completed Calls',
-    description: 'Receive notifications when calls are completed',
-  },
-  {
-    key: 'notify_missed_calls',
-    label: 'Missed Calls',
-    description: 'Receive notifications for missed or unanswered calls',
-  },
-  {
-    key: 'notify_new_leads',
-    label: 'New Leads',
-    description: 'Receive notifications when new leads are created',
-  },
-  {
-    key: 'notify_deal_stage_change',
-    label: 'Deal Stage Changes',
-    description: 'Receive notifications when a deal moves to a new stage',
-  },
+const NOTIFICATION_TOGGLES: { key: keyof UpdateTelegramConfig; labelKey: string; descKey: string }[] = [
+  { key: 'notify_completed_calls', labelKey: 'completedCalls', descKey: 'completedCallsDesc' },
+  { key: 'notify_missed_calls', labelKey: 'missedCalls', descKey: 'missedCallsDesc' },
+  { key: 'notify_new_leads', labelKey: 'newLeads', descKey: 'newLeadsDesc' },
+  { key: 'notify_deal_stage_change', labelKey: 'dealStageChanges', descKey: 'dealStageChangesDesc' },
 ];
 
 export default function TelegramSettingsPage() {
@@ -203,7 +181,7 @@ export default function TelegramSettingsPage() {
           <Card>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Tag color="default">Not Connected</Tag>
+                <Tag color="default">{t('notConnected')}</Tag>
               </div>
 
               <Divider style={{ margin: '4px 0' }} />
@@ -213,19 +191,13 @@ export default function TelegramSettingsPage() {
                   <InfoCircleOutlined /> {t('connectTelegram')}
                 </Title>
                 <Paragraph type="secondary" style={{ marginBottom: 4 }}>
-                  Follow these steps to connect the S1P bot to your Telegram group:
+                  {t('setupInstructions')}
                 </Paragraph>
                 <ol style={{ paddingLeft: 20, color: '#555', lineHeight: '2' }}>
-                  <li>
-                    Open Telegram and search for <Text strong>@s1p_crm_bot</Text> (or your company bot).
-                  </li>
-                  <li>Add the bot to your Telegram group or start a direct chat.</li>
-                  <li>
-                    Send <Text code>/start</Text> in the chat to activate the bot.
-                  </li>
-                  <li>
-                    Send <Text code>/chatid</Text> to get the chat ID, then paste it below.
-                  </li>
+                  <li>{t('setupStep1')}</li>
+                  <li>{t('setupStep2')}</li>
+                  <li>{t('setupStep3')}</li>
+                  <li>{t('setupStep4')}</li>
                 </ol>
               </div>
 
@@ -263,7 +235,7 @@ export default function TelegramSettingsPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Space>
                   <Tag icon={<CheckCircleOutlined />} color="success">
-                    Connected
+                    {t('connected')}
                   </Tag>
                   <Text type="secondary">
                     {tFields('chatId')}: <Text code>{config.chat_id}</Text>
@@ -283,10 +255,10 @@ export default function TelegramSettingsPage() {
             <Card>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <Text strong>Bot Enabled</Text>
+                  <Text strong>{t('botEnabled')}</Text>
                   <br />
                   <Text type="secondary" style={{ fontSize: 13 }}>
-                    Master switch — when disabled, no notifications are sent
+                    {t('botEnabledDescription')}
                   </Text>
                 </div>
                 <Switch
@@ -304,10 +276,10 @@ export default function TelegramSettingsPage() {
                     {index > 0 && <Divider style={{ margin: '12px 0' }} />}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <Text strong>{toggle.label}</Text>
+                        <Text strong>{t(toggle.labelKey)}</Text>
                         <br />
                         <Text type="secondary" style={{ fontSize: 13 }}>
-                          {toggle.description}
+                          {t(toggle.descKey)}
                         </Text>
                       </div>
                       <Switch
