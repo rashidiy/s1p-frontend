@@ -66,7 +66,18 @@
     "noTemporaryToken": "Vaqtinchalik token topilmadi. Iltimos, qayta kiring.",
     "failedToSetPassword": "Parolni o'rnatib bo'lmadi",
     "enterYourPassword": "Parolingizni kiriting",
-    "manageRelationships": "Mijozlar bilan munosabatlarni oson va samarali boshqaring"
+    "manageRelationships": "Mijozlar bilan munosabatlarni oson va samarali boshqaring",
+    "impersonationFailed": "Kirish tokeni yaroqsiz yoki muddati tugagan",
+    "accessingCompany": "Kompaniyaga kirilmoqda...",
+    "settingUpSession": "Sessiya sozlanmoqda",
+    "pleaseWait": "Iltimos, kuting, tizimga kirilmoqda",
+    "ownerRegistration": "Egasi ro'yxatdan o'tishi",
+    "ownerRegistrationSubtitle": "Platforma administratori hisoblari",
+    "cliOnlyRegistration": "Faqat CLI orqali ro'yxatdan o'tish",
+    "cliOnlyRegistrationDescription": "Egasi (platforma administratori) hisoblari faqat server CLI orqali yaratilishi mumkin. Egalar uchun veb-ro'yxatdan o'tish mavjud emas.",
+    "toCreateOwnerAccount": "Egasi hisobini yaratish uchun serverda bajaring:",
+    "orInsideDocker": "Yoki Docker konteyner ichida:",
+    "goToOwnerLogin": "Egasi kirishiga o'tish"
   },
   "actions": {
     "create": "Yaratish",
@@ -85,6 +96,7 @@
     "refresh": "Yangilash",
     "view": "Ko'rish",
     "viewDetails": "Batafsil",
+    "viewAll": "Hammasini ko'rish",
     "seeDetails": "Batafsil",
     "addWidget": "Vidjet qo'shish",
     "customizeWidget": "Vidjetni sozlash",
@@ -133,7 +145,47 @@
     "prospecting": "Qidiruv",
     "qualification": "Malaka",
     "proposal": "Taklif",
-    "negotiation": "Muzokaralar"
+    "negotiation": "Muzokaralar",
+    "cancelled": "Bekor qilingan",
+    "busy": "Band",
+    "noAnswer": "Javob yo'q",
+    "congestion": "Tiqilinch",
+    "unavailable": "Mavjud emas"
+  },
+  "priorities": {
+    "low": "Past",
+    "medium": "O'rtacha",
+    "high": "Yuqori",
+    "urgent": "Shoshilinch"
+  },
+  "directions": {
+    "inbound": "Kiruvchi",
+    "outbound": "Chiquvchi",
+    "internal": "Ichki"
+  },
+  "roles": {
+    "owner": "Egasi",
+    "company_admin": "Administrator",
+    "company_manager": "Menejer",
+    "company_operator": "Operator"
+  },
+  "billing": {
+    "monthly": "Oylik",
+    "yearly": "Yillik"
+  },
+  "contractStatuses": {
+    "active": "Faol",
+    "warning": "Ogohlantirish",
+    "grace_period": "Imtiyozli muddat",
+    "expired": "Muddati tugagan",
+    "suspended": "To'xtatilgan",
+    "cancelled": "Bekor qilingan"
+  },
+  "paymentStatuses": {
+    "paid": "To'langan",
+    "pending": "Kutilmoqda",
+    "overdue": "Muddati o'tgan",
+    "failed": "Xatolik"
   },
   "dashboard": {
     "totalCalls": "Jami qo'ng'iroqlar",
@@ -157,7 +209,7 @@
     "answered": "{count} javob berildi",
     "convertedCount": "{count} konvertatsiya qilindi",
     "ofTotal": "{count} dan",
-    "welcome": "Xush kelibsiz, {name}",
+    "welcome": "Xush kelibsiz, <gradient>{name}</gradient>",
     "platformOverview": "Platforma sharhi va kompaniyalarni boshqarish",
     "totalCompanies": "Jami kompaniyalar",
     "totalUsers": "Jami foydalanuvchilar",
@@ -172,7 +224,16 @@
     "systemWideMetrics": "Tizim bo'ylab ko'rsatkichlar",
     "totalContacts": "Jami kontaktlar",
     "avgDealValue": "O'rtacha bitim summasi",
-    "addCompany": "Kompaniya qo'shish"
+    "addCompany": "Kompaniya qo'shish",
+    "goodToSeeYouBack": "Qaytganingizdan xursandmiz",
+    "topCompanies": "Eng yaxshi kompaniyalar",
+    "bestPerforming": "Eng samarali kompaniyalar",
+    "companiesWillAppear": "Kompaniyalar yaratilgandan keyin bu yerda paydo bo'ladi",
+    "activeCount": "{count} faol",
+    "newCompanies": "Yangi kompaniyalar",
+    "newUsers": "Yangi foydalanuvchilar",
+    "callsCount": "{count} qo'ng'iroq",
+    "noCompaniesYet": "Hali kompaniyalar yo'q"
   },
   "common": {
     "loading": "Yuklanmoqda",
@@ -188,7 +249,10 @@
     "unknown": "Noma'lum",
     "myCalls": "Faqat mening qo'ng'iroqlarim",
     "comingSoon": "Tez kunda",
-    "comingSoonDescription": "Bu funksiya tez kunda ishga tushadi. Yangiliklar bilan tanishing!"
+    "comingSoonDescription": "Bu funksiya tez kunda ishga tushadi. Yangiliklar bilan tanishing!",
+    "unexpectedError": "Kutilmagan xatolik yuz berdi. Iltimos, qayta urinib ko'ring yoki muammo davom etsa, qo'llab-quvvatlash xizmatiga murojaat qiling.",
+    "goHome": "Bosh sahifaga",
+    "pageNotFoundDescription": "Siz qidirayotgan sahifa mavjud emas yoki ko'chirilgan."
   },
   "errors": {
     "sessionExpired": "Sessiya muddati tugadi",
@@ -201,7 +265,14 @@
     "failedToUpdateProfile": "Profilni yangilab bo'lmadi",
     "failedToChangePassword": "Parolni o'zgartirib bo'lmadi",
     "profileUpdated": "Profil muvaffaqiyatli yangilandi",
-    "passwordChanged": "Parol muvaffaqiyatli o'zgartirildi"
+    "passwordChanged": "Parol muvaffaqiyatli o'zgartirildi",
+    "validationError": "Tekshirish xatosi",
+    "sessionExpiredMessage": "Sessiya muddati tugadi. Qayta kiring.",
+    "accessDeniedDetail": "Sizda bu amalni bajarish uchun ruxsat yo'q.",
+    "notFoundDetail": "So'ralgan resurs topilmadi.",
+    "conflictError": "Ziddiyat",
+    "conflictDetail": "Bunday ma'lumotlarga ega yozuv allaqachon mavjud.",
+    "failedToLoadDashboard": "Boshqaruv panelini yuklab bo'lmadi"
   },
   "fields": {
     "firstName": "Ism",
@@ -331,7 +402,14 @@
     "serverEnvVars": "Server muhit o'zgaruvchilari",
     "serverEnvVarsDescription": "Quyidagi sozlamalar serverda muhit o'zgaruvchilari orqali sozlangan. Ularni veb-interfeys orqali o'zgartirib bo'lmaydi -- .env faylini tahrirlang va o'zgarishlarni qo'llash uchun serverni qayta ishga tushiring.",
     "ownerProfile": "Egasi profili",
-    "myProfileTitle": "Mening profilim"
+    "myProfileTitle": "Mening profilim",
+    "appearance": "Ko'rinish",
+    "appearanceDescription": "Afzal mavzuni tanlang",
+    "light": "Yorug'",
+    "dark": "Qorong'i",
+    "systemTheme": "Tizim",
+    "language": "Til",
+    "languageDescription": "Afzal tilni tanlang"
   },
   "companies": {
     "title": "Kompaniyalar",

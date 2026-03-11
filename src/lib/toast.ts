@@ -33,7 +33,18 @@ export const dismissToast = (id: string | number) => {
 // API ERROR HANDLER - Extracts meaningful messages from API errors
 // ============================================================================
 
-export const handleApiError = (error: unknown, fallbackMessage = 'An error occurred'): void => {
+export interface ErrorTranslations {
+  validationError?: string;
+  sessionExpired?: string;
+  accessDenied?: string;
+  accessDeniedDetail?: string;
+  notFound?: string;
+  notFoundDetail?: string;
+  conflict?: string;
+  conflictDetail?: string;
+}
+
+export const handleApiError = (error: unknown, fallbackMessage = 'An error occurred', translations?: ErrorTranslations): void => {
   const axiosError = error as AxiosError<{ detail: string | Array<{ msg: string; loc: string[] }> }>;
 
   if (axiosError?.response?.data?.detail) {
@@ -49,28 +60,37 @@ export const handleApiError = (error: unknown, fallbackMessage = 'An error occur
       const messages = detail
         .map((err) => `${err.loc?.slice(-1)[0] ?? 'field'}: ${err.msg}`)
         .join(', ');
-      showError('Validation Error', messages);
+      showError(translations?.validationError ?? 'Validation Error', messages);
       return;
     }
   }
 
   if (axiosError?.response?.status === 401) {
-    showError('Session expired. Please log in again.');
+    showError(translations?.sessionExpired ?? 'Session expired. Please log in again.');
     return;
   }
 
   if (axiosError?.response?.status === 403) {
-    showError('Access denied', 'You do not have permission to perform this action.');
+    showError(
+      translations?.accessDenied ?? 'Access denied',
+      translations?.accessDeniedDetail ?? 'You do not have permission to perform this action.',
+    );
     return;
   }
 
   if (axiosError?.response?.status === 404) {
-    showError('Not found', 'The requested resource could not be found.');
+    showError(
+      translations?.notFound ?? 'Not found',
+      translations?.notFoundDetail ?? 'The requested resource could not be found.',
+    );
     return;
   }
 
   if (axiosError?.response?.status === 409) {
-    showError('Conflict', 'A record with these details already exists.');
+    showError(
+      translations?.conflict ?? 'Conflict',
+      translations?.conflictDetail ?? 'A record with these details already exists.',
+    );
     return;
   }
 

@@ -1,58 +1,25 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   UserOutlined,
   BankOutlined,
   FileTextOutlined,
-  BarChartOutlined,
-  SafetyOutlined,
   KeyOutlined,
   RightOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
+import { useTranslations, useLocale } from 'next-intl';
+import { Radio } from 'antd';
+import { useThemeStore } from '@/store/theme';
+import { locales, type Locale } from '@/i18n/config';
 
-const SETTINGS_SECTIONS = [
-  {
-    title: 'Profile & Security',
-    description: 'Update your personal information and change your password',
-    href: '/owner/profile',
-    icon: <UserOutlined className="text-lg" />,
-    color: '#6366f1',
-    bg: '#eef2ff',
-  },
-  {
-    title: 'Companies',
-    description: 'Manage client companies, activate or deactivate them',
-    href: '/owner/companies',
-    icon: <BankOutlined className="text-lg" />,
-    color: '#3b82f6',
-    bg: '#eff6ff',
-  },
-  {
-    title: 'Contracts',
-    description: 'View, create, and manage billing contracts',
-    href: '/owner/contracts',
-    icon: <FileTextOutlined className="text-lg" />,
-    color: '#10b981',
-    bg: '#ecfdf5',
-  },
-  {
-    title: 'Analytics',
-    description: 'Platform-wide usage statistics and performance metrics',
-    href: '/owner/dashboard',
-    icon: <BarChartOutlined className="text-lg" />,
-    color: '#f97316',
-    bg: '#fff7ed',
-  },
-  {
-    title: 'Permissions',
-    description: 'Configure owner-level access control and permissions',
-    href: '/owner/dashboard',
-    icon: <SafetyOutlined className="text-lg" />,
-    color: '#8b5cf6',
-    bg: '#f5f3ff',
-  },
-];
+const LOCALE_NAMES: Record<Locale, string> = {
+  ru: 'Русский',
+  en: 'English',
+  uz: "O'zbekcha",
+};
 
 const ENV_SETTINGS = [
   { key: 'WEBHOOK_IP_WHITELIST_ENABLED', description: 'Enable IP allowlist for incoming webhooks' },
@@ -63,10 +30,47 @@ const ENV_SETTINGS = [
 ];
 
 export default function OwnerSettingsPage() {
+  const t = useTranslations();
+  const locale = useLocale() as Locale;
+  const router = useRouter();
+  const { mode, setMode } = useThemeStore();
+
+  const handleLocaleChange = (newLocale: string) => {
+    document.cookie = `locale=${newLocale};path=/;max-age=31536000;samesite=lax`;
+    router.refresh();
+  };
+
+  const SETTINGS_SECTIONS = [
+    {
+      title: t('settings.profileSecurity'),
+      description: t('settings.profileSecurityDescription'),
+      href: '/owner/profile',
+      icon: <UserOutlined className="text-lg" />,
+      color: '#6366f1',
+      bg: '#eef2ff',
+    },
+    {
+      title: t('nav.companies'),
+      description: t('settings.companiesDescription'),
+      href: '/owner/companies',
+      icon: <BankOutlined className="text-lg" />,
+      color: '#3b82f6',
+      bg: '#eff6ff',
+    },
+    {
+      title: t('nav.contracts'),
+      description: t('settings.contractsDescription'),
+      href: '/owner/contracts',
+      icon: <FileTextOutlined className="text-lg" />,
+      color: '#10b981',
+      bg: '#ecfdf5',
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="page-header">
-        <p className="page-subtitle">Manage all platform-level configuration</p>
+        <p className="page-subtitle">{t('settings.platformSettingsSubtitle')}</p>
       </div>
 
       {/* Navigation cards */}
@@ -94,6 +98,37 @@ export default function OwnerSettingsPage() {
         ))}
       </div>
 
+      {/* Appearance */}
+      <div className="glass-card p-4 sm:p-6 space-y-4">
+        <div>
+          <h2 className="text-base font-semibold text-gray-800">{t('settings.appearance')}</h2>
+          <p className="text-xs text-gray-400">{t('settings.appearanceDescription')}</p>
+        </div>
+        <Radio.Group value={mode} onChange={(e) => setMode(e.target.value)} optionType="button" buttonStyle="solid">
+          <Radio.Button value="light">{t('settings.light')}</Radio.Button>
+          <Radio.Button value="dark">{t('settings.dark')}</Radio.Button>
+          <Radio.Button value="system">{t('settings.systemTheme')}</Radio.Button>
+        </Radio.Group>
+      </div>
+
+      {/* Language */}
+      <div className="glass-card p-4 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <GlobalOutlined className="text-blue-500" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-gray-800">{t('settings.language')}</h2>
+            <p className="text-xs text-gray-400">{t('settings.languageDescription')}</p>
+          </div>
+        </div>
+        <Radio.Group value={locale} onChange={(e) => handleLocaleChange(e.target.value)} optionType="button" buttonStyle="solid">
+          {locales.map((loc) => (
+            <Radio.Button key={loc} value={loc}>{LOCALE_NAMES[loc]}</Radio.Button>
+          ))}
+        </Radio.Group>
+      </div>
+
       {/* Server environment settings — read-only info */}
       <div className="glass-card p-4 sm:p-6 space-y-4">
         <div className="flex items-center gap-3">
@@ -101,9 +136,9 @@ export default function OwnerSettingsPage() {
             <KeyOutlined className="text-amber-500" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-gray-800">Server Environment Variables</h2>
+            <h2 className="text-base font-semibold text-gray-800">{t('settings.serverEnvVars')}</h2>
             <p className="text-xs text-gray-400">
-              Configured via <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">.env</code> file — requires server restart
+              {t('settings.serverEnvVarsDescription')}
             </p>
           </div>
         </div>

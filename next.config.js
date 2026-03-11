@@ -8,14 +8,8 @@ const nextConfig = {
   // Enable standalone output for Docker
   output: 'standalone',
 
-  // Allow images from any domain (configure based on your needs)
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    remotePatterns: [],
   },
 
   // Custom headers for subdomain support

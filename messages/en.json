@@ -66,7 +66,18 @@
     "noTemporaryToken": "No temporary token found. Please login again.",
     "failedToSetPassword": "Failed to set password",
     "enterYourPassword": "Enter your password",
-    "manageRelationships": "Manage your customer relationships with ease and efficiency"
+    "manageRelationships": "Manage your customer relationships with ease and efficiency",
+    "impersonationFailed": "Impersonation token is invalid or expired",
+    "accessingCompany": "Accessing company...",
+    "settingUpSession": "Setting up your session",
+    "pleaseWait": "Please wait while we log you in",
+    "ownerRegistration": "Owner Registration",
+    "ownerRegistrationSubtitle": "Platform administrator accounts",
+    "cliOnlyRegistration": "CLI-only registration",
+    "cliOnlyRegistrationDescription": "Owner (platform administrator) accounts can only be created via the server CLI. There is no web registration endpoint for owners.",
+    "toCreateOwnerAccount": "To create an owner account, run on the server:",
+    "orInsideDocker": "Or inside the Docker container:",
+    "goToOwnerLogin": "Go to Owner Login"
   },
   "actions": {
     "create": "Create",
@@ -85,6 +96,7 @@
     "refresh": "Refresh",
     "view": "View",
     "viewDetails": "View Details",
+    "viewAll": "View all",
     "seeDetails": "See Details",
     "addWidget": "Add Widget",
     "customizeWidget": "Customize Widget",
@@ -133,7 +145,47 @@
     "prospecting": "Prospecting",
     "qualification": "Qualification",
     "proposal": "Proposal",
-    "negotiation": "Negotiation"
+    "negotiation": "Negotiation",
+    "cancelled": "Cancelled",
+    "busy": "Busy",
+    "noAnswer": "No Answer",
+    "congestion": "Congestion",
+    "unavailable": "Unavailable"
+  },
+  "priorities": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "directions": {
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "internal": "Internal"
+  },
+  "roles": {
+    "owner": "Owner",
+    "company_admin": "Admin",
+    "company_manager": "Manager",
+    "company_operator": "Operator"
+  },
+  "billing": {
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "contractStatuses": {
+    "active": "Active",
+    "warning": "Warning",
+    "grace_period": "Grace Period",
+    "expired": "Expired",
+    "suspended": "Suspended",
+    "cancelled": "Cancelled"
+  },
+  "paymentStatuses": {
+    "paid": "Paid",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "failed": "Failed"
   },
   "dashboard": {
     "totalCalls": "Total Calls",
@@ -157,7 +209,7 @@
     "answered": "{count} answered",
     "convertedCount": "{count} converted",
     "ofTotal": "of {count} total",
-    "welcome": "Welcome, {name}",
+    "welcome": "Welcome, <gradient>{name}</gradient>",
     "platformOverview": "Platform overview and company management",
     "totalCompanies": "Total Companies",
     "totalUsers": "Total Users",
@@ -172,7 +224,16 @@
     "systemWideMetrics": "System-wide metrics",
     "totalContacts": "Total Contacts",
     "avgDealValue": "Avg Deal Value",
-    "addCompany": "Add Company"
+    "addCompany": "Add Company",
+    "goodToSeeYouBack": "Good to see you back",
+    "topCompanies": "Top Companies",
+    "bestPerforming": "Best performing companies",
+    "companiesWillAppear": "Companies will appear here once created",
+    "activeCount": "{count} active",
+    "newCompanies": "New Companies",
+    "newUsers": "New Users",
+    "callsCount": "{count} calls",
+    "noCompaniesYet": "No companies yet"
   },
   "common": {
     "loading": "Loading",
@@ -188,7 +249,10 @@
     "unknown": "Unknown",
     "myCalls": "My Calls Only",
     "comingSoon": "Coming Soon",
-    "comingSoonDescription": "This feature is coming soon. Stay tuned!"
+    "comingSoonDescription": "This feature is coming soon. Stay tuned!",
+    "unexpectedError": "An unexpected error occurred. Please try again or contact support if the problem persists.",
+    "goHome": "Go home",
+    "pageNotFoundDescription": "The page you are looking for does not exist or has been moved."
   },
   "errors": {
     "sessionExpired": "Session expired",
@@ -201,7 +265,14 @@
     "failedToUpdateProfile": "Failed to update profile",
     "failedToChangePassword": "Failed to change password",
     "profileUpdated": "Profile updated successfully",
-    "passwordChanged": "Password changed successfully"
+    "passwordChanged": "Password changed successfully",
+    "validationError": "Validation Error",
+    "sessionExpiredMessage": "Session expired. Please log in again.",
+    "accessDeniedDetail": "You do not have permission to perform this action.",
+    "notFoundDetail": "The requested resource could not be found.",
+    "conflictError": "Conflict",
+    "conflictDetail": "A record with these details already exists.",
+    "failedToLoadDashboard": "Failed to load dashboard"
   },
   "fields": {
     "firstName": "First Name",
@@ -331,7 +402,14 @@
     "serverEnvVars": "Server Environment Variables",
     "serverEnvVarsDescription": "The following settings are configured via environment variables on the server. They cannot be changed from the web UI -- edit the .env file and restart the server to apply changes.",
     "ownerProfile": "Owner Profile",
-    "myProfileTitle": "My Profile"
+    "myProfileTitle": "My Profile",
+    "appearance": "Appearance",
+    "appearanceDescription": "Choose your preferred theme",
+    "light": "Light",
+    "dark": "Dark",
+    "systemTheme": "System",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language"
   },
   "companies": {
     "title": "Companies",

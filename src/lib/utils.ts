@@ -1,13 +1,21 @@
-export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+function getLocale(): string {
+  if (typeof document !== 'undefined') {
+    const cookie = document.cookie.split(';').find(c => c.trim().startsWith('locale='));
+    if (cookie) return cookie.split('=')[1].trim();
+  }
+  return 'ru';
+}
+
+export function formatDate(date: string | Date, locale?: string): string {
+  return new Intl.DateTimeFormat(locale || getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   }).format(new Date(date))
 }
 
-export function formatDateTime(date: string | Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+export function formatDateTime(date: string | Date, locale?: string): string {
+  return new Intl.DateTimeFormat(locale || getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
