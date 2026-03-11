@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, TrophyOutlined, CloseCircleOutlined, RiseOutlined } from '@ant-design/icons';
-import { Button, Input, Tag, message } from 'antd';
+import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
@@ -20,6 +20,7 @@ export default function DealDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [newNote, setNewNote] = useState('');
+  const [reasonInput, setReasonInput] = useState('');
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
@@ -79,26 +80,72 @@ export default function DealDetailPage() {
     }
   };
 
-  const handleWin = async () => {
-    const reason = prompt('Win reason (optional):');
-    try {
-      await apiClient.markDealWon(dealId, reason || undefined);
-      loadDeal();
-    } catch (error) {
-      console.error('Failed to mark deal as won:', error);
-      message.error('Failed to mark deal as won');
-    }
+  const handleWin = () => {
+    setReasonInput('');
+    Modal.confirm({
+      title: 'Mark Deal as Won',
+      content: (
+        <div className="mt-2">
+          <label className="text-sm text-gray-600">Win reason (optional):</label>
+          <Input
+            placeholder="Enter reason..."
+            className="mt-1"
+            onChange={(e) => {
+              // Store in a closure-accessible ref via DOM
+              const modal = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
+              if (modal) modal.dataset.value = e.target.value;
+            }}
+          />
+        </div>
+      ),
+      okText: 'Mark as Won',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        const input = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
+        const reason = input?.value || undefined;
+        try {
+          await apiClient.markDealWon(dealId, reason);
+          loadDeal();
+        } catch (error) {
+          console.error('Failed to mark deal as won:', error);
+          message.error('Failed to mark deal as won');
+        }
+      },
+    });
   };
 
-  const handleLose = async () => {
-    const reason = prompt('Loss reason (optional):');
-    try {
-      await apiClient.markDealLost(dealId, reason || undefined);
-      loadDeal();
-    } catch (error) {
-      console.error('Failed to mark deal as lost:', error);
-      message.error('Failed to mark deal as lost');
-    }
+  const handleLose = () => {
+    setReasonInput('');
+    Modal.confirm({
+      title: 'Mark Deal as Lost',
+      content: (
+        <div className="mt-2">
+          <label className="text-sm text-gray-600">Loss reason (optional):</label>
+          <Input
+            placeholder="Enter reason..."
+            className="mt-1"
+            onChange={(e) => {
+              const modal = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
+              if (modal) modal.dataset.value = e.target.value;
+            }}
+          />
+        </div>
+      ),
+      okText: 'Mark as Lost',
+      okButtonProps: { danger: true },
+      cancelText: 'Cancel',
+      onOk: async () => {
+        const input = document.querySelector('.ant-modal-confirm-content input') as HTMLInputElement;
+        const reason = input?.value || undefined;
+        try {
+          await apiClient.markDealLost(dealId, reason);
+          loadDeal();
+        } catch (error) {
+          console.error('Failed to mark deal as lost:', error);
+          message.error('Failed to mark deal as lost');
+        }
+      },
+    });
   };
 
   const handleAddNote = async () => {
@@ -117,15 +164,23 @@ export default function DealDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this deal?')) return;
-    try {
-      await apiClient.deleteDeal(dealId);
-      router.push('/deals');
-    } catch (error) {
-      console.error('Failed to delete deal:', error);
-      message.error('Failed to delete deal');
-    }
+  const handleDelete = () => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to delete this deal? This action cannot be undone.',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await apiClient.deleteDeal(dealId);
+          router.push('/deals');
+        } catch (error) {
+          console.error('Failed to delete deal:', error);
+          message.error('Failed to delete deal');
+        }
+      },
+    });
   };
 
   if (loading) return (

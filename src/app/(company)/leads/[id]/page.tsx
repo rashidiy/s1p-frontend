@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
-import { Button, Input, Tag, message } from 'antd';
+import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
@@ -77,18 +77,25 @@ export default function LeadDetailPage() {
     }
   };
 
-  const handleConvert = async () => {
-    if (!confirm('Convert this lead to a deal?')) return;
-    setConverting(true);
-    try {
-      await apiClient.convertLead(leadId, true);
-      loadLead();
-    } catch (error) {
-      console.error('Failed to convert lead:', error);
-      message.error('Failed to convert lead');
-    } finally {
-      setConverting(false);
-    }
+  const handleConvert = () => {
+    Modal.confirm({
+      title: 'Convert Lead',
+      content: 'Convert this lead to a deal?',
+      okText: 'Convert',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        setConverting(true);
+        try {
+          await apiClient.convertLead(leadId, true);
+          loadLead();
+        } catch (error) {
+          console.error('Failed to convert lead:', error);
+          message.error('Failed to convert lead');
+        } finally {
+          setConverting(false);
+        }
+      },
+    });
   };
 
   const handleAddNote = async () => {
@@ -107,15 +114,23 @@ export default function LeadDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this lead?')) return;
-    try {
-      await apiClient.deleteLead(leadId);
-      router.push('/leads');
-    } catch (error) {
-      console.error('Failed to delete lead:', error);
-      message.error('Failed to delete lead');
-    }
+  const handleDelete = () => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to delete this lead? This action cannot be undone.',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await apiClient.deleteLead(leadId);
+          router.push('/leads');
+        } catch (error) {
+          console.error('Failed to delete lead:', error);
+          message.error('Failed to delete lead');
+        }
+      },
+    });
   };
 
   if (loading) return (

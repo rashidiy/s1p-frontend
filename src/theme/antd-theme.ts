@@ -1,6 +1,7 @@
 import type { ThemeConfig } from 'antd';
+import { theme } from 'antd';
 
-export const antdTheme: ThemeConfig = {
+export const antdLightTheme: ThemeConfig = {
   token: {
     // Primary palette — red-orange accent
     colorPrimary: '#E84040',
@@ -83,5 +84,41 @@ export const antdTheme: ThemeConfig = {
     Notification: {
       borderRadiusLG: 12,
     },
+  },
+};
+
+/** Backward compat alias */
+export const antdTheme = antdLightTheme;
+
+export const antdDarkTheme: ThemeConfig = {
+  algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#E84040',
+    colorSuccess: '#10b981',
+    colorWarning: '#f59e0b',
+    colorError: '#ef4444',
+    colorInfo: '#E84040',
+    borderRadius: 12,
+    borderRadiusLG: 16,
+    borderRadiusSM: 10,
+    fontFamily:
+      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    fontSize: 14,
+    colorLink: '#FF6B6B',
+    colorLinkHover: '#FF8A8A',
+    colorLinkActive: '#E84040',
+  },
+  components: {
+    Button: { borderRadius: 10, controlHeight: 40, controlHeightLG: 44, controlHeightSM: 32, fontWeight: 500 },
+    Input: { borderRadius: 10, controlHeight: 40 },
+    Select: { borderRadius: 10, controlHeight: 40 },
+    Card: { borderRadiusLG: 16 },
+    Menu: { itemBorderRadius: 10, itemHeight: 40, iconSize: 18 },
+    Modal: { borderRadiusLG: 16 },
+    Table: { borderRadiusLG: 12 },
+    Tag: { borderRadiusSM: 6 },
+    Tabs: { itemSelectedColor: '#E84040', inkBarColor: '#E84040' },
+    Alert: { borderRadiusLG: 12 },
+    Notification: { borderRadiusLG: 12 },
   },
 };

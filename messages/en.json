@@ -331,7 +331,16 @@
     "serverEnvVars": "Server Environment Variables",
     "serverEnvVarsDescription": "The following settings are configured via environment variables on the server. They cannot be changed from the web UI -- edit the .env file and restart the server to apply changes.",
     "ownerProfile": "Owner Profile",
-    "myProfileTitle": "My Profile"
+    "myProfileTitle": "My Profile",
+    "appearance": "Appearance",
+    "appearanceDescription": "Choose your preferred theme",
+    "light": "Light",
+    "dark": "Dark",
+    "systemTheme": "System",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language",
+    "telegramBot": "Telegram Bot",
+    "telegramBotDescription": "Connect and configure Telegram bot notifications"
   },
   "companies": {
     "title": "Companies",

@@ -331,7 +331,16 @@
     "serverEnvVars": "Переменные окружения сервера",
     "serverEnvVarsDescription": "Следующие настройки задаются через переменные окружения на сервере. Их нельзя изменить через веб-интерфейс -- отредактируйте файл .env и перезапустите сервер для применения изменений.",
     "ownerProfile": "Профиль владельца",
-    "myProfileTitle": "Мой профиль"
+    "myProfileTitle": "Мой профиль",
+    "appearance": "Оформление",
+    "appearanceDescription": "Выберите предпочитаемую тему",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "systemTheme": "Системная",
+    "language": "Язык",
+    "languageDescription": "Выберите предпочитаемый язык",
+    "telegramBot": "Telegram бот",
+    "telegramBotDescription": "Подключение и настройка уведомлений Telegram бота"
   },
   "companies": {
     "title": "Компании",

@@ -13,7 +13,7 @@ import {
   SafetyOutlined,
   CalendarOutlined,
 } from '@ant-design/icons';
-import { Alert, Button, Input, Select, Spin, Tag } from 'antd';
+import { Alert, Button, Input, Modal, Select, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
@@ -97,20 +97,28 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleToggleStatus = async () => {
+  const handleToggleStatus = () => {
     if (!user) return;
-    if (!confirm(`${user.is_active ? 'Deactivate' : 'Activate'} this user?`)) return;
-    try {
-      if (user.is_active) {
-        await apiClient.deactivateUser(userId);
-      } else {
-        await apiClient.activateUser(userId);
-      }
-      setSuccessMsg(`User ${user.is_active ? 'deactivated' : 'activated'} successfully`);
-      loadUser();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update user status');
-    }
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: `${user.is_active ? 'Deactivate' : 'Activate'} this user?`,
+      okText: user.is_active ? 'Deactivate' : 'Activate',
+      cancelText: 'Cancel',
+      okButtonProps: user.is_active ? { danger: true } : {},
+      onOk: async () => {
+        try {
+          if (user.is_active) {
+            await apiClient.deactivateUser(userId);
+          } else {
+            await apiClient.activateUser(userId);
+          }
+          setSuccessMsg(`User ${user.is_active ? 'deactivated' : 'activated'} successfully`);
+          loadUser();
+        } catch (err: any) {
+          setError(err.response?.data?.detail || 'Failed to update user status');
+        }
+      },
+    });
   };
 
   const formatRole = (role: string) =>

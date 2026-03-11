@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, Input, Tag, message } from 'antd';
+import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
@@ -74,15 +74,23 @@ export default function PermissionGroupsPage() {
     }
   };
 
-  const handleDelete = async (groupId: string) => {
-    if (!confirm('Are you sure you want to delete this permission group?')) return;
-    try {
-      await apiClient.deletePermissionGroup(groupId);
-      loadData();
-    } catch (error) {
-      console.error('Failed to delete permission group:', error);
-      message.error('Failed to delete permission group');
-    }
+  const handleDelete = (groupId: string) => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to delete this permission group? This action cannot be undone.',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await apiClient.deletePermissionGroup(groupId);
+          loadData();
+        } catch (error) {
+          console.error('Failed to delete permission group:', error);
+          message.error('Failed to delete permission group');
+        }
+      },
+    });
   };
 
   const togglePermission = (perm: string) => {

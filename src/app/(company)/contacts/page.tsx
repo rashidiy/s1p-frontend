@@ -17,8 +17,17 @@ import Link from 'next/link';
 export default function ContactsPage() {
   const [data, setData] = useState<PaginatedResponse<ContactResponse> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     loadContacts();
@@ -80,8 +89,8 @@ export default function ContactsPage() {
 
       <Input.Search
         placeholder="Search contacts..."
-        value={search}
-        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
         allowClear
         size="large"
         className="w-full md:max-w-lg"

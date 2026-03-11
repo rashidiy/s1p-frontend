@@ -13,9 +13,18 @@ const priorityColors: Record<string, string> = { high: 'red', medium: 'orange', 
 export default function TasksPage() {
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<string>('');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => { loadTasks(); }, [page, search, status]);
 
@@ -69,7 +78,7 @@ export default function TasksPage() {
       <p className="page-subtitle">Manage your to-do list</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input.Search placeholder="Search tasks..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
+        <Input.Search placeholder="Search tasks..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder="All Statuses" allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: 'Pending', value: 'pending' }, { label: 'In Progress', value: 'in_progress' }, { label: 'Completed', value: 'completed' }]}
         />
