@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Layout, Menu, Avatar, Popover } from 'antd';
+import { Layout, Menu, Avatar, Popover, Drawer } from 'antd';
 import {
   DashboardOutlined,
   PhoneOutlined,
@@ -19,8 +19,7 @@ import {
   SendOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
-import { UserRole } from '@/types/api';
-import { apiClient } from '@/lib/api';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import type { MenuProps } from 'antd';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -62,9 +61,15 @@ const adminNavigation: NavItem[] = [
   { name: 'Settings', href: '/settings', icon: <SettingOutlined /> },
 ];
 
-export function Sidebar() {
-  const pathname = usePathname();
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
+  const pathname = usePathname() ?? '/';
   const router = useRouter();
+  const isMobile = useIsMobile();
   const { user, isOwner, isAdmin, isManager, hasPermissionString, logout } = useAuthStore();
   const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -90,9 +95,14 @@ export function Sidebar() {
 
   const handleLogout = () => {
     setPopoverOpen(false);
-    apiClient.logout();
+    onMobileClose?.();
+    apiLogout();
     logout();
     router.push(isOwner ? '/owner/login' : '/login');
+  };
+
+  const apiLogout = () => {
+    import('@/lib/api').then(({ apiClient }) => apiClient.logout());
   };
 
   const getInitials = (firstName: string, lastName?: string | null) => {
@@ -103,6 +113,11 @@ export function Sidebar() {
   const activeKey = navigation.find(
     (item) => pathname === item.href || pathname.startsWith(item.href + '/')
   )?.href;
+
+  const handleMenuClick = (key: string) => {
+    router.push(key);
+    onMobileClose?.();
+  };
 
   const menuItems: MenuProps['items'] = navigation.map((item) => ({
     key: item.href,
@@ -117,7 +132,7 @@ export function Sidebar() {
       </div>
       <Link
         href={isOwner ? '/owner/profile' : '/profile'}
-        onClick={() => setPopoverOpen(false)}
+        onClick={() => { setPopoverOpen(false); onMobileClose?.(); }}
       >
         <div className="profile-menu-item">
           <UserOutlined /> Profile
@@ -130,166 +145,100 @@ export function Sidebar() {
     </div>
   );
 
-  return (
-    <Sider
-      collapsed
-      collapsedWidth={64}
-      trigger={null}
-      style={{
-        background: '#FFFFFF',
-        borderRight: '1px solid #E5E7EB',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        left: 0,
-        flexShrink: 0,
-      }}
-    >
-      {/* Logo mark */}
-      <div
-        style={{
-          height: 64,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderBottom: '1px solid #E5E7EB',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ position: 'relative', width: 32, height: 32 }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: 20,
-              height: 20,
-              borderRadius: 4,
-              background: '#E84040',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: 20,
-              height: 20,
-              borderRadius: 4,
-              background: '#2563EB',
-              opacity: 0.85,
-            }}
-          />
+  const sidebarContent = (
+    <div className="sidebar-inner">
+      {/* Logo + brand header */}
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em' }}>
+            S1P
+          </span>
+          <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+            CRM Platform
+          </span>
         </div>
       </div>
 
-      {/* Navigation — scrollable */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '8px 0' }}>
+      {/* Navigation */}
+      <div className="sidebar-nav">
         <Menu
           mode="inline"
-          inlineCollapsed={true}
           selectedKeys={activeKey ? [activeKey] : []}
           items={menuItems}
-          onSelect={({ key }) => router.push(key)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-          }}
+          onSelect={({ key }) => handleMenuClick(key)}
+          style={{ background: 'transparent', border: 'none' }}
           className="crm-sidebar-menu"
         />
       </div>
 
-      {/* Bottom section — dots + avatar */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 8,
-          paddingTop: 12,
-          paddingBottom: 16,
-          borderTop: '1px solid #E5E7EB',
-        }}
-      >
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#8B5CF6' }} />
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#EC4899' }} />
-
+      {/* User profile */}
+      <div className="sidebar-profile">
         {user && (
           <Popover
             content={profileMenuContent}
             trigger="click"
             open={popoverOpen}
             onOpenChange={setPopoverOpen}
-            placement="rightTop"
+            placement={isMobile ? 'topRight' : 'rightTop'}
             overlayStyle={{ padding: 0 }}
-            overlayInnerStyle={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+            styles={{ container: { padding: 0, borderRadius: 12, overflow: 'hidden' } }}
           >
-            <Avatar
-              size={36}
-              style={{
-                backgroundColor: '#E84040',
-                color: 'white',
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginTop: 4,
-                flexShrink: 0,
-              }}
-            >
-              {getInitials(user.first_name, user.last_name)}
-            </Avatar>
+            <div className="sidebar-profile-trigger">
+              <Avatar
+                size={36}
+                style={{
+                  backgroundColor: '#E84040',
+                  color: 'white',
+                  fontWeight: 600,
+                  flexShrink: 0,
+                }}
+              >
+                {getInitials(user.first_name, user.last_name)}
+              </Avatar>
+              <div style={{ minWidth: 0 }}>
+                <div className="sidebar-profile-name">
+                  {user.first_name} {user.last_name}
+                </div>
+                <div className="sidebar-profile-email">
+                  {user.email}
+                </div>
+              </div>
+            </div>
           </Popover>
         )}
       </div>
+    </div>
+  );
 
-      <style jsx global>{`
-        .crm-sidebar-menu .ant-layout-sider-children {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-        }
-        .crm-sidebar-menu .ant-menu-item {
-          color: #64748b !important;
-          margin: 2px 8px !important;
-          border-radius: 10px !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .crm-sidebar-menu .ant-menu-item:hover {
-          color: #0f172a !important;
-          background: #f1f5f9 !important;
-        }
-        .crm-sidebar-menu .ant-menu-item-selected {
-          color: #e84040 !important;
-          background: #fff0f0 !important;
-          font-weight: 500;
-        }
-        .crm-sidebar-menu .ant-menu-item-selected::after {
-          display: none !important;
-        }
-        .crm-sidebar-menu .ant-menu-item .anticon {
-          font-size: 18px !important;
-        }
-        .profile-menu-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 9px 16px;
-          cursor: pointer;
-          font-size: 14px;
-          color: #333;
-          transition: background 0.15s;
-        }
-        .profile-menu-item:hover {
-          background: #f5f5f5;
-        }
-        .profile-menu-item--danger {
-          color: #ef4444;
-        }
-        .profile-menu-item--danger:hover {
-          background: #fef2f2;
-        }
-      `}</style>
+  // Mobile: render as Drawer
+  if (isMobile) {
+    return (
+      <Drawer
+        open={mobileOpen}
+        onClose={onMobileClose}
+        placement="left"
+        width={280}
+        styles={{ body: { padding: 0 }, header: { display: 'none' } }}
+        closable={false}
+      >
+        {sidebarContent}
+      </Drawer>
+    );
+  }
+
+  // Desktop: render as Sider
+  return (
+    <Sider
+      width={240}
+      trigger={null}
+      className="sidebar-desktop"
+    >
+      {sidebarContent}
     </Sider>
   );
 }

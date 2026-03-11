@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Spin, Button, Tag, Select } from 'antd';
+import { Input, Pagination, Button, Tag, Select, message } from 'antd';
 import { PlusOutlined, DollarOutlined, RiseOutlined, UserOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { DealResponse, PaginatedResponse } from '@/types/api';
@@ -25,30 +25,58 @@ export default function DealsPage() {
     try {
       const result = await apiClient.getDeals({ page, page_size: 20, search: search || undefined, stage: stage || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load deals:', error); }
+    } catch (error) { console.error('Failed to load deals:', error); message.error('Failed to load deals'); }
     finally { setLoading(false); }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <div className="h-9 w-28 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="h-10 w-full md:max-w-lg bg-gray-50 rounded-lg animate-pulse" />
+        <div className="h-10 w-full sm:w-44 bg-gray-50 rounded-lg animate-pulse" />
+      </div>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="glass-card p-5 border-l-4 border-l-gray-100">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-24 bg-gray-50 rounded mt-2 animate-pulse" />
+              </div>
+              <div className="h-5 w-20 bg-gray-100 rounded animate-pulse" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-5 w-24 bg-gray-50 rounded animate-pulse" />
+              <div className="h-3 w-36 bg-gray-50 rounded animate-pulse" />
+              <div className="flex gap-2 pt-2">
+                <div className="h-8 flex-1 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="h-8 w-16 bg-gray-100 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Deals</h1>
-          <p className="text-gray-500">Track your active opportunities</p>
-        </div>
+      <div className="page-header">
         <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>Add Deal</Button></Link>
       </div>
+      <p className="page-subtitle">Track your active opportunities</p>
 
-      <div className="flex items-center gap-3">
-        <Input.Search placeholder="Search deals..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="max-w-lg" />
-        <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder="All Stages" allowClear style={{ width: 180 }} size="large"
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Input.Search placeholder="Search deals..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
+        <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder="All Stages" allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: 'Prospecting', value: 'prospecting' }, { label: 'Qualification', value: 'qualification' }, { label: 'Proposal', value: 'proposal' }, { label: 'Negotiation', value: 'negotiation' }, { label: 'Won', value: 'won' }, { label: 'Lost', value: 'lost' }]}
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {data?.items.map((deal) => (
           <div key={deal.id} className="glass-card p-5 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
@@ -67,7 +95,7 @@ export default function DealsPage() {
               {deal.assigned_to_name && <p className="text-sm text-gray-600">Owner: <span className="font-medium">{deal.assigned_to_name}</span></p>}
               <div className="flex gap-2 pt-2">
                 <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>View</Button></Link>
-                {deal.stage !== 'won' && deal.stage !== 'lost' && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch {} }}>Win</Button>}
+                {deal.stage !== 'won' && deal.stage !== 'lost' && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error('Failed to mark deal as won'); } }}>Win</Button>}
               </div>
             </div>
           </div>
@@ -77,10 +105,12 @@ export default function DealsPage() {
       {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
 
       {data?.items.length === 0 && (
-        <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
-          <p className="mt-4 text-lg font-medium text-gray-700">No deals found</p>
-          <p className="text-sm text-gray-500">{search ? 'Try adjusting your search' : 'Get started by adding a deal'}</p>
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="no-deals" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">No deals found</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search || stage ? 'Try adjusting your filters' : 'Create your first deal to start tracking revenue'}
+          </p>
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { Alert, Button, Input, Spin } from 'antd';
+import { Alert, Button, Input, message as antdMessage } from 'antd';
 import type { OwnerResponse } from '@/types/api';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -47,6 +47,7 @@ export default function OwnerProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
+      antdMessage.error('Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -111,106 +112,137 @@ export default function OwnerProfilePage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="max-w-2xl sm:mx-auto space-y-6">
+      <div>
+        <div className="h-4 w-48 bg-gray-50 rounded animate-pulse" />
+      </div>
+      {[1, 2].map((i) => (
+        <div key={i} className="glass-card p-5 sm:p-8 space-y-5">
+          <div className="h-5 w-40 bg-gray-100 rounded animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="space-y-2">
+                <div className="h-3 w-20 bg-gray-50 rounded animate-pulse" />
+                <div className="h-10 bg-gray-50 rounded-lg animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <h1 className="text-3xl font-bold gradient-text">Owner Profile</h1>
+    <div className="max-w-2xl sm:mx-auto space-y-6">
+      <div className="page-header">
+        <p className="page-subtitle">Manage your account settings</p>
+      </div>
 
-      <div className="glass-card p-0">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Personal Information</h3>
-          <p className="text-sm text-muted-foreground">Update your personal details</p>
+      <div className="glass-card overflow-hidden">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
+          <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+          <p className="text-sm text-gray-400 mt-0.5">Update your personal details</p>
         </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleSaveProfile} className="space-y-4">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
+          <form onSubmit={handleSaveProfile} className="space-y-5">
             {message && (
-              <Alert type="success" message={message} showIcon className="!rounded-xl" />
+              <Alert type="success" message={message} showIcon className="!rounded-xl" closable onClose={() => setMessage('')} />
             )}
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" />
+              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">First Name</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">First Name <span className="text-red-400">*</span></label>
                 <Input
                   value={profileForm.first_name}
                   onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
                   required
+                  size="large"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Last Name</label>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Last Name</label>
                 <Input
                   value={profileForm.last_name}
                   onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
+                  size="large"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <Input value={profile?.email || ''} disabled />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <Input value={profile?.email || ''} disabled size="large" />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Phone</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">Phone</label>
               <Input
                 value={profileForm.phone}
                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                size="large"
+                placeholder="+998 90 123 4567"
               />
             </div>
-            <Button htmlType="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <div className="pt-2 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" size="large" loading={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
           </form>
         </div>
       </div>
 
-      <div className="glass-card p-0">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
-          <p className="text-sm text-muted-foreground">Update your password</p>
+      <div className="glass-card overflow-hidden">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
+          <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+          <p className="text-sm text-gray-400 mt-0.5">Update your account password</p>
         </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleChangePassword} className="space-y-4">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
+          <form onSubmit={handleChangePassword} className="space-y-5">
             {passwordMessage && (
-              <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" />
+              <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" closable onClose={() => setPasswordMessage('')} />
             )}
             {passwordError && (
-              <Alert type="error" message={passwordError} showIcon className="!rounded-xl" />
+              <Alert type="error" message={passwordError} showIcon className="!rounded-xl" closable onClose={() => setPasswordError('')} />
             )}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Current Password</label>
-              <Input
-                type="password"
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">Current Password</label>
+              <Input.Password
                 value={passwordForm.old_password}
                 onChange={(e) => setPasswordForm({ ...passwordForm, old_password: e.target.value })}
                 required
+                size="large"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">New Password</label>
-              <Input
-                type="password"
-                value={passwordForm.new_password}
-                onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                At least 8 characters, one uppercase letter, and one number
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">New Password</label>
+                <Input.Password
+                  value={passwordForm.new_password}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                  required
+                  size="large"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+                <Input.Password
+                  value={passwordForm.confirm_password}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                  required
+                  size="large"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm New Password</label>
-              <Input
-                type="password"
-                value={passwordForm.confirm_password}
-                onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
-                required
-              />
+            <p className="text-xs text-gray-400">
+              At least 8 characters, one uppercase letter, and one number
+            </p>
+            <div className="pt-2 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" size="large" loading={changingPassword}>
+                {changingPassword ? 'Changing...' : 'Change Password'}
+              </Button>
             </div>
-            <Button htmlType="submit" disabled={changingPassword}>
-              {changingPassword ? 'Changing...' : 'Change Password'}
-            </Button>
           </form>
         </div>
       </div>

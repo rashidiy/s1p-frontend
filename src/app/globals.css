@@ -58,35 +58,351 @@
   }
 }
 
-/* CRM clean card utilities */
+/* ========================================
+   APP LAYOUT — Header, Sidebar, Navigation
+   ======================================== */
+
+/* App header bar */
+.app-header {
+  height: 56px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F1F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    height: 64px;
+    padding: 0 24px;
+  }
+}
+
+.app-header-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 768px) {
+  .app-header-title {
+    font-size: 20px;
+  }
+}
+
+/* Hamburger — visible only on mobile */
+.hamburger-btn {
+  color: #64748B !important;
+  border-radius: 10px !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none !important;
+  }
+}
+
+/* Header icon buttons */
+.header-icon-btn {
+  color: #94A3B8 !important;
+  border-radius: 10px !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+/* ========================================
+   SIDEBAR COMPONENT STYLES
+   ======================================== */
+
+.sidebar-desktop {
+  background: #FFFFFF !important;
+  border-right: 1px solid #F1F5F9;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+  border-bottom: 1px solid #F1F5F9;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #E84040, #FF6B6B);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(232, 64, 64, 0.25);
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.sidebar-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.sidebar-profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-profile-email {
+  font-size: 11px;
+  color: #94A3B8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sidebar menu items */
+.crm-sidebar-menu .ant-menu-item {
+  color: #64748b !important;
+  margin: 2px 12px !important;
+  border-radius: 10px !important;
+  padding: 0 16px !important;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+}
+
+.crm-sidebar-menu .ant-menu-item:hover {
+  color: #0f172a !important;
+  background: #f1f5f9 !important;
+}
+
+.crm-sidebar-menu .ant-menu-item-selected {
+  color: #e84040 !important;
+  background: #fef2f2 !important;
+  font-weight: 600;
+}
+
+.crm-sidebar-menu .ant-menu-item-selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #e84040;
+}
+
+.crm-sidebar-menu .ant-menu-item-selected::after {
+  display: none !important;
+}
+
+.crm-sidebar-menu .ant-menu-item .anticon {
+  font-size: 18px !important;
+  transition: transform 0.2s ease !important;
+}
+
+.crm-sidebar-menu .ant-menu-item:hover .anticon {
+  transform: scale(1.1);
+}
+
+/* Profile popover menu items */
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.profile-menu-item:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.profile-menu-item--danger {
+  color: #ef4444;
+}
+
+.profile-menu-item--danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+.app-loading-screen {
+  animation: loading-appear 0.4s ease-out;
+}
+
+@keyframes loading-appear {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.page-fade-in {
+  animation: page-enter 0.3s ease-out;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Auth background animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+.auth-orb {
+  animation: float 8s ease-in-out infinite;
+}
+.auth-orb-1 { animation-duration: 8s; }
+.auth-orb-2 { animation-duration: 10s; animation-direction: reverse; }
+.auth-orb-3 { animation-duration: 12s; animation-delay: 2s; }
+
+/* ========================================
+   BUTTON ENHANCEMENTS
+   ======================================== */
+
+.ant-btn {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ant-btn-primary:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   CARD UTILITIES
+   ======================================== */
+
 @layer utilities {
-  /* Primary CRM card — white, clean shadow */
+  /* Primary CRM card */
   .crm-card {
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Updated glass-card — clean white (no glassmorphism) */
+  .crm-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  /* Glass card — clean white */
   .glass-card {
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Updated glass-sidebar — white with border */
-  .glass-sidebar {
+  /* Auth card */
+  .auth-card {
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      0 12px 48px rgba(0, 0, 0, 0.15),
+      0 4px 16px rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    animation: auth-card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4338ca, #6366f1, #818cf8);
+    border-radius: 24px 24px 0 0;
+  }
+
+  @keyframes auth-card-appear {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Form section card */
+  .form-section {
     background: #ffffff;
-    border-right: 1px solid #E5E7EB;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease;
   }
 
-  /* Updated glass — clean white */
-  .glass {
-    background: #ffffff;
-    border: 1px solid #E5E7EB;
+  .form-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
-  /* Updated gradient-text — red-orange accent */
+  /* Gradient text */
   .gradient-text {
     background: linear-gradient(135deg, #E84040 0%, #FF6B6B 100%);
     -webkit-background-clip: text;
@@ -94,7 +410,7 @@
     background-clip: text;
   }
 
-  /* Updated glass-input — clean white */
+  /* Glass input */
   .glass-input {
     background: #ffffff;
     border: 1px solid #E5E7EB;
@@ -105,6 +421,37 @@
     background: #ffffff;
     border-color: #E84040;
     box-shadow: 0 0 0 3px rgba(232, 64, 64, 0.1);
+  }
+
+  .auth-card .glass-input:focus,
+  .auth-card .glass-input:focus-within {
+    border-color: #4338ca;
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+  }
+
+  /* Gradient stat card */
+  .stat-card-gradient {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .stat-card-gradient::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translate(30px, -30px);
+    pointer-events: none;
+  }
+
+  .stat-card-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   }
 
   /* Badge utilities */
@@ -131,4 +478,89 @@
     background: #FEE2E2;
     color: #DC2626;
   }
+}
+
+/* ========================================
+   PAGE HEADER PATTERN
+   ======================================== */
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE TABLE/LIST PATTERNS
+   ======================================== */
+
+/* On mobile, make filter rows scroll horizontally if needed */
+.filter-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   RESPONSIVE FORM PATTERNS
+   ======================================== */
+
+/* Two-column forms that stack on mobile */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+/* ========================================
+   MISC RESPONSIVE HELPERS
+   ======================================== */
+
+/* Hide on mobile, show on tablet+ */
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 768px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Ant Design Drawer backdrop fix */
+.ant-drawer-mask {
+  backdrop-filter: blur(2px);
 }

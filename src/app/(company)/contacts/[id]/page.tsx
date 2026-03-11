@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, MailOutlined, PhoneOutlined, FundProjectionScreenOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Spin, Tag } from 'antd';
+import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { ContactResponse, NoteResponse } from '@/types/api';
 import Link from 'next/link';
 
 export default function ContactDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const { hasPermissionString } = useAuthStore();
   const contactId = params.id as string;
@@ -55,6 +55,7 @@ export default function ContactDetailPage() {
       });
     } catch (error) {
       console.error('Failed to load contact:', error);
+      message.error('Failed to load contact');
     } finally {
       setLoading(false);
     }
@@ -66,6 +67,7 @@ export default function ContactDetailPage() {
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
+      message.error('Failed to load notes');
     }
   };
 
@@ -75,6 +77,7 @@ export default function ContactDetailPage() {
       setActivity(data);
     } catch (error) {
       console.error('Failed to load activity:', error);
+      message.error('Failed to load activity');
     }
   };
 
@@ -93,6 +96,7 @@ export default function ContactDetailPage() {
       loadContact();
     } catch (error) {
       console.error('Failed to update contact:', error);
+      message.error('Failed to update contact');
     }
   };
 
@@ -108,6 +112,7 @@ export default function ContactDetailPage() {
       loadNotes();
     } catch (error) {
       console.error('Failed to add note:', error);
+      message.error('Failed to add note');
     }
   };
 
@@ -118,11 +123,40 @@ export default function ContactDetailPage() {
       router.push('/contacts');
     } catch (error) {
       console.error('Failed to delete contact:', error);
+      message.error('Failed to delete contact');
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+          <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="glass-card p-6 space-y-4">
+              <div className="h-5 w-40 bg-gray-100 rounded animate-pulse" />
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${70 - i * 10}%` }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="glass-card p-6 space-y-3">
+            <div className="h-5 w-24 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-4 w-16 bg-gray-50 rounded animate-pulse" />
+                <div className="h-5 w-8 bg-gray-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!contact) {
@@ -131,17 +165,14 @@ export default function ContactDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+          <Button size="small" type="text"   onClick={() => router.push('/contacts')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
-          <h1 className="text-3xl font-bold gradient-text">
-            {contact.first_name} {contact.last_name}
-          </h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {hasPermissionString('contacts.write') && !editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
@@ -160,69 +191,42 @@ export default function ContactDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Contact Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Contact Information</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">First Name</label>
-                    <Input
-                      value={editForm.first_name}
-                      onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
-                    />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">First Name</label>
+                    <Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Last Name</label>
-                    <Input
-                      value={editForm.last_name}
-                      onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Last Name</label>
+                    <Input value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
-                    <Input
-                      value={editForm.email}
-                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Email</label>
+                    <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Phone</label>
-                    <Input
-                      value={editForm.phone}
-                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Phone</label>
+                    <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Company</label>
-                    <Input
-                      value={editForm.company_name}
-                      onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Company</label>
+                    <Input value={editForm.company_name} onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Position</label>
-                    <Input
-                      value={editForm.position}
-                      onChange={(e) => setEditForm({ ...editForm, position: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Position</label>
+                    <Input value={editForm.position} onChange={(e) => setEditForm({ ...editForm, position: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Source</label>
-                    <Input
-                      value={editForm.source}
-                      onChange={(e) => setEditForm({ ...editForm, source: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Source</label>
+                    <Input value={editForm.source} onChange={(e) => setEditForm({ ...editForm, source: e.target.value })} size="large" />
                   </div>
-                  <div className="col-span-2 flex gap-2">
-                    <Button onClick={handleSave}>
-                      <SaveOutlined style={{ marginRight: 8 }} />
-                      Save
-                    </Button>
-                    <Button type="default"  onClick={() => setEditing(false)}>
-                      <CloseOutlined style={{ marginRight: 8 }} />
-                      Cancel
-                    </Button>
+                  <div className="col-span-1 sm:col-span-2 flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>Save</Button>
+                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>Cancel</Button>
                   </div>
                 </div>
               ) : (
@@ -277,7 +281,7 @@ export default function ContactDetailPage() {
           {/* Notes */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Notes</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
@@ -311,7 +315,7 @@ export default function ContactDetailPage() {
         <div className="space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Summary</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Summary</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between">
@@ -331,7 +335,7 @@ export default function ContactDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Activity Timeline</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Activity Timeline</h3>
             </div>
             <div className="p-6 pt-0">
               {activity.length > 0 ? (
@@ -375,6 +379,7 @@ export default function ContactDetailPage() {
                 setCallModalVisible(false);
               } catch (err: any) {
                 console.error(err);
+                message.error('Failed to make call');
               } finally {
                 setCalling(false);
               }

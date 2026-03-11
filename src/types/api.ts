@@ -106,7 +106,15 @@ export type UserListResponse = Schema<'UserListResponse'>;
 // Calls
 export type CallRequest = Schema<'CallRequest'>;
 export type CallResponse = Schema<'CallResponse'>;
-export type CallEventResponse = Schema<'CallEventResponse'>;
+export type CallEventResponse = Schema<'CallEventResponse'> & {
+  // Fields present in DB model but missing from backend response schema — remove when backend adds them
+  outcome?: string | null;
+  disposition_notes?: string | null;
+  deal_id?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+};
 export type CallOutcomeUpdate = Schema<'CallOutcomeUpdate'>;
 export type CallLinkRequest = Schema<'CallLinkRequest'>;
 export type CallNumberRequest = Schema<'CallNumberRequest'>;

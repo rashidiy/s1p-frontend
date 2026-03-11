@@ -54,7 +54,7 @@ const stateColors: Record<string, string> = {
 };
 
 export default function CallDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const callId = params.id as string;
 
@@ -78,17 +78,20 @@ export default function CallDetailPage() {
     try {
       const data = await apiClient.getCall(callId);
       setCall(data);
-      if ((data as any).outcome) setOutcome((data as any).outcome);
-      if ((data as any).disposition_notes) setDispositionNotes((data as any).disposition_notes);
+      if (data.outcome) setOutcome(data.outcome);
+      if (data.disposition_notes) setDispositionNotes(data.disposition_notes);
       const phone = data.phone_2 || data.phone_1;
       if (phone) {
         try {
           const sugg = await apiClient.getAutoLinkSuggestions(phone);
           setSuggestions(sugg);
-        } catch {}
+        } catch {
+          console.error('Failed to load auto-link suggestions');
+        }
       }
     } catch (e) {
       console.error(e);
+      message.error('Failed to load call');
     } finally {
       setLoading(false);
     }
@@ -158,6 +161,7 @@ export default function CallDetailPage() {
       setLinkSearchResults(results);
     } catch {
       setLinkSearchResults([]);
+      message.error('Failed to search entities');
     } finally {
       setSearchLoading(false);
     }
@@ -177,30 +181,70 @@ export default function CallDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+          <div className="h-8 w-40 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="glass-card p-6 space-y-4">
+              <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-32 bg-gray-50 rounded animate-pulse" />
+                <div className="h-5 w-5 bg-gray-50 rounded animate-pulse" />
+                <div className="h-6 w-32 bg-gray-50 rounded animate-pulse" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i}>
+                    <div className="h-3 w-12 bg-gray-50 rounded animate-pulse mb-2" />
+                    <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="glass-card p-6 space-y-3">
+              <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+              <div className="h-9 bg-gray-50 rounded-lg animate-pulse" />
+              <div className="h-20 bg-gray-50 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          <div className="glass-card p-6 space-y-3">
+            <div className="h-5 w-28 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-4 w-16 bg-gray-50 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!call) {
     return <div className="p-6">Call not found</div>;
   }
 
-  const callAny = call as any;
-  const recordingUrl = callAny.recording_url || callAny.record_url;
-
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <Button size="small" type="text"   onClick={() => router.push('/calls')}>
-          <ArrowLeftOutlined style={{ marginRight: 4 }} />
-          Back to Calls
-        </Button>
-        <h1 className="text-3xl font-bold gradient-text">Call #{call.id}</h1>
-        {call.direction && (
-          <Tag color={call.direction === 'inbound' ? 'blue' : call.direction === 'outbound' ? 'green' : 'default'}>
-            {CALL_DIRECTION_LABELS[call.direction] || call.direction}
-          </Tag>
-        )}
+      <div className="page-header">
+        <div className="flex items-center gap-4 flex-wrap">
+          <Button size="small" type="text"   onClick={() => router.push('/calls')}>
+            <ArrowLeftOutlined style={{ marginRight: 4 }} />
+            Back to Calls
+          </Button>
+          {call.direction && (
+            <Tag color={call.direction === 'inbound' ? 'blue' : call.direction === 'outbound' ? 'green' : 'default'}>
+              {CALL_DIRECTION_LABELS[call.direction] || call.direction}
+            </Tag>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -209,7 +253,7 @@ export default function CallDetailPage() {
           {/* Call Information */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Call Information</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex items-center gap-3">
@@ -249,23 +293,16 @@ export default function CallDetailPage() {
                 </div>
               </div>
 
-              {recordingUrl && (
-                <div className="mt-4">
-                  <span className="text-sm text-gray-500 block mb-2">Recording</span>
-                  <audio controls className="w-full">
-                    <source src={recordingUrl} />
-                  </audio>
-                </div>
-              )}
-
-              {call.has_recording && !recordingUrl && (
+              {call.has_recording && (
                 <div className="mt-4">
                   <Button size="small" type="default"
                     onClick={async () => {
                       try {
                         const recUrl = await apiClient.getCallRecording(callId);
                         window.open(recUrl, '_blank');
-                      } catch {}
+                      } catch {
+                        message.error('Failed to load recording');
+                      }
                     }}
                   >
                     Play Recording
@@ -278,14 +315,14 @@ export default function CallDetailPage() {
           {/* Set Call Outcome */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Set Call Outcome</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Set Call Outcome</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
-              {callAny.outcome && (
+              {call.outcome && (
                 <div>
                   <span className="text-sm text-gray-500 mr-2">Current outcome:</span>
-                  <Tag color={outcomeColors[callAny.outcome] || 'default'}>
-                    {OUTCOME_OPTIONS.find(o => o.value === callAny.outcome)?.label || callAny.outcome}
+                  <Tag color={outcomeColors[call.outcome] || 'default'}>
+                    {OUTCOME_OPTIONS.find(o => o.value === call.outcome)?.label || call.outcome}
                   </Tag>
                 </div>
               )}
@@ -322,7 +359,7 @@ export default function CallDetailPage() {
           {/* Link to CRM Entity */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Link to CRM Entity</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Link to CRM Entity</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex flex-wrap gap-2">
@@ -336,12 +373,12 @@ export default function CallDetailPage() {
                     <Tag color="green" className="cursor-pointer">Lead: {call.lead_id}</Tag>
                   </Link>
                 )}
-                {callAny.deal_id && (
-                  <Link href={`/deals/${callAny.deal_id}`}>
-                    <Tag color="purple" className="cursor-pointer">Deal: {callAny.deal_id}</Tag>
+                {call.deal_id && (
+                  <Link href={`/deals/${call.deal_id}`}>
+                    <Tag color="purple" className="cursor-pointer">Deal: {call.deal_id}</Tag>
                   </Link>
                 )}
-                {!call.contact_id && !call.lead_id && !callAny.deal_id && (
+                {!call.contact_id && !call.lead_id && !call.deal_id && (
                   <span className="text-sm text-gray-500">No linked entities</span>
                 )}
               </div>
@@ -386,7 +423,7 @@ export default function CallDetailPage() {
           {/* Auto-Link Suggestions */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Auto-Link Suggestions</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Auto-Link Suggestions</h3>
             </div>
             <div className="p-6 pt-0">
               {suggestions ? (
@@ -446,14 +483,14 @@ export default function CallDetailPage() {
           {/* Call Summary */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Summary</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Call Summary</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Outcome</span>
-                {callAny.outcome ? (
-                  <Tag color={outcomeColors[callAny.outcome] || 'default'}>
-                    {OUTCOME_OPTIONS.find(o => o.value === callAny.outcome)?.label || callAny.outcome}
+                {call.outcome ? (
+                  <Tag color={outcomeColors[call.outcome] || 'default'}>
+                    {OUTCOME_OPTIONS.find(o => o.value === call.outcome)?.label || call.outcome}
                   </Tag>
                 ) : (
                   <span className="text-gray-400">Not set</span>
@@ -487,12 +524,12 @@ export default function CallDetailPage() {
                     Lead
                   </Link>
                 ) : null}
-                {callAny.deal_id ? (
-                  <Link href={`/deals/${callAny.deal_id}`} className="text-sm text-blue-600 hover:underline block">
+                {call.deal_id ? (
+                  <Link href={`/deals/${call.deal_id}`} className="text-sm text-blue-600 hover:underline block">
                     Deal
                   </Link>
                 ) : null}
-                {!call.contact_id && !call.lead_id && !callAny.deal_id && (
+                {!call.contact_id && !call.lead_id && !call.deal_id && (
                   <span className="text-sm text-gray-400">None</span>
                 )}
               </div>
@@ -500,28 +537,28 @@ export default function CallDetailPage() {
           </div>
 
           {/* UTM Tracking */}
-          {(callAny.utm_source || callAny.utm_medium || callAny.utm_campaign) && (
+          {(call.utm_source || call.utm_medium || call.utm_campaign) && (
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">UTM Tracking</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight">UTM Tracking</h3>
               </div>
               <div className="p-6 pt-0 space-y-3">
-                {callAny.utm_source && (
+                {call.utm_source && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Source</span>
-                    <Tag bordered>{callAny.utm_source}</Tag>
+                    <Tag bordered>{call.utm_source}</Tag>
                   </div>
                 )}
-                {callAny.utm_medium && (
+                {call.utm_medium && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Medium</span>
-                    <Tag bordered>{callAny.utm_medium}</Tag>
+                    <Tag bordered>{call.utm_medium}</Tag>
                   </div>
                 )}
-                {callAny.utm_campaign && (
+                {call.utm_campaign && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Campaign</span>
-                    <Tag bordered>{callAny.utm_campaign}</Tag>
+                    <Tag bordered>{call.utm_campaign}</Tag>
                   </div>
                 )}
               </div>

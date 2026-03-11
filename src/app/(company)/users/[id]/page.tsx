@@ -33,7 +33,7 @@ const statCards = [
 ] as const;
 
 export default function UserDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const { hasPermission } = useAuthStore();
   const userId = params.id as string;
@@ -140,21 +140,18 @@ export default function UserDetailPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+      <div className="page-header">
+        <div className="flex items-center gap-4 flex-wrap">
+          <Button size="small" type="text"   onClick={() => router.push('/users')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
               {initials}
             </div>
             <div>
-              <h1 className="text-2xl font-bold gradient-text">
-                {user.first_name} {user.last_name}
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Tag color={roleColors[user.role] || 'default'}>
                   <SafetyOutlined style={{ marginRight: 4 }} />
                   {formatRole(user.role)}
@@ -168,7 +165,7 @@ export default function UserDetailPage() {
         </div>
 
         {canManageUsers && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {!editing && (
               <Button type="default"  onClick={() => setEditing(true)}>
                 <EditOutlined style={{ marginRight: 8 }} />
@@ -200,12 +197,12 @@ export default function UserDetailPage() {
         <div className="lg:col-span-2">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">User Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">User Information</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">First Name</label>
                       <Input
@@ -305,7 +302,7 @@ export default function UserDetailPage() {
         <div className="space-y-4">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Permissions</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Permissions</h3>
             </div>
             <div className="p-6 pt-0">
               {user.permissions && user.permissions.length > 0 ? (
@@ -324,7 +321,7 @@ export default function UserDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Account Status</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Account Status</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center text-sm">

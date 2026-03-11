@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, FileTextOutlined, DollarOutlined, CalendarOutlined, TeamOutlined, PhoneOutlined, ReloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Button, Input, Spin, Tag } from 'antd';
+import { Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractDetailResponse } from '@/types/api';
 
 export default function ContractDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const contractId = params.id as string;
 
@@ -30,6 +30,7 @@ export default function ContractDetailPage() {
       setContract(data);
     } catch (error) {
       console.error('Failed to load contract:', error);
+      message.error('Failed to load contract');
     } finally {
       setLoading(false);
     }
@@ -47,6 +48,7 @@ export default function ContractDetailPage() {
       loadContract();
     } catch (error) {
       console.error('Failed to renew contract:', error);
+      message.error('Failed to renew contract');
     } finally {
       setProcessing(false);
     }
@@ -60,12 +62,42 @@ export default function ContractDetailPage() {
       loadContract();
     } catch (error) {
       console.error('Failed to cancel contract:', error);
+      message.error('Failed to cancel contract');
     } finally {
       setProcessing(false);
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+        <div className="h-8 w-56 bg-gray-100 rounded-lg animate-pulse" />
+        <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="glass-card p-5">
+            <div className="h-3 w-16 bg-gray-50 rounded animate-pulse mb-3" />
+            <div className="h-7 w-20 bg-gray-100 rounded-lg animate-pulse" />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[1, 2].map((i) => (
+          <div key={i} className="glass-card p-6 space-y-3">
+            <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="flex justify-between">
+                <div className="h-4 w-24 bg-gray-50 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
   if (!contract) return <div className="p-6">Contract not found</div>;
 
   const statusColor = CONTRACT_STATUS_COLORS[contract.status] || 'bg-gray-100 text-gray-800';
@@ -73,26 +105,24 @@ export default function ContractDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+      <div className="page-header">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button size="small" type="text" onClick={() => router.push('/owner/contracts')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
-          <FileTextOutlined style={{ fontSize: 24, color: '#2563eb' }} />
-          <h1 className="text-3xl font-bold gradient-text">{contract.name}</h1>
           <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
         </div>
         <div className="flex gap-2">
           {contract.status === 'active' && (
             <>
-              <Button type="default"  onClick={() => setShowRenew(true)}>
+              <Button type="default" onClick={() => setShowRenew(true)}>
                 <ReloadOutlined style={{ marginRight: 8 }} />
-                Renew
+                <span className="hidden sm:inline">Renew</span>
               </Button>
-              <Button type="primary" danger  onClick={handleCancel} disabled={processing}>
+              <Button type="primary" danger onClick={handleCancel} disabled={processing}>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
-                Cancel
+                <span className="hidden sm:inline">Cancel</span>
               </Button>
             </>
           )}
@@ -102,38 +132,36 @@ export default function ContractDetailPage() {
       {showRenew && (
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Renew Contract</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">Renew Contract</h3>
           </div>
           <div className="p-6 pt-0 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">New End Date *</label>
-                <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} required />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">New End Date *</label>
+                <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} required size="large" />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">New Amount (optional)</label>
-                <Input type="number" value={renewAmount} onChange={(e) => setRenewAmount(e.target.value)} placeholder="Keep current" />
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">New Amount (optional)</label>
+                <Input type="number" value={renewAmount} onChange={(e) => setRenewAmount(e.target.value)} placeholder="Keep current" size="large" />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleRenew} disabled={processing || !renewDate}>
-                {processing ? 'Renewing...' : 'Confirm Renewal'}
-              </Button>
-              <Button type="default"  onClick={() => setShowRenew(false)}>Cancel</Button>
+            <div className="flex gap-2 pt-3 border-t border-gray-100">
+              <Button type="primary" onClick={handleRenew} loading={processing} disabled={!renewDate}>Confirm Renewal</Button>
+              <Button type="default" onClick={() => setShowRenew(false)}>Cancel</Button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Amount</p>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
+            <p className="text-sm text-gray-400">Amount</p>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
               <DollarOutlined style={{ fontSize: 20, color: '#16a34a' }} />
-              <span className="text-2xl font-bold">{contract.price}</span>
+              <span className="text-xl sm:text-2xl font-bold">{contract.price}</span>
             </div>
             <p className="text-xs text-gray-500">
               {contract.currency} / {BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase()}
@@ -142,37 +170,37 @@ export default function ContractDetailPage() {
         </div>
 
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Days Remaining</p>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
+            <p className="text-sm text-gray-400">Days Remaining</p>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
               <CalendarOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.days_until_expiry ?? '\u2014'}</span>
+              <span className="text-xl sm:text-2xl font-bold">{contract.days_until_expiry ?? '\u2014'}</span>
             </div>
           </div>
         </div>
 
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Users</p>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
+            <p className="text-sm text-gray-400">Users</p>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
               <TeamOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.current_admins + contract.current_managers + contract.current_operators} / {contract.max_admins + contract.max_managers + contract.max_operators}</span>
+              <span className="text-xl sm:text-2xl font-bold">{contract.current_admins + contract.current_managers + contract.current_operators} / {contract.max_admins + contract.max_managers + contract.max_operators}</span>
             </div>
           </div>
         </div>
 
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Storage</p>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
+            <p className="text-sm text-gray-400">Storage</p>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
               <PhoneOutlined style={{ fontSize: 20 }} />
-              <span className="text-2xl font-bold">{contract.max_storage_gb} GB</span>
+              <span className="text-xl sm:text-2xl font-bold">{contract.max_storage_gb} GB</span>
             </div>
           </div>
         </div>
@@ -180,10 +208,10 @@ export default function ContractDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Contract Details</h3>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6">
+            <h3 className="text-base font-semibold leading-none tracking-tight">Contract Details</h3>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Company</span>
@@ -218,10 +246,10 @@ export default function ContractDetailPage() {
         </div>
 
         <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Payment Info</h3>
+          <div className="flex flex-col space-y-1.5 p-4 sm:p-6">
+            <h3 className="text-base font-semibold leading-none tracking-tight">Payment Info</h3>
           </div>
-          <div className="p-6 pt-0">
+          <div className="p-4 sm:p-6 pt-0">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Next Payment</span>

@@ -36,7 +36,7 @@ export default function InviteUserPage() {
       });
       router.push('/users');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to invite user');
+      setError(getErrorMessage(err, 'Failed to invite user'));
     } finally {
       setIsLoading(false);
     }
@@ -44,22 +44,22 @@ export default function InviteUserPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link href="/users">
-          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
-            <ArrowLeftOutlined />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Invite User</h1>
-          <p className="text-gray-500">Send an invitation to join your team</p>
+      <div className="page-header">
+        <div className="flex items-center gap-4">
+          <Link href="/users">
+            <Button size="small" type="text">
+              <ArrowLeftOutlined style={{ marginRight: 4 }} />
+              Back
+            </Button>
+          </Link>
+          <p className="page-subtitle">Send an invitation to join your team</p>
         </div>
       </div>
 
-      <div className="glass-card p-0 max-w-2xl">
+      <div className="glass-card p-0 max-w-3xl mx-auto">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">User Information</h3>
-          <p className="text-sm text-muted-foreground">Enter the details for the new team member</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">User Information</h3>
+          <p className="text-sm text-gray-400">Enter the details for the new team member</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -67,7 +67,7 @@ export default function InviteUserPage() {
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="first_name" className="text-sm font-medium">First Name *</label>
                 <Input
@@ -126,7 +126,7 @@ export default function InviteUserPage() {
             </div>
 
             <div className="flex space-x-3">
-              <Button htmlType="submit" disabled={isLoading}>
+              <Button type="primary" htmlType="submit" disabled={isLoading}>
                 {isLoading ? 'Sending...' : 'Send Invitation'}
               </Button>
               <Link href="/users">

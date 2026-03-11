@@ -3,10 +3,17 @@
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import { Alert, Button, Input, Spin } from 'antd';
+import { Alert, Button, Input, message as antMessage } from 'antd';
 import type { UserResponse } from '@/types/api';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+const ROLE_LABELS: Record<string, string> = {
+  company_admin: 'Admin',
+  company_manager: 'Manager',
+  company_operator: 'Operator',
+  owner: 'Owner',
+};
 
 export default function ProfilePage() {
   const { user, setUser } = useAuthStore();
@@ -46,6 +53,7 @@ export default function ProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
+      antMessage.error('Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -111,16 +119,37 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="h-8 w-32 bg-gray-100 rounded-lg animate-pulse" />
+      {[1, 2].map((i) => (
+        <div key={i} className="glass-card p-6 space-y-4">
+          <div className="h-5 w-40 bg-gray-100 rounded animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="space-y-2">
+                <div className="h-3 w-20 bg-gray-50 rounded animate-pulse" />
+                <div className="h-10 bg-gray-50 rounded-lg animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <h1 className="text-3xl font-bold gradient-text">My Profile</h1>
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="page-header">
+        <div>
+          <p className="page-subtitle">Update your personal details and password</p>
+        </div>
+      </div>
 
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Personal Information</h3>
-          <p className="text-sm text-muted-foreground">Update your personal details</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">Personal Information</h3>
+          <p className="text-sm text-gray-400">Update your personal details</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleSaveProfile} className="space-y-4">
@@ -130,7 +159,7 @@ export default function ProfilePage() {
             {error && (
               <Alert type="error" message={error} showIcon className="!rounded-xl" />
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">First Name</label>
                 <Input
@@ -160,9 +189,9 @@ export default function ProfilePage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Role</label>
-              <Input value={profile?.role || ''} disabled />
+              <Input value={ROLE_LABELS[profile?.role || ''] || profile?.role || ''} disabled />
             </div>
-            <Button htmlType="submit" disabled={saving}>
+            <Button type="primary" htmlType="submit" disabled={saving}>
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
@@ -171,8 +200,8 @@ export default function ProfilePage() {
 
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
-          <p className="text-sm text-muted-foreground">Update your password</p>
+          <h3 className="text-base font-semibold leading-none tracking-tight">Change Password</h3>
+          <p className="text-sm text-gray-400">Update your password</p>
         </div>
         <div className="p-6 pt-0">
           <form onSubmit={handleChangePassword} className="space-y-4">
@@ -199,7 +228,7 @@ export default function ProfilePage() {
                 onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
                 required
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-400">
                 At least 8 characters, one uppercase letter, and one number
               </p>
             </div>
@@ -212,7 +241,7 @@ export default function ProfilePage() {
                 required
               />
             </div>
-            <Button htmlType="submit" disabled={changingPassword}>
+            <Button type="primary" htmlType="submit" disabled={changingPassword}>
               {changingPassword ? 'Changing...' : 'Change Password'}
             </Button>
           </form>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, CheckOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select, Spin, Tag } from 'antd';
+import { Alert, Button, Input, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function TaskDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const id = params.id as string;
 
@@ -67,7 +67,9 @@ export default function TaskDetailPage() {
     try {
       const result = await apiClient.getUsers({});
       setUsers(result.users || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load users');
+    }
   };
 
   const handleSave = async () => {
@@ -116,7 +118,39 @@ export default function TaskDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+          <div className="h-8 w-56 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 glass-card p-6 space-y-4">
+            <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${75 - i * 15}%` }} />
+            ))}
+          </div>
+          <div className="space-y-6">
+            <div className="glass-card p-6 space-y-3">
+              <div className="h-5 w-24 bg-gray-100 rounded animate-pulse" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex justify-between">
+                  <div className="h-4 w-16 bg-gray-50 rounded animate-pulse" />
+                  <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+            <div className="glass-card p-6 space-y-3">
+              <div className="h-5 w-20 bg-gray-100 rounded animate-pulse" />
+              <div className="h-9 bg-gray-50 rounded-lg animate-pulse" />
+              <div className="h-9 bg-gray-50 rounded-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!task) {
@@ -129,20 +163,19 @@ export default function TaskDetailPage() {
         <Alert type="error" message={error} showIcon closable onClose={() => setError('')} className="!rounded-xl" />
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="page-header">
+        <div className="flex items-center gap-4 flex-wrap">
           <Link href="/tasks">
             <Button size="small" type="text">
               <ArrowLeftOutlined style={{ marginRight: 4 }} />
               Back
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold gradient-text">{task.title}</h1>
           {task.status && (
             <Tag color={statusColors[task.status] || 'default'}>{task.status.replace('_', ' ')}</Tag>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {!editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
@@ -156,27 +189,27 @@ export default function TaskDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Task Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Task Details</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Title</label>
+                    <label className="text-sm font-medium text-gray-700">Title</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Description</label>
+                    <label className="text-sm font-medium text-gray-700">Description</label>
                     <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Priority</label>
+                    <label className="text-sm font-medium text-gray-700">Priority</label>
                     <Select
                       value={editForm.priority}
                       onChange={(val) => setEditForm({ ...editForm, priority: val })}
@@ -191,7 +224,7 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Due Date</label>
+                    <label className="text-sm font-medium text-gray-700">Due Date</label>
                     <Input
                       type="datetime-local"
                       value={editForm.due_date}
@@ -199,7 +232,7 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Assigned To</label>
+                    <label className="text-sm font-medium text-gray-700">Assigned To</label>
                     <Select
                       allowClear
                       style={{ width: '100%' }}
@@ -213,7 +246,7 @@ export default function TaskDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Entity Type</label>
+                    <label className="text-sm font-medium text-gray-700">Entity Type</label>
                     <Select
                       value={editForm.entity_type}
                       onChange={(val) => setEditForm({ ...editForm, entity_type: val })}
@@ -228,7 +261,7 @@ export default function TaskDetailPage() {
                   </div>
                   {editForm.entity_type && (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} ID</label>
+                      <label className="text-sm font-medium text-gray-700">{editForm.entity_type.charAt(0).toUpperCase() + editForm.entity_type.slice(1)} ID</label>
                       <Input
                         value={editForm.entity_id}
                         onChange={(e) => setEditForm({ ...editForm, entity_id: e.target.value })}
@@ -236,15 +269,9 @@ export default function TaskDetailPage() {
                       />
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave} disabled={saving}>
-                      <SaveOutlined style={{ marginRight: 8 }} />
-                      {saving ? 'Saving...' : 'Save'}
-                    </Button>
-                    <Button type="default"  onClick={() => { setEditing(false); loadTask(); }}>
-                      <CloseOutlined style={{ marginRight: 8 }} />
-                      Cancel
-                    </Button>
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>Save</Button>
+                    <Button type="default" onClick={() => { setEditing(false); loadTask(); }} icon={<CloseOutlined />}>Cancel</Button>
                   </div>
                 </div>
               ) : (
@@ -278,7 +305,7 @@ export default function TaskDetailPage() {
           {task.entity_type && task.entity_id && (
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Linked Entity</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight">Linked Entity</h3>
               </div>
               <div className="p-6 pt-0">
                 <div className="flex items-center gap-3">
@@ -298,7 +325,7 @@ export default function TaskDetailPage() {
         <div className="space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Summary</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Summary</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between items-center">
@@ -343,7 +370,7 @@ export default function TaskDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Actions</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Actions</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <Button type="default"

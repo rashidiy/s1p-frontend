@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input, Spin, Button, Tag, Select, Pagination, Checkbox } from 'antd';
+import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, message } from 'antd';
+import dayjs from 'dayjs';
 import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
@@ -51,7 +52,7 @@ export default function CallsPage() {
     try {
       const result = await apiClient.getCallHistory({ page, page_size: 20, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load call history:', error); }
+    } catch (error) { console.error('Failed to load call history:', error); message.error('Failed to load call history'); }
     finally { setLoading(false); }
   };
 
@@ -61,6 +62,7 @@ export default function CallsPage() {
       window.open(blobUrl, '_blank');
     } catch (err) {
       console.error('Failed to load recording:', err);
+      message.error('Failed to load recording');
     }
   };
 
@@ -79,13 +81,10 @@ export default function CallsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold gradient-text">Call History</h1>
-        <p className="text-gray-500">View and filter call records</p>
-      </div>
+      <p className="page-subtitle">View and filter call records</p>
 
       <div className="glass-card p-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="text-xs text-gray-500 block mb-1">Direction</label>
             <Select value={direction || undefined} onChange={(v) => { setDirection(v || ''); setPage(1); }} placeholder="All" allowClear style={{ width: '100%' }}
@@ -98,65 +97,83 @@ export default function CallsPage() {
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">From</label>
-            <Input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} />
+            <DatePicker className="w-full" format="YYYY-MM-DD" value={dateFrom ? dayjs(dateFrom) : null} onChange={(date) => { setDateFrom(date ? date.format('YYYY-MM-DD') : ''); setPage(1); }} />
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">To</label>
-            <Input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} />
+            <DatePicker className="w-full" format="YYYY-MM-DD" value={dateTo ? dayjs(dateTo) : null} onChange={(date) => { setDateTo(date ? date.format('YYYY-MM-DD') : ''); setPage(1); }} />
           </div>
-          <div className="flex items-end">
-            <Checkbox checked={myCalls} onChange={(e) => { setMyCalls(e.target.checked); setPage(1); }}>My Calls Only</Checkbox>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Filter</label>
+            <Checkbox checked={myCalls} onChange={(e) => { setMyCalls(e.target.checked); setPage(1); }} className="mt-1">My Calls Only</Checkbox>
           </div>
         </div>
       </div>
 
       <div className="glass-card p-0 overflow-hidden">
         {loading ? (
-          <div className="p-8 flex justify-center"><Spin size="large" /></div>
+          <div className="divide-y divide-gray-100">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="w-5 h-5 bg-gray-100 rounded animate-pulse shrink-0" />
+                  <div>
+                    <div className="h-4 w-48 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-3 w-36 bg-gray-50 rounded mt-1.5 animate-pulse" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pl-8 sm:pl-0">
+                  <div className="h-7 w-32 bg-gray-50 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : data && data.items.length > 0 ? (
           <div className="divide-y divide-gray-100">
             {data.items.map((call) => (
-              <div key={call.id} className="flex items-center justify-between p-4 hover:bg-white/50 transition-colors cursor-pointer" onClick={() => router.push(`/calls/${call.id}`)}>
-                <div className="flex items-center gap-4">
-                  {getDirectionIcon(call.direction)}
-                  <div>
+              <div key={call.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3 hover:bg-white/50 transition-colors cursor-pointer" onClick={() => router.push(`/calls/${call.id}`)}>
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+                  <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction)}</span>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{call.phone_1 || 'Unknown'} &rarr; {call.phone_2 || 'Unknown'}</span>
+                      <span className="font-medium text-sm sm:text-base">{call.phone_1 || 'Unknown'} &rarr; {call.phone_2 || 'Unknown'}</span>
                       {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_LABELS[call.direction] || call.direction}</Tag>}
                       {call.state && <Tag>{CALL_STATUS_LABELS[call.state] || call.state}</Tag>}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1 flex-wrap">
                       <span>{new Date(call.created_at).toLocaleString()}</span>
                       {call.billing_sec != null && <span className="flex items-center gap-1"><ClockCircleOutlined /> {formatDuration(call.billing_sec)}</span>}
-                      {(call as any).outcome && <Tag className="!text-xs">{(call as any).outcome}</Tag>}
+                      {call.outcome && <Tag className="!text-xs">{call.outcome}</Tag>}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 pl-8 sm:pl-0 shrink-0">
                   <Select
                     size="small"
                     placeholder="Set outcome..."
-                    value={(call as any).outcome || undefined}
-                    style={{ width: 160 }}
+                    value={call.outcome || undefined}
+                    className="w-[140px] sm:w-[160px]"
                     onClick={(e) => e.stopPropagation()}
                     onChange={async (value) => {
                       try {
                         await apiClient.setCallOutcome(String(call.id), { outcome: value });
                         loadCallHistory();
-                      } catch (err) { console.error(err); }
+                      } catch (err) { console.error(err); message.error('Failed to set call outcome'); }
                     }}
                     options={OUTCOME_OPTIONS}
                   />
-                  {(call as any).record_url && <Button type="text" icon={<PlayCircleOutlined />} onClick={(e) => { e.stopPropagation(); handlePlayRecording(String(call.id)); }} />}
+                  {call.has_recording && <Button type="text" icon={<PlayCircleOutlined />} onClick={(e) => { e.stopPropagation(); handlePlayRecording(String(call.id)); }} />}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="py-12 flex flex-col items-center justify-center">
-            <EmptyStateCharacter width={150} height={150} />
-            <p className="mt-4 text-lg font-medium text-gray-700">No calls found</p>
-            <p className="text-sm text-gray-500">Try adjusting your filters</p>
+          <div className="py-16 flex flex-col items-center justify-center">
+            <EmptyStateCharacter width={160} height={160} variant="no-calls" />
+            <h3 className="mt-5 text-lg font-semibold text-gray-800">No calls found</h3>
+            <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+              Calls will appear here as they come in. Try adjusting your filters if you expected results.
+            </p>
           </div>
         )}
       </div>

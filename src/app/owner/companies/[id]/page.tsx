@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAddOutlined, SaveOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Spin, Tag } from 'antd';
+import { Alert, Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import type { CompanyDetailResponse, UserResponse } from '@/types/api';
 
 export default function CompanyDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const companyId = params.id as string;
 
@@ -39,6 +39,7 @@ export default function CompanyDetailPage() {
       setEditForm({ name: data.name });
     } catch (error) {
       console.error('Failed to load company:', error);
+      message.error('Failed to load company');
     } finally {
       setLoading(false);
     }
@@ -51,6 +52,7 @@ export default function CompanyDetailPage() {
       loadCompany();
     } catch (error) {
       console.error('Failed to update company:', error);
+      message.error('Failed to update company');
     }
   };
 
@@ -65,6 +67,7 @@ export default function CompanyDetailPage() {
       loadCompany();
     } catch (error) {
       console.error('Failed to toggle company status:', error);
+      message.error('Failed to toggle company status');
     }
   };
 
@@ -89,29 +92,47 @@ export default function CompanyDetailPage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+        <div className="h-6 w-6 bg-gray-100 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+        <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {[1, 2].map((i) => (
+          <div key={i} className="glass-card p-6 space-y-4">
+            <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="flex justify-between py-1.5">
+                <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+                <div className="h-4 w-28 bg-gray-50 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
   if (!company) return <div className="p-6">Company not found</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+      <div className="page-header">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button size="small" type="text" onClick={() => router.push('/owner/companies')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
-          <div className="flex items-center gap-3">
-            <BankOutlined style={{ fontSize: 24, color: '#2563eb' }} />
-            <h1 className="text-3xl font-bold gradient-text">{company.name}</h1>
-          </div>
           <Tag color={company.is_active ? 'blue' : undefined}>
             {company.is_active ? 'Active' : 'Inactive'}
           </Tag>
         </div>
         <div className="flex gap-2">
-          <Button type="default"  onClick={() => setShowInvite(true)}>
+          <Button type="default" onClick={() => setShowInvite(true)}>
             <UserAddOutlined style={{ marginRight: 8 }} />
-            Invite Admin
+            <span className="hidden sm:inline">Invite Admin</span>
           </Button>
           <Button type="primary" danger={company.is_active}
             onClick={handleToggleActive}>
@@ -132,51 +153,55 @@ export default function CompanyDetailPage() {
       )}
 
       {showInvite && (
-        <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Invite Company Admin</h3>
-            <p className="text-sm text-muted-foreground">Send an invitation to a new admin for this company</p>
+        <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
+            <h3 className="text-base font-semibold text-gray-900">Invite Company Admin</h3>
+            <p className="text-sm text-gray-400 mt-0.5">Send an invitation to a new admin for this company</p>
           </div>
-          <div className="p-6 pt-0">
+          <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
             <form onSubmit={handleInviteAdmin} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">Email <span className="text-red-400">*</span></label>
                   <Input
                     type="email"
                     value={inviteForm.email}
                     onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
                     required
+                    size="large"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">First Name *</label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">First Name <span className="text-red-400">*</span></label>
                   <Input
                     value={inviteForm.first_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, first_name: e.target.value })}
                     required
+                    size="large"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Last Name</label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">Last Name</label>
                   <Input
                     value={inviteForm.last_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, last_name: e.target.value })}
+                    size="large"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone</label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">Phone</label>
                   <Input
                     value={inviteForm.phone}
                     onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
+                    size="large"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button htmlType="submit" disabled={inviting}>
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <Button type="primary" htmlType="submit" loading={inviting}>
                   {inviting ? 'Inviting...' : 'Send Invite'}
                 </Button>
-                <Button type="default"  htmlType="button" onClick={() => setShowInvite(false)}>
+                <Button htmlType="button" onClick={() => setShowInvite(false)}>
                   Cancel
                 </Button>
               </div>
@@ -185,103 +210,93 @@ export default function CompanyDetailPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Company Details</h3>
-              {!editing && (
-                <Button size="small" type="text"   onClick={() => setEditing(true)}>
-                  <EditOutlined />
-                </Button>
-              )}
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-gray-900">Company Details</h3>
+            {!editing && (
+              <Button size="small" type="text" icon={<EditOutlined />} onClick={() => setEditing(true)} />
+            )}
           </div>
-          <div className="p-6 pt-0">
+          <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
             {editing ? (
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Company Name</label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">Company Name</label>
                   <Input
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    size="large"
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleSave}>
-                    <SaveOutlined style={{ marginRight: 8 }} />
-                    Save
-                  </Button>
-                  <Button type="default"  onClick={() => setEditing(false)}>
-                    <CloseOutlined style={{ marginRight: 8 }} />
-                    Cancel
-                  </Button>
+                  <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>Save</Button>
+                  <Button icon={<CloseOutlined />} onClick={() => setEditing(false)}>Cancel</Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Name</span>
-                  <span className="font-medium">{company.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Subdomain</span>
-                  <span className="font-medium">{company.subdomain || '-'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Provider</span>
-                  <span className="font-medium uppercase">{company.provider_type}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Status</span>
-                  <Tag color={company.is_active ? 'blue' : undefined}>
+              <div className="space-y-3">
+                {[
+                  { label: 'Name', value: company.name },
+                  { label: 'Subdomain', value: company.subdomain || '-' },
+                  { label: 'Provider', value: company.provider_type?.toUpperCase() },
+                  { label: 'Created', value: new Date(company.created_at).toLocaleDateString() },
+                ].map((row) => (
+                  <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                    <span className="text-sm text-gray-400">{row.label}</span>
+                    <span className="text-sm font-medium text-gray-900">{row.value}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center py-1.5">
+                  <span className="text-sm text-gray-400">Status</span>
+                  <Tag color={company.is_active ? 'green' : 'default'}>
                     {company.is_active ? 'Active' : 'Inactive'}
                   </Tag>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Created</span>
-                  <span>{new Date(company.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="glass-card p-0">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Provider Configuration</h3>
+        <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
+            <h3 className="text-base font-semibold text-gray-900">Provider Configuration</h3>
           </div>
-          <div className="p-6 pt-0">
-            <div className="space-y-3 text-sm">
-              {Object.entries(company.provider_config || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between">
-                  <span className="text-gray-500">{key}</span>
-                  <span className="font-medium font-mono text-xs">
-                    {typeof value === 'string' ? value : JSON.stringify(value)}
-                  </span>
-                </div>
-              ))}
-              {Object.keys(company.provider_config || {}).length === 0 && (
-                <p className="text-gray-500">No provider configuration</p>
-              )}
-            </div>
+          <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
+            {Object.keys(company.provider_config || {}).length > 0 ? (
+              <div className="space-y-3">
+                {Object.entries(company.provider_config || {}).map(([key, value]) => (
+                  <div key={key} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                    <span className="text-sm text-gray-400">{key}</span>
+                    <code className="text-xs font-mono bg-gray-50 text-gray-600 px-2 py-1 rounded-lg">
+                      {typeof value === 'string' ? value : JSON.stringify(value)}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">No provider configuration</p>
+            )}
           </div>
         </div>
 
         {company.webhook_url && (
-          <div className="glass-card p-0 lg:col-span-2">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Webhook</h3>
+          <div className="glass-card overflow-hidden lg:col-span-2">
+            <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
+              <h3 className="text-base font-semibold text-gray-900">Webhook</h3>
             </div>
-            <div className="p-6 pt-0 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">URL</span>
-                <span className="font-mono text-xs">{company.webhook_url}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Token</span>
-                <span className="font-mono text-xs">{company.webhook_token}</span>
-              </div>
+            <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3 space-y-3">
+              {[
+                { label: 'URL', value: company.webhook_url },
+                { label: 'Token', value: company.webhook_token },
+              ].map((row) => (
+                <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-400">{row.label}</span>
+                  <code className="text-xs font-mono bg-gray-50 text-gray-600 px-2 py-1 rounded-lg max-w-md truncate">
+                    {row.value}
+                  </code>
+                </div>
+              ))}
             </div>
           </div>
         )}

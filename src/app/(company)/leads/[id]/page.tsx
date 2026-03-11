@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
-import { Button, Input, Spin, Tag } from 'antd';
+import { Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
 import type { LeadResponse, NoteResponse } from '@/types/api';
 
 export default function LeadDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const { hasPermissionString } = useAuthStore();
   const leadId = params.id as string;
@@ -45,6 +45,7 @@ export default function LeadDetailPage() {
       });
     } catch (error) {
       console.error('Failed to load lead:', error);
+      message.error('Failed to load lead');
     } finally {
       setLoading(false);
     }
@@ -56,6 +57,7 @@ export default function LeadDetailPage() {
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
+      message.error('Failed to load notes');
     }
   };
 
@@ -71,6 +73,7 @@ export default function LeadDetailPage() {
       loadLead();
     } catch (error) {
       console.error('Failed to update lead:', error);
+      message.error('Failed to update lead');
     }
   };
 
@@ -82,6 +85,7 @@ export default function LeadDetailPage() {
       loadLead();
     } catch (error) {
       console.error('Failed to convert lead:', error);
+      message.error('Failed to convert lead');
     } finally {
       setConverting(false);
     }
@@ -99,6 +103,7 @@ export default function LeadDetailPage() {
       loadNotes();
     } catch (error) {
       console.error('Failed to add note:', error);
+      message.error('Failed to add note');
     }
   };
 
@@ -109,26 +114,51 @@ export default function LeadDetailPage() {
       router.push('/leads');
     } catch (error) {
       console.error('Failed to delete lead:', error);
+      message.error('Failed to delete lead');
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+        <div className="h-8 w-56 bg-gray-100 rounded-lg animate-pulse" />
+        <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass-card p-6 space-y-4">
+          <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${80 - i * 15}%` }} />
+          ))}
+        </div>
+        <div className="glass-card p-6 space-y-3">
+          <div className="h-5 w-20 bg-gray-100 rounded animate-pulse" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex justify-between">
+              <div className="h-4 w-16 bg-gray-50 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-50 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
   if (!lead) return <div className="p-6">Lead not found</div>;
 
   const statusColor = LEAD_STATUS_COLORS[lead.status?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+      <div className="page-header">
+        <div className="flex items-center gap-4 flex-wrap">
+          <Button size="small" type="text"   onClick={() => router.push('/leads')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
-          <h1 className="text-3xl font-bold gradient-text">{lead.title}</h1>
           {lead.status && <Tag className={statusColor}>{lead.status}</Tag>}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {lead.status !== 'converted' && hasPermissionString('leads.write') && (
             <Button onClick={handleConvert} disabled={converting}>
               <RightCircleOutlined style={{ marginRight: 8 }} />
@@ -153,51 +183,32 @@ export default function LeadDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Lead Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Lead Information</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Title</label>
-                    <Input
-                      value={editForm.title}
-                      onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Title</label>
+                    <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} size="large" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Description</label>
-                    <Input.TextArea
-                      value={editForm.description}
-                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                    />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Description</label>
+                    <Input.TextArea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={3} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Estimated Value</label>
-                      <Input
-                        type="number"
-                        value={editForm.estimated_value}
-                        onChange={(e) => setEditForm({ ...editForm, estimated_value: e.target.value })}
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-700">Estimated Value</label>
+                      <Input type="number" value={editForm.estimated_value} onChange={(e) => setEditForm({ ...editForm, estimated_value: e.target.value })} size="large" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Source</label>
-                      <Input
-                        value={editForm.source}
-                        onChange={(e) => setEditForm({ ...editForm, source: e.target.value })}
-                      />
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-700">Source</label>
+                      <Input value={editForm.source} onChange={(e) => setEditForm({ ...editForm, source: e.target.value })} size="large" />
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave}>
-                      <SaveOutlined style={{ marginRight: 8 }} />
-                      Save
-                    </Button>
-                    <Button type="default"  onClick={() => setEditing(false)}>
-                      <CloseOutlined style={{ marginRight: 8 }} />
-                      Cancel
-                    </Button>
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>Save</Button>
+                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>Cancel</Button>
                   </div>
                 </div>
               ) : (
@@ -246,7 +257,7 @@ export default function LeadDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Notes</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
@@ -279,7 +290,7 @@ export default function LeadDetailPage() {
         <div>
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Details</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">

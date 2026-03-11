@@ -22,10 +22,13 @@ export default function NewCompanyPage() {
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
     const subdomain = formData.get('subdomain') as string;
-    const providerConfig = formData.get('provider_config') as string;
+    const cabinetId = formData.get('cabinet_id') as string;
+    const securityKey = formData.get('security_key') as string;
 
     try {
-      const config = providerConfig ? JSON.parse(providerConfig) : {};
+      const config: Record<string, string> = {};
+      if (cabinetId) config.cabinet_id = cabinetId;
+      if (securityKey) config.security_key = securityKey;
       await apiClient.createCompany({
         name,
         subdomain: subdomain || null,
@@ -42,85 +45,97 @@ export default function NewCompanyPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link href="/owner/companies">
-          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
-            <ArrowLeftOutlined />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Add New Company</h1>
-          <p className="text-gray-500">Register a new company on the platform</p>
+      <div className="page-header">
+        <div className="flex items-center gap-3">
+          <Link href="/owner/companies">
+            <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
+              <ArrowLeftOutlined />
+            </Button>
+          </Link>
+          <p className="page-subtitle">Register a new company on the platform</p>
         </div>
       </div>
 
-      <div className="glass-card p-0 max-w-2xl">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Company Information</h3>
-          <p className="text-sm text-muted-foreground">Enter the details for the new company</p>
+      <div className="glass-card max-w-2xl sm:mx-auto overflow-hidden">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-2">
+          <h3 className="text-lg font-semibold text-gray-900">Company Information</h3>
+          <p className="text-sm text-gray-400 mt-0.5">Enter the details for the new company</p>
         </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" />
+              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">Company Name *</label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Acme Corp"
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="subdomain" className="text-sm font-medium">Subdomain</label>
-              <Input
-                id="subdomain"
-                name="subdomain"
-                type="text"
-                placeholder="acme"
-                disabled={isLoading}
-              />
-              <p className="text-xs text-gray-500">
-                Optional: Custom subdomain for the company
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="provider_type" className="text-sm font-medium">Provider Type *</label>
-              <Select
-                  value={providerType}
-                  onChange={setProviderType}
-                  style={{ width: "100%" }}
-                  options={[{ value: "sipuni", label: "SIPUNI" }, { value: "binotel", label: "Binotel" }]}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-sm font-medium text-gray-700">Company Name <span className="text-red-400">*</span></label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Acme Corp"
+                  required
+                  size="large"
+                  disabled={isLoading}
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="subdomain" className="text-sm font-medium text-gray-700">Subdomain</label>
+                <Input
+                  id="subdomain"
+                  name="subdomain"
+                  type="text"
+                  placeholder="acme"
+                  size="large"
+                  disabled={isLoading}
+                  addonBefore={<span className="text-gray-400 text-xs">https://</span>}
+                  addonAfter={<span className="text-gray-400 text-xs">.s1p.uz</span>}
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="provider_config" className="text-sm font-medium">Provider Configuration</label>
-              <Input.TextArea
-                id="provider_config"
-                name="provider_config"
-                placeholder='{"api_key": "your-key", "account_id": "123"}'
-                rows={6}
-                disabled={isLoading}
+            <div className="space-y-1.5">
+              <label htmlFor="provider_type" className="text-sm font-medium text-gray-700">Provider Type <span className="text-red-400">*</span></label>
+              <Select
+                value={providerType}
+                onChange={setProviderType}
+                size="large"
+                style={{ width: "100%" }}
+                options={[{ value: "sipuni", label: "SIPUNI" }, { value: "binotel", label: "Binotel" }]}
               />
-              <p className="text-xs text-gray-500">
-                Enter provider-specific configuration as JSON
-              </p>
             </div>
 
-            <div className="flex space-x-3">
-              <Button htmlType="submit" disabled={isLoading}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label htmlFor="cabinet_id" className="text-sm font-medium text-gray-700">Cabinet ID</label>
+                <Input
+                  id="cabinet_id"
+                  name="cabinet_id"
+                  placeholder="12345"
+                  size="large"
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="security_key" className="text-sm font-medium text-gray-700">Security Key</label>
+                <Input.Password
+                  id="security_key"
+                  name="security_key"
+                  placeholder="your-secret-key"
+                  size="large"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" size="large" loading={isLoading}>
                 {isLoading ? 'Creating...' : 'Create Company'}
               </Button>
               <Link href="/owner/companies">
-                <Button type="default" htmlType="button"  disabled={isLoading}>
+                <Button size="large" disabled={isLoading}>
                   Cancel
                 </Button>
               </Link>

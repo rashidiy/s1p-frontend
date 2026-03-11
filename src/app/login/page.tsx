@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Input, Alert } from 'antd';
+import { LoginOutlined } from '@ant-design/icons';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -11,11 +12,41 @@ import { useAuthStore } from '@/store/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Handle owner impersonation token
+  useEffect(() => {
+    const impersonateToken = searchParams?.get('impersonate');
+    if (impersonateToken) {
+      apiClient.consumeImpersonationToken(impersonateToken);
+      // Load profile and redirect to dashboard
+      apiClient.getMyProfile().then((profile) => {
+        setUser({
+          id: profile.id,
+          email: profile.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          role: profile.role as any,
+          company_id: profile.company_id ?? undefined,
+          is_active: profile.is_active,
+          credentials: { access: impersonateToken },
+          permissions: profile.permissions,
+        }, 'company_user');
+        router.replace('/dashboard');
+      }).catch(() => {
+        setError('Impersonation token is invalid or expired');
+        // Clean up bad token
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_type');
+      });
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +74,11 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Enter your credentials to access your account">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthLayout title="Welcome back" subtitle="Enter your credentials to access your account" icon={<LoginOutlined style={{ fontSize: 28 }} />}>
+      <form onSubmit={handleSubmit} className="space-y-5">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium leading-none">Email</label>
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
           <Input
             id="email"
             type="email"
@@ -55,12 +86,13 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            size="large"
             className="glass-input"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium leading-none">Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
             <Link href="/forgot-password" className="text-sm text-crm-indigo-500 hover:underline">
               Forgot password?
             </Link>
@@ -71,12 +103,15 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            size="large"
             className="glass-input"
           />
         </div>
-        <Button type="primary" htmlType="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign in'}
-        </Button>
+        <div className="pt-1">
+          <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign in'}
+          </Button>
+        </div>
         <p className="text-sm text-center text-gray-500">
           Don&apos;t have an account?{' '}
           <Link href="/register" className="text-crm-indigo-500 hover:underline font-medium">

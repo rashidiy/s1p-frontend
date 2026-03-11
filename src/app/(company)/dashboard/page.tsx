@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Button, Spin } from 'antd';
+import { Button, message } from 'antd';
 import {
   PhoneOutlined,
   RiseOutlined,
@@ -80,6 +80,7 @@ export default function DashboardPage() {
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
+      message.error('Failed to load dashboard');
     } finally {
       setLoading(false);
     }
@@ -91,8 +92,37 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Spin size="large" />
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-1">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-9 w-20 bg-gray-100 rounded-lg animate-pulse" />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-28 bg-gray-100 rounded-lg animate-pulse hidden sm:block" />
+            <div className="h-9 w-20 bg-gray-100 rounded-lg animate-pulse" />
+          </div>
+        </div>
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="crm-card p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-4 bg-gray-50 rounded animate-pulse" />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gray-100 animate-pulse" />
+                <div className="h-7 w-12 bg-gray-100 rounded-lg animate-pulse" />
+              </div>
+              <div className="h-11 bg-gray-50 rounded animate-pulse" />
+              <div className="flex items-center justify-between border-t border-gray-100 pt-2.5">
+                <div className="h-3 w-20 bg-gray-50 rounded animate-pulse" />
+                <div className="h-3 w-16 bg-gray-50 rounded animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -129,26 +159,14 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Tab bar row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ display: 'flex', gap: 4 }}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-1 overflow-x-auto pb-1 -mb-1">
           {[{ key: 'overview', label: t('overview') }, { key: 'calls', label: t('totalCalls') }, { key: 'leads', label: t('totalLeads') }].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              className="shrink-0 px-4 py-2 text-sm font-medium rounded-lg border-none cursor-pointer transition-all"
               style={{
-                padding: '8px 16px',
-                fontSize: 14,
-                fontWeight: 500,
-                borderRadius: 8,
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
                 background: activeTab === tab.key ? '#E84040' : 'transparent',
                 color: activeTab === tab.key ? '#ffffff' : '#6B7280',
               }}
@@ -157,9 +175,10 @@ export default function DashboardPage() {
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="flex items-center gap-2">
           <Button
             icon={<PlusOutlined />}
+            className="!hidden sm:!inline-flex"
             style={{ borderColor: '#E5E7EB', color: '#374151', borderRadius: 8 }}
           >
             {tActions('addWidget')}
@@ -172,6 +191,7 @@ export default function DashboardPage() {
           </Button>
           <Button
             type="primary"
+            className="!hidden sm:!inline-flex"
             style={{ background: '#0F172A', borderColor: '#0F172A', borderRadius: 8 }}
           >
             {tActions('export')}
@@ -180,7 +200,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => {
           const { value, sub } = getStatValue(card.key);
           return (

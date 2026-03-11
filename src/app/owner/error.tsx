@@ -11,21 +11,23 @@ export default function OwnerPanelError({
   reset: () => void;
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px' }}>
-      <ErrorCharacter width={160} height={160} />
-      <h2 style={{ fontSize: '20px', fontWeight: 700, marginTop: '20px', color: '#1f2937' }}>
-        Something went wrong
-      </h2>
-      <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px', textAlign: 'center', maxWidth: '400px' }}>
-        There was an error loading this page. Please try again.
-      </p>
-      <Button
-        type="primary"
-        onClick={reset}
-        style={{ marginTop: '20px' }}
-      >
-        Try again
-      </Button>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
+      <div className="crm-card px-10 py-12 text-center max-w-sm w-full page-fade-in">
+        <ErrorCharacter width={140} height={140} className="mx-auto" />
+        <h2 className="text-xl font-bold text-gray-900 mt-5">
+          Something went wrong
+        </h2>
+        <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
+          There was an error loading this page. Please try again.
+        </p>
+        <Button
+          type="primary"
+          onClick={reset}
+          className="mt-5"
+        >
+          Try again
+        </Button>
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined } from '@ant-design/icons';
-import { Alert, Spin, Tabs } from 'antd';
+import { Alert, Spin, Tabs, message } from 'antd';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -75,6 +75,7 @@ export default function AnalyticsPage() {
       }
     } catch (error) {
       console.error('Failed to load dashboards:', error);
+      message.error('Failed to load dashboards');
     } finally {
       setLoading(false);
     }
@@ -102,6 +103,7 @@ export default function AnalyticsPage() {
 
       setChartData(prev => ({ ...prev, outcomeDistribution: outcomeData }));
     } catch {
+      message.error('Failed to load chart data');
       setChartData({
         callTrends: SAMPLE_TREND_DATA,
         teamPerformance: SAMPLE_TEAM_DATA,
@@ -113,7 +115,30 @@ export default function AnalyticsPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+    return (
+      <div className="space-y-6">
+        <div>
+          <div className="h-8 w-32 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-56 bg-gray-50 rounded animate-pulse mt-2" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass-card p-5">
+              <div className="h-3 w-20 bg-gray-50 rounded animate-pulse mb-3" />
+              <div className="h-7 w-12 bg-gray-100 rounded-lg animate-pulse" />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-card p-6">
+              <div className="h-5 w-36 bg-gray-100 rounded animate-pulse mb-4" />
+              <div className="h-[250px] bg-gray-50 rounded-lg animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   // Use this_month data for display
@@ -122,9 +147,10 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold gradient-text">Analytics</h1>
-        <p className="text-gray-500">Performance metrics and insights</p>
+      <div className="page-header">
+        <div>
+          <p className="page-subtitle">Performance metrics and insights</p>
+        </div>
       </div>
 
       <Alert
@@ -142,17 +168,17 @@ export default function AnalyticsPage() {
             key: 'my',
             label: 'My Performance',
             children: (<div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                 <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.calls.total_calls || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-400">
                   {myStats?.calls.answered_calls || 0} answered
                 </p>
               </div>
@@ -160,14 +186,14 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Leads</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Leads</h3>
                 <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.leads.total_leads || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-400">
                   {myStats?.leads.converted_leads || 0} converted
                 </p>
               </div>
@@ -175,7 +201,7 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Deals</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Deals</h3>
                 <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
@@ -190,25 +216,25 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-row items-center justify-between p-6 pb-2">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Tasks</h3>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Tasks</h3>
                 <CheckSquareOutlined style={{ color: 'var(--muted-foreground)' }} />
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
                   {myStats?.tasks.completed_tasks || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-400">
                   of {myStats?.tasks.total_tasks || 0} total
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Call Statistics</h3>
-                <p className="text-sm text-muted-foreground">Your calling performance</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">Call Statistics</h3>
+                <p className="text-sm text-gray-400">Your calling performance</p>
               </div>
               <div className="p-6 pt-0 space-y-3">
                 <div className="flex justify-between">
@@ -238,8 +264,8 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Performance Score</h3>
-                <p className="text-sm text-muted-foreground">Overall productivity</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">Performance Score</h3>
+                <p className="text-sm text-gray-400">Overall productivity</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="flex items-center justify-center py-6">
@@ -256,9 +282,9 @@ export default function AnalyticsPage() {
             </div>
           </div>
           {/* Charts Section */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Chart 1: Call Trends Line Chart */}
-            <div className="glass-card p-6 md:col-span-2">
+            <div className="glass-card p-6 lg:col-span-2">
               <h3 className="text-lg font-semibold gradient-text mb-4">Call Volume Trends</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[300px]"><Spin /></div>
@@ -332,17 +358,17 @@ export default function AnalyticsPage() {
             key: 'team',
             label: 'Team Overview',
             children: (<div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Members</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Team Members</h3>
                   <TeamOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.total_operators || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {teamStats?.active_operators || 0} active
                   </p>
                 </div>
@@ -350,14 +376,14 @@ export default function AnalyticsPage() {
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Total Calls</h3>
                   <PhoneOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.calls.total_calls || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {teamStats?.calls.answered_calls || 0} answered
                   </p>
                 </div>
@@ -365,14 +391,14 @@ export default function AnalyticsPage() {
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Team Leads</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Team Leads</h3>
                   <RiseOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     {teamStats?.leads.total_leads || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {teamStats?.leads.converted_leads || 0} converted
                   </p>
                 </div>
@@ -380,14 +406,14 @@ export default function AnalyticsPage() {
 
               <div className="glass-card p-0">
                 <div className="flex flex-row items-center justify-between p-6 pb-2">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-sm font-medium">Revenue</h3>
+                  <h3 className="text-base font-semibold leading-none tracking-tight text-sm font-medium">Revenue</h3>
                   <FundProjectionScreenOutlined style={{ color: 'var(--muted-foreground)' }} />
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
                     ${teamStats?.deals.total_value?.toLocaleString() || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {teamStats?.deals.won || 0} deals won
                   </p>
                 </div>
@@ -396,8 +422,8 @@ export default function AnalyticsPage() {
 
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Top Performers</h3>
-                <p className="text-sm text-muted-foreground">Operators ranked by performance</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight">Top Performers</h3>
+                <p className="text-sm text-gray-400">Operators ranked by performance</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="space-y-4">

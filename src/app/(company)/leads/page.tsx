@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Spin, Button, Tag, Select } from 'antd';
+import { Input, Pagination, Button, Tag, Select, message } from 'antd';
 import { PlusOutlined, UserOutlined, DollarOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { LeadResponse, PaginatedResponse } from '@/types/api';
@@ -25,30 +25,58 @@ export default function LeadsPage() {
     try {
       const result = await apiClient.getLeads({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load leads:', error); }
+    } catch (error) { console.error('Failed to load leads:', error); message.error('Failed to load leads'); }
     finally { setLoading(false); }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <div className="h-9 w-28 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="h-10 w-full md:max-w-lg bg-gray-50 rounded-lg animate-pulse" />
+        <div className="h-10 w-full sm:w-44 bg-gray-50 rounded-lg animate-pulse" />
+      </div>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="glass-card p-5 border-l-4 border-l-gray-100">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-24 bg-gray-50 rounded mt-2 animate-pulse" />
+              </div>
+              <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+              <div className="h-3 w-28 bg-gray-50 rounded animate-pulse" />
+              <div className="flex gap-2 pt-2">
+                <div className="h-8 flex-1 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="h-8 w-20 bg-gray-100 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Leads</h1>
-          <p className="text-gray-500">Manage your sales pipeline</p>
-        </div>
+      <div className="page-header">
         <Link href="/leads/new"><Button type="primary" icon={<PlusOutlined />}>Add Lead</Button></Link>
       </div>
+      <p className="page-subtitle">Manage your sales pipeline</p>
 
-      <div className="flex items-center gap-3">
-        <Input.Search placeholder="Search leads..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="max-w-lg" />
-        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder="All Statuses" allowClear style={{ width: 180 }} size="large"
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Input.Search placeholder="Search leads..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
+        <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder="All Statuses" allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: 'New', value: 'new' }, { label: 'Contacted', value: 'contacted' }, { label: 'Qualified', value: 'qualified' }, { label: 'Converted', value: 'converted' }, { label: 'Lost', value: 'lost' }]}
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {data?.items.map((lead) => (
           <div key={lead.id} className="glass-card p-5 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
@@ -65,7 +93,7 @@ export default function LeadsPage() {
               {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
               <div className="flex gap-2 pt-2">
                 <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>View</Button></Link>
-                {lead.status !== 'converted' && <Button type="primary" onClick={async () => { try { await apiClient.convertLead(lead.id, true); loadLeads(); } catch {} }}>Convert</Button>}
+                {lead.status !== 'converted' && <Button type="primary" onClick={async () => { try { await apiClient.convertLead(lead.id, true); loadLeads(); } catch (err) { message.error('Failed to convert lead'); } }}>Convert</Button>}
               </div>
             </div>
           </div>
@@ -75,10 +103,12 @@ export default function LeadsPage() {
       {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
 
       {data?.items.length === 0 && (
-        <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
-          <p className="mt-4 text-lg font-medium text-gray-700">No leads found</p>
-          <p className="text-sm text-gray-500">{search ? 'Try adjusting your search' : 'Get started by adding a lead'}</p>
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="no-results" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">No leads found</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search || status ? 'Try adjusting your filters' : 'Create your first lead to start tracking opportunities'}
+          </p>
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button, Input, Alert } from 'antd';
+import { KeyOutlined } from '@ant-design/icons';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 
@@ -29,12 +30,13 @@ export default function ForgotPasswordPage() {
     <AuthLayout
       title="Forgot Password"
       subtitle={submitted ? 'Check your email for instructions' : 'Enter your email to receive a password reset link'}
+      icon={<KeyOutlined style={{ fontSize: 28 }} />}
     >
       {submitted ? (
         <div className="space-y-4">
           <Alert
             type="success"
-            message="If an account with that email exists, we've sent password reset instructions."
+            title="If an account with that email exists, we've sent password reset instructions."
             showIcon
             className="!rounded-xl"
           />
@@ -45,9 +47,9 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium leading-none">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
             <Input
               id="email"
               type="email"
@@ -55,12 +57,15 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              size="large"
               className="glass-input"
             />
           </div>
-          <Button type="primary" htmlType="submit" className="w-full" disabled={loading}>
-            {loading ? 'Sending...' : 'Send Reset Instructions'}
-          </Button>
+          <div className="pt-1">
+            <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Reset Instructions'}
+            </Button>
+          </div>
           <div className="text-center">
             <Link href="/login" className="text-sm text-crm-indigo-500 hover:underline font-medium">
               Back to Login

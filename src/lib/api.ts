@@ -32,24 +32,39 @@ class ApiClient {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
+        const requestUrl = originalRequest?.url || '';
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Never attempt token refresh on auth endpoints — login/register 401s are
+        // expected "wrong credentials" responses, not expired sessions.
+        // Also skip for /me profile endpoints (used by initAuth — if that fails,
+        // the session is truly gone and we should just redirect to login).
+        const isAuthEndpoint = /\/(auth|owner\/auth)\/(login|register|set-password|forgot-password|reset-password|refresh|me)/.test(requestUrl);
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           originalRequest._retry = true;
 
           try {
-            // Try refresh — cookies carry the refresh token; localStorage is fallback for legacy sessions
-            // Use bare axios to avoid triggering this interceptor recursively
+            // Determine which refresh endpoint to use based on user type
+            const userType = typeof window !== 'undefined' ? localStorage.getItem('user_type') : null;
+            const refreshUrl = userType === 'owner'
+              ? `${API_BASE_URL}/api/v1/owner/auth/refresh`
+              : `${API_BASE_URL}/api/v1/auth/refresh`;
+
+            // Try refresh — cookies carry the refresh token
             const refreshToken = this.getRefreshToken();
-            const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`,
+            const response = await axios.post(refreshUrl,
               refreshToken ? { refresh_token: refreshToken } : {},
               { withCredentials: true }
             );
             if (response.data.access) {
+              this.saveTokens(response.data);
               originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
             }
             return this.client(originalRequest);
           } catch (refreshError) {
-            this.clearTokens();
+            // Clear tokens but preserve user_type — initAuth needs it to know
+            // which profile endpoint to try on next page load
+            this.clearSession();
             return Promise.reject(refreshError);
           }
         }
@@ -82,13 +97,33 @@ class ApiClient {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
-      localStorage.removeItem('user_type'); // owner or company_user
+      localStorage.removeItem('user_type');
+    }
+  }
+
+  /** Clear session tokens but preserve user_type hint for initAuth */
+  private clearSession() {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
     }
   }
 
   private saveUserType(userType: 'owner' | 'company_user') {
     if (typeof window !== 'undefined') {
       localStorage.setItem('user_type', userType);
+    }
+  }
+
+  private saveTokens(credentials: { access?: string; refresh?: string }) {
+    if (typeof window !== 'undefined') {
+      if (credentials.access) {
+        localStorage.setItem('access_token', credentials.access);
+      }
+      if (credentials.refresh) {
+        localStorage.setItem('refresh_token', credentials.refresh);
+      }
     }
   }
 
@@ -101,14 +136,18 @@ class ApiClient {
     if (response.data.must_change_password && response.data.temporary_token) {
       return response.data;
     }
-    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
     this.saveUserType('company_user');
     return response.data;
   }
 
   async setPassword(data: API.SetPasswordRequest) {
     const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/set-password', data);
-    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
     this.saveUserType('company_user');
     return response.data;
   }
@@ -144,7 +183,9 @@ class ApiClient {
     if (response.data.must_change_password && response.data.temporary_token) {
       return response.data;
     }
-    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
     this.saveUserType('owner');
     return response.data;
   }
@@ -161,7 +202,9 @@ class ApiClient {
 
   async ownerSetPassword(data: API.SetPasswordRequest) {
     const response = await this.client.post<API.OwnerWithCredentials>('/api/v1/owner/auth/set-password', data);
-    // Tokens are now in httpOnly cookies set by the backend — no localStorage storage
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
     this.saveUserType('owner');
     return response.data;
   }
@@ -212,6 +255,27 @@ class ApiClient {
   async deactivateCompany(companyId: string) {
     const response = await this.client.post<API.CompanyResponse>(`/api/v1/owner/companies/${companyId}/deactivate`);
     return response.data;
+  }
+
+  // ============================================================================
+  // OWNER - IMPERSONATION
+  // ============================================================================
+
+  async impersonateCompany(companyId: string): Promise<{ token: string; url: string }> {
+    const response = await this.client.post<{ token: string; url: string }>(`/api/v1/owner/companies/${companyId}/impersonate`);
+    return response.data;
+  }
+
+  /**
+   * Consume an impersonation token — store it as access token for company session.
+   * Called on the company-side login page when ?impersonate=<token> is present.
+   */
+  consumeImpersonationToken(token: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('access_token', token);
+      localStorage.setItem('user_type', 'company_user');
+      // No refresh token — session expires in 15 min
+    }
   }
 
   // ============================================================================

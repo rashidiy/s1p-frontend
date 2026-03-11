@@ -1,37 +1,78 @@
 'use client';
 
 import React from 'react';
-import { AuthCharacter } from '@/components/illustrations';
+import { ConfigProvider } from 'antd';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
+  icon?: React.ReactNode;
 }
 
-export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+export function AuthLayout({ children, title, subtitle, icon }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex bg-gradient-auth">
+    <div className="min-h-screen flex bg-gradient-auth relative overflow-hidden">
+      {/* Animated decorative orbs */}
+      <div className="absolute top-[-15%] left-[-8%] w-[450px] h-[450px] rounded-full bg-white/[0.06] pointer-events-none auth-orb auth-orb-1" />
+      <div className="absolute bottom-[-10%] right-[15%] w-[350px] h-[350px] rounded-full bg-white/[0.05] pointer-events-none auth-orb auth-orb-2" />
+      <div className="absolute top-[40%] left-[5%] w-[200px] h-[200px] rounded-full bg-white/[0.04] pointer-events-none auth-orb auth-orb-3" />
+
       {/* Left side - branding + illustration (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12">
-        <div className="max-w-md text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">S1P</h1>
-          <p className="text-lg text-white/70 mb-8">
-            Manage your customer relationships with ease and efficiency
+      <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12 relative z-10">
+        <div className="max-w-lg text-center">
+          <div className="mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-5 border border-white/20">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h1 className="text-6xl font-extrabold text-white tracking-tight mb-3">S1P</h1>
+            <div className="w-16 h-1 bg-gradient-to-r from-white/0 via-white/40 to-white/0 rounded-full mx-auto" />
+          </div>
+          <p className="text-xl text-white/90 leading-relaxed font-medium">
+            Manage your customer relationships<br />with ease and efficiency
           </p>
-          <AuthCharacter width={280} height={280} className="mx-auto" />
         </div>
       </div>
 
       {/* Right side - form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
-        <div className="glass-card w-full max-w-md p-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 pb-8 sm:p-8 relative z-10">
+        {/* Mobile-only brand header */}
+        <div className="lg:hidden text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm mb-3 border border-white/20">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
           </div>
-          {children}
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">S1P</h1>
+          <p className="text-sm text-white/60 mt-1">Customer Relationship Management</p>
         </div>
+
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#4338ca',
+              colorInfo: '#4338ca',
+              colorLink: '#4338ca',
+              colorLinkHover: '#6366f1',
+              colorLinkActive: '#3730a3',
+            },
+          }}
+        >
+          <div className="auth-card w-full max-w-md p-8 sm:p-10">
+            <div className="text-center mb-8">
+              {icon && (
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-crm-indigo-50 text-crm-indigo-600 mb-4">
+                  {icon}
+                </div>
+              )}
+              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+              <p className="text-sm text-gray-500 mt-2">{subtitle}</p>
+            </div>
+            {children}
+          </div>
+        </ConfigProvider>
       </div>
     </div>
   );

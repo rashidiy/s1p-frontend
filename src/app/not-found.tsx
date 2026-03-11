@@ -3,35 +3,25 @@ import { SearchCharacter } from '@/components/illustrations/SearchCharacter';
 
 export default function NotFound() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: '#F8F9FA' }}>
-      <SearchCharacter width={200} height={200} />
-      <h1 style={{ fontSize: '72px', fontWeight: 800, color: '#e5e7eb', marginTop: '16px', lineHeight: 1 }}>
-        404
-      </h1>
-      <h2 style={{ fontSize: '24px', fontWeight: 700, marginTop: '8px', color: '#1f2937' }}>
-        Page not found
-      </h2>
-      <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px', textAlign: 'center', maxWidth: '400px' }}>
-        The page you are looking for does not exist or has been moved.
-      </p>
-      <Link
-        href="/"
-        style={{
-          marginTop: '24px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '8px 24px',
-          borderRadius: '8px',
-          background: '#E84040',
-          color: 'white',
-          fontWeight: 600,
-          fontSize: '14px',
-          textDecoration: 'none',
-        }}
-      >
-        Go home
-      </Link>
+    <div className="flex items-center justify-center min-h-screen p-6 bg-[#F8F9FA]">
+      <div className="crm-card px-12 py-14 text-center max-w-md w-full page-fade-in">
+        <SearchCharacter width={180} height={180} className="mx-auto" />
+        <h1 className="text-7xl font-extrabold text-gray-200 mt-4 leading-none tracking-tight">
+          404
+        </h1>
+        <h2 className="text-2xl font-bold text-gray-900 mt-2">
+          Page not found
+        </h2>
+        <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto leading-relaxed">
+          The page you are looking for does not exist or has been moved.
+        </p>
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center mt-6 px-6 py-2.5 rounded-xl bg-gradient-primary text-white font-semibold text-sm hover:opacity-90 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+        >
+          Go home
+        </Link>
+      </div>
     </div>
   );
 }

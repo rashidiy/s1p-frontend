@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Input, Pagination, Spin, Button, Tag } from 'antd';
+import { Input, Pagination, Button, Tag, message } from 'antd';
 import { TeamOutlined, PlusOutlined, MailOutlined, SafetyOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -28,35 +28,53 @@ export default function UsersPage() {
     try {
       const result = await apiClient.getUsers({ page, page_size: 20, search: search || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load users:', error); }
+    } catch (error) { console.error('Failed to load users:', error); message.error('Failed to load users'); }
     finally { setLoading(false); }
   }, [page, search]);
 
   useEffect(() => { loadUsers(); }, [loadUsers]);
 
   const toggleUserStatus = async (userId: string, isActive: boolean) => {
-    try { if (isActive) await apiClient.deactivateUser(userId); else await apiClient.activateUser(userId); loadUsers(); } catch {}
+    try { if (isActive) await apiClient.deactivateUser(userId); else await apiClient.activateUser(userId); loadUsers(); } catch { message.error('Failed to update user status'); }
   };
 
   const formatRole = (role: string) => role.replace('company_', '').replace('_', ' ').toUpperCase();
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <div className="h-9 w-28 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="h-10 w-full md:max-w-lg bg-gray-50 rounded-lg animate-pulse" />
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="glass-card p-5 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-gray-100 rounded-full animate-pulse" />
+              <div className="space-y-1.5">
+                <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-36 bg-gray-50 rounded animate-pulse" />
+              </div>
+            </div>
+            <div className="h-5 w-16 bg-gray-50 rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const totalPages = data ? Math.ceil(data.total / data.page_size) : 1;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Team Members</h1>
-          <p className="text-gray-500">Manage user accounts and permissions</p>
-        </div>
+      <div className="page-header">
         {canManageUsers && <Link href="/users/invite"><Button type="primary" icon={<PlusOutlined />}>Invite User</Button></Link>}
       </div>
+      <p className="page-subtitle">Manage user accounts and permissions</p>
 
-      <Input.Search placeholder="Search users..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="max-w-lg" />
+      <Input.Search placeholder="Search users..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {data?.users.map((user) => (
           <div key={user.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-400 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
@@ -95,7 +113,7 @@ export default function UsersPage() {
 
       {data?.users.length === 0 && (
         <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
+          <EmptyStateCharacter width={160} height={160} variant="default" />
           <p className="mt-4 text-lg font-medium text-gray-700">No users found</p>
           <p className="text-sm text-gray-500">{search ? 'Try adjusting your search' : 'Get started by inviting team members'}</p>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Button, Tag, Select, Pagination, Alert } from 'antd';
+import { Button, Tag, Select, Pagination, Alert } from 'antd';
 import { FileTextOutlined, PlusOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -34,58 +34,94 @@ export default function OwnerContractsPage() {
     finally { setLoading(false); }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
-
-  return (
+  if (loading) return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">Contracts</h1>
-          <p className="text-gray-500">Manage company contracts and billing</p>
+          <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-64 bg-gray-50 rounded mt-2 animate-pulse" />
         </div>
-        <Link href="/owner/contracts/new"><Button type="primary" icon={<PlusOutlined />}>New Contract</Button></Link>
+        <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
       </div>
-
       <div className="flex gap-3">
-        <Select value={statusFilter || undefined} onChange={(v) => { setStatusFilter(v || ''); setPage(1); }} placeholder="All Statuses" allowClear style={{ width: 180 }}
-          options={[{ label: 'Active', value: 'active' }, { label: 'Expired', value: 'expired' }, { label: 'Cancelled', value: 'cancelled' }, { label: 'Pending', value: 'pending' }]} />
-        <Select value={paymentFilter || undefined} onChange={(v) => { setPaymentFilter(v || ''); setPage(1); }} placeholder="Payment Status" allowClear style={{ width: 180 }}
-          options={[{ label: 'Paid', value: 'paid' }, { label: 'Pending', value: 'pending' }, { label: 'Overdue', value: 'overdue' }, { label: 'Failed', value: 'failed' }]} />
+        <div className="h-8 w-40 bg-gray-50 rounded-lg animate-pulse" />
+        <div className="h-8 w-44 bg-gray-50 rounded-lg animate-pulse" />
       </div>
-
-      {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
-
       <div className="space-y-3">
-        {contracts.map((contract) => (
-          <div key={contract.id} className="glass-card p-5 flex items-center justify-between">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="glass-card p-5 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <FileTextOutlined className="text-2xl text-crm-indigo-500" />
+              <div className="w-10 h-10 rounded-xl bg-gray-100 animate-pulse" />
               <div>
-                <h3 className="font-semibold text-lg">{contract.name}</h3>
-                <p className="text-sm text-gray-500">{contract.company_name || contract.company_id}</p>
+                <div className="h-4 w-36 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-24 bg-gray-50 rounded mt-2 animate-pulse" />
               </div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <div className="flex items-center gap-1"><DollarOutlined className="text-green-600" /><span className="font-bold text-lg">{contract.price}</span><span className="text-gray-500 text-sm">/{BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase() || contract.billing_period}</span></div>
-                <div className="flex items-center gap-1 text-xs text-gray-500 mt-1"><CalendarOutlined /> {new Date(contract.start_date).toLocaleDateString()} - {new Date(contract.end_date).toLocaleDateString()}</div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Tag color={statusTagColors[contract.status] || 'default'}>{CONTRACT_STATUS_LABELS[contract.status] || contract.status}</Tag>
-                <Tag color={paymentTagColors[contract.payment_status] || 'default'}>{PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}</Tag>
-              </div>
-              <Link href={`/owner/contracts/${contract.id}`}><Button>View</Button></Link>
+            <div className="flex items-center gap-4">
+              <div className="h-5 w-20 bg-gray-50 rounded animate-pulse" />
+              <div className="h-8 w-16 bg-gray-100 rounded-lg animate-pulse" />
             </div>
           </div>
         ))}
       </div>
+    </div>
+  );
 
-      {totalPages > 1 && <div className="flex justify-center"><Pagination current={page} total={totalPages * 20} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+  return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <p className="page-subtitle">Manage company contracts and billing</p>
+        <Link href="/owner/contracts/new"><Button type="primary" icon={<PlusOutlined />}>New Contract</Button></Link>
+      </div>
 
-      {!error && contracts.length === 0 && (
-        <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
-          <p className="mt-4 text-lg font-medium text-gray-700">No contracts found</p>
+      <div className="flex flex-wrap gap-3 items-center">
+        <Select value={statusFilter || undefined} onChange={(v) => { setStatusFilter(v || ''); setPage(1); }} placeholder="All Statuses" allowClear size="middle" className="w-full sm:w-40"
+          options={[{ label: 'Active', value: 'active' }, { label: 'Expired', value: 'expired' }, { label: 'Cancelled', value: 'cancelled' }, { label: 'Pending', value: 'pending' }]} />
+        <Select value={paymentFilter || undefined} onChange={(v) => { setPaymentFilter(v || ''); setPage(1); }} placeholder="Payment Status" allowClear size="middle" className="w-full sm:w-44"
+          options={[{ label: 'Paid', value: 'paid' }, { label: 'Pending', value: 'pending' }, { label: 'Overdue', value: 'overdue' }, { label: 'Failed', value: 'failed' }]} />
+      </div>
+
+      {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
+
+      {contracts.length > 0 ? (
+        <>
+          <div className="space-y-3">
+            {contracts.map((contract) => (
+              <div key={contract.id} className="glass-card p-4 sm:p-5 hover:shadow-md transition-all duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                      <FileTextOutlined className="text-lg text-indigo-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">{contract.name}</h3>
+                      <p className="text-sm text-gray-400 truncate">{contract.company_name || contract.company_id}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-6 pl-14 sm:pl-0">
+                    <div className="sm:text-right">
+                      <div className="flex items-center gap-1"><DollarOutlined className="text-green-600" /><span className="font-bold text-lg">{contract.price}</span><span className="text-gray-400 text-sm">/{BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase() || contract.billing_period}</span></div>
+                      <div className="flex items-center gap-1 text-xs text-gray-400 mt-1"><CalendarOutlined /> {new Date(contract.start_date).toLocaleDateString()} - {new Date(contract.end_date).toLocaleDateString()}</div>
+                    </div>
+                    <div className="flex sm:flex-col gap-1">
+                      <Tag color={statusTagColors[contract.status] || 'default'}>{CONTRACT_STATUS_LABELS[contract.status] || contract.status}</Tag>
+                      <Tag color={paymentTagColors[contract.payment_status] || 'default'}>{PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}</Tag>
+                    </div>
+                    <Link href={`/owner/contracts/${contract.id}`}><Button>View</Button></Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {totalPages > 1 && <div className="flex justify-center"><Pagination current={page} total={totalPages * 20} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+        </>
+      ) : !loading && (
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="thinking" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">No contracts yet</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            Create billing contracts to manage company subscriptions and payments
+          </p>
         </div>
       )}
     </div>

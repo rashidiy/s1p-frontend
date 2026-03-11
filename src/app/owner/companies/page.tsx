@@ -1,12 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Spin, Button, Tag } from 'antd';
-import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Input, Button, Tag, message } from 'antd';
+import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined, ExportOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { CompanyResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+
+function getCompanyUrl(subdomain: string): string {
+  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const port = process.env.NODE_ENV === 'production' ? '' : ':3000';
+  return `${protocol}://${subdomain}.${baseDomain}${port}`;
+}
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<CompanyResponse[]>([]);
@@ -17,41 +24,79 @@ export default function CompaniesPage() {
 
   const loadCompanies = async () => {
     try { const data = await apiClient.getOwnerCompanies(); setCompanies(data); }
-    catch (error) { console.error('Failed to load companies:', error); }
+    catch (error) { console.error('Failed to load companies:', error); message.error('Failed to load companies'); }
     finally { setLoading(false); }
   };
 
   const toggleCompanyStatus = async (companyId: string, isActive: boolean) => {
-    try { if (isActive) await apiClient.deactivateCompany(companyId); else await apiClient.activateCompany(companyId); loadCompanies(); } catch {}
+    try { if (isActive) await apiClient.deactivateCompany(companyId); else await apiClient.activateCompany(companyId); loadCompanies(); } catch (error) { console.error('Failed to toggle company status:', error); message.error('Failed to toggle company status'); }
+  };
+
+  const handleImpersonate = async (companyId: string) => {
+    try {
+      const { url } = await apiClient.impersonateCompany(companyId);
+      window.open(url, '_blank');
+    } catch (error: any) {
+      message.error(error.response?.data?.detail || 'Failed to access company');
+    }
   };
 
   const filteredCompanies = companies.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) || c.subdomain?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
-
-  return (
+  if (loading) return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">Companies</h1>
-          <p className="text-gray-500">Manage all registered companies</p>
+          <div className="h-8 w-40 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-56 bg-gray-50 rounded animate-pulse mt-2" />
         </div>
+        <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="h-10 w-80 bg-gray-50 rounded-lg animate-pulse" />
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="glass-card p-5 border-l-4 border-l-gray-100 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-gray-100 rounded-xl animate-pulse" />
+              <div className="space-y-1.5">
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-24 bg-gray-50 rounded animate-pulse" />
+              </div>
+            </div>
+            <div className="h-5 w-16 bg-gray-50 rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <p className="page-subtitle">Manage all registered companies</p>
         <Link href="/owner/companies/new"><Button type="primary" icon={<PlusOutlined />}>Add Company</Button></Link>
       </div>
 
-      <Input.Search placeholder="Search by name or subdomain..." value={search} onChange={(e) => setSearch(e.target.value)} allowClear size="large" className="max-w-lg" />
+      <Input.Search placeholder="Search by name or subdomain..." value={search} onChange={(e) => setSearch(e.target.value)} allowClear size="large" className="max-w-full sm:max-w-lg" />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredCompanies.map((company) => (
           <div key={company.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-500 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <BankOutlined className="text-xl text-crm-indigo-600" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">{company.name}</h3>
-                  <p className="text-sm text-gray-500">{company.subdomain}</p>
+                  <Link href={`/owner/companies/${company.id}`} className="font-semibold text-gray-900 hover:text-crm-indigo-600 transition-colors">{company.name}</Link>
+                  {company.subdomain ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleImpersonate(company.id); }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-crm-indigo-600 transition-colors cursor-pointer bg-transparent border-none p-0">
+                      <span>{getCompanyUrl(company.subdomain).replace(/^https?:\/\//, '')}</span>
+                      <ExportOutlined style={{ fontSize: 11 }} />
+                    </button>
+                  ) : (
+                    <p className="text-sm text-gray-500">—</p>
+                  )}
                 </div>
               </div>
               <Tag color={company.is_active ? 'green' : 'default'}>{company.is_active ? 'Active' : 'Inactive'}</Tag>
@@ -70,10 +115,14 @@ export default function CompaniesPage() {
       </div>
 
       {filteredCompanies.length === 0 && (
-        <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
-          <p className="mt-4 text-lg font-medium text-gray-700">No companies found</p>
-          <p className="text-sm text-gray-500">{search ? 'Try adjusting your search' : 'Get started by adding a company'}</p>
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="no-deals" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">
+            {search ? 'No matches found' : 'No companies yet'}
+          </h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search ? 'Try adjusting your search terms' : 'Create your first company to start managing your CRM platform'}
+          </p>
         </div>
       )}
     </div>

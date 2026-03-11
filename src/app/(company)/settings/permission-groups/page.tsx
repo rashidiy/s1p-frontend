@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, Input, Spin, Tag } from 'antd';
+import { Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
 
 export default function PermissionGroupsPage() {
@@ -33,6 +34,7 @@ export default function PermissionGroupsPage() {
       setAvailablePerms(permsData);
     } catch (error) {
       console.error('Failed to load permission groups:', error);
+      message.error('Failed to load permission groups');
     } finally {
       setLoading(false);
     }
@@ -66,6 +68,7 @@ export default function PermissionGroupsPage() {
       loadData();
     } catch (error) {
       console.error('Failed to save permission group:', error);
+      message.error('Failed to save permission group');
     } finally {
       setSaving(false);
     }
@@ -78,6 +81,7 @@ export default function PermissionGroupsPage() {
       loadData();
     } catch (error) {
       console.error('Failed to delete permission group:', error);
+      message.error('Failed to delete permission group');
     }
   };
 
@@ -96,14 +100,42 @@ export default function PermissionGroupsPage() {
     return acc;
   }, {});
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
-
-  return (
+  if (loading) return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">Permission Groups</h1>
-          <p className="text-gray-500">Manage user permission templates</p>
+          <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-56 bg-gray-50 rounded animate-pulse mt-2" />
+        </div>
+        <div className="h-9 w-36 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="glass-card p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+              <div className="flex gap-2">
+                <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
+                <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
+              </div>
+            </div>
+            <div className="h-4 w-64 bg-gray-50 rounded animate-pulse" />
+            <div className="flex gap-2">
+              {[1, 2, 3].map((j) => (
+                <div key={j} className="h-5 w-20 bg-gray-50 rounded animate-pulse" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="page-header">
+        <div>
+          <p className="page-subtitle">Manage user permission templates</p>
         </div>
         <Button onClick={handleCreate}>
           <PlusOutlined style={{ marginRight: 8 }} />
@@ -114,10 +146,10 @@ export default function PermissionGroupsPage() {
       {showForm && (
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">{editingId ? 'Edit Group' : 'Create Group'}</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">{editingId ? 'Edit Group' : 'Create Group'}</h3>
           </div>
           <div className="p-6 pt-0 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Name</label>
                 <Input
@@ -191,9 +223,9 @@ export default function PermissionGroupsPage() {
                 <div className="flex items-center gap-2">
                   <SafetyOutlined style={{ fontSize: 20, color: '#2563eb' }} />
                   <div>
-                    <h3 className="text-2xl font-semibold leading-none tracking-tight text-lg">{group.name}</h3>
+                    <h3 className="text-base font-semibold leading-none tracking-tight text-lg">{group.name}</h3>
                     {group.description && (
-                      <p className="text-sm text-muted-foreground">{group.description}</p>
+                      <p className="text-sm text-gray-400">{group.description}</p>
                     )}
                   </div>
                 </div>
@@ -230,12 +262,10 @@ export default function PermissionGroupsPage() {
       </div>
 
       {groups.length === 0 && !showForm && (
-        <div className="glass-card p-0">
-          <div className="p-6 pt-0 flex flex-col items-center justify-center py-12">
-            <SafetyOutlined style={{ fontSize: 48, color: '#9ca3af' }} />
-            <p className="mt-4 text-lg font-medium">No permission groups</p>
-            <p className="text-sm text-gray-500">Create groups to manage user permissions</p>
-          </div>
+        <div className="glass-card py-12 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="setup" />
+          <p className="mt-4 text-lg font-medium text-gray-700">No permission groups</p>
+          <p className="text-sm text-gray-500">Create groups to manage user permissions</p>
         </div>
       )}
     </div>

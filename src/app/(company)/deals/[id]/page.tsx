@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, TrophyOutlined, CloseCircleOutlined, RiseOutlined } from '@ant-design/icons';
-import { Button, Input, Spin, Tag } from 'antd';
+import { Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
 import type { DealResponse, NoteResponse } from '@/types/api';
 
 export default function DealDetailPage() {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const { hasPermissionString } = useAuthStore();
   const dealId = params.id as string;
@@ -46,6 +46,7 @@ export default function DealDetailPage() {
       });
     } catch (error) {
       console.error('Failed to load deal:', error);
+      message.error('Failed to load deal');
     } finally {
       setLoading(false);
     }
@@ -57,6 +58,7 @@ export default function DealDetailPage() {
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
+      message.error('Failed to load notes');
     }
   };
 
@@ -73,6 +75,7 @@ export default function DealDetailPage() {
       loadDeal();
     } catch (error) {
       console.error('Failed to update deal:', error);
+      message.error('Failed to update deal');
     }
   };
 
@@ -83,6 +86,7 @@ export default function DealDetailPage() {
       loadDeal();
     } catch (error) {
       console.error('Failed to mark deal as won:', error);
+      message.error('Failed to mark deal as won');
     }
   };
 
@@ -93,6 +97,7 @@ export default function DealDetailPage() {
       loadDeal();
     } catch (error) {
       console.error('Failed to mark deal as lost:', error);
+      message.error('Failed to mark deal as lost');
     }
   };
 
@@ -108,6 +113,7 @@ export default function DealDetailPage() {
       loadNotes();
     } catch (error) {
       console.error('Failed to add note:', error);
+      message.error('Failed to add note');
     }
   };
 
@@ -118,10 +124,36 @@ export default function DealDetailPage() {
       router.push('/deals');
     } catch (error) {
       console.error('Failed to delete deal:', error);
+      message.error('Failed to delete deal');
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-6 w-14 bg-gray-100 rounded animate-pulse" />
+        <div className="h-8 w-56 bg-gray-100 rounded-lg animate-pulse" />
+        <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass-card p-6 space-y-4">
+          <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${80 - i * 15}%` }} />
+          ))}
+        </div>
+        <div className="glass-card p-6 space-y-3">
+          <div className="h-5 w-20 bg-gray-100 rounded animate-pulse" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex justify-between">
+              <div className="h-4 w-16 bg-gray-50 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-50 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
   if (!deal) return <div className="p-6">Deal not found</div>;
 
   const stageColor = DEAL_STAGE_COLORS[deal.stage?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
@@ -129,16 +161,15 @@ export default function DealDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button size="small" type="text"   onClick={() => router.back()}>
+      <div className="page-header">
+        <div className="flex items-center gap-4 flex-wrap">
+          <Button size="small" type="text"   onClick={() => router.push('/deals')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             Back
           </Button>
-          <h1 className="text-3xl font-bold gradient-text">{deal.title}</h1>
           {deal.stage && <Tag className={stageColor}>{deal.stage}</Tag>}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {!isClosedDeal && hasPermissionString('deals.write') && (
             <>
               <Button type="primary"  onClick={handleWin} className="bg-green-600 hover:bg-green-700">
@@ -169,62 +200,61 @@ export default function DealDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Deal Information</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Deal Information</h3>
             </div>
             <div className="p-6 pt-0">
               {editing ? (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Title</label>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Title</label>
                     <Input
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                      size="large"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Description</label>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">Description</label>
                     <Input.TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      rows={3}
                     />
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Amount</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-700">Amount</label>
                       <Input
                         type="number"
                         value={editForm.amount}
                         onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                        size="large"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Probability (%)</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-700">Probability (%)</label>
                       <Input
                         type="number"
                         min="0"
                         max="100"
                         value={editForm.probability}
                         onChange={(e) => setEditForm({ ...editForm, probability: e.target.value })}
+                        size="large"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Expected Close Date</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-700">Expected Close Date</label>
                       <Input
                         type="date"
                         value={editForm.expected_close_date}
                         onChange={(e) => setEditForm({ ...editForm, expected_close_date: e.target.value })}
+                        size="large"
                       />
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave}>
-                      <SaveOutlined style={{ marginRight: 8 }} />
-                      Save
-                    </Button>
-                    <Button type="default"  onClick={() => setEditing(false)}>
-                      <CloseOutlined style={{ marginRight: 8 }} />
-                      Cancel
-                    </Button>
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>Save</Button>
+                    <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>Cancel</Button>
                   </div>
                 </div>
               ) : (
@@ -286,7 +316,7 @@ export default function DealDetailPage() {
 
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Notes</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Notes</h3>
             </div>
             <div className="p-6 pt-0 space-y-4">
               <div className="flex gap-2">
@@ -319,7 +349,7 @@ export default function DealDetailPage() {
         <div>
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Details</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">Details</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">

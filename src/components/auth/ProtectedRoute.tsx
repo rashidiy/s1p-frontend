@@ -22,7 +22,7 @@ export function ProtectedRoute({
   requiredPermission,
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '/';
   const { isAuthenticated, isInitializing, isOwner, userType, hasPermission, hasPermissionString, initAuth, mustChangePassword } = useAuthStore();
 
   useEffect(() => {
@@ -93,10 +93,17 @@ export function ProtectedRoute({
 
   if (isInitializing || (requireAuth && !isAuthenticated)) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#f0f2ff]">
-        <div className="text-center">
-          <Spin size="large" />
-          <p className="mt-4 text-sm text-gray-500">Loading...</p>
+      <div className="flex h-screen items-center justify-center bg-[#F8F9FA]">
+        <div className="text-center app-loading-screen">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#E84040] to-[#FF6B6B] mb-4 shadow-lg shadow-red-200/50">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div className="text-lg font-bold text-gray-800 tracking-tight">S1P</div>
+          <div className="mt-3">
+            <Spin size="small" />
+          </div>
         </div>
       </div>
     );

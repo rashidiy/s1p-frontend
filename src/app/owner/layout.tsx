@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from 'antd';
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, MenuOutlined } from '@ant-design/icons';
 
 const PUBLIC_OWNER_PATHS = [
   '/owner/login',
@@ -41,7 +42,12 @@ export default function OwnerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname() ?? '/owner/dashboard';
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   if (PUBLIC_OWNER_PATHS.some((path) => pathname.startsWith(path))) {
     return <>{children}</>;
@@ -52,53 +58,32 @@ export default function OwnerLayout({
   return (
     <ProtectedRoute requireAuth requireOwner>
       <div className="flex h-screen bg-[#F8F9FA]">
-        <Sidebar />
+        <Sidebar
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+        />
         <div className="flex flex-col flex-1 min-w-0">
-          {/* Top header */}
-          <header
-            style={{
-              height: 64,
-              background: '#FFFFFF',
-              borderBottom: '1px solid #E5E7EB',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingLeft: 24,
-              paddingRight: 24,
-              flexShrink: 0,
-            }}
-          >
-            <h1
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                color: '#0F172A',
-                margin: 0,
-              }}
-            >
-              {pageTitle}
-            </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <header className="app-header">
+            <div className="flex items-center gap-3">
+              <Button
+                icon={<MenuOutlined />}
+                type="text"
+                onClick={() => setSidebarOpen(true)}
+                className="hamburger-btn"
+              />
+              <h1 className="app-header-title">{pageTitle}</h1>
+            </div>
+            <div className="flex items-center gap-2">
               <Button
                 icon={<BellOutlined />}
                 type="text"
-                style={{ color: '#64748B' }}
+                className="header-icon-btn"
               />
-              <Button
-                style={{
-                  borderColor: '#E5E7EB',
-                  color: '#374151',
-                  fontSize: 13,
-                  borderRadius: 8,
-                }}
-              >
-                Customize Widget
-              </Button>
             </div>
           </header>
-
-          {/* Main content */}
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 page-fade-in">
+            {children}
+          </main>
         </div>
       </div>
     </ProtectedRoute>

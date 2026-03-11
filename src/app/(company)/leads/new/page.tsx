@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import type { ContactResponse, UserResponse } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select } from 'antd';
+import { Alert, Button, Input, Select, message } from 'antd';
 import Link from 'next/link';
 
 export default function NewLeadPage() {
@@ -26,7 +26,9 @@ export default function NewLeadPage() {
     try {
       const result = await apiClient.getUsers({});
       setUsers(result.users || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load users');
+    }
   };
 
   const searchContacts = async (query: string) => {
@@ -34,7 +36,9 @@ export default function NewLeadPage() {
     try {
       const result = await apiClient.getContacts({ search: query, page: 1, page_size: 10 });
       setContacts(result.items || []);
-    } catch {}
+    } catch {
+      message.error('Failed to search contacts');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -68,129 +72,71 @@ export default function NewLeadPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link href="/leads">
-          <Button size="middle" style={{ width: 40, height: 40, padding: 0 }} type="text">
-            <ArrowLeftOutlined />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">New Lead</h1>
-          <p className="text-gray-500">Create a new sales lead</p>
+      <div className="page-header">
+        <div className="flex items-center gap-4">
+          <Link href="/leads">
+            <Button size="small" type="text">
+              <ArrowLeftOutlined style={{ marginRight: 4 }} />
+              Back
+            </Button>
+          </Link>
+          <p className="page-subtitle">Create a new sales lead</p>
         </div>
       </div>
 
-      <div className="glass-card p-0 max-w-2xl">
+      <div className="glass-card p-0 max-w-3xl mx-auto">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Lead Information</h3>
-          <p className="text-sm text-muted-foreground">Enter the details for the new lead</p>
+          <h3 className="text-lg font-semibold leading-none tracking-tight">Lead Information</h3>
+          <p className="text-sm text-gray-400">Enter the details for the new lead</p>
         </div>
         <div className="p-6 pt-0">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" />
+              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">Title *</label>
-              <Input
-                id="title"
-                name="title"
-                type="text"
-                placeholder="Software Implementation"
-                required
-                disabled={isLoading}
-              />
+            <div className="space-y-1.5">
+              <label htmlFor="title" className="text-sm font-medium text-gray-700">Title *</label>
+              <Input id="title" name="title" type="text" placeholder="Software Implementation" required disabled={isLoading} size="large" />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Contact</label>
-              <Select
-                showSearch
-                allowClear
-                style={{ width: '100%' }}
-                placeholder="Search contacts..."
-                filterOption={false}
-                onSearch={searchContacts}
-                value={contactId || undefined}
-                onChange={(val) => setContactId(val || null)}
-                options={contacts.map(c => ({
-                  value: c.id,
-                  label: `${c.first_name}${c.last_name ? ' ' + c.last_name : ''}`,
-                }))}
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="source" className="text-sm font-medium">Source</label>
-              <Input
-                id="source"
-                name="source"
-                type="text"
-                placeholder="Referral"
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">Description</label>
-              <Input.TextArea
-                id="description"
-                name="description"
-                placeholder="Customer needs..."
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="estimated_value" className="text-sm font-medium">Estimated Value</label>
-                <Input
-                  id="estimated_value"
-                  name="estimated_value"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="50000"
-                  disabled={isLoading}
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Contact</label>
+                <Select showSearch allowClear style={{ width: '100%' }} placeholder="Search contacts..." filterOption={false} onSearch={searchContacts} value={contactId || undefined} onChange={(val) => setContactId(val || null)} options={contacts.map(c => ({ value: c.id, label: `${c.first_name}${c.last_name ? ' ' + c.last_name : ''}` }))} disabled={isLoading} size="large" />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Currency</label>
-                <Select
-                  value={currency}
-                  onChange={setCurrency}
-                  style={{ width: "100%" }}
-                  options={[{ value: "USD", label: "USD" }, { value: "EUR", label: "EUR" }, { value: "UZS", label: "UZS" }]}
-                />
+              <div className="space-y-1.5">
+                <label htmlFor="source" className="text-sm font-medium text-gray-700">Source</label>
+                <Input id="source" name="source" type="text" placeholder="Referral" disabled={isLoading} size="large" />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Assigned To</label>
-              <Select
-                allowClear
-                style={{ width: '100%' }}
-                placeholder="Select user..."
-                value={assignedTo || undefined}
-                onChange={(val) => setAssignedTo(val || null)}
-                options={users.map(u => ({
-                  value: u.id,
-                  label: `${u.first_name}${u.last_name ? ' ' + u.last_name : ''}`,
-                }))}
-                disabled={isLoading}
-              />
+            <div className="space-y-1.5">
+              <label htmlFor="description" className="text-sm font-medium text-gray-700">Description</label>
+              <Input.TextArea id="description" name="description" placeholder="Customer needs..." disabled={isLoading} rows={3} />
             </div>
 
-            <div className="flex space-x-3">
-              <Button htmlType="submit" disabled={isLoading}>
-                {isLoading ? 'Creating...' : 'Create Lead'}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label htmlFor="estimated_value" className="text-sm font-medium text-gray-700">Estimated Value</label>
+                <Input id="estimated_value" name="estimated_value" type="number" min="0" step="0.01" placeholder="50000" disabled={isLoading} size="large" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Currency</label>
+                <Select value={currency} onChange={setCurrency} style={{ width: "100%" }} options={[{ value: "USD", label: "USD" }, { value: "EUR", label: "EUR" }, { value: "UZS", label: "UZS" }]} size="large" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Assigned To</label>
+                <Select allowClear style={{ width: '100%' }} placeholder="Select user..." value={assignedTo || undefined} onChange={(val) => setAssignedTo(val || null)} options={users.map(u => ({ value: u.id, label: `${u.first_name}${u.last_name ? ' ' + u.last_name : ''}` }))} disabled={isLoading} size="large" />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 pt-4 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" loading={isLoading} size="large">
+                Create Lead
               </Button>
               <Link href="/leads">
-                <Button type="default" htmlType="button"  disabled={isLoading}>
-                  Cancel
-                </Button>
+                <Button type="default" htmlType="button" disabled={isLoading} size="large">Cancel</Button>
               </Link>
             </div>
           </form>

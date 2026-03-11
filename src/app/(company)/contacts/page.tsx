@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Spin, Button, Tag } from 'antd';
+import { Input, Pagination, Button, Tag, message } from 'antd';
 import {
   UserOutlined,
   PlusOutlined,
@@ -34,26 +34,49 @@ export default function ContactsPage() {
       setData(result);
     } catch (error) {
       console.error('Failed to load contacts:', error);
+      message.error('Failed to load contacts');
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="page-header">
+          <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
+        </div>
+        <div className="h-10 w-full md:max-w-lg bg-gray-50 rounded-lg animate-pulse" />
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="glass-card p-5 border-l-4 border-l-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-full bg-gray-100 animate-pulse" />
+                <div>
+                  <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-3 w-20 bg-gray-50 rounded mt-1.5 animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-40 bg-gray-50 rounded animate-pulse" />
+                <div className="h-3 w-32 bg-gray-50 rounded animate-pulse" />
+                <div className="h-8 w-full bg-gray-100 rounded-lg mt-3 animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Contacts</h1>
-          <p className="text-gray-500">Manage your contact database</p>
-        </div>
+      <div className="page-header">
         <Link href="/contacts/new">
           <Button type="primary" icon={<PlusOutlined />}>Add Contact</Button>
         </Link>
       </div>
+      <p className="page-subtitle">Manage your contact database</p>
 
       <Input.Search
         placeholder="Search contacts..."
@@ -61,10 +84,10 @@ export default function ContactsPage() {
         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         allowClear
         size="large"
-        className="max-w-lg"
+        className="w-full md:max-w-lg"
       />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {data?.items.map((contact) => (
           <div key={contact.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center space-x-3 mb-3">
@@ -113,11 +136,11 @@ export default function ContactsPage() {
       )}
 
       {data?.items.length === 0 && (
-        <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={150} height={150} />
-          <p className="mt-4 text-lg font-medium text-gray-700">No contacts found</p>
-          <p className="text-sm text-gray-500">
-            {search ? 'Try adjusting your search' : 'Get started by adding a contact'}
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="no-contacts" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">No contacts found</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search ? 'Try adjusting your search criteria' : 'Add your first contact to start building your database'}
           </p>
         </div>
       )}

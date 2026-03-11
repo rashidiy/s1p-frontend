@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert } from 'antd';
+import { LockOutlined } from '@ant-design/icons';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -53,37 +54,41 @@ export default function SetPasswordPage() {
   };
 
   return (
-    <AuthLayout title="Set New Password" subtitle="Please set a new password to continue">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthLayout title="Set New Password" subtitle="Please set a new password to continue" icon={<LockOutlined style={{ fontSize: 28 }} />}>
+      <form onSubmit={handleSubmit} className="space-y-5">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium leading-none">New Password</label>
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">New Password</label>
           <Input.Password
             id="password"
             placeholder="Create a strong password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            size="large"
             className="glass-input"
           />
           <p className="text-xs text-gray-400">
             At least 8 characters, one uppercase letter, and one number
           </p>
         </div>
-        <div className="space-y-2">
-          <label htmlFor="confirmPassword" className="text-sm font-medium leading-none">Confirm Password</label>
+        <div className="space-y-1.5">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</label>
           <Input.Password
             id="confirmPassword"
             placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            size="large"
             className="glass-input"
           />
         </div>
-        <Button type="primary" htmlType="submit" className="w-full" disabled={loading}>
-          {loading ? 'Setting password...' : 'Set Password'}
-        </Button>
+        <div className="pt-1">
+          <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading}>
+            {loading ? 'Setting password...' : 'Set Password'}
+          </Button>
+        </div>
       </form>
     </AuthLayout>
   );

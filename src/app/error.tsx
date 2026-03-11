@@ -11,22 +11,24 @@ export default function RootError({
   reset: () => void;
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: '#F8F9FA' }}>
-      <ErrorCharacter width={180} height={180} />
-      <h1 style={{ fontSize: '24px', fontWeight: 700, marginTop: '24px', color: '#1f2937' }}>
-        Something went wrong
-      </h1>
-      <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px', textAlign: 'center', maxWidth: '400px' }}>
-        An unexpected error occurred. Please try again or contact support if the problem persists.
-      </p>
-      <Button
-        type="primary"
-        size="large"
-        onClick={reset}
-        style={{ marginTop: '24px' }}
-      >
-        Try again
-      </Button>
+    <div className="flex items-center justify-center min-h-screen p-6 bg-[#F8F9FA]">
+      <div className="crm-card px-12 py-14 text-center max-w-md w-full page-fade-in">
+        <ErrorCharacter width={160} height={160} className="mx-auto" />
+        <h1 className="text-2xl font-bold text-gray-900 mt-6">
+          Something went wrong
+        </h1>
+        <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
+          An unexpected error occurred. Please try again or contact support if the problem persists.
+        </p>
+        <Button
+          type="primary"
+          size="large"
+          onClick={reset}
+          className="mt-6"
+        >
+          Try again
+        </Button>
+      </div>
     </div>
   );
 }

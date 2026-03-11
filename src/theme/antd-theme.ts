@@ -46,6 +46,8 @@ export const antdTheme: ThemeConfig = {
     Input: {
       borderRadius: 10,
       controlHeight: 40,
+      activeBorderColor: '#E84040',
+      hoverBorderColor: '#FDA4AF',
     },
     Select: {
       borderRadius: 10,
@@ -62,12 +64,24 @@ export const antdTheme: ThemeConfig = {
     Modal: {
       borderRadiusLG: 16,
     },
+    Table: {
+      borderRadiusLG: 12,
+      headerBg: '#FAFBFC',
+      headerColor: '#64748B',
+      rowHoverBg: '#F8FAFC',
+    },
     Tag: {
       borderRadiusSM: 6,
     },
     Tabs: {
       itemSelectedColor: '#E84040',
       inkBarColor: '#E84040',
+    },
+    Alert: {
+      borderRadiusLG: 12,
+    },
+    Notification: {
+      borderRadiusLG: 12,
     },
   },
 };

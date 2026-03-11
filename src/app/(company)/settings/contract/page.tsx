@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Alert, Progress, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
 
@@ -27,18 +28,45 @@ export default function ContractStatusPage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="h-8 w-32 bg-gray-100 rounded-lg animate-pulse" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="glass-card p-5">
+            <div className="h-3 w-20 bg-gray-50 rounded animate-pulse mb-3" />
+            <div className="h-7 w-24 bg-gray-100 rounded-lg animate-pulse" />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[1, 2].map((i) => (
+          <div key={i} className="glass-card p-6 space-y-3">
+            <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+            {[1, 2, 3].map((j) => (
+              <div key={j} className="flex justify-between">
+                <div className="h-4 w-24 bg-gray-50 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-gray-50 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (!contract || error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold gradient-text">Contract</h1>
-        <div className="glass-card p-0">
-          <div className="p-6 pt-0 flex flex-col items-center justify-center py-12">
-            <FileTextOutlined style={{ fontSize: 48, color: '#9ca3af' }} />
-            <p className="mt-4 text-lg font-medium">No Active Contract</p>
-            <p className="text-sm text-gray-500">Please contact the platform administrator</p>
+        <div className="page-header">
+          <div>
+            <p className="page-subtitle">View your active contract and billing status</p>
           </div>
+        </div>
+        <div className="glass-card py-12 flex flex-col items-center justify-center">
+          <EmptyStateCharacter width={160} height={160} variant="thinking" />
+          <p className="mt-4 text-lg font-medium text-gray-700">No Active Contract</p>
+          <p className="text-sm text-gray-500">Please contact the platform administrator</p>
         </div>
       </div>
     );
@@ -52,7 +80,11 @@ export default function ContractStatusPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold gradient-text">Contract</h1>
+      <div className="page-header">
+        <div>
+          <p className="page-subtitle">View your active contract, usage limits, and billing status</p>
+        </div>
+      </div>
 
       {contract.warnings && contract.warnings.length > 0 && (
         <div className="space-y-2">
@@ -66,8 +98,8 @@ export default function ContractStatusPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Plan</p>
-            <h3 className="text-2xl font-semibold leading-none tracking-tight text-2xl">{contract.name}</h3>
+            <p className="text-sm text-gray-400">Plan</p>
+            <h3 className="text-base font-semibold leading-none tracking-tight text-2xl">{contract.name}</h3>
           </div>
           <div className="p-6 pt-0">
             <Tag className={statusColor}>{contract.status.replace('_', ' ')}</Tag>
@@ -76,8 +108,8 @@ export default function ContractStatusPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Billing Period</p>
-            <h3 className="text-2xl font-semibold leading-none tracking-tight text-xl capitalize">
+            <p className="text-sm text-gray-400">Billing Period</p>
+            <h3 className="text-base font-semibold leading-none tracking-tight text-xl capitalize">
               {BILLING_PERIOD_LABELS[contract.billing_period] || contract.billing_period}
             </h3>
           </div>
@@ -90,8 +122,8 @@ export default function ContractStatusPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
-            <p className="text-sm text-muted-foreground">Days Until Expiry</p>
-            <h3 className="text-2xl font-semibold leading-none tracking-tight text-2xl flex items-center gap-2">
+            <p className="text-sm text-gray-400">Days Until Expiry</p>
+            <h3 className="text-base font-semibold leading-none tracking-tight text-2xl flex items-center gap-2">
               <CalendarOutlined />
               {contract.days_until_expiry ?? '—'}
             </h3>
@@ -107,7 +139,7 @@ export default function ContractStatusPage() {
       {/* User Limits */}
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+          <h3 className="text-base font-semibold leading-none tracking-tight flex items-center gap-2">
             <TeamOutlined />
             User Limits
           </h3>
@@ -120,7 +152,7 @@ export default function ContractStatusPage() {
             </div>
             <Progress percent={userUsage} showInfo={false} size="small" />
           </div>
-          <div className="grid grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div className="text-center p-3 bg-purple-50 rounded-lg">
               <p className="font-bold text-purple-700">{contract.current_admins}/{contract.max_admins}</p>
               <p className="text-xs text-gray-500 mt-1">Admins</p>
@@ -140,13 +172,13 @@ export default function ContractStatusPage() {
       {/* Contract Details */}
       <div className="glass-card p-0">
         <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+          <h3 className="text-base font-semibold leading-none tracking-tight flex items-center gap-2">
             <SafetyOutlined />
             Contract Details
           </h3>
         </div>
         <div className="p-6 pt-0">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-gray-500">Auto Renew</span>
               <p className="font-medium">{contract.auto_renew ? 'Yes' : 'No'}</p>

@@ -159,10 +159,12 @@ export default function TelegramSettingsPage() {
   if (error) {
     return (
       <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
-        <div style={{ padding: '24px', maxWidth: 700 }}>
-          <Title level={3} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <SendOutlined /> Telegram Bot
-          </Title>
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="page-header">
+            <div>
+              <p className="page-subtitle">Configure Telegram bot notifications for your team.</p>
+            </div>
+          </div>
           <Alert
             type="error"
             message="Error"
@@ -183,12 +185,11 @@ export default function TelegramSettingsPage() {
 
   return (
     <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
-      <div style={{ padding: '24px', maxWidth: 700 }}>
-        <div style={{ marginBottom: 24 }}>
-          <Title level={3} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <SendOutlined /> Telegram Bot
-          </Title>
-          <Text type="secondary">Configure Telegram bot notifications for your team.</Text>
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="page-header">
+          <div>
+            <p className="page-subtitle">Configure Telegram bot notifications for your team.</p>
+          </div>
         </div>
 
         {!isConnected ? (
