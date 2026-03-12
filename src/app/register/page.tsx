@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Button, Alert } from 'antd';
-import { MailOutlined } from '@ant-design/icons';
+import { SendOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
@@ -13,36 +13,16 @@ export default function RegisterPage() {
     <AuthLayout
       title={t('accountRegistration')}
       subtitle={t('howToGetAccess')}
-      icon={<MailOutlined style={{ fontSize: 28 }} />}
+      icon={<SendOutlined style={{ fontSize: 28 }} />}
     >
       <div className="space-y-5">
         <Alert
           type="info"
           showIcon
-          icon={<MailOutlined />}
           className="!rounded-xl"
-          title={t('invitationRequired')}
-          description={t('invitationDescription')}
+          message={t('telegramRegistrationRequired') || 'Registration via Telegram'}
+          description={t('telegramRegistrationDescription') || 'To register, ask your company admin for a Telegram invite link. Open the link in Telegram to start registration.'}
         />
-
-        <div className="text-sm text-gray-500 space-y-3">
-          <p className="font-medium text-gray-700">{t('whatToDoNext')}</p>
-          <div className="space-y-2">
-            {[
-              t('step1'),
-              t('step2'),
-              t('step3'),
-              t('step4'),
-            ].map((step, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-crm-indigo-50 text-crm-indigo-600 text-xs font-semibold flex items-center justify-center mt-0.5">
-                  {i + 1}
-                </span>
-                <span className="text-gray-600 leading-relaxed">{step}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <Link href="/login">
           <Button type="primary" className="w-full" size="large">{t('goToLogin')}</Button>

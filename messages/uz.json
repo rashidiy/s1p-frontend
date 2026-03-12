@@ -99,7 +99,14 @@
     "telegramInviteTokenLabel": "Taklif tokeni",
     "telegramInviteTokenHint": "Administrator bergan XXXX-XXXX tokenini kiriting",
     "telegramRegistering": "Ro'yxatdan o'tilmoqda...",
-    "telegramRegisterSubmit": "Ro'yxatdan o'tishni yakunlash"
+    "telegramRegisterSubmit": "Ro'yxatdan o'tishni yakunlash",
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "phone": "Telefon",
+    "loading": "Yuklanmoqda...",
+    "telegramRegistrationRequired": "Telegram orqali ro'yxatdan o'tish",
+    "telegramRegistrationDescription": "Ro'yxatdan o'tish uchun kompaniya administratoringizdan Telegram taklif havolasini so'rang. Ro'yxatdan o'tishni boshlash uchun havolani Telegramda oching.",
+    "or": "yoki"
   },
   "actions": {
     "create": "Yaratish",
@@ -654,7 +661,9 @@
     "telegramNoInvites": "Hali takliflar yo'q",
     "roleOperator": "Operator",
     "roleManager": "Menejer",
-    "roleAdmin": "Administrator"
+    "roleAdmin": "Administrator",
+    "copyMessage": "Xabarni nusxalash",
+    "copyTokenOnly": "Faqat tokenni nusxalash"
   },
   "settings": {
     "title": "Sozlamalar",

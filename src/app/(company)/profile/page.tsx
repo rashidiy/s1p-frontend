@@ -107,7 +107,7 @@ export default function ProfilePage() {
 
     setChangingPassword(true);
     try {
-      await apiClient.resetPassword({
+      await apiClient.changePassword({
         old_password: passwordForm.old_password,
         new_password: passwordForm.new_password,
       });

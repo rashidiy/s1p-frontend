@@ -99,7 +99,14 @@
     "telegramInviteTokenLabel": "Invite Token",
     "telegramInviteTokenHint": "Enter the XXXX-XXXX token provided by your administrator",
     "telegramRegistering": "Registering...",
-    "telegramRegisterSubmit": "Complete Registration"
+    "telegramRegisterSubmit": "Complete Registration",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "loading": "Loading...",
+    "telegramRegistrationRequired": "Registration via Telegram",
+    "telegramRegistrationDescription": "To register, ask your company admin for a Telegram invite link. Open the link in Telegram to start registration.",
+    "or": "or"
   },
   "actions": {
     "create": "Create",
@@ -654,7 +661,9 @@
     "telegramNoInvites": "No invite tokens yet",
     "roleOperator": "Operator",
     "roleManager": "Manager",
-    "roleAdmin": "Admin"
+    "roleAdmin": "Admin",
+    "copyMessage": "Copy Message",
+    "copyTokenOnly": "Copy Token Only"
   },
   "settings": {
     "title": "Settings",

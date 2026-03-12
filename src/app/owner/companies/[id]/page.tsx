@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAddOutlined, SaveOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
-import type { CompanyDetailResponse, UserResponse } from '@/types/api';
+import type { CompanyDetailResponse, InviteAdminResponse } from '@/types/api';
 
 export default function CompanyDetailPage() {
   const params = useParams()!;
@@ -20,13 +20,14 @@ export default function CompanyDetailPage() {
   // Invite admin form
   const [showInvite, setShowInvite] = useState(false);
   const [inviteForm, setInviteForm] = useState({
-    email: '',
     first_name: '',
     last_name: '',
     phone: '',
   });
   const [inviting, setInviting] = useState(false);
   const [inviteMessage, setInviteMessage] = useState('');
+  const [inviteResult, setInviteResult] = useState<InviteAdminResponse | null>(null);
+  const [messageCopied, setMessageCopied] = useState(false);
 
   useEffect(() => {
     loadCompany();
@@ -76,19 +77,51 @@ export default function CompanyDetailPage() {
     setInviting(true);
     setInviteMessage('');
     try {
-      await apiClient.inviteAdmin(companyId, {
-        email: inviteForm.email,
+      const result = await apiClient.inviteAdmin(companyId, {
         first_name: inviteForm.first_name,
         last_name: inviteForm.last_name || null,
         phone: inviteForm.phone || null,
       });
-      setInviteMessage('Admin invited successfully');
-      setInviteForm({ email: '', first_name: '', last_name: '', phone: '' });
-      setShowInvite(false);
+      setInviteResult(result);
+      setInviteForm({ first_name: '', last_name: '', phone: '' });
     } catch (error: any) {
       setInviteMessage(error.response?.data?.detail || 'Failed to invite admin');
     } finally {
       setInviting(false);
+    }
+  };
+
+  const buildAdminInviteMessage = () => {
+    if (!inviteResult) return '';
+    const expiresFormatted = new Date(inviteResult.expires_at).toLocaleString();
+    return [
+      `Вас пригласили в ${inviteResult.company_name} (S1P CRM)!`,
+      '',
+      `Роль: Admin`,
+      `Код приглашения: ${inviteResult.invite_token}`,
+      '',
+      'Для регистрации нажмите на ссылку:',
+      `👉 ${inviteResult.deep_link}`,
+      '',
+      `Действует до: ${expiresFormatted}`,
+    ].join('\n');
+  };
+
+  const handleCopyAdminMessage = async () => {
+    const msg = buildAdminInviteMessage();
+    try {
+      await navigator.clipboard.writeText(msg);
+      setMessageCopied(true);
+      setTimeout(() => setMessageCopied(false), 2000);
+    } catch {
+      const el = document.createElement('textarea');
+      el.value = msg;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setMessageCopied(true);
+      setTimeout(() => setMessageCopied(false), 2000);
     }
   };
 
@@ -152,25 +185,15 @@ export default function CompanyDetailPage() {
         />
       )}
 
-      {showInvite && (
+      {showInvite && !inviteResult && (
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
             <h3 className="text-base font-semibold text-gray-900">Invite Company Admin</h3>
-            <p className="text-sm text-gray-400 mt-0.5">Send an invitation to a new admin for this company</p>
+            <p className="text-sm text-gray-400 mt-0.5">Create a Telegram invite for a new company admin</p>
           </div>
           <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
             <form onSubmit={handleInviteAdmin} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700">Email <span className="text-red-400">*</span></label>
-                  <Input
-                    type="email"
-                    value={inviteForm.email}
-                    onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                    required
-                    size="large"
-                  />
-                </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-gray-700">First Name <span className="text-red-400">*</span></label>
                   <Input
@@ -188,24 +211,58 @@ export default function CompanyDetailPage() {
                     size="large"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700">Phone</label>
-                  <Input
-                    value={inviteForm.phone}
-                    onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
-                    size="large"
-                  />
-                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Phone</label>
+                <Input
+                  value={inviteForm.phone}
+                  onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
+                  placeholder="+998901234567"
+                  size="large"
+                />
               </div>
               <div className="flex gap-2 pt-2 border-t border-gray-100">
                 <Button type="primary" htmlType="submit" loading={inviting}>
-                  {inviting ? 'Inviting...' : 'Send Invite'}
+                  {inviting ? 'Creating...' : 'Create Invite'}
                 </Button>
                 <Button htmlType="button" onClick={() => setShowInvite(false)}>
                   Cancel
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {inviteResult && (
+        <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
+            <h3 className="text-base font-semibold text-gray-900">Admin Invite Created</h3>
+          </div>
+          <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3 space-y-4">
+            <Alert
+              type="warning"
+              showIcon
+              className="!rounded-xl"
+              message="This invite token will only be shown once. Copy the message now."
+            />
+            <div className="bg-gray-50 rounded-xl p-5 font-mono text-sm text-gray-800 whitespace-pre-wrap">
+              {buildAdminInviteMessage()}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="primary"
+                onClick={handleCopyAdminMessage}
+              >
+                {messageCopied ? 'Copied!' : 'Copy Message'}
+              </Button>
+              <Button onClick={() => {
+                setInviteResult(null);
+                setShowInvite(false);
+              }}>
+                Done
+              </Button>
+            </div>
           </div>
         </div>
       )}

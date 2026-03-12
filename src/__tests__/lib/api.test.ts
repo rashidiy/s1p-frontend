@@ -64,28 +64,6 @@ describe('API Client', () => {
     });
   });
 
-  describe('login', () => {
-    it('calls POST /api/v1/auth/login and saves tokens', async () => {
-      const mock = getMockAxios();
-      const loginData = { email: 'test@example.com', password: 'password123' };
-      const responseData = {
-        id: '1',
-        email: 'test@example.com',
-        credentials: { access: 'access-token', refresh: 'refresh-token' },
-      };
-
-      mock.post.mockResolvedValueOnce({ data: responseData });
-
-      const result = await apiClient.login(loginData);
-
-      expect(mock.post).toHaveBeenCalledWith('/api/v1/auth/login', loginData);
-      expect(result).toEqual(responseData);
-      expect(localStorage.getItem('access_token')).toBe('access-token');
-      expect(localStorage.getItem('refresh_token')).toBe('refresh-token');
-      expect(localStorage.getItem('user_type')).toBe('company_user');
-    });
-  });
-
   describe('ownerLogin', () => {
     it('calls POST /api/v1/owner/auth/login and saves tokens', async () => {
       const mock = getMockAxios();

@@ -131,35 +131,6 @@ class ApiClient {
   // COMPANY USER AUTH
   // ============================================================================
 
-  async login(data: API.LoginRequest) {
-    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/login', data);
-    if (response.data.must_change_password && response.data.temporary_token) {
-      return response.data;
-    }
-    if (response.data.credentials) {
-      this.saveTokens(response.data.credentials);
-    }
-    this.saveUserType('company_user');
-    return response.data;
-  }
-
-  async setPassword(data: API.SetPasswordRequest) {
-    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/set-password', data);
-    if (response.data.credentials) {
-      this.saveTokens(response.data.credentials);
-    }
-    this.saveUserType('company_user');
-    return response.data;
-  }
-
-  async forgotPassword(data: API.ForgotPasswordRequest) {
-    return this.client.post('/api/v1/auth/forgot-password', data);
-  }
-
-  async resetPassword(data: API.ResetPasswordRequest) {
-    return this.client.post('/api/v1/auth/reset-password', data);
-  }
-
   async getMyProfile() {
     const response = await this.client.get<API.UserResponse>('/api/v1/company/users/me');
     return response.data;
@@ -168,6 +139,10 @@ class ApiClient {
   async updateMyProfile(data: API.ProfileUpdateRequest) {
     const response = await this.client.put<API.UserResponse>('/api/v1/company/users/me', data);
     return response.data;
+  }
+
+  async changePassword(data: API.ResetPasswordRequest) {
+    return this.client.post('/api/v1/auth/reset-password', data);
   }
 
   logout() {
@@ -283,7 +258,7 @@ class ApiClient {
   // ============================================================================
 
   async inviteAdmin(companyId: string, data: API.InviteAdminRequest) {
-    const response = await this.client.post<API.UserResponse>(`/api/v1/owner/companies/${companyId}/invite-admin`, data);
+    const response = await this.client.post<API.InviteAdminResponse>(`/api/v1/owner/companies/${companyId}/invite-admin`, data);
     return response.data;
   }
 
@@ -359,6 +334,11 @@ class ApiClient {
       this.saveTokens(response.data.credentials);
     }
     this.saveUserType('company_user');
+    return response.data;
+  }
+
+  async getRegisterPrefill(challengeId: string) {
+    const response = await this.client.get<API.RegisterPrefillResponse>(`/api/v1/auth/telegram/register-prefill/${challengeId}`);
     return response.data;
   }
 
