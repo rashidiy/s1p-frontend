@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
   const items: MenuProps['items'] = locales.map((loc) => ({
     key: loc,
     label: LOCALE_LABELS[loc],
-    style: loc === locale ? { fontWeight: 700, color: '#E84040' } : undefined,
+    style: loc === locale ? { fontWeight: 700, color: '#4338CA' } : undefined,
     onClick: () => handleLocaleChange(loc),
   }));
 

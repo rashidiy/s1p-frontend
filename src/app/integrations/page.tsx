@@ -10,7 +10,7 @@ export default function IntegrationsPage() {
   return (
     <div style={{ padding: '24px' }}>
       <Result
-        icon={<ApiOutlined style={{ color: '#E84040' }} />}
+        icon={<ApiOutlined style={{ color: '#4338CA' }} />}
         title={t('comingSoon')}
         subTitle={t('comingSoonDescription')}
       />

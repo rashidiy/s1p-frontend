@@ -241,7 +241,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
               <Avatar
                 size={36}
                 style={{
-                  backgroundColor: '#E84040',
+                  backgroundColor: '#4338CA',
                   color: 'white',
                   fontWeight: 600,
                   flexShrink: 0,

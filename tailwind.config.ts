@@ -89,8 +89,8 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #E84040 0%, #FF6B6B 100%)',
-        'gradient-red': 'linear-gradient(135deg, #E84040 0%, #FF7676 100%)',
+        'gradient-primary': 'linear-gradient(135deg, #4338CA 0%, #6366F1 100%)',
+        'gradient-red': 'linear-gradient(135deg, #4338CA 0%, #818CF8 100%)',
         'gradient-auth': 'linear-gradient(135deg, #312e81 0%, #4338ca 30%, #6366f1 60%, #818cf8 100%)',
         'gradient-warm': 'linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #f59e0b 100%)',
         'gradient-indigo': 'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)',

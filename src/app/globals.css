@@ -10,7 +10,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 0 76% 58%;
+    --primary: 239 58% 50%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 0 76% 58%;
+    --ring: 239 58% 50%;
     --radius: 0.75rem;
 
     --surface: #FFFFFF;
@@ -40,7 +40,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 76% 58%;
+    --primary: 239 58% 50%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -52,7 +52,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 0 76% 58%;
+    --ring: 239 58% 50%;
 
     --surface: #1a1a2e;
     --surface-secondary: #16213e;
@@ -164,12 +164,12 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #E84040, #FF6B6B);
+  background: linear-gradient(135deg, #4338CA, #6366F1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(232, 64, 64, 0.25);
+  box-shadow: 0 2px 8px rgba(67, 56, 202, 0.25);
 }
 
 .sidebar-nav {
@@ -230,8 +230,8 @@
 }
 
 .crm-sidebar-menu .ant-menu-item-selected {
-  color: #e84040 !important;
-  background: #fef2f2 !important;
+  color: #4338CA !important;
+  background: #EEF2FF !important;
   font-weight: 600;
 }
 
@@ -243,7 +243,7 @@
   bottom: 8px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: #e84040;
+  background: #4338CA;
 }
 
 .crm-sidebar-menu .ant-menu-item-selected::after {
@@ -410,7 +410,7 @@
 
   /* Gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, #E84040 0%, #FF6B6B 100%);
+    background: linear-gradient(135deg, #4338CA 0%, #6366F1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -425,8 +425,8 @@
 
   .glass-input:focus {
     background: #ffffff;
-    border-color: #E84040;
-    box-shadow: 0 0 0 3px rgba(232, 64, 64, 0.1);
+    border-color: #4338CA;
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
   }
 
   .auth-card .glass-input:focus,

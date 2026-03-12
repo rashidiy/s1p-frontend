@@ -3,12 +3,12 @@ import { theme } from 'antd';
 
 export const antdLightTheme: ThemeConfig = {
   token: {
-    // Primary palette — red-orange accent
-    colorPrimary: '#E84040',
+    // Primary palette — indigo accent
+    colorPrimary: '#4338CA',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#E84040',
+    colorInfo: '#4338CA',
 
     // Clean white surfaces
     colorBgContainer: '#FFFFFF',
@@ -31,10 +31,10 @@ export const antdLightTheme: ThemeConfig = {
     boxShadowSecondary:
       '0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.07)',
 
-    // Link — red-orange tones
-    colorLink: '#E84040',
-    colorLinkHover: '#FF6B6B',
-    colorLinkActive: '#C53030',
+    // Link — indigo tones
+    colorLink: '#4338CA',
+    colorLinkHover: '#6366F1',
+    colorLinkActive: '#3730A3',
   },
   components: {
     Button: {
@@ -47,8 +47,8 @@ export const antdLightTheme: ThemeConfig = {
     Input: {
       borderRadius: 10,
       controlHeight: 40,
-      activeBorderColor: '#E84040',
-      hoverBorderColor: '#FDA4AF',
+      activeBorderColor: '#4338CA',
+      hoverBorderColor: '#A5B4FC',
     },
     Select: {
       borderRadius: 10,
@@ -75,8 +75,8 @@ export const antdLightTheme: ThemeConfig = {
       borderRadiusSM: 6,
     },
     Tabs: {
-      itemSelectedColor: '#E84040',
-      inkBarColor: '#E84040',
+      itemSelectedColor: '#4338CA',
+      inkBarColor: '#4338CA',
     },
     Alert: {
       borderRadiusLG: 12,
@@ -93,20 +93,20 @@ export const antdTheme = antdLightTheme;
 export const antdDarkTheme: ThemeConfig = {
   algorithm: theme.darkAlgorithm,
   token: {
-    colorPrimary: '#E84040',
+    colorPrimary: '#4338CA',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#E84040',
+    colorInfo: '#4338CA',
     borderRadius: 12,
     borderRadiusLG: 16,
     borderRadiusSM: 10,
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
     fontSize: 14,
-    colorLink: '#FF6B6B',
-    colorLinkHover: '#FF8A8A',
-    colorLinkActive: '#E84040',
+    colorLink: '#6366F1',
+    colorLinkHover: '#818CF8',
+    colorLinkActive: '#4338CA',
   },
   components: {
     Button: { borderRadius: 10, controlHeight: 40, controlHeightLG: 44, controlHeightSM: 32, fontWeight: 500 },
@@ -117,7 +117,7 @@ export const antdDarkTheme: ThemeConfig = {
     Modal: { borderRadiusLG: 16 },
     Table: { borderRadiusLG: 12 },
     Tag: { borderRadiusSM: 6 },
-    Tabs: { itemSelectedColor: '#E84040', inkBarColor: '#E84040' },
+    Tabs: { itemSelectedColor: '#4338CA', inkBarColor: '#4338CA' },
     Alert: { borderRadiusLG: 12 },
     Notification: { borderRadiusLG: 12 },
   },

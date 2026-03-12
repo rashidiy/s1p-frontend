@@ -22,8 +22,8 @@ const statCards = [
     labelKey: 'totalCalls' as const,
     icon: <PhoneOutlined />,
     href: '/calls',
-    iconBg: '#FFF0F0',
-    iconColor: '#E84040',
+    iconBg: '#EEF2FF',
+    iconColor: '#4338CA',
   },
   {
     key: 'leads',
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   style={{
                     fontSize: 12,
                     fontWeight: 500,
-                    color: '#E84040',
+                    color: '#4338CA',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
@@ -302,7 +302,7 @@ export default function DashboardPage() {
                   style={{
                     fontWeight: 700,
                     fontSize: item.highlight ? 18 : 14,
-                    color: item.highlight ? '#E84040' : 'var(--text-primary)',
+                    color: item.highlight ? '#4338CA' : 'var(--text-primary)',
                   }}
                 >
                   {item.value}
