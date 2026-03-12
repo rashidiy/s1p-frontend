@@ -25,6 +25,11 @@ vi.mock('@/hooks/useIsMobile', () => ({
   useIsMobile: () => false,
 }));
 
+// Mock theme store
+vi.mock('@/store/theme', () => ({
+  useThemeStore: () => ({ mode: 'system', resolved: 'light', setMode: vi.fn() }),
+}));
+
 // Mock antd components
 vi.mock('antd', () => {
   const Layout = { Sider: ({ children, ...props }: any) => <div data-testid="sider" {...props}>{children}</div> };
@@ -43,6 +48,15 @@ vi.mock('antd', () => {
     Avatar: ({ children, ...props }: any) => <div data-testid="avatar" {...props}>{children}</div>,
     Popover: ({ children }: any) => <div>{children}</div>,
     Drawer: ({ children }: any) => <div>{children}</div>,
+    Segmented: ({ options, value, onChange, ...props }: any) => (
+      <div data-testid="segmented" {...props}>
+        {options?.map((opt: any) => (
+          <button key={typeof opt === 'string' ? opt : opt.value} data-value={typeof opt === 'string' ? opt : opt.value}>
+            {typeof opt === 'string' ? opt : opt.label || opt.icon}
+          </button>
+        ))}
+      </div>
+    ),
   };
 });
 
@@ -74,7 +88,6 @@ describe('Sidebar', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Companies')).toBeInTheDocument();
     expect(screen.getByText('Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
 
     // Should not have company-specific items
     expect(screen.queryByText('Contacts')).not.toBeInTheDocument();
@@ -137,7 +150,6 @@ describe('Sidebar', () => {
     expect(screen.getByText('Team')).toBeInTheDocument();
     expect(screen.getByText('Permission Groups')).toBeInTheDocument();
     expect(screen.getByText('Telegram')).toBeInTheDocument();
-    // Note: "Settings" appears in adminNavigation
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
 

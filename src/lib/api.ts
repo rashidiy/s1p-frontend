@@ -340,6 +340,56 @@ class ApiClient {
   }
 
   // ============================================================================
+  // TELEGRAM AUTH
+  // ============================================================================
+
+  async createLoginChallenge() {
+    const response = await this.client.post<API.LoginChallengeResponse>('/api/v1/auth/telegram/login-challenge');
+    return response.data;
+  }
+
+  async pollChallengeStatus(challengeId: string) {
+    const response = await this.client.get<API.ChallengeStatusResponse>(`/api/v1/auth/telegram/login-challenge/${challengeId}/status`);
+    return response.data;
+  }
+
+  async verifyOtp(data: API.VerifyOtpRequest) {
+    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/telegram/verify-otp', data);
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
+    this.saveUserType('company_user');
+    return response.data;
+  }
+
+  async telegramRegister(data: API.TelegramRegisterRequest) {
+    const response = await this.client.post<API.AuthorizedResponse>('/api/v1/auth/telegram/register', data);
+    if (response.data.credentials) {
+      this.saveTokens(response.data.credentials);
+    }
+    this.saveUserType('company_user');
+    return response.data;
+  }
+
+  // ============================================================================
+  // TELEGRAM INVITE TOKENS (ADMIN)
+  // ============================================================================
+
+  async createInviteToken(data: API.InviteTokenCreateRequest) {
+    const response = await this.client.post<API.InviteTokenResponse>('/api/v1/company/users/invite-telegram', data);
+    return response.data;
+  }
+
+  async getInviteTokens(params?: { page?: number; page_size?: number; status?: string }) {
+    const response = await this.client.get<API.PaginatedResponse<API.InviteTokenListItem>>('/api/v1/company/users/invite-tokens', { params });
+    return response.data;
+  }
+
+  async revokeInviteToken(tokenId: string) {
+    await this.client.delete(`/api/v1/company/users/invite-tokens/${tokenId}`);
+  }
+
+  // ============================================================================
   // COMPANY - USER MANAGEMENT
   // ============================================================================
 

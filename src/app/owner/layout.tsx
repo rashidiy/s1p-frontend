@@ -19,7 +19,6 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
   '/owner/dashboard': 'dashboard',
   '/owner/companies': 'companies',
   '/owner/contracts': 'contracts',
-  '/owner/settings': 'settings',
   '/owner/profile': 'profile',
 };
 

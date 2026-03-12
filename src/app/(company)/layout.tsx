@@ -20,7 +20,6 @@ const PAGE_TITLE_KEYS: Record<string, { ns: string; key: string }> = {
   '/settings/permission-groups': { ns: 'nav', key: 'permissionGroups' },
   '/settings/contract': { ns: 'nav', key: 'contract' },
   '/settings/telegram': { ns: 'nav', key: 'telegram' },
-  '/settings': { ns: 'nav', key: 'settings' },
   '/profile': { ns: 'nav', key: 'profile' },
 };
 

@@ -1,32 +1,56 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button, Input, Alert } from 'antd';
-import { LoginOutlined } from '@ant-design/icons';
+import { Button, Input, Alert, Divider } from 'antd';
+import { LoginOutlined, SendOutlined } from '@ant-design/icons';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
 
+const OTP_LENGTH = 6;
+const POLL_INTERVAL = 2000;
+const POLL_MAX_DURATION = 5 * 60 * 1000; // 5 minutes
+
+type TelegramStep = 'idle' | 'waiting_bot' | 'enter_otp' | 'verifying' | 'expired';
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setUser = useAuthStore((state) => state.setUser);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const t = useTranslations('auth');
+
+  // Telegram OTP state
+  const [step, setStep] = useState<TelegramStep>('idle');
+  const [challengeId, setChallengeId] = useState('');
+  const [deepLink, setDeepLink] = useState('');
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const t = useTranslations('auth');
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const pollStartRef = useRef<number>(0);
+  const otpInputRef = useRef<any>(null);
+
+  // Email fallback state
+  const [showEmailFallback, setShowEmailFallback] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
   // Handle owner impersonation token
   useEffect(() => {
     const impersonateToken = searchParams?.get('impersonate');
     if (impersonateToken) {
       apiClient.consumeImpersonationToken(impersonateToken);
-      // Load profile and redirect to dashboard
       apiClient.getMyProfile().then((profile) => {
         setUser({
           id: profile.id,
@@ -43,21 +67,111 @@ export default function LoginPage() {
         router.replace('/dashboard');
       }).catch(() => {
         setError(t('impersonationFailed'));
-        // Clean up bad token
         localStorage.removeItem('access_token');
         localStorage.removeItem('user_type');
       });
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, []);
+
+  // Step 1: Create challenge and open Telegram
+  const handleTelegramLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const challenge = await apiClient.createLoginChallenge();
+      setChallengeId(challenge.challenge_id);
+      setDeepLink(challenge.deep_link);
+      setStep('waiting_bot');
+
+      // Open Telegram deep link
+      window.open(challenge.deep_link, '_blank');
+
+      // Start polling for OTP sent status
+      pollStartRef.current = Date.now();
+      pollRef.current = setInterval(async () => {
+        // Timeout after 5 minutes
+        if (Date.now() - pollStartRef.current > POLL_MAX_DURATION) {
+          stopPolling();
+          setStep('expired');
+          return;
+        }
+
+        try {
+          const status = await apiClient.pollChallengeStatus(challenge.challenge_id);
+          if (status.status === 'otp_sent') {
+            stopPolling();
+            setStep('enter_otp');
+            setTimeout(() => otpInputRef.current?.focus(), 100);
+          } else if (status.status === 'expired') {
+            stopPolling();
+            setStep('expired');
+          } else if (status.status === 'used') {
+            stopPolling();
+          }
+        } catch {
+          // Ignore poll errors, keep trying
+        }
+      }, POLL_INTERVAL);
+    } catch (err: any) {
+      setError(getErrorMessage(err, t('telegramLoginFailed')));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP
+  const handleVerifyOtp = async () => {
+    if (!challengeId || otp.length !== OTP_LENGTH) return;
+    setError('');
+    setStep('verifying');
+    try {
+      const response = await apiClient.verifyOtp({ challenge_id: challengeId, otp });
+      setUser(response, 'company_user');
+      router.push('/dashboard');
+    } catch (err: any) {
+      setStep('enter_otp');
+      setOtp('');
+      setError(getErrorMessage(err, t('telegramOtpFailed')));
+    }
+  };
+
+  // OTP input handler — digits only, auto-submit on 6 digits
+  const handleOtpChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, OTP_LENGTH);
+    setOtp(digits);
+  };
+
+  // Auto-submit when 6 digits entered
+  useEffect(() => {
+    if (otp.length === OTP_LENGTH && step === 'enter_otp') {
+      handleVerifyOtp();
+    }
+  }, [otp]);
+
+  // Reset to start
+  const handleReset = () => {
+    stopPolling();
+    setStep('idle');
+    setChallengeId('');
+    setDeepLink('');
+    setOtp('');
+    setError('');
+  };
+
+  // Email/password fallback
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const response = await apiClient.login({ email, password });
-
       if (response.must_change_password && response.temporary_token) {
         if (typeof window !== 'undefined') {
           localStorage.setItem('temporary_token', response.temporary_token);
@@ -65,7 +179,6 @@ export default function LoginPage() {
         router.push('/set-password');
         return;
       }
-
       setUser(response, 'company_user');
       router.push('/dashboard');
     } catch (err: any) {
@@ -77,50 +190,144 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title={t('welcomeBack')} subtitle={t('enterCredentials')} icon={<LoginOutlined style={{ fontSize: 28 }} />}>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">{t('email')}</label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            size="large"
-            className="glass-input"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">{t('password')}</label>
-            <Link href="/forgot-password" className="text-sm text-crm-indigo-500 hover:underline">
-              {t('forgotPassword')}
-            </Link>
-          </div>
-          <Input.Password
-            id="password"
-            placeholder={t('enterYourPassword')}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            size="large"
-            className="glass-input"
-          />
-        </div>
-        <div className="pt-1">
-          <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading}>
-            {loading ? t('signingIn') : t('signIn')}
-          </Button>
-        </div>
-        <p className="text-sm text-center text-gray-500">
-          {t('dontHaveAccount')}{' '}
-          <Link href="/register" className="text-crm-indigo-500 hover:underline font-medium">
-            {t('signUp')}
-          </Link>
-        </p>
-      </form>
+      <div className="space-y-5">
+        {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
+
+        {/* ── Telegram OTP Flow ── */}
+        {!showEmailFallback && (
+          <>
+            {step === 'idle' && (
+              <Button
+                type="primary"
+                size="large"
+                icon={<SendOutlined />}
+                className="w-full"
+                onClick={handleTelegramLogin}
+                loading={loading}
+              >
+                {t('telegramLogin')}
+              </Button>
+            )}
+
+            {step === 'waiting_bot' && (
+              <div className="text-center space-y-4">
+                <div className="animate-pulse">
+                  <SendOutlined style={{ fontSize: 32, color: '#0088cc' }} />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">{t('telegramWaitingBot')}</p>
+                  <p className="text-sm text-gray-500 mt-1">{t('telegramWaitingBotHint')}</p>
+                </div>
+                <Button size="small" type="link" href={deepLink} target="_blank">
+                  {t('telegramLogin')}
+                </Button>
+                <div>
+                  <Button size="small" type="text" onClick={handleReset}>
+                    {t('telegramCancel')}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === 'enter_otp' && (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="font-medium text-gray-800">{t('telegramEnterOtp')}</p>
+                  <p className="text-sm text-gray-500 mt-1">{t('telegramOtpHint')}</p>
+                </div>
+                <Input
+                  ref={otpInputRef}
+                  value={otp}
+                  onChange={(e) => handleOtpChange(e.target.value)}
+                  placeholder="000000"
+                  maxLength={OTP_LENGTH}
+                  size="large"
+                  className="text-center text-2xl tracking-[0.5em] font-mono"
+                  autoFocus
+                />
+                <Button
+                  type="primary"
+                  size="large"
+                  className="w-full"
+                  onClick={handleVerifyOtp}
+                  disabled={otp.length !== OTP_LENGTH}
+                  loading={step === 'verifying' as any}
+                >
+                  {t('signIn')}
+                </Button>
+                <div className="text-center">
+                  <Button size="small" type="text" onClick={handleReset}>
+                    {t('telegramCancel')}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === 'verifying' && (
+              <div className="text-center space-y-4">
+                <div className="animate-spin inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+                <p className="text-gray-600">{t('signingIn')}...</p>
+              </div>
+            )}
+
+            {step === 'expired' && (
+              <div className="text-center space-y-4">
+                <p className="text-gray-600">{t('telegramLinkExpired')}</p>
+                <Button type="primary" onClick={handleReset}>
+                  {t('telegramTryAgain')}
+                </Button>
+              </div>
+            )}
+
+            <Divider plain className="!text-gray-400 !text-xs">{t('or') || 'or'}</Divider>
+
+            <div className="text-center">
+              <Button type="link" size="small" onClick={() => setShowEmailFallback(true)}>
+                {t('useEmailInstead') || 'Use email instead'}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* ── Email/Password Fallback ── */}
+        {showEmailFallback && (
+          <form onSubmit={handleEmailLogin} className="space-y-5">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">{t('email')}</label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                size="large"
+                className="glass-input"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">{t('password')}</label>
+              <Input.Password
+                id="password"
+                placeholder={t('enterYourPassword')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                size="large"
+                className="glass-input"
+              />
+            </div>
+            <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading} loading={loading}>
+              {t('signIn')}
+            </Button>
+            <div className="text-center">
+              <Button type="link" size="small" onClick={() => { setShowEmailFallback(false); setError(''); }}>
+                {t('telegramLogin')}
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
     </AuthLayout>
   );
 }

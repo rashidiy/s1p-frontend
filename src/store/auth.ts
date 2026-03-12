@@ -6,10 +6,11 @@ export type UserType = 'owner' | 'company_user';
 
 interface AuthUser {
   id: string;
-  email: string;
+  email: string | null;
   first_name: string;
   last_name?: string | null;
   phone?: string | null;
+  telegram_user_id?: number | null;
   role?: UserRole;
   company_id?: string;
   is_active: boolean;

@@ -1,11 +1,10 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Layout, Menu, Avatar, Popover, Drawer } from 'antd';
+import { Layout, Menu, Avatar, Popover, Drawer, Segmented } from 'antd';
 import {
   DashboardOutlined,
   PhoneOutlined,
-  SettingOutlined,
   LogoutOutlined,
   BankOutlined,
   BarChartOutlined,
@@ -17,9 +16,16 @@ import {
   SafetyOutlined,
   FileTextOutlined,
   SendOutlined,
+  SunOutlined,
+  MoonOutlined,
+  LaptopOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
+import { useThemeStore } from '@/store/theme';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useLocale } from 'next-intl';
+import { locales, type Locale } from '@/i18n/config';
 import type { MenuProps } from 'antd';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -37,7 +43,6 @@ const ownerNavigation: NavItem[] = [
   { name: 'Dashboard', href: '/owner/dashboard', icon: <DashboardOutlined /> },
   { name: 'Companies', href: '/owner/companies', icon: <BankOutlined /> },
   { name: 'Contracts', href: '/owner/contracts', icon: <FileTextOutlined /> },
-  { name: 'Settings', href: '/owner/settings', icon: <SettingOutlined /> },
 ];
 
 const baseCompanyNavigation: NavItem[] = [
@@ -58,7 +63,6 @@ const adminNavigation: NavItem[] = [
   { name: 'Permission Groups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
   { name: 'Contract', href: '/settings/contract', icon: <FileTextOutlined /> },
   { name: 'Telegram', href: '/settings/telegram', icon: <SendOutlined /> },
-  { name: 'Settings', href: '/settings', icon: <SettingOutlined /> },
 ];
 
 interface SidebarProps {
@@ -66,12 +70,25 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
+const LOCALE_LABELS: Record<Locale, string> = {
+  ru: 'RU',
+  en: 'EN',
+  uz: 'UZ',
+};
+
 export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname() ?? '/';
   const router = useRouter();
   const isMobile = useIsMobile();
   const { user, isOwner, isAdmin, isManager, hasPermissionString, logout } = useAuthStore();
+  const { mode, setMode } = useThemeStore();
+  const locale = useLocale() as Locale;
   const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const handleLocaleChange = (newLocale: string) => {
+    document.cookie = `locale=${newLocale};path=/;max-age=31536000;samesite=lax`;
+    router.refresh();
+  };
 
   const getNavigation = () => {
     if (isOwner) return ownerNavigation;
@@ -126,7 +143,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   }));
 
   const profileMenuContent = (
-    <div style={{ width: 220, padding: '4px 0' }}>
+    <div style={{ width: 240, padding: '4px 0' }}>
       <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
         <p style={{ fontSize: 13, color: '#666', margin: 0 }}>{user?.email || user?.phone || ''}</p>
       </div>
@@ -138,6 +155,38 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           <UserOutlined /> Profile
         </div>
       </Link>
+      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '4px 0' }} />
+
+      {/* Theme */}
+      <div style={{ padding: '8px 16px' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Theme</div>
+        <Segmented
+          block
+          size="small"
+          value={mode}
+          onChange={(val) => setMode(val as 'light' | 'dark' | 'system')}
+          options={[
+            { value: 'light', icon: <SunOutlined /> },
+            { value: 'dark', icon: <MoonOutlined /> },
+            { value: 'system', icon: <LaptopOutlined /> },
+          ]}
+        />
+      </div>
+
+      {/* Language */}
+      <div style={{ padding: '4px 16px 8px' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <GlobalOutlined style={{ marginRight: 4 }} />Language
+        </div>
+        <Segmented
+          block
+          size="small"
+          value={locale}
+          onChange={(val) => handleLocaleChange(val as string)}
+          options={locales.map((loc) => ({ value: loc, label: LOCALE_LABELS[loc] }))}
+        />
+      </div>
+
       <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '4px 0' }} />
       <div className="profile-menu-item profile-menu-item--danger" onClick={handleLogout}>
         <LogoutOutlined /> Log out

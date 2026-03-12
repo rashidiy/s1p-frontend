@@ -292,6 +292,61 @@ export interface ContractFilters extends PaginationParams {
 }
 
 // ============================================================================
+// TELEGRAM AUTH
+// ============================================================================
+
+export interface InviteTokenCreateRequest {
+  first_name: string;
+  last_name?: string | null;
+  phone: string;
+  role?: string;
+  permissions?: string[];
+  permission_group_id?: string | null;
+}
+
+export interface InviteTokenResponse {
+  invite_token: string;
+  expires_at: string;
+  role: string;
+  first_name: string;
+  phone: string;
+}
+
+export interface InviteTokenListItem {
+  id: string;
+  role: string;
+  first_name: string;
+  last_name: string | null;
+  phone: string;
+  created_by_name: string;
+  expires_at: string;
+  used_at: string | null;
+  created_at: string;
+  status: 'pending' | 'used' | 'expired';
+}
+
+export interface LoginChallengeResponse {
+  challenge_id: string;
+  deep_link: string;
+  expires_at: string;
+}
+
+export interface ChallengeStatusResponse {
+  status: 'pending' | 'otp_sent' | 'expired' | 'used';
+  expires_at: string;
+}
+
+export interface VerifyOtpRequest {
+  challenge_id: string;
+  otp: string;
+}
+
+export interface TelegramRegisterRequest {
+  session_id: string;
+  invite_token: string;
+}
+
+// ============================================================================
 // TELEGRAM CONFIGURATION
 // ============================================================================
 
