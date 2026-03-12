@@ -99,7 +99,14 @@
     "telegramInviteTokenLabel": "Токен приглашения",
     "telegramInviteTokenHint": "Введите токен XXXX-XXXX, полученный от администратора",
     "telegramRegistering": "Регистрация...",
-    "telegramRegisterSubmit": "Завершить регистрацию"
+    "telegramRegisterSubmit": "Завершить регистрацию",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "phone": "Телефон",
+    "loading": "Загрузка...",
+    "telegramRegistrationRequired": "Регистрация через Telegram",
+    "telegramRegistrationDescription": "Для регистрации попросите администратора вашей компании отправить ссылку-приглашение в Telegram. Откройте ссылку в Telegram для начала регистрации.",
+    "or": "или"
   },
   "actions": {
     "create": "Создать",
@@ -654,7 +661,9 @@
     "telegramNoInvites": "Пока нет приглашений",
     "roleOperator": "Оператор",
     "roleManager": "Менеджер",
-    "roleAdmin": "Администратор"
+    "roleAdmin": "Администратор",
+    "copyMessage": "Копировать сообщение",
+    "copyTokenOnly": "Копировать только токен"
   },
   "settings": {
     "title": "Настройки",

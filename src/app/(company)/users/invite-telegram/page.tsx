@@ -7,7 +7,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { UserRole } from '@/types/api';
 import type { InviteTokenResponse } from '@/types/api';
 import { ArrowLeftOutlined, CopyOutlined, CheckOutlined, WarningOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select, Modal, Typography } from 'antd';
+import { Alert, Button, Input, Select, Typography } from 'antd';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
@@ -24,7 +24,6 @@ export default function InviteTelegramPage() {
   const tFields = useTranslations('fields');
   const tActions = useTranslations('actions');
   const tErrors = useTranslations('errors');
-  const tAuth = useTranslations('auth');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,9 +57,47 @@ export default function InviteTelegramPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       const el = document.createElement('textarea');
       el.value = tokenResult.invite_token;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Build invite message for copying
+  const buildInviteMessage = () => {
+    if (!tokenResult) return '';
+    const roleName = tokenResult.role.replace('company_', '').charAt(0).toUpperCase() + tokenResult.role.replace('company_', '').slice(1);
+    const expiresFormatted = new Date(tokenResult.expires_at).toLocaleString();
+    const companyName = tokenResult.company_name || 'вашу компанию';
+    const deepLink = tokenResult.deep_link || '';
+
+    return [
+      `Вас пригласили в ${companyName} (S1P CRM)!`,
+      '',
+      `Роль: ${roleName}`,
+      `Код приглашения: ${tokenResult.invite_token}`,
+      '',
+      'Для регистрации нажмите на ссылку:',
+      `👉 ${deepLink}`,
+      '',
+      `Действует до: ${expiresFormatted}`,
+    ].join('\n');
+  };
+
+  const handleCopyMessage = async () => {
+    const msg = buildInviteMessage();
+    try {
+      await navigator.clipboard.writeText(msg);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const el = document.createElement('textarea');
+      el.value = msg;
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -97,21 +134,27 @@ export default function InviteTelegramPage() {
               message={t('telegramTokenOnceWarning')}
             />
 
-            <div className="bg-gray-50 rounded-xl p-6 text-center">
-              <p className="text-xs text-gray-500 mb-2">{t('telegramInviteTokenLabel')}</p>
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-3xl font-mono font-bold tracking-[0.4em] text-gray-900">
-                  {tokenResult.invite_token}
-                </span>
-                <Button
-                  icon={copied ? <CheckOutlined /> : <CopyOutlined />}
-                  type={copied ? 'primary' : 'default'}
-                  onClick={handleCopyToken}
-                  size="large"
-                >
-                  {copied ? t('telegramTokenCopied') : t('telegramTokenCopy')}
-                </Button>
-              </div>
+            {/* Formatted invite message preview */}
+            <div className="bg-gray-50 rounded-xl p-5 space-y-1 font-mono text-sm text-gray-800 whitespace-pre-wrap">
+              {buildInviteMessage()}
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="primary"
+                icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+                onClick={handleCopyMessage}
+                size="large"
+              >
+                {copied ? t('telegramTokenCopied') : (t('copyMessage') || 'Copy Message')}
+              </Button>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleCopyToken}
+                size="large"
+              >
+                {t('copyTokenOnly') || 'Copy Token Only'}
+              </Button>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">

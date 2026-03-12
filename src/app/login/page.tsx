@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { Button, Input, Alert, Divider } from 'antd';
+import { Button, Input, Alert } from 'antd';
 import { LoginOutlined, SendOutlined } from '@ant-design/icons';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { apiClient } from '@/lib/api';
@@ -33,11 +32,6 @@ export default function LoginPage() {
   const pollRef = useRef<NodeJS.Timeout | null>(null);
   const pollStartRef = useRef<number>(0);
   const otpInputRef = useRef<any>(null);
-
-  // Email fallback state
-  const [showEmailFallback, setShowEmailFallback] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   // Cleanup polling on unmount
   useEffect(() => {
@@ -165,167 +159,93 @@ export default function LoginPage() {
     setError('');
   };
 
-  // Email/password fallback
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const response = await apiClient.login({ email, password });
-      if (response.must_change_password && response.temporary_token) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('temporary_token', response.temporary_token);
-        }
-        router.push('/set-password');
-        return;
-      }
-      setUser(response, 'company_user');
-      router.push('/dashboard');
-    } catch (err: any) {
-      setError(getErrorMessage(err, t('enterCredentials')));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <AuthLayout title={t('welcomeBack')} subtitle={t('enterCredentials')} icon={<LoginOutlined style={{ fontSize: 28 }} />}>
       <div className="space-y-5">
         {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
 
-        {/* ── Telegram OTP Flow ── */}
-        {!showEmailFallback && (
-          <>
-            {step === 'idle' && (
-              <Button
-                type="primary"
-                size="large"
-                icon={<SendOutlined />}
-                className="w-full"
-                onClick={handleTelegramLogin}
-                loading={loading}
-              >
-                {t('telegramLogin')}
-              </Button>
-            )}
-
-            {step === 'waiting_bot' && (
-              <div className="text-center space-y-4">
-                <div className="animate-pulse">
-                  <SendOutlined style={{ fontSize: 32, color: '#0088cc' }} />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800">{t('telegramWaitingBot')}</p>
-                  <p className="text-sm text-gray-500 mt-1">{t('telegramWaitingBotHint')}</p>
-                </div>
-                <Button size="small" type="link" href={deepLink} target="_blank">
-                  {t('telegramLogin')}
-                </Button>
-                <div>
-                  <Button size="small" type="text" onClick={handleReset}>
-                    {t('telegramCancel')}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {step === 'enter_otp' && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <p className="font-medium text-gray-800">{t('telegramEnterOtp')}</p>
-                  <p className="text-sm text-gray-500 mt-1">{t('telegramOtpHint')}</p>
-                </div>
-                <Input
-                  ref={otpInputRef}
-                  value={otp}
-                  onChange={(e) => handleOtpChange(e.target.value)}
-                  placeholder="000000"
-                  maxLength={OTP_LENGTH}
-                  size="large"
-                  className="text-center text-2xl tracking-[0.5em] font-mono"
-                  autoFocus
-                />
-                <Button
-                  type="primary"
-                  size="large"
-                  className="w-full"
-                  onClick={handleVerifyOtp}
-                  disabled={otp.length !== OTP_LENGTH}
-                  loading={step === 'verifying' as any}
-                >
-                  {t('signIn')}
-                </Button>
-                <div className="text-center">
-                  <Button size="small" type="text" onClick={handleReset}>
-                    {t('telegramCancel')}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {step === 'verifying' && (
-              <div className="text-center space-y-4">
-                <div className="animate-spin inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
-                <p className="text-gray-600">{t('signingIn')}...</p>
-              </div>
-            )}
-
-            {step === 'expired' && (
-              <div className="text-center space-y-4">
-                <p className="text-gray-600">{t('telegramLinkExpired')}</p>
-                <Button type="primary" onClick={handleReset}>
-                  {t('telegramTryAgain')}
-                </Button>
-              </div>
-            )}
-
-            <Divider plain className="!text-gray-400 !text-xs">{t('or') || 'or'}</Divider>
-
-            <div className="text-center">
-              <Button type="link" size="small" onClick={() => setShowEmailFallback(true)}>
-                {t('useEmailInstead') || 'Use email instead'}
-              </Button>
-            </div>
-          </>
+        {/* Telegram OTP Flow */}
+        {step === 'idle' && (
+          <Button
+            type="primary"
+            size="large"
+            icon={<SendOutlined />}
+            className="w-full"
+            onClick={handleTelegramLogin}
+            loading={loading}
+          >
+            {t('telegramLogin')}
+          </Button>
         )}
 
-        {/* ── Email/Password Fallback ── */}
-        {showEmailFallback && (
-          <form onSubmit={handleEmailLogin} className="space-y-5">
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">{t('email')}</label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                size="large"
-                className="glass-input"
-              />
+        {step === 'waiting_bot' && (
+          <div className="text-center space-y-4">
+            <div className="animate-pulse">
+              <SendOutlined style={{ fontSize: 32, color: '#0088cc' }} />
             </div>
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">{t('password')}</label>
-              <Input.Password
-                id="password"
-                placeholder={t('enterYourPassword')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                size="large"
-                className="glass-input"
-              />
+            <div>
+              <p className="font-medium text-gray-800">{t('telegramWaitingBot')}</p>
+              <p className="text-sm text-gray-500 mt-1">{t('telegramWaitingBotHint')}</p>
             </div>
-            <Button type="primary" htmlType="submit" className="w-full" size="large" disabled={loading} loading={loading}>
+            <Button size="small" type="link" href={deepLink} target="_blank">
+              {t('telegramLogin')}
+            </Button>
+            <div>
+              <Button size="small" type="text" onClick={handleReset}>
+                {t('telegramCancel')}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 'enter_otp' && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <p className="font-medium text-gray-800">{t('telegramEnterOtp')}</p>
+              <p className="text-sm text-gray-500 mt-1">{t('telegramOtpHint')}</p>
+            </div>
+            <Input
+              ref={otpInputRef}
+              value={otp}
+              onChange={(e) => handleOtpChange(e.target.value)}
+              placeholder="000000"
+              maxLength={OTP_LENGTH}
+              size="large"
+              className="text-center text-2xl tracking-[0.5em] font-mono"
+              autoFocus
+            />
+            <Button
+              type="primary"
+              size="large"
+              className="w-full"
+              onClick={handleVerifyOtp}
+              disabled={otp.length !== OTP_LENGTH}
+              loading={step === 'verifying' as any}
+            >
               {t('signIn')}
             </Button>
             <div className="text-center">
-              <Button type="link" size="small" onClick={() => { setShowEmailFallback(false); setError(''); }}>
-                {t('telegramLogin')}
+              <Button size="small" type="text" onClick={handleReset}>
+                {t('telegramCancel')}
               </Button>
             </div>
-          </form>
+          </div>
+        )}
+
+        {step === 'verifying' && (
+          <div className="text-center space-y-4">
+            <div className="animate-spin inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+            <p className="text-gray-600">{t('signingIn')}...</p>
+          </div>
+        )}
+
+        {step === 'expired' && (
+          <div className="text-center space-y-4">
+            <p className="text-gray-600">{t('telegramLinkExpired')}</p>
+            <Button type="primary" onClick={handleReset}>
+              {t('telegramTryAgain')}
+            </Button>
+          </div>
         )}
       </div>
     </AuthLayout>
