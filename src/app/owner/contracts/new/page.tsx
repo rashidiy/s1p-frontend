@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Alert, Button, DatePicker, Input, Select, message } from 'antd';
+import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -15,6 +16,10 @@ export default function NewContractPage() {
   const [companies, setCompanies] = useState<CompanyResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const t = useTranslations('ownerContracts');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
+  const tFields = useTranslations('fields');
 
   const [form, setForm] = useState({
     company_id: '',
@@ -40,7 +45,7 @@ export default function NewContractPage() {
       setCompanies(data);
     } catch (err) {
       console.error('Failed to load companies:', err);
-      message.error('Failed to load companies');
+      message.error(tErrors('failedToLoadCompanies'));
     }
   };
 
@@ -67,7 +72,7 @@ export default function NewContractPage() {
       });
       router.push(`/owner/contracts/${contract.id}`);
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to create contract'));
+      setError(getErrorMessage(err, tErrors('failedToCreateContract')));
     } finally {
       setLoading(false);
     }
@@ -79,16 +84,16 @@ export default function NewContractPage() {
         <div className="flex items-center gap-3">
           <Button size="small" type="text" onClick={() => router.push('/owner/contracts')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
-          <p className="page-subtitle">Configure the billing contract for a company</p>
+          <p className="page-subtitle">{t('configureContract')}</p>
         </div>
       </div>
 
       <div className="glass-card overflow-hidden">
         <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
-          <h3 className="text-lg font-semibold text-gray-900">Contract Details</h3>
-          <p className="text-sm text-gray-400 mt-0.5">Fill in the contract information below</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('contractDetails')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('contractInfo')}</p>
         </div>
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -98,18 +103,18 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Company <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{tFields('company')} <span className="text-red-400">*</span></label>
                 <Select
                   value={form.company_id || undefined}
                   onChange={(v) => setForm({ ...form, company_id: v })}
-                  placeholder="Select company"
+                  placeholder={t('selectCompany')}
                   size="large"
                   style={{ width: "100%" }}
                   options={companies.map((c) => ({ value: c.id, label: c.name }))}
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Contract Name <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{t('contractName')} <span className="text-red-400">*</span></label>
                 <Input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -122,7 +127,7 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Billing Period <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{tFields('billingPeriod')} <span className="text-red-400">*</span></label>
                 <Select
                   value={form.billing_period}
                   onChange={(v) => setForm({ ...form, billing_period: v as 'monthly' | 'yearly' })}
@@ -132,7 +137,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Price <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{t('price')} <span className="text-red-400">*</span></label>
                 <Input
                   type="number"
                   value={form.price}
@@ -143,7 +148,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Currency</label>
+                <label className="text-sm font-medium text-gray-700">{tFields('currency')}</label>
                 <Input
                   value={form.currency}
                   onChange={(e) => setForm({ ...form, currency: e.target.value })}
@@ -154,26 +159,26 @@ export default function NewContractPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Max Admins</label>
+                <label className="text-sm font-medium text-gray-700">{t('maxAdmins')}</label>
                 <Input type="number" value={form.max_admins} onChange={(e) => setForm({ ...form, max_admins: e.target.value })} size="large" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Max Managers</label>
+                <label className="text-sm font-medium text-gray-700">{t('maxManagers')}</label>
                 <Input type="number" value={form.max_managers} onChange={(e) => setForm({ ...form, max_managers: e.target.value })} size="large" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Max Operators</label>
+                <label className="text-sm font-medium text-gray-700">{t('maxOperators')}</label>
                 <Input type="number" value={form.max_operators} onChange={(e) => setForm({ ...form, max_operators: e.target.value })} size="large" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Storage (GB)</label>
+                <label className="text-sm font-medium text-gray-700">{t('storageGb')}</label>
                 <Input type="number" value={form.max_storage_gb} onChange={(e) => setForm({ ...form, max_storage_gb: e.target.value })} size="large" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Start Date <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{tFields('startDate')} <span className="text-red-400">*</span></label>
                 <DatePicker
                   className="w-full"
                   size="large"
@@ -183,7 +188,7 @@ export default function NewContractPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">End Date <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{tFields('endDate')} <span className="text-red-400">*</span></label>
                 <DatePicker
                   className="w-full"
                   size="large"
@@ -196,10 +201,10 @@ export default function NewContractPage() {
 
             <div className="flex gap-3 pt-3 border-t border-gray-100">
               <Button type="primary" htmlType="submit" size="large" loading={loading}>
-                {loading ? 'Creating...' : 'Create Contract'}
+                {loading ? tActions('creating') : t('createContract')}
               </Button>
               <Button size="large" htmlType="button" onClick={() => router.push('/owner/contracts')}>
-                Cancel
+                {tActions('cancel')}
               </Button>
             </div>
           </form>

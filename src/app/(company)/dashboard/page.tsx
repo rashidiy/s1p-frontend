@@ -56,6 +56,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
   const t = useTranslations('dashboard');
+  const tErrors = useTranslations('errors');
   const tActions = useTranslations('actions');
 
   const loadDashboard = useCallback(async () => {
@@ -64,7 +65,7 @@ export default function DashboardPage() {
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
-      message.error('Failed to load dashboard');
+      message.error(tErrors('failedToLoadDashboard'));
     } finally {
       setLoading(false);
     }

@@ -24,7 +24,7 @@ import {
 import { useAuthStore } from '@/store/auth';
 import { useThemeStore } from '@/store/theme';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { locales, type Locale } from '@/i18n/config';
 import type { MenuProps } from 'antd';
 import { useState } from 'react';
@@ -33,36 +33,36 @@ import Link from 'next/link';
 const { Sider } = Layout;
 
 interface NavItem {
-  name: string;
+  nameKey: string;
   href: string;
   icon: React.ReactNode;
   permission?: string;
 }
 
 const ownerNavigation: NavItem[] = [
-  { name: 'Dashboard', href: '/owner/dashboard', icon: <DashboardOutlined /> },
-  { name: 'Companies', href: '/owner/companies', icon: <BankOutlined /> },
-  { name: 'Contracts', href: '/owner/contracts', icon: <FileTextOutlined /> },
+  { nameKey: 'dashboard', href: '/owner/dashboard', icon: <DashboardOutlined /> },
+  { nameKey: 'companies', href: '/owner/companies', icon: <BankOutlined /> },
+  { nameKey: 'contracts', href: '/owner/contracts', icon: <FileTextOutlined /> },
 ];
 
 const baseCompanyNavigation: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: <DashboardOutlined /> },
-  { name: 'Contacts', href: '/contacts', icon: <UserOutlined />, permission: 'contacts.read' },
-  { name: 'Leads', href: '/leads', icon: <RiseOutlined />, permission: 'leads.read' },
-  { name: 'Deals', href: '/deals', icon: <FundProjectionScreenOutlined />, permission: 'deals.read' },
-  { name: 'Tasks', href: '/tasks', icon: <CheckSquareOutlined />, permission: 'tasks.read' },
-  { name: 'Calls', href: '/calls', icon: <PhoneOutlined />, permission: 'calls.read' },
+  { nameKey: 'dashboard', href: '/dashboard', icon: <DashboardOutlined /> },
+  { nameKey: 'contacts', href: '/contacts', icon: <UserOutlined />, permission: 'contacts.read' },
+  { nameKey: 'leads', href: '/leads', icon: <RiseOutlined />, permission: 'leads.read' },
+  { nameKey: 'deals', href: '/deals', icon: <FundProjectionScreenOutlined />, permission: 'deals.read' },
+  { nameKey: 'tasks', href: '/tasks', icon: <CheckSquareOutlined />, permission: 'tasks.read' },
+  { nameKey: 'calls', href: '/calls', icon: <PhoneOutlined />, permission: 'calls.read' },
 ];
 
 const managerNavigation: NavItem[] = [
-  { name: 'Analytics', href: '/analytics', icon: <BarChartOutlined /> },
+  { nameKey: 'analytics', href: '/analytics', icon: <BarChartOutlined /> },
 ];
 
 const adminNavigation: NavItem[] = [
-  { name: 'Team', href: '/users', icon: <TeamOutlined /> },
-  { name: 'Permission Groups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
-  { name: 'Contract', href: '/settings/contract', icon: <FileTextOutlined /> },
-  { name: 'Telegram', href: '/settings/telegram', icon: <SendOutlined /> },
+  { nameKey: 'team', href: '/users', icon: <TeamOutlined /> },
+  { nameKey: 'permissionGroups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
+  { nameKey: 'contract', href: '/settings/contract', icon: <FileTextOutlined /> },
+  { nameKey: 'telegram', href: '/settings/telegram', icon: <SendOutlined /> },
 ];
 
 interface SidebarProps {
@@ -84,6 +84,9 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const { mode, setMode } = useThemeStore();
   const locale = useLocale() as Locale;
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const t = useTranslations('nav');
+  const tSettings = useTranslations('settings');
+  const tCommon = useTranslations('common');
 
   const handleLocaleChange = (newLocale: string) => {
     document.cookie = `locale=${newLocale};path=/;max-age=31536000;samesite=lax`;
@@ -139,27 +142,27 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const menuItems: MenuProps['items'] = navigation.map((item) => ({
     key: item.href,
     icon: item.icon,
-    label: item.name,
+    label: t(item.nameKey),
   }));
 
   const profileMenuContent = (
     <div style={{ width: 240, padding: '4px 0' }}>
-      <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-        <p style={{ fontSize: 13, color: '#666', margin: 0 }}>{user?.email || user?.phone || ''}</p>
+      <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid var(--popover-border)' }}>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>{user?.phone || user?.email || ''}</p>
       </div>
       <Link
         href={isOwner ? '/owner/profile' : '/profile'}
         onClick={() => { setPopoverOpen(false); onMobileClose?.(); }}
       >
         <div className="profile-menu-item">
-          <UserOutlined /> Profile
+          <UserOutlined /> {t('profile')}
         </div>
       </Link>
-      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '4px 0' }} />
+      <div style={{ borderTop: '1px solid var(--popover-border)', margin: '4px 0' }} />
 
       {/* Theme */}
       <div style={{ padding: '8px 16px' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Theme</div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tSettings('appearance')}</div>
         <Segmented
           block
           size="small"
@@ -175,8 +178,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
 
       {/* Language */}
       <div style={{ padding: '4px 16px 8px' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          <GlobalOutlined style={{ marginRight: 4 }} />Language
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <GlobalOutlined style={{ marginRight: 4 }} />{tSettings('language')}
         </div>
         <Segmented
           block
@@ -187,9 +190,9 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
         />
       </div>
 
-      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '4px 0' }} />
+      <div style={{ borderTop: '1px solid var(--popover-border)', margin: '4px 0' }} />
       <div className="profile-menu-item profile-menu-item--danger" onClick={handleLogout}>
-        <LogoutOutlined /> Log out
+        <LogoutOutlined /> {t('logout')}
       </div>
     </div>
   );
@@ -204,11 +207,11 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           </svg>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             S1P
           </span>
-          <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
-            CRM Platform
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+            {tCommon('crmPlatform')}
           </span>
         </div>
       </div>
@@ -254,7 +257,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
                   {user.first_name} {user.last_name}
                 </div>
                 <div className="sidebar-profile-email">
-                  {user.email || user.phone || ''}
+                  {user.phone || user.email || ''}
                 </div>
               </div>
             </div>

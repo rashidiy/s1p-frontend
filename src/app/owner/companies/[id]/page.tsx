@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAddOutlined, SaveOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, Tag, message } from 'antd';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import type { CompanyDetailResponse, InviteAdminResponse } from '@/types/api';
 
@@ -11,6 +12,12 @@ export default function CompanyDetailPage() {
   const params = useParams()!;
   const router = useRouter();
   const companyId = params.id as string;
+  const t = useTranslations('companies');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
+  const tFields = useTranslations('fields');
+  const tStatuses = useTranslations('statuses');
+  const tUsers = useTranslations('users');
 
   const [company, setCompany] = useState<CompanyDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +47,7 @@ export default function CompanyDetailPage() {
       setEditForm({ name: data.name });
     } catch (error) {
       console.error('Failed to load company:', error);
-      message.error('Failed to load company');
+      message.error(tErrors('failedToLoadCompanies'));
     } finally {
       setLoading(false);
     }
@@ -53,7 +60,7 @@ export default function CompanyDetailPage() {
       loadCompany();
     } catch (error) {
       console.error('Failed to update company:', error);
-      message.error('Failed to update company');
+      message.error(tErrors('failedToUpdateCompany'));
     }
   };
 
@@ -68,7 +75,7 @@ export default function CompanyDetailPage() {
       loadCompany();
     } catch (error) {
       console.error('Failed to toggle company status:', error);
-      message.error('Failed to toggle company status');
+      message.error(tErrors('failedToToggleCompanyStatus'));
     }
   };
 
@@ -85,24 +92,35 @@ export default function CompanyDetailPage() {
       setInviteResult(result);
       setInviteForm({ first_name: '', last_name: '', phone: '' });
     } catch (error: any) {
-      setInviteMessage(error.response?.data?.detail || 'Failed to invite admin');
+      setInviteMessage(error.response?.data?.detail || tErrors('failedToInviteAdmin'));
     } finally {
       setInviting(false);
     }
   };
 
+  const buildRegistrationUrl = () => {
+    if (!company?.subdomain) return '';
+    const { protocol, host } = window.location;
+    const parts = host.split('.');
+    if (parts.length >= 3) {
+      parts[0] = company.subdomain;
+    } else {
+      parts.unshift(company.subdomain);
+    }
+    return `${protocol}//${parts.join('.')}/register`;
+  };
+
   const buildAdminInviteMessage = () => {
     if (!inviteResult) return '';
     const expiresFormatted = new Date(inviteResult.expires_at).toLocaleString();
+    const regUrl = buildRegistrationUrl();
     return [
       `Вас пригласили в ${inviteResult.company_name} (S1P CRM)!`,
       '',
       `Роль: Admin`,
       `Код приглашения: ${inviteResult.invite_token}`,
       '',
-      'Для регистрации нажмите на ссылку:',
-      `👉 ${inviteResult.deep_link}`,
-      '',
+      ...(regUrl ? [`Для регистрации перейдите по ссылке:`, regUrl, ''] : []),
       `Действует до: ${expiresFormatted}`,
     ].join('\n');
   };
@@ -148,7 +166,7 @@ export default function CompanyDetailPage() {
       </div>
     </div>
   );
-  if (!company) return <div className="p-6">Company not found</div>;
+  if (!company) return <div className="p-6">{t('companyNotFound')}</div>;
 
   return (
     <div className="space-y-6">
@@ -156,20 +174,20 @@ export default function CompanyDetailPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <Button size="small" type="text" onClick={() => router.push('/owner/companies')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
           <Tag color={company.is_active ? 'blue' : undefined}>
-            {company.is_active ? 'Active' : 'Inactive'}
+            {company.is_active ? tStatuses('active') : tStatuses('inactive')}
           </Tag>
         </div>
         <div className="flex gap-2">
           <Button type="default" onClick={() => setShowInvite(true)}>
             <UserAddOutlined style={{ marginRight: 8 }} />
-            <span className="hidden sm:inline">Invite Admin</span>
+            <span className="hidden sm:inline">{t('inviteAdmin')}</span>
           </Button>
           <Button type="primary" danger={company.is_active}
             onClick={handleToggleActive}>
-            {company.is_active ? 'Deactivate' : 'Activate'}
+            {company.is_active ? tActions('deactivate') : tActions('activate')}
           </Button>
         </div>
       </div>
@@ -188,14 +206,14 @@ export default function CompanyDetailPage() {
       {showInvite && !inviteResult && (
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
-            <h3 className="text-base font-semibold text-gray-900">Invite Company Admin</h3>
-            <p className="text-sm text-gray-400 mt-0.5">Create a Telegram invite for a new company admin</p>
+            <h3 className="text-base font-semibold text-gray-900">{t('inviteCompanyAdmin')}</h3>
+            <p className="text-sm text-gray-400 mt-0.5">{t('inviteCompanyAdminSubtitle')}</p>
           </div>
           <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
             <form onSubmit={handleInviteAdmin} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700">First Name <span className="text-red-400">*</span></label>
+                  <label className="text-sm font-medium text-gray-700">{tFields('firstName')} <span className="text-red-400">*</span></label>
                   <Input
                     value={inviteForm.first_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, first_name: e.target.value })}
@@ -204,7 +222,7 @@ export default function CompanyDetailPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700">Last Name</label>
+                  <label className="text-sm font-medium text-gray-700">{tFields('lastName')}</label>
                   <Input
                     value={inviteForm.last_name}
                     onChange={(e) => setInviteForm({ ...inviteForm, last_name: e.target.value })}
@@ -213,7 +231,7 @@ export default function CompanyDetailPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Phone</label>
+                <label className="text-sm font-medium text-gray-700">{tFields('phone')}</label>
                 <Input
                   value={inviteForm.phone}
                   onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
@@ -223,10 +241,10 @@ export default function CompanyDetailPage() {
               </div>
               <div className="flex gap-2 pt-2 border-t border-gray-100">
                 <Button type="primary" htmlType="submit" loading={inviting}>
-                  {inviting ? 'Creating...' : 'Create Invite'}
+                  {inviting ? tActions('creating') : tActions('create')}
                 </Button>
                 <Button htmlType="button" onClick={() => setShowInvite(false)}>
-                  Cancel
+                  {tActions('cancel')}
                 </Button>
               </div>
             </form>
@@ -237,14 +255,14 @@ export default function CompanyDetailPage() {
       {inviteResult && (
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
-            <h3 className="text-base font-semibold text-gray-900">Admin Invite Created</h3>
+            <h3 className="text-base font-semibold text-gray-900">{t('adminInviteCreated')}</h3>
           </div>
           <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3 space-y-4">
             <Alert
               type="warning"
               showIcon
               className="!rounded-xl"
-              message="This invite token will only be shown once. Copy the message now."
+              message={t('inviteTokenOnceWarning')}
             />
             <div className="bg-gray-50 rounded-xl p-5 font-mono text-sm text-gray-800 whitespace-pre-wrap">
               {buildAdminInviteMessage()}
@@ -254,13 +272,13 @@ export default function CompanyDetailPage() {
                 type="primary"
                 onClick={handleCopyAdminMessage}
               >
-                {messageCopied ? 'Copied!' : 'Copy Message'}
+                {messageCopied ? tUsers('telegramTokenCopied') : tUsers('copyMessage')}
               </Button>
               <Button onClick={() => {
                 setInviteResult(null);
                 setShowInvite(false);
               }}>
-                Done
+                {tActions('done')}
               </Button>
             </div>
           </div>
@@ -270,7 +288,7 @@ export default function CompanyDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">Company Details</h3>
+            <h3 className="text-base font-semibold text-gray-900">{t('companyDetails')}</h3>
             {!editing && (
               <Button size="small" type="text" icon={<EditOutlined />} onClick={() => setEditing(true)} />
             )}
@@ -279,7 +297,7 @@ export default function CompanyDetailPage() {
             {editing ? (
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700">Company Name</label>
+                  <label className="text-sm font-medium text-gray-700">{t('companyName')}</label>
                   <Input
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
@@ -287,17 +305,17 @@ export default function CompanyDetailPage() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>Save</Button>
-                  <Button icon={<CloseOutlined />} onClick={() => setEditing(false)}>Cancel</Button>
+                  <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>{tActions('save')}</Button>
+                  <Button icon={<CloseOutlined />} onClick={() => setEditing(false)}>{tActions('cancel')}</Button>
                 </div>
               </div>
             ) : (
               <div className="space-y-3">
                 {[
-                  { label: 'Name', value: company.name },
-                  { label: 'Subdomain', value: company.subdomain || '-' },
-                  { label: 'Provider', value: company.provider_type?.toUpperCase() },
-                  { label: 'Created', value: new Date(company.created_at).toLocaleDateString() },
+                  { label: tFields('name'), value: company.name },
+                  { label: t('subdomain'), value: company.subdomain || '-' },
+                  { label: tFields('provider'), value: company.provider_type?.toUpperCase() },
+                  { label: tFields('created'), value: new Date(company.created_at).toLocaleDateString() },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
                     <span className="text-sm text-gray-400">{row.label}</span>
@@ -305,9 +323,9 @@ export default function CompanyDetailPage() {
                   </div>
                 ))}
                 <div className="flex justify-between items-center py-1.5">
-                  <span className="text-sm text-gray-400">Status</span>
+                  <span className="text-sm text-gray-400">{tFields('status')}</span>
                   <Tag color={company.is_active ? 'green' : 'default'}>
-                    {company.is_active ? 'Active' : 'Inactive'}
+                    {company.is_active ? tStatuses('active') : tStatuses('inactive')}
                   </Tag>
                 </div>
               </div>
@@ -317,7 +335,7 @@ export default function CompanyDetailPage() {
 
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
-            <h3 className="text-base font-semibold text-gray-900">Provider Configuration</h3>
+            <h3 className="text-base font-semibold text-gray-900">{t('providerConfiguration')}</h3>
           </div>
           <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3">
             {Object.keys(company.provider_config || {}).length > 0 ? (
@@ -332,7 +350,7 @@ export default function CompanyDetailPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No provider configuration</p>
+              <p className="text-sm text-gray-400">{t('noProviderConfiguration')}</p>
             )}
           </div>
         </div>
@@ -340,12 +358,12 @@ export default function CompanyDetailPage() {
         {company.webhook_url && (
           <div className="glass-card overflow-hidden lg:col-span-2">
             <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-2">
-              <h3 className="text-base font-semibold text-gray-900">Webhook</h3>
+              <h3 className="text-base font-semibold text-gray-900">{t('webhook')}</h3>
             </div>
             <div className="px-4 sm:px-6 pb-5 sm:pb-6 pt-3 space-y-3">
               {[
-                { label: 'URL', value: company.webhook_url },
-                { label: 'Token', value: company.webhook_token },
+                { label: t('url'), value: company.webhook_url },
+                { label: t('token'), value: company.webhook_token },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
                   <span className="text-sm text-gray-400">{row.label}</span>

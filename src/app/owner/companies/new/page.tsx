@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -13,6 +14,9 @@ export default function NewCompanyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [providerType, setProviderType] = useState<string>('sipuni');
+  const t = useTranslations('companies');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +41,7 @@ export default function NewCompanyPage() {
       });
       router.push('/owner/companies');
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to create company'));
+      setError(getErrorMessage(err, tErrors('failedToCreateCompany')));
     } finally {
       setIsLoading(false);
     }
@@ -52,14 +56,14 @@ export default function NewCompanyPage() {
               <ArrowLeftOutlined />
             </Button>
           </Link>
-          <p className="page-subtitle">Register a new company on the platform</p>
+          <p className="page-subtitle">{t('registerNewCompany')}</p>
         </div>
       </div>
 
       <div className="glass-card max-w-2xl sm:mx-auto overflow-hidden">
         <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-2">
-          <h3 className="text-lg font-semibold text-gray-900">Company Information</h3>
-          <p className="text-sm text-gray-400 mt-0.5">Enter the details for the new company</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('companyInformation')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('enterCompanyDetails')}</p>
         </div>
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -69,7 +73,7 @@ export default function NewCompanyPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label htmlFor="name" className="text-sm font-medium text-gray-700">Company Name <span className="text-red-400">*</span></label>
+                <label htmlFor="name" className="text-sm font-medium text-gray-700">{t('companyName')} <span className="text-red-400">*</span></label>
                 <Input
                   id="name"
                   name="name"
@@ -82,7 +86,7 @@ export default function NewCompanyPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="subdomain" className="text-sm font-medium text-gray-700">Subdomain</label>
+                <label htmlFor="subdomain" className="text-sm font-medium text-gray-700">{t('subdomain')}</label>
                 <Input
                   id="subdomain"
                   name="subdomain"
@@ -97,7 +101,7 @@ export default function NewCompanyPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="provider_type" className="text-sm font-medium text-gray-700">Provider Type <span className="text-red-400">*</span></label>
+              <label htmlFor="provider_type" className="text-sm font-medium text-gray-700">{t('providerType')} <span className="text-red-400">*</span></label>
               <Select
                 value={providerType}
                 onChange={setProviderType}
@@ -109,7 +113,7 @@ export default function NewCompanyPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label htmlFor="cabinet_id" className="text-sm font-medium text-gray-700">Cabinet ID</label>
+                <label htmlFor="cabinet_id" className="text-sm font-medium text-gray-700">{t('cabinetId')}</label>
                 <Input
                   id="cabinet_id"
                   name="cabinet_id"
@@ -119,7 +123,7 @@ export default function NewCompanyPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="security_key" className="text-sm font-medium text-gray-700">Security Key</label>
+                <label htmlFor="security_key" className="text-sm font-medium text-gray-700">{t('securityKey')}</label>
                 <Input.Password
                   id="security_key"
                   name="security_key"
@@ -132,11 +136,11 @@ export default function NewCompanyPage() {
 
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
               <Button type="primary" htmlType="submit" size="large" loading={isLoading}>
-                {isLoading ? 'Creating...' : 'Create Company'}
+                {isLoading ? tActions('creating') : t('createCompany')}
               </Button>
               <Link href="/owner/companies">
                 <Button size="large" disabled={isLoading}>
-                  Cancel
+                  {tActions('cancel')}
                 </Button>
               </Link>
             </div>

@@ -5,12 +5,18 @@ import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Alert, Button, Input, message as antdMessage } from 'antd';
+import { useTranslations } from 'next-intl';
 import type { OwnerResponse } from '@/types/api';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export default function OwnerProfilePage() {
   const { setUser } = useAuthStore();
+  const t = useTranslations('profile');
+  const tFields = useTranslations('fields');
+  const tActions = useTranslations('actions');
+  const tErrors = useTranslations('errors');
+  const tAuth = useTranslations('auth');
   const [profile, setProfile] = useState<OwnerResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,7 +53,7 @@ export default function OwnerProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
-      antdMessage.error('Failed to load profile');
+      antdMessage.error(tErrors('failedToLoadProfile'));
     } finally {
       setLoading(false);
     }
@@ -61,7 +67,7 @@ export default function OwnerProfilePage() {
     try {
       const updated = await apiClient.updateOwnerProfile(profileForm);
       setProfile(updated);
-      setMessage('Profile updated successfully');
+      setMessage(tErrors('profileUpdated'));
       if (typeof window !== 'undefined') {
         const userStr = localStorage.getItem('user');
         if (userStr) {
@@ -76,7 +82,7 @@ export default function OwnerProfilePage() {
         }
       }
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to update profile'));
+      setError(getErrorMessage(err, tErrors('failedToUpdateProfile')));
     } finally {
       setSaving(false);
     }
@@ -88,12 +94,12 @@ export default function OwnerProfilePage() {
     setPasswordMessage('');
 
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('passwordMismatch'));
       return;
     }
 
     if (!PASSWORD_REGEX.test(passwordForm.new_password)) {
-      setPasswordError('Password must be at least 8 characters, contain at least one uppercase letter and one number');
+      setPasswordError(tAuth('passwordRequirementsError'));
       return;
     }
 
@@ -103,10 +109,10 @@ export default function OwnerProfilePage() {
         old_password: passwordForm.old_password,
         new_password: passwordForm.new_password,
       });
-      setPasswordMessage('Password changed successfully');
+      setPasswordMessage(tErrors('passwordChanged'));
       setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
     } catch (err: any) {
-      setPasswordError(err.response?.data?.detail || 'Failed to change password');
+      setPasswordError(err.response?.data?.detail || tErrors('failedToChangePassword'));
     } finally {
       setChangingPassword(false);
     }
@@ -136,13 +142,13 @@ export default function OwnerProfilePage() {
   return (
     <div className="max-w-2xl sm:mx-auto space-y-6">
       <div className="page-header">
-        <p className="page-subtitle">Manage your account settings</p>
+        <p className="page-subtitle">{t('subtitle')}</p>
       </div>
 
       <div className="glass-card overflow-hidden">
         <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
-          <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
-          <p className="text-sm text-gray-400 mt-0.5">Update your personal details</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('personalDetails')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('updatePersonalDetails')}</p>
         </div>
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleSaveProfile} className="space-y-5">
@@ -154,7 +160,7 @@ export default function OwnerProfilePage() {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">First Name <span className="text-red-400">*</span></label>
+                <label className="text-sm font-medium text-gray-700">{tFields('firstName')} <span className="text-red-400">*</span></label>
                 <Input
                   value={profileForm.first_name}
                   onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
@@ -163,7 +169,7 @@ export default function OwnerProfilePage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Last Name</label>
+                <label className="text-sm font-medium text-gray-700">{tFields('lastName')}</label>
                 <Input
                   value={profileForm.last_name}
                   onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
@@ -172,11 +178,11 @@ export default function OwnerProfilePage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Email</label>
+              <label className="text-sm font-medium text-gray-700">{tFields('email')}</label>
               <Input value={profile?.email || ''} disabled size="large" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Phone</label>
+              <label className="text-sm font-medium text-gray-700">{tFields('phone')}</label>
               <Input
                 value={profileForm.phone}
                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
@@ -186,7 +192,7 @@ export default function OwnerProfilePage() {
             </div>
             <div className="pt-2 border-t border-gray-100">
               <Button type="primary" htmlType="submit" size="large" loading={saving}>
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? tActions('saving') : tActions('saveChanges')}
               </Button>
             </div>
           </form>
@@ -195,8 +201,8 @@ export default function OwnerProfilePage() {
 
       <div className="glass-card overflow-hidden">
         <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
-          <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
-          <p className="text-sm text-gray-400 mt-0.5">Update your account password</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('changePassword')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('updatePassword')}</p>
         </div>
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleChangePassword} className="space-y-5">
@@ -207,40 +213,43 @@ export default function OwnerProfilePage() {
               <Alert type="error" message={passwordError} showIcon className="!rounded-xl" closable onClose={() => setPasswordError('')} />
             )}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Current Password</label>
+              <label className="text-sm font-medium text-gray-700">{tFields('currentPassword')}</label>
               <Input.Password
                 value={passwordForm.old_password}
                 onChange={(e) => setPasswordForm({ ...passwordForm, old_password: e.target.value })}
                 required
                 size="large"
+                autoComplete="off"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">New Password</label>
+                <label className="text-sm font-medium text-gray-700">{tFields('newPassword')}</label>
                 <Input.Password
                   value={passwordForm.new_password}
                   onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
                   required
                   size="large"
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+                <label className="text-sm font-medium text-gray-700">{tFields('confirmNewPassword')}</label>
                 <Input.Password
                   value={passwordForm.confirm_password}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
                   required
                   size="large"
+                  autoComplete="off"
                 />
               </div>
             </div>
             <p className="text-xs text-gray-400">
-              At least 8 characters, one uppercase letter, and one number
+              {tAuth('passwordRequirements')}
             </p>
             <div className="pt-2 border-t border-gray-100">
               <Button type="primary" htmlType="submit" size="large" loading={changingPassword}>
-                {changingPassword ? 'Changing...' : 'Change Password'}
+                {changingPassword ? tActions('changing') : t('changePassword')}
               </Button>
             </div>
           </form>

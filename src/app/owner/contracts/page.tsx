@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Tag, Select, Pagination, Alert } from 'antd';
 import { FileTextOutlined, PlusOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
@@ -21,6 +22,13 @@ export default function OwnerContractsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('');
+  const t = useTranslations('ownerContracts');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
+  const tStatuses = useTranslations('statuses');
+  const tContractStatuses = useTranslations('contractStatuses');
+  const tPaymentStatuses = useTranslations('paymentStatuses');
+  const tCommon = useTranslations('common');
 
   useEffect(() => { loadContracts(); }, [page, statusFilter, paymentFilter]);
 
@@ -30,7 +38,7 @@ export default function OwnerContractsPage() {
       const result = await apiClient.getContracts({ page, page_size: 20, status: statusFilter || undefined, payment_status: paymentFilter || undefined });
       if (Array.isArray(result)) { setContracts(result); setTotalPages(1); }
       else { setContracts(result.items || []); setTotalPages(result.total_pages || 1); }
-    } catch (err: any) { setError(getErrorMessage(err, 'Failed to load contracts')); }
+    } catch (err: any) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); }
     finally { setLoading(false); }
   };
 
@@ -70,15 +78,15 @@ export default function OwnerContractsPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <p className="page-subtitle">Manage company contracts and billing</p>
-        <Link href="/owner/contracts/new"><Button type="primary" icon={<PlusOutlined />}>New Contract</Button></Link>
+        <p className="page-subtitle">{t('manageContracts')}</p>
+        <Link href="/owner/contracts/new"><Button type="primary" icon={<PlusOutlined />}>{t('newContract')}</Button></Link>
       </div>
 
       <div className="flex flex-wrap gap-3 items-center">
-        <Select value={statusFilter || undefined} onChange={(v) => { setStatusFilter(v || ''); setPage(1); }} placeholder="All Statuses" allowClear size="middle" className="w-full sm:w-40"
-          options={[{ label: 'Active', value: 'active' }, { label: 'Expired', value: 'expired' }, { label: 'Cancelled', value: 'cancelled' }, { label: 'Pending', value: 'pending' }]} />
-        <Select value={paymentFilter || undefined} onChange={(v) => { setPaymentFilter(v || ''); setPage(1); }} placeholder="Payment Status" allowClear size="middle" className="w-full sm:w-44"
-          options={[{ label: 'Paid', value: 'paid' }, { label: 'Pending', value: 'pending' }, { label: 'Overdue', value: 'overdue' }, { label: 'Failed', value: 'failed' }]} />
+        <Select value={statusFilter || undefined} onChange={(v) => { setStatusFilter(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear size="middle" className="w-full sm:w-40"
+          options={[{ label: tContractStatuses('active'), value: 'active' }, { label: tContractStatuses('expired'), value: 'expired' }, { label: tContractStatuses('cancelled'), value: 'cancelled' }, { label: tStatuses('pending'), value: 'pending' }]} />
+        <Select value={paymentFilter || undefined} onChange={(v) => { setPaymentFilter(v || ''); setPage(1); }} placeholder={t('paymentStatus')} allowClear size="middle" className="w-full sm:w-44"
+          options={[{ label: tPaymentStatuses('paid'), value: 'paid' }, { label: tPaymentStatuses('pending'), value: 'pending' }, { label: tPaymentStatuses('overdue'), value: 'overdue' }, { label: tPaymentStatuses('failed'), value: 'failed' }]} />
       </div>
 
       {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
@@ -107,7 +115,7 @@ export default function OwnerContractsPage() {
                       <Tag color={statusTagColors[contract.status] || 'default'}>{CONTRACT_STATUS_LABELS[contract.status] || contract.status}</Tag>
                       <Tag color={paymentTagColors[contract.payment_status] || 'default'}>{PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}</Tag>
                     </div>
-                    <Link href={`/owner/contracts/${contract.id}`}><Button>View</Button></Link>
+                    <Link href={`/owner/contracts/${contract.id}`}><Button>{tActions('view')}</Button></Link>
                   </div>
                 </div>
               </div>
@@ -117,10 +125,10 @@ export default function OwnerContractsPage() {
         </>
       ) : !loading && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="thinking" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">No contracts yet</h3>
+          <EmptyStateCharacter height={115} variant="thinking" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noContractsYet')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            Create billing contracts to manage company subscriptions and payments
+            {t('noContractsDescription')}
           </p>
         </div>
       )}

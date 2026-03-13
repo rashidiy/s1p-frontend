@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, FileTextOutlined, DollarOutlined, CalendarOutlined, TeamOutlined, PhoneOutlined, ReloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Button, Input, Tag, message, Modal } from 'antd';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractDetailResponse } from '@/types/api';
@@ -12,6 +13,11 @@ export default function ContractDetailPage() {
   const params = useParams()!;
   const router = useRouter();
   const contractId = params.id as string;
+  const t = useTranslations('ownerContracts');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
+  const tFields = useTranslations('fields');
+  const tEntities = useTranslations('entities');
 
   const [contract, setContract] = useState<ContractDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +36,7 @@ export default function ContractDetailPage() {
       setContract(data);
     } catch (error) {
       console.error('Failed to load contract:', error);
-      message.error('Failed to load contract');
+      message.error(tErrors('failedToLoadContract'));
     } finally {
       setLoading(false);
     }
@@ -48,7 +54,7 @@ export default function ContractDetailPage() {
       loadContract();
     } catch (error) {
       console.error('Failed to renew contract:', error);
-      message.error('Failed to renew contract');
+      message.error(tErrors('failedToRenewContract'));
     } finally {
       setProcessing(false);
     }
@@ -56,9 +62,9 @@ export default function ContractDetailPage() {
 
   const handleCancel = () => {
     Modal.confirm({
-      title: 'Are you sure you want to cancel this contract?',
-      okText: 'Yes, cancel',
-      cancelText: 'No',
+      title: t('confirmCancelContract'),
+      okText: t('yesCancel'),
+      cancelText: tActions('no'),
       okButtonProps: { danger: true },
       onOk: async () => {
         setProcessing(true);
@@ -67,7 +73,7 @@ export default function ContractDetailPage() {
           loadContract();
         } catch (error) {
           console.error('Failed to cancel contract:', error);
-          message.error('Failed to cancel contract');
+          message.error(tErrors('failedToCancelContract'));
         } finally {
           setProcessing(false);
         }
@@ -105,7 +111,7 @@ export default function ContractDetailPage() {
       </div>
     </div>
   );
-  if (!contract) return <div className="p-6">Contract not found</div>;
+  if (!contract) return <div className="p-6">{t('contractNotFound')}</div>;
 
   const statusColor = CONTRACT_STATUS_COLORS[contract.status] || 'bg-gray-100 text-gray-800';
   const paymentColor = PAYMENT_STATUS_COLORS[contract.payment_status] || 'bg-gray-100 text-gray-800';
@@ -116,7 +122,7 @@ export default function ContractDetailPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <Button size="small" type="text" onClick={() => router.push('/owner/contracts')}>
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
-            Back
+            {tActions('back')}
           </Button>
           <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
         </div>
@@ -125,11 +131,11 @@ export default function ContractDetailPage() {
             <>
               <Button type="default" onClick={() => setShowRenew(true)}>
                 <ReloadOutlined style={{ marginRight: 8 }} />
-                <span className="hidden sm:inline">Renew</span>
+                <span className="hidden sm:inline">{t('renew')}</span>
               </Button>
               <Button type="primary" danger onClick={handleCancel} disabled={processing}>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
-                <span className="hidden sm:inline">Cancel</span>
+                <span className="hidden sm:inline">{tActions('cancel')}</span>
               </Button>
             </>
           )}
@@ -139,22 +145,22 @@ export default function ContractDetailPage() {
       {showRenew && (
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-base font-semibold leading-none tracking-tight">Renew Contract</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">{t('renewContract')}</h3>
           </div>
           <div className="p-6 pt-0 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">New End Date *</label>
+                <label className="text-sm font-medium text-gray-700">{t('newEndDate')} *</label>
                 <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} required size="large" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">New Amount (optional)</label>
-                <Input type="number" value={renewAmount} onChange={(e) => setRenewAmount(e.target.value)} placeholder="Keep current" size="large" />
+                <label className="text-sm font-medium text-gray-700">{t('newAmount')}</label>
+                <Input type="number" value={renewAmount} onChange={(e) => setRenewAmount(e.target.value)} placeholder={t('keepCurrent')} size="large" />
               </div>
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100">
-              <Button type="primary" onClick={handleRenew} loading={processing} disabled={!renewDate}>Confirm Renewal</Button>
-              <Button type="default" onClick={() => setShowRenew(false)}>Cancel</Button>
+              <Button type="primary" onClick={handleRenew} loading={processing} disabled={!renewDate}>{t('confirmRenewal')}</Button>
+              <Button type="default" onClick={() => setShowRenew(false)}>{tActions('cancel')}</Button>
             </div>
           </div>
         </div>
@@ -163,7 +169,7 @@ export default function ContractDetailPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
-            <p className="text-sm text-gray-400">Amount</p>
+            <p className="text-sm text-gray-400">{tFields('amount')}</p>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
@@ -178,7 +184,7 @@ export default function ContractDetailPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
-            <p className="text-sm text-gray-400">Days Remaining</p>
+            <p className="text-sm text-gray-400">{t('daysRemaining')}</p>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
@@ -190,7 +196,7 @@ export default function ContractDetailPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
-            <p className="text-sm text-gray-400">Users</p>
+            <p className="text-sm text-gray-400">{tEntities('users')}</p>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
@@ -202,7 +208,7 @@ export default function ContractDetailPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6 pb-2">
-            <p className="text-sm text-gray-400">Storage</p>
+            <p className="text-sm text-gray-400">{t('storage')}</p>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="flex items-center gap-1">
@@ -216,36 +222,36 @@ export default function ContractDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6">
-            <h3 className="text-base font-semibold leading-none tracking-tight">Contract Details</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">{t('contractDetails')}</h3>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Company</span>
+                <span className="text-gray-500">{tFields('company')}</span>
                 <span className="font-medium">{contract.company_name || contract.company_id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
+                <span className="text-gray-500">{tFields('status')}</span>
                 <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Payment</span>
+                <span className="text-gray-500">{t('payment')}</span>
                 <Tag className={paymentColor}>{PAYMENT_STATUS_LABELS[contract.payment_status]}</Tag>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Billing Period</span>
+                <span className="text-gray-500">{tFields('billingPeriod')}</span>
                 <span>{BILLING_PERIOD_LABELS[contract.billing_period]}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Auto Renew</span>
-                <span>{contract.auto_renew ? 'Yes' : 'No'}</span>
+                <span className="text-gray-500">{t('autoRenew')}</span>
+                <span>{contract.auto_renew ? tActions('yes') : tActions('no')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Start Date</span>
+                <span className="text-gray-500">{tFields('startDate')}</span>
                 <span>{new Date(contract.start_date).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">End Date</span>
+                <span className="text-gray-500">{tFields('endDate')}</span>
                 <span>{new Date(contract.end_date).toLocaleDateString()}</span>
               </div>
             </div>
@@ -254,21 +260,21 @@ export default function ContractDetailPage() {
 
         <div className="glass-card p-0">
           <div className="flex flex-col space-y-1.5 p-4 sm:p-6">
-            <h3 className="text-base font-semibold leading-none tracking-tight">Payment Info</h3>
+            <h3 className="text-base font-semibold leading-none tracking-tight">{t('paymentInfo')}</h3>
           </div>
           <div className="p-4 sm:p-6 pt-0">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Next Payment</span>
+                <span className="text-gray-500">{t('nextPayment')}</span>
                 <span>{contract.next_payment_date ? new Date(contract.next_payment_date).toLocaleDateString() : '\u2014'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Grace Period</span>
-                <span>{contract.grace_period_days} days</span>
+                <span className="text-gray-500">{t('gracePeriod')}</span>
+                <span>{t('gracePeriodDays', { days: contract.grace_period_days })}</span>
               </div>
               {contract.notes && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Notes</span>
+                  <span className="text-gray-500">{tFields('notes')}</span>
                   <span>{contract.notes}</span>
                 </div>
               )}

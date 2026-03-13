@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Input, Button, Tag, message } from 'antd';
 import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined, ExportOutlined } from '@ant-design/icons';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import type { CompanyResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
@@ -19,17 +20,24 @@ export default function CompaniesPage() {
   const [companies, setCompanies] = useState<CompanyResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const t = useTranslations('companies');
+  const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
+  const tStatuses = useTranslations('statuses');
+  const tFields = useTranslations('fields');
+  const tCommon = useTranslations('common');
+  const tEntities = useTranslations('entities');
 
   useEffect(() => { loadCompanies(); }, []);
 
   const loadCompanies = async () => {
     try { const data = await apiClient.getOwnerCompanies(); setCompanies(data); }
-    catch (error) { console.error('Failed to load companies:', error); message.error('Failed to load companies'); }
+    catch (error) { console.error('Failed to load companies:', error); message.error(tErrors('failedToLoadCompanies')); }
     finally { setLoading(false); }
   };
 
   const toggleCompanyStatus = async (companyId: string, isActive: boolean) => {
-    try { if (isActive) await apiClient.deactivateCompany(companyId); else await apiClient.activateCompany(companyId); loadCompanies(); } catch (error) { console.error('Failed to toggle company status:', error); message.error('Failed to toggle company status'); }
+    try { if (isActive) await apiClient.deactivateCompany(companyId); else await apiClient.activateCompany(companyId); loadCompanies(); } catch (error) { console.error('Failed to toggle company status:', error); message.error(tErrors('failedToToggleCompanyStatus')); }
   };
 
   const handleImpersonate = async (companyId: string) => {
@@ -37,7 +45,7 @@ export default function CompaniesPage() {
       const { url } = await apiClient.impersonateCompany(companyId);
       window.open(url, '_blank');
     } catch (error: any) {
-      message.error(error.response?.data?.detail || 'Failed to access company');
+      message.error(error.response?.data?.detail || tErrors('failedToAccessCompany'));
     }
   };
 
@@ -75,11 +83,11 @@ export default function CompaniesPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <p className="page-subtitle">Manage all registered companies</p>
-        <Link href="/owner/companies/new"><Button type="primary" icon={<PlusOutlined />}>Add Company</Button></Link>
+        <p className="page-subtitle">{t('subtitle')}</p>
+        <Link href="/owner/companies/new"><Button type="primary" icon={<PlusOutlined />}>{t('addCompany')}</Button></Link>
       </div>
 
-      <Input.Search placeholder="Search by name or subdomain..." value={search} onChange={(e) => setSearch(e.target.value)} allowClear size="large" className="max-w-full sm:max-w-lg" />
+      <Input.Search placeholder={t('searchCompanies')} value={search} onChange={(e) => setSearch(e.target.value)} allowClear size="large" className="max-w-full sm:max-w-lg" />
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredCompanies.map((company) => (
@@ -99,14 +107,14 @@ export default function CompaniesPage() {
                   )}
                 </div>
               </div>
-              <Tag color={company.is_active ? 'green' : 'default'}>{company.is_active ? 'Active' : 'Inactive'}</Tag>
+              <Tag color={company.is_active ? 'green' : 'default'}>{company.is_active ? tStatuses('active') : tStatuses('inactive')}</Tag>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm"><span className="text-gray-600">Provider</span><span className="font-medium uppercase">{company.provider_type}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-600">Users</span><span className="font-medium">{company.users_count || 0}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-600">Created</span><span className="font-medium">{new Date(company.created_at).toLocaleDateString()}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-gray-600">{tFields('provider')}</span><span className="font-medium uppercase">{company.provider_type}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-gray-600">{tEntities('users')}</span><span className="font-medium">{company.users_count || 0}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-gray-600">{tFields('created')}</span><span className="font-medium">{new Date(company.created_at).toLocaleDateString()}</span></div>
               <div className="flex gap-2 pt-2">
-                <Link href={`/owner/companies/${company.id}`} className="flex-1"><Button block>View Details</Button></Link>
+                <Link href={`/owner/companies/${company.id}`} className="flex-1"><Button block>{tActions('viewDetails')}</Button></Link>
                 <Button danger={company.is_active} onClick={() => toggleCompanyStatus(company.id, company.is_active)} icon={company.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />} />
               </div>
             </div>
@@ -116,12 +124,12 @@ export default function CompaniesPage() {
 
       {filteredCompanies.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="no-deals" />
+          <EmptyStateCharacter height={115} variant="no-deals" />
           <h3 className="mt-5 text-lg font-semibold text-gray-800">
-            {search ? 'No matches found' : 'No companies yet'}
+            {search ? t('noMatchesFound') : t('noCompaniesFound')}
           </h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search ? 'Try adjusting your search terms' : 'Create your first company to start managing your CRM platform'}
+            {search ? tCommon('tryAdjustingSearch') : t('getStartedDescription')}
           </p>
         </div>
       )}

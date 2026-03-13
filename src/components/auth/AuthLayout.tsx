@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
+import { useTranslations } from 'next-intl';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,9 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ children, title, subtitle, icon }: AuthLayoutProps) {
+  const tAuth = useTranslations('auth');
+  const tCommon = useTranslations('common');
+
   return (
     <div className="min-h-screen flex bg-gradient-auth relative overflow-hidden">
       {/* Animated decorative orbs */}
@@ -31,7 +35,7 @@ export function AuthLayout({ children, title, subtitle, icon }: AuthLayoutProps)
             <div className="w-16 h-1 bg-gradient-to-r from-white/0 via-white/40 to-white/0 rounded-full mx-auto" />
           </div>
           <p className="text-xl text-white/90 leading-relaxed font-medium">
-            Manage your customer relationships<br />with ease and efficiency
+            {tAuth('manageRelationships')}
           </p>
         </div>
       </div>
@@ -46,11 +50,12 @@ export function AuthLayout({ children, title, subtitle, icon }: AuthLayoutProps)
             </svg>
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">S1P</h1>
-          <p className="text-sm text-white/60 mt-1">Customer Relationship Management</p>
+          <p className="text-sm text-white/60 mt-1">{tCommon('customerRelationshipManagement')}</p>
         </div>
 
         <ConfigProvider
           theme={{
+            algorithm: theme.defaultAlgorithm,
             token: {
               colorPrimary: '#4338ca',
               colorInfo: '#4338ca',
