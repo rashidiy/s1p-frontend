@@ -193,7 +193,7 @@ export default function TelegramSettingsPage() {
                 <Paragraph type="secondary" style={{ marginBottom: 4 }}>
                   {t('setupInstructions')}
                 </Paragraph>
-                <ol style={{ paddingLeft: 20, color: '#555', lineHeight: '2' }}>
+                <ol style={{ paddingLeft: 20, color: 'var(--text-secondary)', lineHeight: '2' }}>
                   <li>{t('setupStep1')}</li>
                   <li>{t('setupStep2')}</li>
                   <li>{t('setupStep3')}</li>
