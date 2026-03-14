@@ -93,20 +93,35 @@ export const antdTheme = antdLightTheme;
 export const antdDarkTheme: ThemeConfig = {
   algorithm: theme.darkAlgorithm,
   token: {
-    colorPrimary: '#4338CA',
+    colorPrimary: '#6366F1',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#4338CA',
+    colorInfo: '#6366F1',
+
+    // Neutral dark surfaces — no blue/purple tint
+    colorBgContainer: '#1c1c20',
+    colorBgLayout: '#121214',
+    colorBgElevated: '#242428',
+    colorBgSpotlight: '#2c2c30',
+    colorBorder: '#2c2c30',
+    colorBorderSecondary: '#242428',
+
+    // Text
+    colorText: '#ededf0',
+    colorTextSecondary: '#a0a0a8',
+    colorTextTertiary: '#62626a',
+    colorTextQuaternary: '#42424a',
+
     borderRadius: 12,
     borderRadiusLG: 16,
     borderRadiusSM: 10,
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
     fontSize: 14,
-    colorLink: '#6366F1',
-    colorLinkHover: '#818CF8',
-    colorLinkActive: '#4338CA',
+    colorLink: '#818CF8',
+    colorLinkHover: '#A5B4FC',
+    colorLinkActive: '#6366F1',
   },
   components: {
     Button: { borderRadius: 10, controlHeight: 40, controlHeightLG: 44, controlHeightSM: 32, fontWeight: 500 },
@@ -115,9 +130,14 @@ export const antdDarkTheme: ThemeConfig = {
     Card: { borderRadiusLG: 16 },
     Menu: { itemBorderRadius: 10, itemHeight: 40, iconSize: 18 },
     Modal: { borderRadiusLG: 16 },
-    Table: { borderRadiusLG: 12 },
+    Table: {
+      borderRadiusLG: 12,
+      headerBg: '#1c1c20',
+      headerColor: '#a0a0a8',
+      rowHoverBg: '#242428',
+    },
     Tag: { borderRadiusSM: 6 },
-    Tabs: { itemSelectedColor: '#4338CA', inkBarColor: '#4338CA' },
+    Tabs: { itemSelectedColor: '#818CF8', inkBarColor: '#6366F1' },
     Alert: { borderRadiusLG: 12 },
     Notification: { borderRadiusLG: 12 },
   },

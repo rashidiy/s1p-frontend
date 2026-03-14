@@ -174,7 +174,7 @@ export default function CallsPage() {
           </div>
         ) : (
           <div className="py-16 flex flex-col items-center justify-center">
-            <EmptyStateCharacter width={160} height={160} variant="no-calls" />
+            <EmptyStateCharacter height={115} variant="no-calls" />
             <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noCallsFound')}</h3>
             <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
               {tCommon('tryAdjustingFilters')}

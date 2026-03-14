@@ -510,6 +510,16 @@
     -webkit-text-fill-color: #9ca3af !important;
   }
 
+  /* Auth card — force light text/bg inside dark mode (card is always white) */
+  .dark .auth-card .text-gray-900 { color: #111827 !important; }
+  .dark .auth-card .text-gray-800 { color: #1f2937 !important; }
+  .dark .auth-card .text-gray-700 { color: #374151 !important; }
+  .dark .auth-card .text-gray-600 { color: #4b5563 !important; }
+  .dark .auth-card .text-gray-500 { color: #6b7280 !important; }
+  .dark .auth-card .text-gray-400 { color: #9ca3af !important; }
+  .dark .auth-card .bg-crm-indigo-50 { background-color: #eef2ff !important; }
+  .dark .auth-card .text-crm-indigo-600 { color: #4f46e5 !important; }
+
   .auth-card::before {
     content: '';
     position: absolute;

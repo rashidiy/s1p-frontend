@@ -21,8 +21,8 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      mode: 'system' as ThemeMode,
-      resolved: resolveTheme('system'),
+      mode: 'light' as ThemeMode,
+      resolved: 'light' as const,
       setMode: (mode: ThemeMode) => {
         set({ mode, resolved: resolveTheme(mode) });
         if (typeof document !== 'undefined') {

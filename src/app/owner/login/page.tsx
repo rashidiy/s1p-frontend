@@ -79,6 +79,7 @@ export default function OwnerLoginPage() {
             size="large"
             disabled={isLoading}
             className="glass-input"
+            autoComplete="off"
           />
         </div>
         <div className="pt-1">

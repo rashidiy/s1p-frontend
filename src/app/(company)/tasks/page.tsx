@@ -129,7 +129,7 @@ export default function TasksPage() {
 
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="confused" />
+          <EmptyStateCharacter height={115} variant="confused" />
           <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noTasksFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
             {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}

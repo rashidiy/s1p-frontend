@@ -93,14 +93,14 @@ export function ProtectedRoute({
 
   if (isInitializing || (requireAuth && !isAuthenticated)) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#F8F9FA]">
+      <div className="flex h-screen items-center justify-center" style={{ background: 'var(--surface-secondary)' }}>
         <div className="text-center app-loading-screen">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#4338CA] to-[#6366F1] mb-4 shadow-lg shadow-indigo-200/50">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
             </svg>
           </div>
-          <div className="text-lg font-bold text-gray-800 tracking-tight">S1P</div>
+          <div className="text-lg font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>S1P</div>
           <div className="mt-3">
             <Spin size="small" />
           </div>

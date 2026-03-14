@@ -69,7 +69,7 @@ export default function ContractStatusPage() {
           </div>
         </div>
         <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="thinking" />
+          <EmptyStateCharacter height={115} variant="thinking" />
           <p className="mt-4 text-lg font-medium text-gray-700">{t('noActiveContract')}</p>
           <p className="text-sm text-gray-500">{t('viewContractStatus')}</p>
         </div>

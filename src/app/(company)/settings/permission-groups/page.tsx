@@ -277,7 +277,7 @@ export default function PermissionGroupsPage() {
 
       {groups.length === 0 && !showForm && (
         <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="setup" />
+          <EmptyStateCharacter height={115} variant="setup" />
           <p className="mt-4 text-lg font-medium text-gray-700">{tCommon('noDataFound')}</p>
           <p className="text-sm text-gray-500">{t('permissionGroupsDescription')}</p>
         </div>

@@ -118,6 +118,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
     onMobileClose?.();
     apiLogout();
     logout();
+    setMode('light');
     router.push(isOwner ? '/owner/login' : '/login');
   };
 

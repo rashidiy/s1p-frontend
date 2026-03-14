@@ -178,10 +178,6 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('email')}</label>
-              <Input value={profile?.email || ''} disabled />
-            </div>
-            <div className="space-y-2">
               <label className="text-sm font-medium">{tFields('phone')}</label>
               <Input
                 value={profileForm.phone}

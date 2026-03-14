@@ -6,7 +6,7 @@ export type UserType = 'owner' | 'company_user';
 
 interface AuthUser {
   id: string;
-  email: string | null;
+  email?: string | null;  // Owner only
   first_name: string;
   last_name?: string | null;
   phone?: string | null;
@@ -151,7 +151,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({
           user: {
             id: profile.id,
-            email: profile.email,
             first_name: profile.first_name,
             last_name: profile.last_name,
             phone: profile.phone,

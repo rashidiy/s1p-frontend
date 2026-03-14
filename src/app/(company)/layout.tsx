@@ -55,7 +55,7 @@ export default function CompanyLayout({
 
   return (
     <ProtectedRoute requireAuth>
-      <div className="flex h-screen bg-[#F8F9FA]">
+      <div className="flex h-screen" style={{ background: 'var(--surface-secondary)' }}>
         <Sidebar
           mobileOpen={sidebarOpen}
           onMobileClose={() => setSidebarOpen(false)}

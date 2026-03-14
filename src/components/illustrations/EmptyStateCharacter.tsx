@@ -18,22 +18,19 @@ export type BotVariant =
   | 'sleeping';
 
 interface Props {
-  width?: number;
   height?: number;
   className?: string;
   variant?: BotVariant;
 }
 
-export function EmptyStateCharacter({ width = 160, height = 160, className, variant = 'default' }: Props) {
+export function EmptyStateCharacter({ height = 115, className, variant = 'default' }: Props) {
   return (
-    <Image
+    <img
       src={`/illustrations/bot-${variant}.png`}
       alt="S1P Bot"
-      width={width}
       height={height}
       className={className}
-      style={{ objectFit: 'contain' }}
-      priority={false}
+      style={{ height, width: 'auto', objectFit: 'contain' }}
     />
   );
 }

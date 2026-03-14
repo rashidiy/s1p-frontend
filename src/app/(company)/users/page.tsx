@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Input, Pagination, Button, Tag, message, Table, Modal, Select, Tabs } from 'antd';
-import { TeamOutlined, PlusOutlined, MailOutlined, SafetyOutlined, SendOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { SafetyOutlined, SendOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
@@ -187,15 +187,16 @@ export default function UsersPage() {
           <div key={user.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-400 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-crm-indigo-100">
-                  <TeamOutlined className="text-crm-indigo-600" />
-                </div>
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-crm-indigo-100 flex items-center justify-center text-crm-indigo-600 font-semibold text-sm">
+                    {user.first_name?.[0]?.toUpperCase()}{user.last_name?.[0]?.toUpperCase() || ''}
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold text-gray-900">{user.first_name} {user.last_name}</h3>
-                  {user.email && (
-                    <p className="text-sm text-gray-500 flex items-center gap-1"><MailOutlined className="text-xs" /> {user.email}</p>
-                  )}
-                  {!user.email && user.phone && (
+                  {user.phone && (
                     <p className="text-sm text-gray-500">{user.phone}</p>
                   )}
                 </div>
@@ -226,7 +227,7 @@ export default function UsersPage() {
 
       {data?.users.length === 0 && (
         <div className="glass-card py-12 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="default" />
+          <EmptyStateCharacter height={115} variant="default" />
           <p className="mt-4 text-lg font-medium text-gray-700">{t('noUsersFound')}</p>
           <p className="text-sm text-gray-500">{search ? tCommon('tryAdjustingSearch') : t('getStarted')}</p>
         </div>
@@ -293,10 +294,7 @@ export default function UsersPage() {
       <div className="page-header">
         <div className="flex gap-2">
           {canManageUsers && (
-            <>
-              <Link href="/users/invite"><Button icon={<MailOutlined />}>{t('inviteUser')}</Button></Link>
-              <Link href="/users/invite-telegram"><Button type="primary" icon={<SendOutlined />}>{t('telegramInviteUser')}</Button></Link>
-            </>
+            <Link href="/users/invite-telegram"><Button type="primary" icon={<SendOutlined />}>{t('telegramInviteUser')}</Button></Link>
           )}
         </div>
       </div>

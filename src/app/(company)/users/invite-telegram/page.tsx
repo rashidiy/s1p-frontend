@@ -73,17 +73,16 @@ export default function InviteTelegramPage() {
     if (!tokenResult) return '';
     const roleName = tokenResult.role.replace('company_', '').charAt(0).toUpperCase() + tokenResult.role.replace('company_', '').slice(1);
     const expiresFormatted = new Date(tokenResult.expires_at).toLocaleString();
-    const companyName = tokenResult.company_name || 'вашу компанию';
-    const deepLink = tokenResult.deep_link || '';
+    const regUrl = `${window.location.origin}/register`;
 
     return [
-      `Вас пригласили в ${companyName} (S1P CRM)!`,
+      `Вас пригласили в S1P CRM!`,
       '',
       `Роль: ${roleName}`,
       `Код приглашения: ${tokenResult.invite_token}`,
       '',
-      'Для регистрации нажмите на ссылку:',
-      `👉 ${deepLink}`,
+      `Для регистрации перейдите по ссылке:`,
+      regUrl,
       '',
       `Действует до: ${expiresFormatted}`,
     ].join('\n');

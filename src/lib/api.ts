@@ -337,8 +337,13 @@ class ApiClient {
     return response.data;
   }
 
-  async getRegisterPrefill(challengeId: string) {
-    const response = await this.client.get<API.RegisterPrefillResponse>(`/api/v1/auth/telegram/register-prefill/${challengeId}`);
+  async createRegisterChallenge(data: API.RegisterChallengeRequest) {
+    const response = await this.client.post<API.RegisterChallengeResponse>('/api/v1/auth/telegram/register-challenge', data);
+    return response.data;
+  }
+
+  async pollRegisterChallengeStatus(challengeId: string) {
+    const response = await this.client.get<API.RegisterChallengeStatusResponse>(`/api/v1/auth/telegram/register-challenge/${challengeId}/status`);
     return response.data;
   }
 
@@ -370,13 +375,32 @@ class ApiClient {
   }
 
   // ============================================================================
-  // COMPANY - USER MANAGEMENT
+  // COMPANY - AVATAR
   // ============================================================================
 
-  async inviteUser(data: API.UserInviteRequest) {
-    const response = await this.client.post<API.UserResponse>('/api/v1/company/users/invite', data);
+  async uploadAvatar(file: File): Promise<API.UserResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await this.client.post<API.UserResponse>(
+      '/api/v1/company/users/me/avatar',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return response.data;
   }
+
+  async deleteAvatar(): Promise<API.UserResponse> {
+    const response = await this.client.delete<API.UserResponse>('/api/v1/company/users/me/avatar');
+    return response.data;
+  }
+
+  // ============================================================================
+  // COMPANY - USER MANAGEMENT
+  // ============================================================================
 
   async getUsers(params: API.UserFilters) {
     const response = await this.client.get<API.UserListResponse>('/api/v1/company/users/', { params });

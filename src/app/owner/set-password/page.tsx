@@ -70,6 +70,7 @@ export default function OwnerSetPasswordPage() {
             required
             size="large"
             className="glass-input"
+            autoComplete="off"
           />
           <p className="text-xs text-gray-400">
             {t('passwordRequirements')}
@@ -85,6 +86,7 @@ export default function OwnerSetPasswordPage() {
             required
             size="large"
             className="glass-input"
+            autoComplete="off"
           />
         </div>
         <div className="pt-1">

@@ -10,11 +10,11 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: '#F8F9FA' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: 'var(--surface-secondary, #F8F9FA)', color: 'var(--text-primary, #1f2937)' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 700 }}>
             Something went wrong
           </h1>
-          <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary, #6b7280)', marginTop: '8px' }}>
             An unexpected error occurred.
           </p>
           <button

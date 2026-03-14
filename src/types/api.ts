@@ -102,10 +102,14 @@ export type CompanyUpdateRequest = Schema<'CompanyUpdateRequest'>;
 
 // Users
 export type UserInviteRequest = Schema<'UserInviteRequest'>;
-export type UserResponse = Schema<'UserResponse'>;
+export type UserResponse = Schema<'UserResponse'> & {
+  avatar_url?: string | null;
+};
 export type UserDetailResponse = Schema<'UserDetailResponse'>;
 export type UserUpdateRequest = Schema<'UserUpdateRequest'>;
-export type UserListResponse = Schema<'UserListResponse'>;
+export type UserListResponse = Omit<Schema<'UserListResponse'>, 'users'> & {
+  users: UserResponse[];
+};
 
 // Calls
 export type CallRequest = Schema<'CallRequest'>;
@@ -314,13 +318,10 @@ export interface InviteTokenResponse {
   role: string;
   first_name: string;
   phone: string;
-  deep_link?: string;
-  company_name?: string;
 }
 
 export interface InviteAdminResponse {
   invite_token: string;
-  deep_link: string;
   company_name: string;
   expires_at: string;
   role: string;
@@ -363,15 +364,28 @@ export interface TelegramRegisterRequest {
   first_name?: string;
   last_name?: string;
   phone?: string;
+  skip_avatar?: boolean;
 }
 
-export interface RegisterPrefillResponse {
+export interface RegisterChallengeRequest {
+  invite_token: string;
+}
+
+export interface RegisterChallengeResponse {
+  challenge_id: string;
+  deep_link: string;
+  company_name: string;
+  invite_first_name: string | null;
+  invite_last_name: string | null;
+  invite_phone: string | null;
+}
+
+export interface RegisterChallengeStatusResponse {
+  status: 'pending' | 'telegram_connected' | 'expired' | 'used';
   telegram_first_name: string | null;
   telegram_last_name: string | null;
   telegram_username: string | null;
-  telegram_avatar_file_id: string | null;
-  invite_phone: string | null;
-  invite_first_name: string | null;
+  has_avatar: boolean;
 }
 
 // ============================================================================

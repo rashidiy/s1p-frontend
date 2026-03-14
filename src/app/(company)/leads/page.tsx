@@ -121,7 +121,7 @@ export default function LeadsPage() {
 
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter width={160} height={160} variant="no-results" />
+          <EmptyStateCharacter height={115} variant="no-results" />
           <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noLeadsFound')}</h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
             {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
