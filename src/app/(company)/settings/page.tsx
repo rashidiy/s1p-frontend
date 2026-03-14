@@ -9,6 +9,9 @@ import {
   UserOutlined,
   LockOutlined,
   SendOutlined,
+  FormOutlined,
+  KeyOutlined,
+  ApiOutlined,
 } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -60,6 +63,30 @@ export default function SettingsPage() {
       title: t('contractBilling'),
       description: t('contractBillingDescription'),
       bg: 'bg-cyan-50',
+      adminOnly: true,
+    },
+    {
+      href: '/settings/custom-fields',
+      icon: <FormOutlined style={{ fontSize: 22, color: '#f59e0b' }} />,
+      title: t('customFields'),
+      description: t('customFieldsDescription'),
+      bg: 'bg-amber-50',
+      adminOnly: true,
+    },
+    {
+      href: '/settings/api-keys',
+      icon: <KeyOutlined style={{ fontSize: 22, color: '#10b981' }} />,
+      title: t('apiKeys'),
+      description: t('apiKeysDescription'),
+      bg: 'bg-emerald-50',
+      adminOnly: true,
+    },
+    {
+      href: '/settings/webhooks',
+      icon: <ApiOutlined style={{ fontSize: 22, color: '#8b5cf6' }} />,
+      title: t('webhooks'),
+      description: t('webhooksDescription'),
+      bg: 'bg-violet-50',
       adminOnly: true,
     },
     {

@@ -20,6 +20,9 @@ import {
   MoonOutlined,
   LaptopOutlined,
   GlobalOutlined,
+  FormOutlined,
+  KeyOutlined,
+  ApiOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
 import { useThemeStore } from '@/store/theme';
@@ -61,6 +64,9 @@ const managerNavigation: NavItem[] = [
 const adminNavigation: NavItem[] = [
   { nameKey: 'team', href: '/users', icon: <TeamOutlined /> },
   { nameKey: 'permissionGroups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
+  { nameKey: 'customFields', href: '/settings/custom-fields', icon: <FormOutlined /> },
+  { nameKey: 'apiKeys', href: '/settings/api-keys', icon: <KeyOutlined /> },
+  { nameKey: 'webhooks', href: '/settings/webhooks', icon: <ApiOutlined /> },
   { nameKey: 'contract', href: '/settings/contract', icon: <FileTextOutlined /> },
   { nameKey: 'telegram', href: '/settings/telegram', icon: <SendOutlined /> },
 ];

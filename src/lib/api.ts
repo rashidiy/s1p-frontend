@@ -802,6 +802,88 @@ class ApiClient {
   }
 
   // ============================================================================
+  // COMPANY - CUSTOM FIELDS
+  // ============================================================================
+
+  async getCustomFields(entityType?: string) {
+    const response = await this.client.get<API.CustomFieldDefinitionResponse[]>(
+      '/api/v1/company/custom-fields',
+      { params: entityType ? { entity_type: entityType } : undefined }
+    );
+    return response.data;
+  }
+
+  async createCustomField(data: API.CustomFieldDefinitionCreate) {
+    const response = await this.client.post<API.CustomFieldDefinitionResponse>('/api/v1/company/custom-fields', data);
+    return response.data;
+  }
+
+  async updateCustomField(fieldId: string, data: API.CustomFieldDefinitionUpdate) {
+    const response = await this.client.put<API.CustomFieldDefinitionResponse>(`/api/v1/company/custom-fields/${fieldId}`, data);
+    return response.data;
+  }
+
+  async deleteCustomField(fieldId: string) {
+    await this.client.delete(`/api/v1/company/custom-fields/${fieldId}`);
+  }
+
+  async reorderCustomFields(data: API.CustomFieldReorderRequest) {
+    const response = await this.client.put<API.CustomFieldDefinitionResponse[]>('/api/v1/company/custom-fields/reorder', data);
+    return response.data;
+  }
+
+  // ============================================================================
+  // COMPANY - API KEYS
+  // ============================================================================
+
+  async getApiKeys() {
+    const response = await this.client.get<API.ApiKeyListResponse>('/api/v1/company/api-keys');
+    return response.data;
+  }
+
+  async createApiKey(data: API.ApiKeyCreateRequest) {
+    const response = await this.client.post<API.ApiKeyCreateResponse>('/api/v1/company/api-keys', data);
+    return response.data;
+  }
+
+  async revokeApiKey(keyId: string) {
+    await this.client.delete(`/api/v1/company/api-keys/${keyId}`);
+  }
+
+  // ============================================================================
+  // COMPANY - OUTBOUND WEBHOOKS
+  // ============================================================================
+
+  async getWebhookEndpoints(params?: { page?: number; page_size?: number; is_active?: boolean }) {
+    const response = await this.client.get<API.PaginatedResponse<API.WebhookEndpointResponse>>('/api/v1/company/outbound-webhooks', { params });
+    return response.data;
+  }
+
+  async createWebhookEndpoint(data: API.WebhookEndpointCreate) {
+    const response = await this.client.post<API.WebhookEndpointResponse>('/api/v1/company/outbound-webhooks', data);
+    return response.data;
+  }
+
+  async updateWebhookEndpoint(endpointId: string, data: API.WebhookEndpointUpdate) {
+    const response = await this.client.put<API.WebhookEndpointResponse>(`/api/v1/company/outbound-webhooks/${endpointId}`, data);
+    return response.data;
+  }
+
+  async deleteWebhookEndpoint(endpointId: string) {
+    await this.client.delete(`/api/v1/company/outbound-webhooks/${endpointId}`);
+  }
+
+  async getWebhookDeliveries(endpointId: string, params?: { page?: number; page_size?: number; status?: string }) {
+    const response = await this.client.get<API.PaginatedResponse<API.WebhookDeliveryResponse>>(`/api/v1/company/outbound-webhooks/${endpointId}/deliveries`, { params });
+    return response.data;
+  }
+
+  async getWebhookEvents() {
+    const response = await this.client.get<{ events: string[] }>('/api/v1/company/outbound-webhooks/events');
+    return response.data;
+  }
+
+  // ============================================================================
   // COMPANY - TELEGRAM CONFIGURATION
   // ============================================================================
 

@@ -389,6 +389,113 @@ export interface RegisterChallengeStatusResponse {
 }
 
 // ============================================================================
+// CUSTOM FIELDS
+// ============================================================================
+
+export interface CustomFieldDefinitionCreate {
+  entity_type: string;
+  field_name: string;
+  field_type: string;
+  options?: string[] | null;
+  sort_order?: number;
+  is_required?: boolean;
+}
+
+export interface CustomFieldDefinitionUpdate {
+  field_name?: string;
+  options?: string[] | null;
+  sort_order?: number;
+  is_required?: boolean;
+}
+
+export interface CustomFieldDefinitionResponse {
+  id: string;
+  company_id: string;
+  entity_type: string;
+  field_name: string;
+  field_type: string;
+  options: string[] | null;
+  sort_order: number;
+  is_required: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomFieldReorderRequest {
+  field_ids: string[];
+}
+
+// ============================================================================
+// API KEYS
+// ============================================================================
+
+export interface ApiKeyCreateRequest {
+  name: string;
+}
+
+export interface ApiKeyCreateResponse {
+  id: string;
+  name: string;
+  key: string;
+  key_prefix: string;
+  created_at: string;
+}
+
+export interface ApiKeyResponse {
+  id: string;
+  name: string;
+  key_prefix: string;
+  is_active: boolean;
+  last_used_at: string | null;
+  created_at: string;
+}
+
+export interface ApiKeyListResponse {
+  items: ApiKeyResponse[];
+  total: number;
+}
+
+// ============================================================================
+// OUTBOUND WEBHOOKS
+// ============================================================================
+
+export interface WebhookEndpointCreate {
+  url: string;
+  events: string[];
+  secret: string;
+}
+
+export interface WebhookEndpointUpdate {
+  url?: string;
+  events?: string[];
+  secret?: string;
+  is_active?: boolean;
+}
+
+export interface WebhookEndpointResponse {
+  id: string;
+  company_id: string;
+  url: string;
+  events: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WebhookDeliveryResponse {
+  id: string;
+  endpoint_id: string;
+  event_type: string;
+  payload: Record<string, unknown>;
+  status: string;
+  attempts: number;
+  last_attempt_at: string | null;
+  response_code: number | null;
+  response_body: string | null;
+  created_at: string;
+}
+
+// ============================================================================
 // TELEGRAM CONFIGURATION
 // ============================================================================
 
