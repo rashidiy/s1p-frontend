@@ -938,5 +938,129 @@
     "createContract": "Shartnoma yaratish",
     "configureContract": "Kompaniya uchun shartnomani sozlang",
     "contractCreated": "Shartnoma muvaffaqiyatli yaratildi"
+  },
+  "landing": {
+    "nav": {
+      "features": "Imkoniyatlar",
+      "howItWorks": "Qanday ishlaydi",
+      "pricing": "Narxlar",
+      "faq": "FAQ",
+      "tryFree": "Bepul sinab ko'rish",
+      "phone": "+998 XX XXX XX XX"
+    },
+    "hero": {
+      "title": "Birorta qo'ng'iroq e'tiborsiz qolmaydi",
+      "subtitle": "Qo'ng'iroq markazlari uchun CRM + Telegram bot. Tezkor bildirishnomalar, lidlarni boshqarish, analitika — barchasi bir joyda.",
+      "cta": "Bepul sinab ko'rish",
+      "watchDemo": "Demoni ko'rish",
+      "integrationStrip": "Telefoniyangiz bilan integratsiya"
+    },
+    "pain": {
+      "title": "Siz mijozlarni yo'qotyapsiz",
+      "stat1": "67%",
+      "stat1Text": "kompaniyalar javobsiz qo'ng'iroqlar tufayli mijozlarni yo'qotadi",
+      "stat2": "5 daqiqa",
+      "stat2Text": "va mijoz qayta qo'ng'iroq qilmasangiz raqobatchiga ketadi",
+      "stat3": "30%",
+      "stat3Text": "lidlar CRMsiz yo'qoladi — menejerlar qayta qo'ng'iroq qilishni unutadi"
+    },
+    "steps": {
+      "title": "Qanday ishlaydi",
+      "step1Title": "Telefoniyani ulang",
+      "step1Desc": "Sipuni yoki Binotel — 3 daqiqada sozlash. API-kalitni kiriting va tayyor.",
+      "step2Title": "Telegram botni qo'shing",
+      "step2Desc": "@s1pcrm_bot ni ish chatiga qo'shing. Bildirishnomalar darhol kelishni boshlaydi.",
+      "step3Title": "CRM dan boshqaring",
+      "step3Desc": "Lidlar, bitimlar, vazifalar — hammasi avtomatik yaratiladi. Jamoangiz har bir qo'ng'iroqni ko'radi.",
+      "timeToFirst": "Ro'yxatdan o'tishdan birinchi bildirishnomaga qadar: < 15 daqiqa"
+    },
+    "roi": {
+      "title": "ROI Kalkulyator",
+      "subtitle": "CRMsiz qancha yo'qotayotganingizni bilib oling",
+      "callsPerDay": "Kuniga qo'ng'iroqlar soni",
+      "missedPercent": "% javobsiz",
+      "avgCheck": "Mijozning o'rtacha cheki (so'm)",
+      "resultTitle": "Oyiga yo'qotasiz:",
+      "missedCallsMonth": "javobsiz qo'ng'iroq",
+      "lostRevenue": "so'm yo'qotilgan daromad",
+      "s1pCost": "S1P narxi: 290 000 so'm/oy",
+      "roiLabel": "ROI",
+      "currencySuffix": "so'm"
+    },
+    "features": {
+      "title": "Qo'ng'iroqlarni boshqarish uchun kerakli hamma narsa",
+      "telegramBot": "Telegram Bot",
+      "telegramBotDesc": "Qo'ng'iroqlar haqida tezkor bildirishnomalar to'g'ridan-to'g'ri Telegramda. Lidlarni tayinlang, qayta ishlanganini belgilang, qayta qo'ng'iroqni boshlang — hammasini messenjerdan chiqmasdan.",
+      "crm": "Qo'ng'iroqlar uchun CRM",
+      "crmDesc": "Kontaktlar, lidlar, bitimlar, vazifalar. Sozlanadigan bosqichlar bilan sotuv voronkasi.",
+      "telephony": "Sipuni & Binotel",
+      "telephonyDesc": "Yetakchi provayderlar bilan chuqur integratsiya. Kiruvchi, chiquvchi, javobsiz — hammasi CRMda.",
+      "analytics": "Analitika",
+      "analyticsDesc": "Kim qo'ng'iroq qiladi, kim javob bermaydi, qancha lid — real vaqtda.",
+      "api": "API va Vebhuklar",
+      "apiDesc": "Ommaviy REST API. Istalgan tizimga ulang — 1C, Excel, veb-saytingiz.",
+      "i18n": "Ko'p tillilik",
+      "i18nDesc": "Interfeys ruscha, o'zbekcha va inglizchada. Jamoangiz uchun."
+    },
+    "pricing": {
+      "title": "Oddiy va shaffof narx",
+      "planName": "S1P CRM",
+      "price": "290 000",
+      "currency": "so'm/oy",
+      "perUser": "5 tagacha foydalanuvchi kiritilgan",
+      "extraUser": "+ 50 000 so'm har bir qo'shimcha foydalanuvchi uchun",
+      "feature1": "Bildirishnomalari bilan Telegram bot",
+      "feature2": "CRM: kontaktlar, lidlar, bitimlar, vazifalar",
+      "feature3": "Sipuni / Binotel integratsiyasi",
+      "feature4": "Analitika va hisobotlar",
+      "feature5": "Ommaviy API va vebhuklar",
+      "feature6": "3 ta interfeys tili",
+      "feature7": "Telegramda texnik yordam",
+      "cta": "Bepul boshlash — 14 kun",
+      "noCard": "Karta bog'lash shart emas. Istalgan vaqtda bekor qilish.",
+      "annual": "Yillik reja: 2 900 000 so'm/yil",
+      "annualSaving": "580 000 so'm tejash"
+    },
+    "testimonials": {
+      "title": "Mijozlarimiz nima deydi",
+      "quote1": "Avval qo'ng'iroqlarning 30% ni yo'qotar edik. S1P bilan har bir javobsiz qo'ng'iroq Telegramda soniyada.",
+      "author1": "Aziz K.",
+      "role1": "Direktor",
+      "quote2": "10 daqiqada sozladik. Menejerlar endi qayta qo'ng'iroq qilishni unutmaydi.",
+      "author2": "Dilshod M.",
+      "role2": "Qo'ng'iroq markazi rahbari"
+    },
+    "faq": {
+      "title": "Ko'p beriladigan savollar",
+      "q1": "S1P qancha turadi?",
+      "a1": "5 kishigacha jamoa uchun oyiga 290 000 so'm. Har bir qo'shimcha foydalanuvchi — oyiga 50 000 so'm. 14 kun bepul.",
+      "q2": "Qaysi telefoniyalar qo'llab-quvvatlanadi?",
+      "a2": "Sipuni va Binotel. API-kalit orqali ulash 3 daqiqa davom etadi.",
+      "q3": "Ilova o'rnatish kerakmi?",
+      "a3": "Yo'q. S1P brauzerda ishlaydi. Telegram bot — oddiy Telegramingizda.",
+      "q4": "Telegram bot qanday ishlaydi?",
+      "a4": "Botni ish chatiga qo'shasiz. Har bir qo'ng'iroqda — mijoz haqida ma'lumot va harakat tugmalari bilan bildirishnoma.",
+      "q5": "Ma'lumotlarimiz xavfsizmi?",
+      "a5": "Ha. Har bir kompaniya to'liq izolyatsiya qilingan. Ma'lumotlar himoyalangan serverlarda saqlanadi. HTTPS, shifrlash, muntazam zaxira nusxalar.",
+      "q6": "1C yoki boshqa tizimga ulash mumkinmi?",
+      "a6": "Ha. S1P da ommaviy REST API va vebhuklar mavjud. Istalgan tizim bilan integratsiya.",
+      "q7": "Texnik yordam bormi?",
+      "a7": "Ha. Mijozlar uchun Telegram guruh + bot orqali to'g'ridan-to'g'ri yordam."
+    },
+    "ctaFooter": {
+      "title": "Bugun qo'ng'iroq bildirishnomalarini olishni boshlang",
+      "cta": "Bepul sinab ko'rish — 14 kun",
+      "subtitle": "15 daqiqada sozlash. Karta bog'lash shart emas."
+    },
+    "footer": {
+      "description": "Qo'ng'iroq markazlari uchun Telegram botli CRM",
+      "product": "Mahsulot haqida",
+      "pricingLink": "Narxlar",
+      "faqLink": "FAQ",
+      "apiDocs": "API Hujjatlar",
+      "contact": "Biz bilan bog'lanish",
+      "address": "Toshkent, O'zbekiston",
+      "copyright": "© 2026 S1P. Barcha huquqlar himoyalangan."
+    }
   }
 }

@@ -938,5 +938,129 @@
     "createContract": "Create Contract",
     "configureContract": "Configure the billing contract for a company",
     "contractCreated": "Contract created successfully"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "tryFree": "Start free trial",
+      "phone": "+998 XX XXX XX XX"
+    },
+    "hero": {
+      "title": "Never miss a customer call again",
+      "subtitle": "CRM + Telegram bot for call centers. Instant notifications, lead management, analytics — all in one place.",
+      "cta": "Start free trial",
+      "watchDemo": "Watch demo",
+      "integrationStrip": "Integrates with your telephony"
+    },
+    "pain": {
+      "title": "You're losing customers",
+      "stat1": "67%",
+      "stat1Text": "of companies lose customers due to missed calls",
+      "stat2": "5 minutes",
+      "stat2Text": "and the customer goes to a competitor if you don't call back",
+      "stat3": "30%",
+      "stat3Text": "of leads are lost without a CRM — managers forget to call back"
+    },
+    "steps": {
+      "title": "How it works",
+      "step1Title": "Connect telephony",
+      "step1Desc": "Sipuni or Binotel — setup in 3 minutes. Enter your API key and you're done.",
+      "step2Title": "Add Telegram bot",
+      "step2Desc": "Add @s1pcrm_bot to your team chat. Notifications start coming instantly.",
+      "step3Title": "Manage from CRM",
+      "step3Desc": "Leads, deals, tasks — everything is created automatically. Your team sees every call.",
+      "timeToFirst": "Time from sign-up to first notification: < 15 minutes"
+    },
+    "roi": {
+      "title": "ROI Calculator",
+      "subtitle": "See how much you're losing without a CRM",
+      "callsPerDay": "Calls per day",
+      "missedPercent": "% missed",
+      "avgCheck": "Average customer check ($)",
+      "resultTitle": "You're losing per month:",
+      "missedCallsMonth": "missed calls",
+      "lostRevenue": "in lost revenue",
+      "s1pCost": "S1P costs: $29/month",
+      "roiLabel": "ROI",
+      "currencySuffix": "$"
+    },
+    "features": {
+      "title": "Everything you need to manage calls",
+      "telegramBot": "Telegram Bot",
+      "telegramBotDesc": "Instant call notifications right in Telegram. Assign leads, mark as handled, trigger callbacks — all without leaving the messenger.",
+      "crm": "CRM for Calls",
+      "crmDesc": "Contacts, leads, deals, tasks. Sales pipeline with customizable stages.",
+      "telephony": "Sipuni & Binotel",
+      "telephonyDesc": "Deep integration with leading providers. Inbound, outbound, missed — everything in CRM.",
+      "analytics": "Analytics",
+      "analyticsDesc": "Who's calling, who's missing, how many leads — in real time.",
+      "api": "API & Webhooks",
+      "apiDesc": "Public REST API. Connect to any system — 1C, Excel, your website.",
+      "i18n": "Multilingual",
+      "i18nDesc": "Interface in Russian, Uzbek, and English. For your team."
+    },
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "planName": "S1P CRM",
+      "price": "$29",
+      "currency": "/month",
+      "perUser": "up to 5 users included",
+      "extraUser": "+ $5 per additional user per month",
+      "feature1": "Telegram bot with notifications",
+      "feature2": "CRM: contacts, leads, deals, tasks",
+      "feature3": "Sipuni / Binotel integration",
+      "feature4": "Analytics & reports",
+      "feature5": "Public API & webhooks",
+      "feature6": "3 interface languages",
+      "feature7": "Telegram support",
+      "cta": "Start free — 14 days",
+      "noCard": "No credit card required. Cancel anytime.",
+      "annual": "Annual plan: $290/year",
+      "annualSaving": "save $58"
+    },
+    "testimonials": {
+      "title": "What our clients say",
+      "quote1": "We used to lose 30% of calls. With S1P, every missed call is in Telegram within seconds.",
+      "author1": "Aziz K.",
+      "role1": "Director",
+      "quote2": "Set up in 10 minutes. Managers never forget to call back now.",
+      "author2": "Dilshod M.",
+      "role2": "Call Center Manager"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": "How much does S1P cost?",
+      "a1": "$29/month for a team of up to 5. Each additional user is $5/month. 14 days free.",
+      "q2": "Which phone providers are supported?",
+      "a2": "Sipuni and Binotel. Connecting via API key takes 3 minutes.",
+      "q3": "Do I need to install an app?",
+      "a3": "No. S1P works in your browser. The Telegram bot works in your regular Telegram.",
+      "q4": "How does the Telegram bot work?",
+      "a4": "Add the bot to your work chat. For every call, you get a notification with customer info and action buttons.",
+      "q5": "Is our data secure?",
+      "a5": "Yes. Each company is fully isolated. Data is stored on secure servers. HTTPS, encryption, regular backups.",
+      "q6": "Can I connect it to 1C or another system?",
+      "a6": "Yes. S1P has a public REST API and webhooks. Integration with any system.",
+      "q7": "Is there support?",
+      "a7": "Yes. Telegram group for clients + direct support via bot."
+    },
+    "ctaFooter": {
+      "title": "Start receiving call notifications today",
+      "cta": "Start free trial — 14 days",
+      "subtitle": "Setup in 15 minutes. No credit card required."
+    },
+    "footer": {
+      "description": "CRM with Telegram bot for call centers",
+      "product": "Product",
+      "pricingLink": "Pricing",
+      "faqLink": "FAQ",
+      "apiDocs": "API Documentation",
+      "contact": "Contact us",
+      "address": "Tashkent, Uzbekistan",
+      "copyright": "© 2026 S1P. All rights reserved."
+    }
   }
 }
