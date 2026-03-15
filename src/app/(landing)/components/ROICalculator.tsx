@@ -52,20 +52,32 @@ export default function ROICalculator() {
     }
   }, [avgCheck]);
 
+  const sliderStyles = {
+    track: { background: 'linear-gradient(90deg, #4338CA, #6366F1)' },
+    handle: {
+      borderColor: '#4338CA',
+      background: '#ffffff',
+      boxShadow: '0 2px 8px rgba(67, 56, 202, 0.3)',
+      width: 20,
+      height: 20,
+    },
+    rail: { background: '#E0E7FF' },
+  };
+
   return (
-    <section id="roi" className="py-24 sm:py-32 bg-gray-50/50">
+    <section id="roi" className="py-20 sm:py-28 bg-gray-50">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
-          className="text-center mb-14 sm:mb-16"
+          className="text-center mb-12 sm:mb-14"
           initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
             {t('roi.title')}
           </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-xl mx-auto">
+          <p className="mt-3 text-lg text-gray-500 max-w-xl mx-auto">
             {t('roi.subtitle')}
           </p>
         </motion.div>
@@ -77,18 +89,18 @@ export default function ROICalculator() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className="rounded-3xl bg-gradient-to-br from-white via-white to-indigo-50/80 shadow-xl shadow-indigo-100/40 border border-gray-100 overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
-              {/* Left: Inputs */}
-              <div className="p-8 sm:p-10 lg:p-12 border-b lg:border-b-0 lg:border-r border-gray-100">
-                <div className="space-y-10">
+          <div className="rounded-3xl bg-white shadow-xl border border-gray-100 overflow-hidden">
+            <div className="grid lg:grid-cols-2">
+              {/* LEFT: Inputs */}
+              <div className="p-8 sm:p-10">
+                <div className="space-y-8">
                   {/* Calls per day */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-semibold text-gray-700">
                         {t('roi.callsPerDay')}
                       </label>
-                      <span className="text-2xl font-bold text-indigo-700 tabular-nums min-w-[60px] text-right">
+                      <span className="bg-indigo-50 rounded-lg px-3 py-1 font-bold text-indigo-700 tabular-nums text-sm">
                         {callsPerDay}
                       </span>
                     </div>
@@ -97,25 +109,17 @@ export default function ROICalculator() {
                       max={500}
                       value={callsPerDay}
                       onChange={setCallsPerDay}
-                      styles={{
-                        track: { background: '#4338CA' },
-                        handle: {
-                          borderColor: '#4338CA',
-                          background: '#ffffff',
-                          boxShadow: '0 2px 8px rgba(67, 56, 202, 0.3)',
-                        },
-                        rail: { background: '#E0E7FF' },
-                      }}
+                      styles={sliderStyles}
                     />
                   </div>
 
                   {/* Missed percent */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-semibold text-gray-700">
                         {t('roi.missedPercent')}
                       </label>
-                      <span className="text-2xl font-bold text-indigo-700 tabular-nums min-w-[60px] text-right">
+                      <span className="bg-indigo-50 rounded-lg px-3 py-1 font-bold text-indigo-700 tabular-nums text-sm">
                         {missedPercent}%
                       </span>
                     </div>
@@ -124,21 +128,13 @@ export default function ROICalculator() {
                       max={50}
                       value={missedPercent}
                       onChange={setMissedPercent}
-                      styles={{
-                        track: { background: '#4338CA' },
-                        handle: {
-                          borderColor: '#4338CA',
-                          background: '#ffffff',
-                          boxShadow: '0 2px 8px rgba(67, 56, 202, 0.3)',
-                        },
-                        rail: { background: '#E0E7FF' },
-                      }}
+                      styles={sliderStyles}
                     />
                   </div>
 
                   {/* Average check */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
                       {t('roi.avgCheck')}
                     </label>
                     <div className="relative">
@@ -148,7 +144,7 @@ export default function ROICalculator() {
                         value={avgCheckDisplay}
                         onChange={(e) => handleAvgCheckChange(e.target.value)}
                         onBlur={handleAvgCheckBlur}
-                        className="w-full rounded-xl border border-gray-200 bg-white px-5 py-3.5 text-lg font-semibold text-gray-900 outline-none transition-all focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                        className="w-full rounded-xl border-2 border-gray-200 bg-white px-5 py-3.5 text-lg font-semibold text-gray-900 outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                       />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
                         {t('roi.currencySuffix')}
@@ -158,50 +154,50 @@ export default function ROICalculator() {
                 </div>
               </div>
 
-              {/* Right: Results */}
-              <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
-                <h3 className="text-lg font-semibold text-gray-500 mb-8">
+              {/* RIGHT: Results */}
+              <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 p-8 sm:p-10 flex flex-col justify-center text-white">
+                <p className="text-sm uppercase tracking-wider opacity-80 mb-6 font-medium">
                   {t('roi.resultTitle')}
-                </h3>
+                </p>
 
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {/* Missed calls */}
                   <div>
                     <AnimatedCounter
                       value={missedCallsMonth}
-                      className="block text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums"
+                      className="block text-4xl font-black tabular-nums text-white"
                     />
-                    <p className="mt-1.5 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-indigo-200">
                       {t('roi.missedCallsMonth')}
                     </p>
                   </div>
 
                   {/* Lost revenue */}
-                  <div>
+                  <div className="text-amber-300">
                     <AnimatedCounter
                       value={lostRevenue}
-                      className="block text-4xl sm:text-5xl font-bold text-red-600 tabular-nums"
+                      className="block text-5xl font-black tabular-nums"
                     />
-                    <p className="mt-1.5 text-sm text-gray-500">
-                      {t('roi.lostRevenue')}
+                    <p className="mt-1 text-lg text-indigo-200">
+                      {t('roi.lostRevenue')} {t('roi.currencySuffix')}
                     </p>
                   </div>
 
                   {/* Divider */}
-                  <div className="border-t border-gray-200 pt-6">
-                    <p className="text-sm text-gray-500 mb-4">
+                  <div className="border-t border-white/20 pt-5">
+                    <p className="text-sm opacity-70 mb-3">
                       {t('roi.s1pCost')}
                     </p>
 
                     {/* ROI */}
                     <div className="flex items-baseline gap-3">
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                      <span className="text-sm font-semibold uppercase tracking-wider opacity-80">
                         {t('roi.roiLabel')}
                       </span>
                       <AnimatedCounter
                         value={roi}
                         suffix="X"
-                        className="text-5xl sm:text-6xl font-extrabold text-indigo-700 tabular-nums"
+                        className="text-6xl font-black text-emerald-300 tabular-nums"
                       />
                     </div>
                   </div>

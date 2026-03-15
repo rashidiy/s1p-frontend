@@ -20,9 +20,9 @@ function usePrefersReducedMotion() {
 
 function PhoneXIcon() {
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-200">
       <svg
-        className="h-6 w-6 text-red-500"
+        className="h-7 w-7 text-white"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -31,8 +31,8 @@ function PhoneXIcon() {
         strokeLinejoin="round"
       >
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-        <line x1="18" y1="2" x2="22" y2="6" className="text-red-400" />
-        <line x1="22" y1="2" x2="18" y2="6" className="text-red-400" />
+        <line x1="18" y1="2" x2="22" y2="6" />
+        <line x1="22" y1="2" x2="18" y2="6" />
       </svg>
     </div>
   );
@@ -40,9 +40,9 @@ function PhoneXIcon() {
 
 function ClockIcon() {
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-200">
       <svg
-        className="h-6 w-6 text-amber-500"
+        className="h-7 w-7 text-white"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -59,9 +59,9 @@ function ClockIcon() {
 
 function ChartDownIcon() {
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-200">
       <svg
-        className="h-6 w-6 text-indigo-500"
+        className="h-7 w-7 text-white"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -79,9 +79,15 @@ function ChartDownIcon() {
 const ICONS = [PhoneXIcon, ClockIcon, ChartDownIcon] as const;
 
 const STAT_COLORS = [
-  'text-red-600',
-  'text-amber-600',
-  'text-indigo-600',
+  'text-rose-500',
+  'text-amber-500',
+  'text-indigo-500',
+] as const;
+
+const CARD_GRADIENTS = [
+  'bg-gradient-to-br from-rose-50 to-white',
+  'bg-gradient-to-br from-amber-50 to-white',
+  'bg-gradient-to-br from-indigo-50 to-white',
 ] as const;
 
 export default function PainPoints() {
@@ -96,23 +102,25 @@ export default function PainPoints() {
   ] as const;
 
   return (
-    <section id="pain" className="py-20 lg:py-28">
+    <section id="pain" className="bg-gray-50/80 py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
+        {/* Section Title — left-aligned with accent border */}
         <motion.div
-          initial={animate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
+          initial={animate ? { opacity: 0, x: -20 } : { opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={
             animate
               ? { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
               : { duration: 0 }
           }
-          className="mb-12 text-center lg:mb-16"
+          className="mb-10 lg:mb-14"
         >
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-            {t('pain.title')}
-          </h2>
+          <div className="border-l-4 border-rose-500 pl-5">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
+              {t('pain.title')}
+            </h2>
+          </div>
         </motion.div>
 
         {/* Cards Grid */}
@@ -128,7 +136,7 @@ export default function PainPoints() {
                   animate ? { opacity: 0, y: 32 } : { opacity: 1, y: 0 }
                 }
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
+                viewport={{ once: true, amount: 0.3 }}
                 transition={
                   animate
                     ? {
@@ -138,12 +146,12 @@ export default function PainPoints() {
                       }
                     : { duration: 0 }
                 }
-                className="group rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-100"
+                className={`group rounded-2xl border border-gray-100 ${CARD_GRADIENTS[index]} p-8 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}
               >
                 <Icon />
 
                 <div
-                  className={`mt-6 text-5xl font-bold tracking-tight ${STAT_COLORS[index]}`}
+                  className={`mt-6 text-6xl font-black tracking-tight ${STAT_COLORS[index]}`}
                 >
                   {t(`pain.${stat.key}`)}
                 </div>

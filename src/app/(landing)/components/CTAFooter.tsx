@@ -63,22 +63,23 @@ export default function CTAFooter() {
     <>
       {/* CTA Section */}
       <section className="relative overflow-hidden">
-        {/* Background */}
+        {/* Background gradient */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(135deg, #4338CA 0%, #3730A3 50%, #312E81 100%)' }}
-        />
-
-        {/* Subtle dot pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
+            background:
+              'linear-gradient(135deg, #4338CA 0%, #3730A3 40%, #5B21B6 100%)',
           }}
         />
 
-        <div className="relative px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+        {/* Floating gradient orbs for depth */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/[0.07] blur-3xl" />
+          <div className="absolute -bottom-16 right-1/4 h-56 w-56 rounded-full bg-white/[0.05] blur-3xl" />
+          <div className="absolute right-0 top-1/3 h-48 w-48 rounded-full bg-violet-400/10 blur-3xl" />
+        </div>
+
+        <div className="relative px-4 py-20 sm:px-6 lg:px-8">
           <motion.div
             className="mx-auto max-w-3xl text-center"
             variants={ctaVariants}
@@ -86,20 +87,20 @@ export default function CTAFooter() {
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
           >
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
               {t('ctaFooter.title')}
             </h2>
 
             <div className="mt-10 flex justify-center">
               <Link
                 href="/register"
-                className="inline-flex items-center rounded-xl bg-white px-8 py-4 text-lg font-semibold text-indigo-700 shadow-xl shadow-indigo-900/20 transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-2xl"
+                className="inline-flex items-center rounded-2xl bg-white px-10 py-4 text-lg font-bold text-indigo-700 shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl"
               >
                 {t('ctaFooter.cta')}
               </Link>
             </div>
 
-            <p className="mt-6 text-base text-indigo-200">
+            <p className="mt-6 text-sm text-indigo-200">
               {t('ctaFooter.subtitle')}
             </p>
           </motion.div>
@@ -107,21 +108,23 @@ export default function CTAFooter() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 bg-gray-900">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="grid gap-12 md:grid-cols-3">
+      <footer className="bg-gray-900">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid gap-10 md:grid-cols-3">
             {/* Brand column */}
             <div>
               <div className="flex items-center gap-2.5">
                 <div
-                  className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px]"
-                  style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, #4338CA, #6366F1)',
+                  }}
                 >
                   <span className="text-[11px] font-bold tracking-wider text-white">
                     S1P
                   </span>
                 </div>
-                <span className="text-xl font-bold text-white">S1P</span>
+                <span className="text-lg font-bold text-white">S1P</span>
               </div>
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-400">
                 {t('footer.description')}
@@ -130,10 +133,10 @@ export default function CTAFooter() {
 
             {/* Links column */}
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {t('footer.product')}
               </h3>
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-2.5">
                 {FOOTER_LINKS.map(({ key, href }) => (
                   <li key={key}>
                     <a
@@ -150,17 +153,17 @@ export default function CTAFooter() {
 
             {/* Contact column */}
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {t('footer.contact')}
               </h3>
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-2.5">
                 <li>
                   <a
                     href={`tel:${t('nav.phone').replace(/\s/g, '')}`}
                     className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                   >
                     <svg
-                      className="h-4 w-4 shrink-0"
+                      className="h-3.5 w-3.5 shrink-0"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -179,7 +182,7 @@ export default function CTAFooter() {
                     className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                   >
                     <svg
-                      className="h-4 w-4 shrink-0"
+                      className="h-3.5 w-3.5 shrink-0"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -201,7 +204,7 @@ export default function CTAFooter() {
                     className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                   >
                     <svg
-                      className="h-4 w-4 shrink-0"
+                      className="h-3.5 w-3.5 shrink-0"
                       viewBox="0 0 24 24"
                       fill="currentColor"
                     >
@@ -212,7 +215,7 @@ export default function CTAFooter() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-400">
                   <svg
-                    className="h-4 w-4 shrink-0"
+                    className="h-3.5 w-3.5 shrink-0"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -230,8 +233,8 @@ export default function CTAFooter() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-12 border-t border-gray-800 pt-8">
-            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="mt-10 border-t border-gray-800 pt-4">
+            <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               {/* Language toggle */}
               <div className="flex items-center gap-1">
                 {locales.map((loc, index) => (

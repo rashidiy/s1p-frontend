@@ -1,57 +1,116 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
-const steps = [
-  {
-    number: '01',
-    titleKey: 'steps.step1Title',
-    descKey: 'steps.step1Desc',
-    icon: (
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="12" fill="#EEF2FF" />
-        <path d="M16 24H32M32 24L28 20M32 24L28 28" stroke="#4338CA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="13" cy="24" r="3" stroke="#4338CA" strokeWidth="2" />
-        <rect x="30" y="18" width="6" height="12" rx="1" stroke="#4338CA" strokeWidth="2" />
+function usePrefersReducedMotion() {
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReduced;
+}
+
+function StepIcon1() {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M8 12H16M16 12L13 9M16 12L13 15" />
+        <circle cx="6" cy="12" r="2.5" />
+        <rect x="17" y="9" width="4" height="6" rx="1" />
       </svg>
-    ),
-  },
-  {
-    number: '02',
-    titleKey: 'steps.step2Title',
-    descKey: 'steps.step2Desc',
-    icon: (
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="12" fill="#EEF2FF" />
-        <path d="M14 30L24 18L34 30H14Z" stroke="#4338CA" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M17 28L24 20L31 28" stroke="#4338CA" strokeWidth="1.5" strokeLinejoin="round" fill="#C7D2FE" fillOpacity="0.5" />
-        <path d="M24 18L34 30H32L24 21L16 30H14L24 18Z" fill="#4338CA" fillOpacity="0.15" />
+    </div>
+  );
+}
+
+function StepIcon2() {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M4 20L12 6L20 20H4Z" />
+        <path d="M7 18L12 9L17 18" strokeWidth="1.5" />
       </svg>
-    ),
-  },
-  {
-    number: '03',
-    titleKey: 'steps.step3Title',
-    descKey: 'steps.step3Desc',
-    icon: (
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="12" fill="#EEF2FF" />
-        <path d="M16 32V22L20 18H28L32 22V32H16Z" stroke="#4338CA" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M20 32V26H28V32" stroke="#4338CA" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M22 22H26" stroke="#4338CA" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="32" cy="16" r="4" fill="#6366F1" />
-        <path d="M30 16L31.5 17.5L34 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </div>
+  );
+}
+
+function StepIcon3() {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M8 20V14L10 11H14L16 14V20H8Z" />
+        <path d="M10 20V16H14V20" />
+        <path d="M11 13H13" />
+        <circle cx="16" cy="8" r="3" fill="white" stroke="none" />
+        <path d="M14.5 8L15.5 9L17.5 7" stroke="#4338CA" strokeWidth="1.5" />
       </svg>
-    ),
-  },
-];
+    </div>
+  );
+}
+
+function ChevronConnector() {
+  return (
+    <div className="hidden lg:flex items-center justify-center">
+      <svg
+        width="40"
+        height="24"
+        viewBox="0 0 40 24"
+        fill="none"
+        className="text-indigo-300"
+      >
+        <path
+          d="M0 12H36M36 12L28 5M36 12L28 19"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
+
+const STEP_ICONS = [StepIcon1, StepIcon2, StepIcon3] as const;
 
 const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.25,
+      staggerChildren: 0.15,
     },
   },
 };
@@ -65,128 +124,126 @@ const stepVariants: Variants = {
   },
 };
 
-const lineVariants: Variants = {
-  hidden: { scaleX: 0 },
-  visible: {
-    scaleX: 1,
-    transition: { duration: 0.5, ease: 'easeInOut' },
-  },
-};
-
-const lineVerticalVariants: Variants = {
-  hidden: { scaleY: 0 },
-  visible: {
-    scaleY: 1,
-    transition: { duration: 0.5, ease: 'easeInOut' },
-  },
-};
-
 export default function HowItWorks() {
   const t = useTranslations('landing');
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReduced = usePrefersReducedMotion();
+  const animate = !prefersReduced;
+
+  const steps = [
+    { number: '01', titleKey: 'steps.step1Title', descKey: 'steps.step1Desc' },
+    { number: '02', titleKey: 'steps.step2Title', descKey: 'steps.step2Desc' },
+    { number: '03', titleKey: 'steps.step3Title', descKey: 'steps.step3Desc' },
+  ] as const;
 
   return (
-    <section id="how-it-works" className="py-24 sm:py-32 bg-white">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="how-it-works" className="bg-white py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Title — centered with indigo underline */}
         <motion.div
-          className="text-center mb-16 sm:mb-20"
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
+          className="mb-12 text-center lg:mb-14"
+          initial={animate ? { opacity: 0, y: 20 } : undefined}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.5 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={animate ? { duration: 0.5 } : { duration: 0 }}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
             {t('steps.title')}
           </h2>
+          <div className="mx-auto mt-4 h-[3px] w-10 rounded-full bg-indigo-500" />
         </motion.div>
 
-        {/* Desktop: Horizontal layout */}
+        {/* Desktop: Horizontal card layout with arrow connectors */}
         <motion.div
-          className="hidden lg:grid lg:grid-cols-5 lg:items-start lg:gap-0"
-          variants={prefersReducedMotion ? undefined : containerVariants}
+          className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-start lg:gap-6"
+          variants={animate ? containerVariants : undefined}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ once: true, amount: 0.3 }}
         >
-          {steps.map((step, index) => (
-            <div key={step.number} className="contents">
-              {/* Step card */}
-              <motion.div
-                className="flex flex-col items-center text-center px-4"
-                variants={prefersReducedMotion ? undefined : stepVariants}
-              >
-                <span className="text-sm font-semibold tracking-widest text-indigo-600 mb-4">
-                  {step.number}
-                </span>
-                <div className="mb-5">{step.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {t(step.titleKey)}
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-[15px] max-w-[260px]">
-                  {t(step.descKey)}
-                </p>
-              </motion.div>
+          {steps.map((step, index) => {
+            const Icon = STEP_ICONS[index];
 
-              {/* Connecting line between steps */}
-              {index < steps.length - 1 && (
-                <div className="flex items-center justify-center pt-16">
-                  <motion.div
-                    className="h-px w-full border-t-2 border-dashed border-indigo-200 origin-left"
-                    variants={prefersReducedMotion ? undefined : lineVariants}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Mobile/Tablet: Vertical timeline */}
-        <motion.div
-          className="lg:hidden flex flex-col items-center gap-0"
-          variants={prefersReducedMotion ? undefined : containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-        >
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex flex-col items-center">
-              <motion.div
-                className="flex flex-col items-center text-center px-4 max-w-md"
-                variants={prefersReducedMotion ? undefined : stepVariants}
-              >
-                <span className="text-sm font-semibold tracking-widest text-indigo-600 mb-4">
-                  {step.number}
-                </span>
-                <div className="mb-5">{step.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {t(step.titleKey)}
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-[15px]">
-                  {t(step.descKey)}
-                </p>
-              </motion.div>
-
-              {/* Vertical connecting line */}
-              {index < steps.length - 1 && (
+            return (
+              <div key={step.number} className="contents">
                 <motion.div
-                  className="w-px h-12 border-l-2 border-dashed border-indigo-200 my-4 origin-top"
-                  variants={prefersReducedMotion ? undefined : lineVerticalVariants}
-                />
-              )}
-            </div>
-          ))}
+                  className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  variants={animate ? stepVariants : undefined}
+                >
+                  {/* Watermark number */}
+                  <span className="pointer-events-none absolute -top-2 right-4 select-none text-7xl font-black text-indigo-100/70">
+                    {step.number}
+                  </span>
+
+                  <div className="relative">
+                    <Icon />
+                    <h3 className="mt-5 text-xl font-bold text-gray-900">
+                      {t(step.titleKey)}
+                    </h3>
+                    <p className="mt-2 leading-relaxed text-gray-500">
+                      {t(step.descKey)}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {index < steps.length - 1 && <ChevronConnector />}
+              </div>
+            );
+          })}
         </motion.div>
 
-        {/* Bottom stat */}
+        {/* Mobile/Tablet: Vertical timeline with indigo left line */}
         <motion.div
-          className="mt-16 sm:mt-20"
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          className="lg:hidden"
+          variants={animate ? containerVariants : undefined}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
         >
-          <div className="mx-auto max-w-2xl bg-indigo-50 rounded-2xl px-8 py-6 text-center">
-            <p className="text-lg sm:text-xl font-bold text-gray-900">
+          <div className="relative border-l-2 border-indigo-200 pl-8">
+            {steps.map((step, index) => {
+              const Icon = STEP_ICONS[index];
+
+              return (
+                <motion.div
+                  key={step.number}
+                  className={`relative ${index < steps.length - 1 ? 'pb-10' : ''}`}
+                  variants={animate ? stepVariants : undefined}
+                >
+                  {/* Timeline dot */}
+                  <div className="absolute -left-[calc(2rem+5px)] top-0 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-indigo-500 ring-4 ring-white" />
+
+                  <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                    {/* Watermark number */}
+                    <span className="pointer-events-none absolute -top-2 right-3 select-none text-6xl font-black text-indigo-100/70">
+                      {step.number}
+                    </span>
+
+                    <div className="relative">
+                      <Icon />
+                      <h3 className="mt-4 text-lg font-bold text-gray-900">
+                        {t(step.titleKey)}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                        {t(step.descKey)}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Bottom stat bar */}
+        <motion.div
+          className="mt-10 lg:mt-14"
+          initial={animate ? { opacity: 0, y: 20 } : undefined}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={animate ? { duration: 0.5, delay: 0.5 } : { duration: 0 }}
+        >
+          <div className="rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-8 py-5 text-center text-white shadow-lg shadow-indigo-200">
+            <p className="text-lg font-semibold sm:text-xl">
               <span className="mr-2" role="img" aria-label="timer">
                 &#9201;
               </span>

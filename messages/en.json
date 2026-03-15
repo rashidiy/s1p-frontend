@@ -989,6 +989,7 @@
     },
     "features": {
       "title": "Everything you need to manage calls",
+      "subtitle": "Tools to control every call and grow your sales",
       "telegramBot": "Telegram Bot",
       "telegramBotDesc": "Instant call notifications right in Telegram. Assign leads, mark as handled, trigger callbacks — all without leaving the messenger.",
       "crm": "CRM for Calls",
