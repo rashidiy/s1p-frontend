@@ -93,10 +93,10 @@ export default function CTAFooter() {
             {/* Brand column */}
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500">
-                  <span className="text-[11px] font-bold tracking-wider text-white">
-                    S1P
-                  </span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-[10px]" style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
                 </div>
                 <span className="font-display text-white font-bold text-lg">S1P</span>
               </div>

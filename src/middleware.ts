@@ -59,8 +59,8 @@ export function middleware(request: NextRequest) {
 
   // OWNER SUBDOMAIN ROUTING
   if (subdomain === OWNER_SUBDOMAIN) {
-    // Owner trying to access company routes - redirect to owner dashboard
-    if (!pathname.startsWith('/owner')) {
+    // Owner hitting root "/" or non-owner routes — redirect to owner dashboard
+    if (pathname === '/' || !pathname.startsWith('/owner')) {
       return NextResponse.redirect(new URL('/owner/dashboard', request.url));
     }
     // Owner accessing owner routes - allow
@@ -69,6 +69,11 @@ export function middleware(request: NextRequest) {
 
   // COMPANY SUBDOMAIN ROUTING
   if (subdomain && subdomain !== OWNER_SUBDOMAIN) {
+    // Company subdomain hitting root "/" — redirect to dashboard (not landing page)
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
     // Company user trying to access owner routes - redirect to company dashboard
     if (pathname.startsWith('/owner')) {
       return NextResponse.redirect(new URL('/dashboard', request.url));

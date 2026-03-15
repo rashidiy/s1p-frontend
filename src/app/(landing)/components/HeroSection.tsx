@@ -35,7 +35,48 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   qualified: { label: 'Квалиф.', color: 'bg-emerald-500/20 text-emerald-400' },
 };
 
+function PhoneIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+function RiseIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18" /><path d="M9 21V9" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+const STAT_CARDS = [
+  { value: 847, labelKey: 'dashboard.totalCalls', icon: PhoneIcon, iconBg: 'bg-indigo-500/15', iconColor: 'text-indigo-400', accent: 'text-indigo-400' },
+  { value: 156, labelKey: 'dashboard.totalLeads', icon: RiseIcon, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', accent: 'text-emerald-400' },
+  { value: 43, labelKey: 'dashboard.totalDeals', icon: ChartIcon, iconBg: 'bg-blue-500/15', iconColor: 'text-blue-400', accent: 'text-blue-400' },
+  { value: 12, labelKey: 'dashboard.completedTasks', icon: CheckIcon, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', accent: 'text-amber-400' },
+];
+
 function CRMDashboardCard() {
+  const tDashboard = useTranslations();
+
   return (
     <BlurFade delay={0.4} direction="left" duration={0.8} blur="12px">
       <div className="relative">
@@ -48,9 +89,17 @@ function CRMDashboardCard() {
         <div className="relative rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-sm overflow-hidden">
           {/* Dashboard header */}
           <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-indigo-500/60" />
-              <span className="text-sm font-display font-semibold text-white/80">S1P Dashboard</span>
+            <div className="flex items-center gap-2.5">
+              <div
+                className="flex h-6 w-6 items-center justify-center rounded-md"
+                style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <span className="text-sm font-body font-semibold text-white/80">S1P</span>
+              <span className="text-[10px] font-body text-gray-500">Dashboard</span>
             </div>
             <div className="flex gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
@@ -59,27 +108,27 @@ function CRMDashboardCard() {
             </div>
           </div>
 
-          {/* Stats grid */}
+          {/* Stats grid — matches real dashboard layout */}
           <div className="grid grid-cols-2 gap-3 p-4">
-            {[
-              { value: 847, label: 'Звонков', icon: '📞', accent: 'text-indigo-400' },
-              { value: 156, label: 'Лидов', icon: '👤', accent: 'text-violet-400' },
-              { value: 43, label: 'Сделок', icon: '💰', accent: 'text-emerald-400' },
-              { value: 12, label: 'Задач', icon: '📋', accent: 'text-amber-400' },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5"
-              >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-xs">{stat.icon}</span>
-                  <span className="text-[11px] font-body text-gray-500 uppercase tracking-wider">{stat.label}</span>
+            {STAT_CARDS.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.labelKey}
+                  className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5"
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${stat.iconBg}`}>
+                      <span className={stat.iconColor}><Icon /></span>
+                    </div>
+                    <span className="text-[11px] font-body text-gray-500">{tDashboard(stat.labelKey)}</span>
+                  </div>
+                  <div className={`text-xl font-display font-bold ${stat.accent}`}>
+                    <NumberTicker value={stat.value} delay={0.6} className={stat.accent} />
+                  </div>
                 </div>
-                <div className={`text-xl font-display font-bold ${stat.accent}`}>
-                  <NumberTicker value={stat.value} delay={0.6} className={stat.accent} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Mini leads table */}
@@ -87,7 +136,7 @@ function CRMDashboardCard() {
             <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
                 <span className="text-[11px] font-body font-medium text-gray-500 uppercase tracking-wider">
-                  Последние лиды
+                  {tDashboard('entities.leads')}
                 </span>
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
