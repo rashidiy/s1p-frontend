@@ -88,6 +88,10 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        display: ['var(--font-display)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+      },
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #4338CA 0%, #6366F1 100%)',
         'gradient-red': 'linear-gradient(135deg, #4338CA 0%, #818CF8 100%)',
@@ -97,6 +101,39 @@ const config = {
         'gradient-blue': 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
         'gradient-teal': 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
         'gradient-orange': 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+      },
+      animation: {
+        "gradient": "gradient 8s linear infinite",
+        "marquee": "marquee var(--duration) infinite linear",
+        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+        "shimmer-slide": "shimmer-slide var(--speed) ease-in-out infinite alternate",
+        "spin-around": "spin-around calc(var(--speed) * 2) infinite linear",
+        "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
+      },
+      keyframes: {
+        gradient: {
+          to: { "background-position": "var(--bg-size, 300%) 0" },
+        },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+        },
+        "marquee-vertical": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
+        "shimmer-slide": {
+          to: { transform: "translate(calc(100cqw - 100%), 0)" },
+        },
+        "spin-around": {
+          "0%": { transform: "translateZ(0) rotate(0)" },
+          "15%, 35%": { transform: "translateZ(0) rotate(90deg)" },
+          "65%, 85%": { transform: "translateZ(0) rotate(270deg)" },
+          "100%": { transform: "translateZ(0) rotate(360deg)" },
+        },
+        "border-beam": {
+          "100%": { "offset-distance": "100%" },
+        },
       },
     },
   },
