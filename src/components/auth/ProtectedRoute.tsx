@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Spin } from 'antd';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
+import { getSubdomainClient, redirectToSubdomain } from '@/lib/subdomain';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -74,6 +75,16 @@ export function ProtectedRoute({
     if (requiredPermission && !hasPermissionString(requiredPermission)) {
       router.push('/dashboard');
       return;
+    }
+
+    // Subdomain validation: ensure URL subdomain matches user's actual company
+    if (isAuthenticated && !isOwner) {
+      const urlSubdomain = getSubdomainClient();
+      const userSubdomain = useAuthStore.getState().user?.company_subdomain;
+      if (urlSubdomain && userSubdomain && urlSubdomain !== userSubdomain) {
+        redirectToSubdomain(userSubdomain, pathname);
+        return;
+      }
     }
   }, [
     isInitializing,

@@ -6,6 +6,7 @@ import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAdd
 import { Alert, Button, Input, Tag, message } from 'antd';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
+import { getSubdomainUrl } from '@/lib/subdomain';
 import type { CompanyDetailResponse, InviteAdminResponse } from '@/types/api';
 
 export default function CompanyDetailPage() {
@@ -100,14 +101,7 @@ export default function CompanyDetailPage() {
 
   const buildRegistrationUrl = () => {
     if (!company?.subdomain) return '';
-    const { protocol, host } = window.location;
-    const parts = host.split('.');
-    if (parts.length >= 3) {
-      parts[0] = company.subdomain;
-    } else {
-      parts.unshift(company.subdomain);
-    }
-    return `${protocol}//${parts.join('.')}/register`;
+    return getSubdomainUrl(company.subdomain, '/register');
   };
 
   const buildAdminInviteMessage = () => {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
+import { getSubdomainClient, getSubdomainUrl } from '@/lib/subdomain';
 import { UserRole } from '@/types/api';
 import type { InviteTokenResponse } from '@/types/api';
 import { ArrowLeftOutlined, CopyOutlined, CheckOutlined, WarningOutlined } from '@ant-design/icons';
@@ -73,7 +74,8 @@ export default function InviteTelegramPage() {
     if (!tokenResult) return '';
     const roleName = tokenResult.role.replace('company_', '').charAt(0).toUpperCase() + tokenResult.role.replace('company_', '').slice(1);
     const expiresFormatted = new Date(tokenResult.expires_at).toLocaleString();
-    const regUrl = `${window.location.origin}/register`;
+    const subdomain = getSubdomainClient();
+    const regUrl = subdomain ? getSubdomainUrl(subdomain, '/register') : `${window.location.origin}/register`;
 
     return [
       `Вас пригласили в S1P CRM!`,

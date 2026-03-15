@@ -2,13 +2,12 @@
  * Subdomain utilities for multi-tenant application
  */
 
-import { cookies } from 'next/headers';
-
 /**
  * Get current subdomain (server-side)
  * Use in Server Components and Server Actions
  */
 export async function getSubdomain(): Promise<string | null> {
+  const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
   const subdomain = cookieStore.get('company_subdomain')?.value;
   return subdomain || null;

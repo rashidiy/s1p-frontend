@@ -13,6 +13,7 @@ interface AuthUser {
   telegram_user_id?: number | null;
   role?: UserRole;
   company_id?: string;
+  company_subdomain?: string | null;
   is_active: boolean;
   created_at?: string;
 }
@@ -156,6 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             phone: profile.phone,
             role: profile.role as UserRole,
             company_id: profile.company_id ?? undefined,
+            company_subdomain: (profile as any).company_subdomain ?? null,
             is_active: profile.is_active,
             created_at: profile.created_at,
           },
