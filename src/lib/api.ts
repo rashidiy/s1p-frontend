@@ -898,12 +898,27 @@ class ApiClient {
   }
 
   async connectTelegram(chatId: string): Promise<API.TelegramConfig> {
-    const response = await this.client.post<API.TelegramConfig>('/api/v1/company/telegram/connect', { chat_id: chatId });
+    const response = await this.client.post<API.TelegramConfig>('/api/v1/company/telegram/config', { chat_id: chatId });
     return response.data;
   }
 
   async disconnectTelegram(): Promise<void> {
-    await this.client.delete('/api/v1/company/telegram/disconnect');
+    await this.client.delete('/api/v1/company/telegram/config');
+  }
+
+  async setupTelegram(data: API.TelegramSetupRequest): Promise<API.TelegramSetupStatus> {
+    const response = await this.client.post<API.TelegramSetupStatus>('/api/v1/company/telegram/setup', data);
+    return response.data;
+  }
+
+  async getTelegramSetupStatus(): Promise<API.TelegramSetupStatus> {
+    const response = await this.client.get<API.TelegramSetupStatus>('/api/v1/company/telegram/setup/status');
+    return response.data;
+  }
+
+  async manualSetupTelegram(chatId: string): Promise<API.TelegramSetupStatus> {
+    const response = await this.client.post<API.TelegramSetupStatus>('/api/v1/company/telegram/setup/manual', { chat_id: chatId });
+    return response.data;
   }
 
 }

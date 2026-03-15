@@ -508,6 +508,16 @@ export interface TelegramConfig {
   notify_missed_calls: boolean;
   notify_new_leads: boolean;
   notify_deal_stage_change: boolean;
+  // V2 fields
+  group_chat_id: number | null;
+  setup_status: 'not_started' | 'creating' | 'ready' | 'failed' | 'manual';
+  setup_error: string | null;
+  invite_link: string | null;
+  group_name: string | null;
+  language: string;
+  send_recordings: boolean;
+  daily_digest: boolean;
+  dm_notifications: boolean;
 }
 
 export interface UpdateTelegramConfig {
@@ -516,6 +526,28 @@ export interface UpdateTelegramConfig {
   notify_missed_calls?: boolean;
   notify_new_leads?: boolean;
   notify_deal_stage_change?: boolean;
+  // V2 settings
+  language?: string;
+  send_recordings?: boolean;
+  daily_digest?: boolean;
+  dm_notifications?: boolean;
+}
+
+export interface TelegramSetupRequest {
+  company_name: string;
+  language?: string;
+}
+
+export interface TelegramSetupStatus {
+  setup_status: 'not_started' | 'creating' | 'ready' | 'failed' | 'manual';
+  setup_error: string | null;
+  invite_link: string | null;
+  group_name: string | null;
+  group_chat_id: number | null;
+}
+
+export interface TelegramManualSetupRequest {
+  chat_id: string;
 }
 
 // ============================================================================
