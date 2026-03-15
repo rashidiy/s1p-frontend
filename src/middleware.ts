@@ -37,23 +37,51 @@ export function middleware(request: NextRequest) {
   if (!subdomain) {
     const parts = hostname.split('.');
 
-    // Check if we have a subdomain (e.g., owner.domain.com or company1.domain.com)
-    if (parts.length >= 3) {
-      subdomain = parts[0];
-    }
+    // Dev: company.localhost (2 parts) — valid
+    // Prod: company.domain.com (3 parts) — valid
+    // Invalid: company.owner.localhost or a.b.c.domain.com — reject
+    const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost';
 
-    // For hosts like owner.localhost or company1.localhost (dev with /etc/hosts),
-    // treat the first label as subdomain and the rest as base "localhost"
-    if (!subdomain && parts.length === 2 && parts[1] === 'localhost') {
-      subdomain = parts[0];
+    if (baseDomain === 'localhost') {
+      // Only allow X.localhost, reject X.Y.localhost
+      if (parts.length === 2 && parts[1] === 'localhost') {
+        subdomain = parts[0];
+      } else if (parts.length > 2 && parts[parts.length - 1] === 'localhost') {
+        // Multi-level subdomain like buka.owner.localhost — invalid
+        const correctSubdomain = parts[0];
+        const redirectUrl = new URL(request.url);
+        redirectUrl.host = `${correctSubdomain}.localhost:${host.split(':')[1] || '3000'}`;
+        return NextResponse.redirect(redirectUrl);
+      }
+    } else {
+      // Prod: X.domain.com (3 parts)
+      if (parts.length === 3) {
+        subdomain = parts[0];
+      }
     }
   }
 
   const { pathname } = request.nextUrl;
 
-  // Allow public routes without subdomain check
-  const publicRoutes = ['/login', '/register', '/set-password', '/forgot-password', '/_next', '/static', '/favicon.ico', '/health'];
+  // Allow static assets and health checks without subdomain validation
+  const staticRoutes = ['/_next', '/static', '/favicon.ico', '/health'];
+  if (staticRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // Public auth routes — allow but still set subdomain cookie if available
+  const publicRoutes = ['/login', '/register', '/set-password', '/forgot-password'];
   if (publicRoutes.some(route => pathname.startsWith(route))) {
+    if (subdomain) {
+      const response = NextResponse.next();
+      response.cookies.set('company_subdomain', subdomain, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+      });
+      return response;
+    }
     return NextResponse.next();
   }
 
