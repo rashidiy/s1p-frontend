@@ -4,9 +4,10 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import Link from 'next/link';
 import { type Locale, locales } from '@/i18n/config';
+import { BlurFade } from './magicui/blur-fade';
+import { ShimmerButton } from './magicui/shimmer-button';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   ru: 'RU',
@@ -25,7 +26,6 @@ export default function CTAFooter() {
   const t = useTranslations('landing');
   const locale = useLocale() as Locale;
   const router = useRouter();
-  const prefersReducedMotion = useReducedMotion();
 
   const handleLocaleChange = useCallback(
     (newLocale: Locale) => {
@@ -48,92 +48,66 @@ export default function CTAFooter() {
     [],
   );
 
-  const ctaVariants: Variants = prefersReducedMotion
-    ? { hidden: {}, visible: {} }
-    : {
-        hidden: { opacity: 0, y: 24 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-        },
-      };
-
   return (
     <>
       {/* CTA Section */}
-      <section className="relative overflow-hidden">
-        {/* Background gradient */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(135deg, #4338CA 0%, #3730A3 40%, #5B21B6 100%)',
-          }}
-        />
-
-        {/* Floating gradient orbs for depth */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/[0.07] blur-3xl" />
-          <div className="absolute -bottom-16 right-1/4 h-56 w-56 rounded-full bg-white/[0.05] blur-3xl" />
-          <div className="absolute right-0 top-1/3 h-48 w-48 rounded-full bg-violet-400/10 blur-3xl" />
+      <section className="bg-gradient-to-br from-indigo-950 via-[#0D0D12] to-violet-950 relative overflow-hidden py-24">
+        {/* Floating gradient orbs */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-32 top-1/4 h-80 w-80 rounded-full bg-indigo-600/[0.12] blur-3xl" />
+          <div className="absolute -right-24 bottom-1/4 h-72 w-72 rounded-full bg-violet-600/[0.10] blur-3xl" />
         </div>
 
-        <div className="relative px-4 py-20 sm:px-6 lg:px-8">
-          <motion.div
-            className="mx-auto max-w-3xl text-center"
-            variants={ctaVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-          >
-            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
-              {t('ctaFooter.title')}
-            </h2>
+        <div className="relative px-4 sm:px-6 lg:px-8">
+          <BlurFade delay={0} inView>
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-white">
+                {t('ctaFooter.title')}
+              </h2>
 
-            <div className="mt-10 flex justify-center">
-              <Link
-                href="/register"
-                className="inline-flex items-center rounded-2xl bg-white px-10 py-4 text-lg font-bold text-indigo-700 shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl"
-              >
-                {t('ctaFooter.cta')}
-              </Link>
+              <div className="mt-10 flex justify-center">
+                <Link href="/register">
+                  <ShimmerButton
+                    className="px-10 py-4 text-lg font-bold"
+                    background="rgba(99, 102, 241, 0.2)"
+                    shimmerColor="#818CF8"
+                    borderRadius="16px"
+                  >
+                    {t('ctaFooter.cta')}
+                  </ShimmerButton>
+                </Link>
+              </div>
+
+              <p className="mt-6 text-indigo-300/60 text-sm font-body">
+                {t('ctaFooter.subtitle')}
+              </p>
             </div>
-
-            <p className="mt-6 text-sm text-indigo-200">
-              {t('ctaFooter.subtitle')}
-            </p>
-          </motion.div>
+          </BlurFade>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900">
+      <footer className="bg-[#08090a] border-t border-white/[0.06]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-10 md:grid-cols-3">
             {/* Brand column */}
             <div>
               <div className="flex items-center gap-2.5">
-                <div
-                  className="flex h-9 w-9 items-center justify-center rounded-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #4338CA, #6366F1)',
-                  }}
-                >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500">
                   <span className="text-[11px] font-bold tracking-wider text-white">
                     S1P
                   </span>
                 </div>
-                <span className="text-lg font-bold text-white">S1P</span>
+                <span className="font-display text-white font-bold text-lg">S1P</span>
               </div>
-              <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-400">
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500 font-body">
                 {t('footer.description')}
               </p>
             </div>
 
             {/* Links column */}
             <div>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <h3 className="text-xs uppercase tracking-[0.15em] text-gray-500 mb-4 font-body">
                 {t('footer.product')}
               </h3>
               <ul className="space-y-2.5">
@@ -142,7 +116,7 @@ export default function CTAFooter() {
                     <a
                       href={href}
                       onClick={(e) => handleSmoothScroll(e, href)}
-                      className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                      className="text-sm text-gray-400 hover:text-white transition font-body"
                     >
                       {t(`footer.${key}`)}
                     </a>
@@ -153,14 +127,14 @@ export default function CTAFooter() {
 
             {/* Contact column */}
             <div>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <h3 className="text-xs uppercase tracking-[0.15em] text-gray-500 mb-4 font-body">
                 {t('footer.contact')}
               </h3>
               <ul className="space-y-2.5">
                 <li>
                   <a
                     href={`tel:${t('nav.phone').replace(/\s/g, '')}`}
-                    className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition font-body"
                   >
                     <svg
                       className="h-3.5 w-3.5 shrink-0"
@@ -179,7 +153,7 @@ export default function CTAFooter() {
                 <li>
                   <a
                     href="mailto:info@s1p.uz"
-                    className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition font-body"
                   >
                     <svg
                       className="h-3.5 w-3.5 shrink-0"
@@ -201,7 +175,7 @@ export default function CTAFooter() {
                     href="https://t.me/s1p_support"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition font-body"
                   >
                     <svg
                       className="h-3.5 w-3.5 shrink-0"
@@ -213,7 +187,7 @@ export default function CTAFooter() {
                     @s1p_support
                   </a>
                 </li>
-                <li className="flex items-center gap-2 text-sm text-gray-400">
+                <li className="flex items-center gap-2 text-sm text-gray-400 font-body">
                   <svg
                     className="h-3.5 w-3.5 shrink-0"
                     viewBox="0 0 24 24"
@@ -233,7 +207,7 @@ export default function CTAFooter() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-10 border-t border-gray-800 pt-4">
+          <div className="mt-10 border-t border-white/[0.06] py-4">
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               {/* Language toggle */}
               <div className="flex items-center gap-1">
@@ -247,8 +221,8 @@ export default function CTAFooter() {
                       onClick={() => handleLocaleChange(loc)}
                       className={`text-sm transition-colors duration-200 ${
                         loc === locale
-                          ? 'font-semibold text-white'
-                          : 'text-gray-500 hover:text-gray-300'
+                          ? 'text-white font-semibold'
+                          : 'text-gray-500 hover:text-white'
                       }`}
                     >
                       {LOCALE_LABELS[loc]}
@@ -258,7 +232,7 @@ export default function CTAFooter() {
               </div>
 
               {/* Copyright */}
-              <p className="text-sm text-gray-500">
+              <p className="text-gray-500 text-sm font-body">
                 {t('footer.copyright')}
               </p>
             </div>

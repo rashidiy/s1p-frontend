@@ -1,54 +1,127 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion, type Variants, type Transition } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import PhoneMockup from './PhoneMockup';
-import BrowserMockup from './BrowserMockup';
-
-function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-  return prefersReduced;
-}
+import { Particles } from './magicui/particles';
+import { BlurFade } from './magicui/blur-fade';
+import { ShimmerButton } from './magicui/shimmer-button';
+import { NumberTicker } from './magicui/number-ticker';
+import { Marquee } from './magicui/marquee';
 
 function SparkleIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
-      <path d="M8 0L9.79 6.21L16 8L9.79 9.79L8 16L6.21 9.79L0 8L6.21 6.21L8 0Z" fill="url(#sparkle-grad)" />
+      <path d="M8 0L9.79 6.21L16 8L9.79 9.79L8 16L6.21 9.79L0 8L6.21 6.21L8 0Z" fill="url(#sparkle-grad-hero)" />
       <defs>
-        <linearGradient id="sparkle-grad" x1="0" y1="0" x2="16" y2="16">
-          <stop stopColor="#818CF8" />
-          <stop offset="1" stopColor="#4338CA" />
+        <linearGradient id="sparkle-grad-hero" x1="0" y1="0" x2="16" y2="16">
+          <stop stopColor="#A78BFA" />
+          <stop offset="1" stopColor="#818CF8" />
         </linearGradient>
       </defs>
     </svg>
   );
 }
 
+const MOCK_LEADS = [
+  { name: 'Алексей М.', phone: '+998 90 •••', status: 'new' },
+  { name: 'Дилшод К.', phone: '+998 91 •••', status: 'contacted' },
+  { name: 'Нодира Р.', phone: '+998 93 •••', status: 'qualified' },
+];
+
+const STATUS_MAP: Record<string, { label: string; color: string }> = {
+  new: { label: 'Новый', color: 'bg-indigo-500/20 text-indigo-400' },
+  contacted: { label: 'Связались', color: 'bg-amber-500/20 text-amber-400' },
+  qualified: { label: 'Квалиф.', color: 'bg-emerald-500/20 text-emerald-400' },
+};
+
+function CRMDashboardCard() {
+  return (
+    <BlurFade delay={0.4} direction="left" duration={0.8} blur="12px">
+      <div className="relative">
+        {/* Glow behind card */}
+        <div
+          className="absolute -inset-8 rounded-3xl opacity-30 blur-3xl"
+          style={{ background: 'radial-gradient(ellipse at center, #6366F1 0%, transparent 70%)' }}
+        />
+
+        <div className="relative rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-sm overflow-hidden">
+          {/* Dashboard header */}
+          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+            <div className="flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full bg-indigo-500/60" />
+              <span className="text-sm font-display font-semibold text-white/80">S1P Dashboard</span>
+            </div>
+            <div className="flex gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+              <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+              <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-3 p-4">
+            {[
+              { value: 847, label: 'Звонков', icon: '📞', accent: 'text-indigo-400' },
+              { value: 156, label: 'Лидов', icon: '👤', accent: 'text-violet-400' },
+              { value: 43, label: 'Сделок', icon: '💰', accent: 'text-emerald-400' },
+              { value: 12, label: 'Задач', icon: '📋', accent: 'text-amber-400' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5"
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-xs">{stat.icon}</span>
+                  <span className="text-[11px] font-body text-gray-500 uppercase tracking-wider">{stat.label}</span>
+                </div>
+                <div className={`text-xl font-display font-bold ${stat.accent}`}>
+                  <NumberTicker value={stat.value} delay={0.6} className={stat.accent} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mini leads table */}
+          <div className="px-4 pb-4">
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
+                <span className="text-[11px] font-body font-medium text-gray-500 uppercase tracking-wider">
+                  Последние лиды
+                </span>
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              </div>
+              {MOCK_LEADS.map((lead, i) => (
+                <div
+                  key={lead.name}
+                  className={`flex items-center justify-between px-3 py-2 ${
+                    i < MOCK_LEADS.length - 1 ? 'border-b border-white/[0.03]' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-medium text-gray-400">
+                      {lead.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-gray-300 font-body">{lead.name}</div>
+                      <div className="text-[10px] text-gray-600 font-body">{lead.phone}</div>
+                    </div>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_MAP[lead.status].color}`}>
+                    {STATUS_MAP[lead.status].label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </BlurFade>
+  );
+}
+
 export default function HeroSection() {
   const t = useTranslations('landing');
-  const prefersReduced = usePrefersReducedMotion();
-  const animate = !prefersReduced;
-
-  const containerVariants: Variants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: animate ? 0.1 : 0 } },
-  };
-
-  const fadeUp: Variants = animate
-    ? {
-        hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
-      }
-    : { hidden: { opacity: 1 }, visible: { opacity: 1, transition: { duration: 0 } } };
 
   const title = t('hero.title');
   const words = title.split(' ');
@@ -56,225 +129,165 @@ export default function HeroSection() {
   const restOfTitle = words.slice(0, -1).join(' ');
 
   return (
-    <section className="relative min-h-[90vh] overflow-hidden pt-24 lg:pt-32">
+    <section className="relative min-h-screen bg-[#08090a] overflow-hidden">
       {/* ===== BACKGROUND LAYERS ===== */}
-      {/* Base gradient */}
-      <div className="absolute inset-0 -z-20 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" />
 
-      {/* Grid pattern */}
+      {/* Layer 1: Particles */}
+      <Particles
+        color="#6366f1"
+        quantity={80}
+        size={0.3}
+        className="z-0"
+      />
+
+      {/* Layer 2: Gradient orbs */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute -right-40 -top-40 h-[700px] w-[700px] rounded-full opacity-[0.10]"
+          style={{ background: 'radial-gradient(circle, #6366F1 0%, transparent 70%)' }}
+          animate={{ y: [0, -30, 0], x: [0, 15, 0], scale: [1, 1.05, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute -left-60 top-1/3 h-[800px] w-[800px] rounded-full opacity-[0.08]"
+          style={{ background: 'radial-gradient(circle, #A78BFA 0%, transparent 70%)' }}
+          animate={{ y: [0, 25, 0], x: [0, -20, 0], scale: [1, 1.08, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
+
+      {/* Layer 3: Grid pattern */}
       <div
-        className="absolute inset-0 -z-10 opacity-[0.03]"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(#4338CA 1px, transparent 1px), linear-gradient(90deg, #4338CA 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px)`,
           backgroundSize: '64px 64px',
         }}
       />
 
-      {/* Floating gradient orbs */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Orb 1 — top right, indigo */}
-        <motion.div
-          className="absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full opacity-[0.12]"
-          style={{ background: 'radial-gradient(circle, #6366F1 0%, transparent 70%)' }}
-          animate={animate ? { y: [0, -30, 0], x: [0, 15, 0], scale: [1, 1.05, 1] } : {}}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Orb 2 — left center, violet */}
-        <motion.div
-          className="absolute -left-48 top-1/3 h-[600px] w-[600px] rounded-full opacity-[0.08]"
-          style={{ background: 'radial-gradient(circle, #8B5CF6 0%, transparent 70%)' }}
-          animate={animate ? { y: [0, 25, 0], x: [0, -20, 0], scale: [1, 1.08, 1] } : {}}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Orb 3 — bottom right, blue */}
-        <motion.div
-          className="absolute -bottom-20 right-1/4 h-[400px] w-[400px] rounded-full opacity-[0.06]"
-          style={{ background: 'radial-gradient(circle, #3B82F6 0%, transparent 70%)' }}
-          animate={animate ? { y: [0, -20, 0], scale: [1, 1.03, 1] } : {}}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
+      {/* ===== CONTENT ===== */}
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 pt-28 lg:pt-36 pb-8">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
 
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-8 xl:gap-12">
-          {/* ===== LEFT: TEXT CONTENT (45%) ===== */}
-          <motion.div
-            className="flex-shrink-0 text-center lg:w-[46%] lg:text-left"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          {/* ===== LEFT: TEXT CONTENT ===== */}
+          <div className="flex-shrink-0 text-center lg:w-[50%] lg:text-left">
+
             {/* Badge */}
-            <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200/60 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm">
-              <SparkleIcon />
-              <span className="text-sm font-semibold tracking-wide text-indigo-700">
-                CRM #1 для колл-центров
-              </span>
-            </motion.div>
+            <BlurFade delay={0} duration={0.5}>
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.06] px-4 py-1.5 backdrop-blur-sm">
+                <SparkleIcon />
+                <span className="text-sm font-body text-gray-300">
+                  CRM #1 для колл-центров
+                </span>
+              </div>
+            </BlurFade>
 
             {/* Headline */}
-            <motion.h1
-              variants={fadeUp}
-              className="text-[2.75rem] font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl xl:text-[4.25rem]"
-            >
-              {restOfTitle}
-              <br />
-              <span className="relative inline-block">
+            <BlurFade delay={0.1} duration={0.6}>
+              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05] -tracking-[0.02em]">
+                {restOfTitle}{' '}
                 <span
-                  className="bg-clip-text text-transparent"
+                  className="inline-block bg-clip-text text-transparent"
                   style={{
-                    backgroundImage: 'linear-gradient(135deg, #4338CA 0%, #6366F1 40%, #818CF8 70%, #4338CA 100%)',
-                    backgroundSize: '200% 100%',
-                    animation: animate ? 'gradient-shift 4s ease-in-out infinite' : 'none',
+                    backgroundImage: 'linear-gradient(90deg, #818CF8, #A78BFA, #C084FC, #818CF8)',
+                    backgroundSize: '300% 100%',
+                    animation: 'hero-gradient-shift 4s ease-in-out infinite',
                   }}
                 >
                   {lastWord}
                 </span>
-                {/* Underline accent */}
-                <motion.div
-                  className="absolute -bottom-1 left-0 right-0 h-[3px] rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #4338CA, #818CF8, #4338CA)' }}
-                  initial={animate ? { scaleX: 0, originX: 0 } : { scaleX: 1 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </span>
-            </motion.h1>
+              </h1>
+            </BlurFade>
 
             {/* Subtitle */}
-            <motion.p
-              variants={fadeUp}
-              className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-gray-500 lg:mx-0 lg:text-xl"
-            >
-              {t('hero.subtitle')}
-            </motion.p>
+            <BlurFade delay={0.2} duration={0.6}>
+              <p className="font-body text-lg lg:text-xl text-gray-400 max-w-xl leading-relaxed mt-6 mx-auto lg:mx-0">
+                {t('hero.subtitle')}
+              </p>
+            </BlurFade>
 
             {/* CTAs */}
-            <motion.div variants={fadeUp} className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
-              {/* Primary CTA with glow */}
-              <Link
-                href="/register"
-                className="group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-8 py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl"
-                style={{ background: 'linear-gradient(135deg, #4338CA 0%, #5B4FE8 50%, #6366F1 100%)' }}
-              >
-                {/* Glow pulse */}
-                <span
-                  className="absolute inset-0 rounded-2xl"
-                  style={{
-                    boxShadow: '0 0 30px rgba(99, 102, 241, 0.4), 0 0 60px rgba(67, 56, 202, 0.2)',
-                    animation: animate ? 'glow-pulse 3s ease-in-out infinite' : 'none',
-                  }}
-                />
-                <span className="relative z-10 flex items-center gap-2.5">
-                  {t('hero.cta')}
-                  <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </span>
-              </Link>
+            <BlurFade delay={0.3} duration={0.6}>
+              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
+                {/* Primary CTA — ShimmerButton */}
+                <Link href="/register">
+                  <ShimmerButton
+                    background="rgba(99, 102, 241, 0.15)"
+                    shimmerColor="#818CF8"
+                    borderRadius="16px"
+                    className="px-8 py-4 text-[15px] font-semibold"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      {t('hero.cta')}
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </span>
+                  </ShimmerButton>
+                </Link>
 
-              {/* Secondary CTA */}
-              <button
-                type="button"
-                className="group inline-flex items-center gap-2.5 rounded-2xl px-6 py-4 text-[15px] font-medium text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-indigo-50 shadow-sm transition-all duration-200 group-hover:shadow-md group-hover:shadow-indigo-200/50">
-                  <svg className="ml-0.5 h-3.5 w-3.5 text-indigo-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
-                {t('hero.watchDemo')}
-              </button>
-            </motion.div>
-          </motion.div>
+                {/* Secondary ghost CTA */}
+                <button
+                  type="button"
+                  className="group inline-flex items-center gap-2.5 rounded-2xl px-6 py-4 text-[15px] font-medium text-gray-400 transition-all duration-200 hover:bg-white/[0.04] hover:text-white"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.06] transition-all duration-200 group-hover:border-indigo-500/30 group-hover:bg-indigo-500/10">
+                    <svg className="ml-0.5 h-3.5 w-3.5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                  {t('hero.watchDemo')}
+                </button>
+              </div>
+            </BlurFade>
+          </div>
 
-          {/* ===== RIGHT: DEVICE MOCKUPS (55%) ===== */}
-          <div className="relative w-full flex-1 lg:w-[54%]">
-            <div className="relative flex items-end justify-center lg:justify-end">
-              {/* Shadow/glow behind mockups */}
-              <div
-                className="absolute bottom-0 left-1/2 h-[80%] w-[80%] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
-                style={{ background: 'radial-gradient(ellipse, #6366F1 0%, transparent 70%)' }}
-              />
-
-              {/* Phone — foreground, overlapping */}
-              <motion.div
-                className="relative z-20 -mr-6 lg:-mr-12"
-                initial={animate ? { opacity: 0, x: -50, y: 20 } : { opacity: 1 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="drop-shadow-2xl">
-                  <PhoneMockup />
-                </div>
-              </motion.div>
-
-              {/* Browser — background, slightly behind and up */}
-              <motion.div
-                className="relative z-10 hidden sm:block"
-                initial={animate ? { opacity: 0, x: 50, y: 20 } : { opacity: 1 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="drop-shadow-xl">
-                  <BrowserMockup />
-                </div>
-              </motion.div>
-            </div>
+          {/* ===== RIGHT: CRM DASHBOARD CARD ===== */}
+          <div className="relative w-full flex-1 lg:w-[50%] hidden sm:block">
+            <CRMDashboardCard />
           </div>
         </div>
 
         {/* ===== SOCIAL PROOF STRIP ===== */}
-        <motion.div
-          initial={animate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={(animate ? { duration: 0.6, delay: 1, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }) as Transition}
-          className="mt-16 lg:mt-24"
-        >
-          <div className="rounded-2xl border border-gray-100 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/80 px-8 py-5">
-            <div className="flex flex-col items-center gap-5 sm:flex-row sm:justify-center sm:gap-10">
-              <span className="text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
+        <BlurFade delay={0.5} duration={0.6}>
+          <div className="mt-16 lg:mt-24 border-t border-white/[0.06] pt-8">
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-0">
+              <span className="text-xs font-body font-semibold uppercase tracking-[0.15em] text-gray-500 whitespace-nowrap sm:mr-8">
                 {t('hero.integrationStrip')}
               </span>
-              <div className="h-px w-12 bg-gray-200 sm:h-8 sm:w-px" />
-              <div className="flex items-center gap-10">
-                {/* Sipuni */}
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 shadow-sm">
-                    <svg className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
+              <div className="w-full overflow-hidden">
+                <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem]">
+                  {/* Sipuni */}
+                  <div className="flex items-center gap-2.5 mx-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04]">
+                      <svg className="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-bold text-gray-400 font-body">Sipuni</span>
                   </div>
-                  <span className="text-sm font-bold text-gray-600">Sipuni</span>
-                </div>
-                {/* Binotel */}
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 shadow-sm">
-                    <svg className="h-5 w-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
+                  {/* Binotel */}
+                  <div className="flex items-center gap-2.5 mx-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04]">
+                      <svg className="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-bold text-gray-400 font-body">Binotel</span>
                   </div>
-                  <span className="text-sm font-bold text-gray-600">Binotel</span>
-                </div>
+                </Marquee>
               </div>
             </div>
           </div>
-        </motion.div>
+        </BlurFade>
       </div>
-
-      {/* Bottom fade to white */}
-      <div className="h-20 bg-gradient-to-b from-transparent to-white lg:h-28" />
 
       {/* Keyframe animations */}
       <style jsx>{`
-        @keyframes gradient-shift {
+        @keyframes hero-gradient-shift {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
         }
       `}</style>
     </section>

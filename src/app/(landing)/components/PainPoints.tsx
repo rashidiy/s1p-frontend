@@ -1,28 +1,13 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-
-function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReduced;
-}
+import { BlurFade } from './magicui/blur-fade';
 
 function PhoneXIcon() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-200">
+    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-rose-500/20">
       <svg
-        className="h-7 w-7 text-white"
+        className="h-7 w-7 text-rose-400"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -40,9 +25,9 @@ function PhoneXIcon() {
 
 function ClockIcon() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-200">
+    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-amber-500/20">
       <svg
-        className="h-7 w-7 text-white"
+        className="h-7 w-7 text-amber-400"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -59,9 +44,9 @@ function ClockIcon() {
 
 function ChartDownIcon() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-200">
+    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-violet-500/20">
       <svg
-        className="h-7 w-7 text-white"
+        className="h-7 w-7 text-violet-400"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -79,21 +64,13 @@ function ChartDownIcon() {
 const ICONS = [PhoneXIcon, ClockIcon, ChartDownIcon] as const;
 
 const STAT_COLORS = [
-  'text-rose-500',
-  'text-amber-500',
-  'text-indigo-500',
-] as const;
-
-const CARD_GRADIENTS = [
-  'bg-gradient-to-br from-rose-50 to-white',
-  'bg-gradient-to-br from-amber-50 to-white',
-  'bg-gradient-to-br from-indigo-50 to-white',
+  'text-rose-400',
+  'text-amber-400',
+  'text-violet-400',
 ] as const;
 
 export default function PainPoints() {
   const t = useTranslations('landing');
-  const prefersReduced = usePrefersReducedMotion();
-  const animate = !prefersReduced;
 
   const stats = [
     { key: 'stat1', text: 'stat1Text' },
@@ -102,26 +79,19 @@ export default function PainPoints() {
   ] as const;
 
   return (
-    <section id="pain" className="bg-gray-50/80 py-16 lg:py-20">
+    <section id="pain" className="bg-[#0D0D12] py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Title — left-aligned with accent border */}
-        <motion.div
-          initial={animate ? { opacity: 0, x: -20 } : { opacity: 1, x: 0 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={
-            animate
-              ? { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-              : { duration: 0 }
-          }
-          className="mb-10 lg:mb-14"
-        >
-          <div className="border-l-4 border-rose-500 pl-5">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
+        {/* Section Title */}
+        <BlurFade delay={0} inView>
+          <div className="mb-10 text-center lg:mb-14">
+            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">
               {t('pain.title')}
             </h2>
+            <p className="mt-3 text-gray-400 font-body">
+              {t('pain.subtitle')}
+            </p>
           </div>
-        </motion.div>
+        </BlurFade>
 
         {/* Cards Grid */}
         {/* Industry stats — update with real data when available */}
@@ -130,36 +100,21 @@ export default function PainPoints() {
             const Icon = ICONS[index];
 
             return (
-              <motion.div
-                key={stat.key}
-                initial={
-                  animate ? { opacity: 0, y: 32 } : { opacity: 1, y: 0 }
-                }
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={
-                  animate
-                    ? {
-                        duration: 0.5,
-                        delay: index * 0.15,
-                        ease: [0.22, 1, 0.36, 1],
-                      }
-                    : { duration: 0 }
-                }
-                className={`group rounded-2xl border border-gray-100 ${CARD_GRADIENTS[index]} p-8 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}
-              >
-                <Icon />
+              <BlurFade key={stat.key} delay={0.1 + index * 0.15} inView>
+                <div className="group rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.15]">
+                  <Icon />
 
-                <div
-                  className={`mt-6 text-6xl font-black tracking-tight ${STAT_COLORS[index]}`}
-                >
-                  {t(`pain.${stat.key}`)}
+                  <div
+                    className={`mt-6 font-display text-5xl font-black tracking-tight md:text-6xl ${STAT_COLORS[index]}`}
+                  >
+                    {t(`pain.${stat.key}`)}
+                  </div>
+
+                  <p className="mt-3 text-base leading-relaxed text-gray-400 font-body">
+                    {t(`pain.${stat.text}`)}
+                  </p>
                 </div>
-
-                <p className="mt-3 text-base leading-relaxed text-gray-600">
-                  {t(`pain.${stat.text}`)}
-                </p>
-              </motion.div>
+              </BlurFade>
             );
           })}
         </div>

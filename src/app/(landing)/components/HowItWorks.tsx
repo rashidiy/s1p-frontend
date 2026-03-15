@@ -1,29 +1,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion, type Variants } from 'framer-motion';
-import { useEffect, useState } from 'react';
-
-function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReduced;
-}
+import { BlurFade } from './magicui/blur-fade';
 
 function StepIcon1() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
       <svg
-        width="28"
-        height="28"
+        width="26"
+        height="26"
         viewBox="0 0 24 24"
         fill="none"
         stroke="white"
@@ -41,10 +26,10 @@ function StepIcon1() {
 
 function StepIcon2() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
       <svg
-        width="28"
-        height="28"
+        width="26"
+        height="26"
         viewBox="0 0 24 24"
         fill="none"
         stroke="white"
@@ -61,10 +46,10 @@ function StepIcon2() {
 
 function StepIcon3() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200">
+    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
       <svg
-        width="28"
-        height="28"
+        width="26"
+        height="26"
         viewBox="0 0 24 24"
         fill="none"
         stroke="white"
@@ -82,52 +67,10 @@ function StepIcon3() {
   );
 }
 
-function ChevronConnector() {
-  return (
-    <div className="hidden lg:flex items-center justify-center">
-      <svg
-        width="40"
-        height="24"
-        viewBox="0 0 40 24"
-        fill="none"
-        className="text-indigo-300"
-      >
-        <path
-          d="M0 12H36M36 12L28 5M36 12L28 19"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
-}
-
 const STEP_ICONS = [StepIcon1, StepIcon2, StepIcon3] as const;
-
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const stepVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
 
 export default function HowItWorks() {
   const t = useTranslations('landing');
-  const prefersReduced = usePrefersReducedMotion();
-  const animate = !prefersReduced;
 
   const steps = [
     { number: '01', titleKey: 'steps.step1Title', descKey: 'steps.step1Desc' },
@@ -136,121 +79,94 @@ export default function HowItWorks() {
   ] as const;
 
   return (
-    <section id="how-it-works" className="bg-white py-16 lg:py-20">
+    <section id="how-it-works" className="bg-[#08090a] py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Title — centered with indigo underline */}
-        <motion.div
-          className="mb-12 text-center lg:mb-14"
-          initial={animate ? { opacity: 0, y: 20 } : undefined}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={animate ? { duration: 0.5 } : { duration: 0 }}
-        >
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-            {t('steps.title')}
-          </h2>
-          <div className="mx-auto mt-4 h-[3px] w-10 rounded-full bg-indigo-500" />
-        </motion.div>
+        <BlurFade delay={0} inView>
+          <div className="mb-12 text-center lg:mb-14">
+            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">
+              {t('steps.title')}
+            </h2>
+            <div className="mx-auto mt-4 h-[2px] w-10 bg-indigo-500" />
+          </div>
+        </BlurFade>
 
         {/* Desktop: Horizontal card layout with arrow connectors */}
-        <motion.div
-          className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-start lg:gap-6"
-          variants={animate ? containerVariants : undefined}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
+        <div className="hidden lg:flex lg:items-start lg:gap-4">
           {steps.map((step, index) => {
             const Icon = STEP_ICONS[index];
 
             return (
-              <div key={step.number} className="contents">
-                <motion.div
-                  className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                  variants={animate ? stepVariants : undefined}
-                >
-                  {/* Watermark number */}
-                  <span className="pointer-events-none absolute -top-2 right-4 select-none text-7xl font-black text-indigo-100/70">
-                    {step.number}
-                  </span>
-
-                  <div className="relative">
-                    <Icon />
-                    <h3 className="mt-5 text-xl font-bold text-gray-900">
-                      {t(step.titleKey)}
-                    </h3>
-                    <p className="mt-2 leading-relaxed text-gray-500">
-                      {t(step.descKey)}
-                    </p>
-                  </div>
-                </motion.div>
-
-                {index < steps.length - 1 && <ChevronConnector />}
-              </div>
-            );
-          })}
-        </motion.div>
-
-        {/* Mobile/Tablet: Vertical timeline with indigo left line */}
-        <motion.div
-          className="lg:hidden"
-          variants={animate ? containerVariants : undefined}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <div className="relative border-l-2 border-indigo-200 pl-8">
-            {steps.map((step, index) => {
-              const Icon = STEP_ICONS[index];
-
-              return (
-                <motion.div
-                  key={step.number}
-                  className={`relative ${index < steps.length - 1 ? 'pb-10' : ''}`}
-                  variants={animate ? stepVariants : undefined}
-                >
-                  {/* Timeline dot */}
-                  <div className="absolute -left-[calc(2rem+5px)] top-0 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-indigo-500 ring-4 ring-white" />
-
-                  <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div key={step.number} className="flex items-start gap-4">
+                <BlurFade delay={0.1 + index * 0.15} inView>
+                  <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.15]">
                     {/* Watermark number */}
-                    <span className="pointer-events-none absolute -top-2 right-3 select-none text-6xl font-black text-indigo-100/70">
+                    <span className="pointer-events-none absolute -top-2 right-4 select-none font-display text-8xl font-black text-white/[0.03]">
                       {step.number}
                     </span>
 
                     <div className="relative">
                       <Icon />
-                      <h3 className="mt-4 text-lg font-bold text-gray-900">
+                      <h3 className="mt-5 font-body text-lg font-bold text-white">
                         {t(step.titleKey)}
                       </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                      <p className="mt-2 font-body text-sm leading-relaxed text-gray-400">
                         {t(step.descKey)}
                       </p>
                     </div>
                   </div>
-                </motion.div>
+                </BlurFade>
+
+                {index < steps.length - 1 && (
+                  <div className="flex items-center self-center pt-4">
+                    <span className="text-2xl text-white/20">&rarr;</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile/Tablet: Vertical stack with left border line */}
+        <div className="lg:hidden">
+          <div className="space-y-6 border-l-2 border-white/[0.08] pl-6">
+            {steps.map((step, index) => {
+              const Icon = STEP_ICONS[index];
+
+              return (
+                <BlurFade key={step.number} delay={0.1 + index * 0.15} inView>
+                  <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6">
+                    {/* Watermark number */}
+                    <span className="pointer-events-none absolute -top-2 right-3 select-none font-display text-8xl font-black text-white/[0.03]">
+                      {step.number}
+                    </span>
+
+                    <div className="relative">
+                      <Icon />
+                      <h3 className="mt-4 font-body text-lg font-bold text-white">
+                        {t(step.titleKey)}
+                      </h3>
+                      <p className="mt-2 font-body text-sm leading-relaxed text-gray-400">
+                        {t(step.descKey)}
+                      </p>
+                    </div>
+                  </div>
+                </BlurFade>
               );
             })}
           </div>
-        </motion.div>
+        </div>
 
         {/* Bottom stat bar */}
-        <motion.div
-          className="mt-10 lg:mt-14"
-          initial={animate ? { opacity: 0, y: 20 } : undefined}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={animate ? { duration: 0.5, delay: 0.5 } : { duration: 0 }}
-        >
-          <div className="rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-8 py-5 text-center text-white shadow-lg shadow-indigo-200">
-            <p className="text-lg font-semibold sm:text-xl">
-              <span className="mr-2" role="img" aria-label="timer">
-                &#9201;
-              </span>
-              {t('steps.timeToFirst')}
-            </p>
+        <BlurFade delay={0.6} inView>
+          <div className="mt-10 lg:mt-14">
+            <div className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-4 text-center">
+              <p className="font-body text-lg font-semibold text-white sm:text-xl">
+                {t('steps.timeToFirst')}
+              </p>
+            </div>
           </div>
-        </motion.div>
+        </BlurFade>
       </div>
     </section>
   );

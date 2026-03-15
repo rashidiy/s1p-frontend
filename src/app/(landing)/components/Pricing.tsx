@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import Link from 'next/link';
+import { BlurFade } from './magicui/blur-fade';
+import { BorderBeam } from './magicui/border-beam';
+import { ShimmerButton } from './magicui/shimmer-button';
 
 const FEATURE_KEYS = [
   'feature1',
@@ -15,185 +17,136 @@ const FEATURE_KEYS = [
   'feature7',
 ] as const;
 
-function CheckIcon() {
-  return (
-    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500">
-      <svg
-        className="h-3 w-3 text-white"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20 6L9 17l-5-5" />
-      </svg>
-    </div>
-  );
-}
-
 export default function Pricing() {
   const t = useTranslations('landing');
-  const prefersReducedMotion = useReducedMotion();
   const [showAnnual, setShowAnnual] = useState(false);
 
-  const cardVariants: Variants = prefersReducedMotion
-    ? { hidden: {}, visible: {} }
-    : {
-        hidden: { opacity: 0, scale: 0.95 },
-        visible: {
-          opacity: 1,
-          scale: 1,
-          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-        },
-      };
-
   return (
-    <section id="pricing" className="bg-gray-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+    <section id="pricing" className="bg-[#0D0D12] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Section heading */}
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            {t('pricing.title')}
-          </h2>
-        </div>
+        <BlurFade delay={0} inView>
+          <div className="mb-12 text-center">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white">
+              {t('pricing.title')}
+            </h2>
+          </div>
+        </BlurFade>
 
         {/* Pricing card */}
-        <motion.div
-          className="mx-auto max-w-xl"
-          variants={cardVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-        >
-          <div className="relative">
-            {/* Glow effect behind card */}
-            <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-indigo-500/10 blur-3xl" />
+        <BlurFade delay={0.15} inView>
+          <div className="relative bg-white/[0.04] border border-white/[0.08] rounded-3xl max-w-xl mx-auto overflow-hidden">
+            <BorderBeam size={250} duration={12} colorFrom="#6366f1" colorTo="#a855f7" />
 
-            <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl">
-              {/* Top gradient border */}
-              <div
-                className="h-1 w-full"
-                style={{
-                  background:
-                    'linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #6366F1 100%)',
-                }}
-              />
+            {/* Free trial badge */}
+            <div className="absolute right-6 top-6 z-10">
+              <div className="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">
+                14 дней бесплатно
+              </div>
+            </div>
 
-              {/* Free trial badge */}
-              <div className="absolute right-6 top-6">
-                <div className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-emerald-500/25">
-                  14 дней бесплатно
-                </div>
+            <div className="p-10 sm:p-12">
+              {/* Plan name */}
+              <p className="text-indigo-400 font-bold text-sm uppercase tracking-wider font-body">
+                {t('pricing.planName')}
+              </p>
+
+              {/* Price */}
+              <div className="mt-6 flex items-baseline">
+                <span className="font-display text-6xl font-black text-white">
+                  {t('pricing.price')}
+                </span>
+                <span className="ml-2 text-xl text-gray-500">
+                  {t('pricing.currency')}
+                </span>
               </div>
 
-              <div className="p-10 sm:p-12">
-                {/* Plan name */}
-                <p className="text-sm font-bold uppercase tracking-wider text-indigo-600">
-                  {t('pricing.planName')}
-                </p>
+              {/* Per user info */}
+              <p className="mt-3 text-base text-gray-400 font-body">
+                {t('pricing.perUser')}
+              </p>
+              <p className="mt-1 text-sm text-gray-500 font-body">
+                {t('pricing.extraUser')}
+              </p>
 
-                {/* Price */}
-                <div className="mt-6 flex items-baseline">
-                  <span className="text-6xl font-black tracking-tight text-gray-900">
-                    {t('pricing.price')}
-                  </span>
-                  <span className="ml-2 text-xl text-gray-400">
-                    {t('pricing.currency')}
-                  </span>
-                </div>
+              {/* Divider */}
+              <div className="my-8">
+                <div className="h-px w-full bg-white/[0.08]" />
+              </div>
 
-                {/* Per user info */}
-                <p className="mt-3 text-base text-gray-500">
-                  {t('pricing.perUser')}
-                </p>
-                <p className="mt-1 text-sm text-gray-400">
-                  {t('pricing.extraUser')}
-                </p>
+              {/* Feature list */}
+              <ul className="space-y-4">
+                {FEATURE_KEYS.map((key) => (
+                  <li key={key} className="flex items-center gap-3">
+                    <div className="bg-emerald-500 w-2 h-2 rounded-full flex-shrink-0" />
+                    <span className="text-gray-300 font-body text-[15px]">
+                      {t(`pricing.${key}`)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
 
-                {/* Gradient divider */}
-                <div className="my-8">
-                  <div
-                    className="h-px w-full"
-                    style={{
-                      background:
-                        'linear-gradient(90deg, transparent 0%, #E0E7FF 50%, transparent 100%)',
-                    }}
-                  />
-                </div>
-
-                {/* Feature list */}
-                <ul className="space-y-4">
-                  {FEATURE_KEYS.map((key) => (
-                    <li key={key} className="flex items-center gap-3">
-                      <CheckIcon />
-                      <span className="text-[15px] text-gray-700">
-                        {t(`pricing.${key}`)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA button */}
-                <Link
-                  href="/register"
-                  className="mt-10 flex w-full items-center justify-center rounded-2xl px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/35"
-                  style={{
-                    background: 'linear-gradient(135deg, #4338CA, #6366F1)',
-                  }}
-                >
-                  {t('pricing.cta')}
+              {/* CTA button */}
+              <div className="mt-10">
+                <Link href="/register" className="block">
+                  <ShimmerButton
+                    className="w-full py-4 text-lg font-semibold"
+                    background="rgba(99, 102, 241, 0.2)"
+                    shimmerColor="#818CF8"
+                    borderRadius="16px"
+                  >
+                    {t('pricing.cta')}
+                  </ShimmerButton>
                 </Link>
+              </div>
 
-                {/* No card disclaimer */}
-                <p className="mt-4 text-center text-sm text-gray-400">
-                  {t('pricing.noCard')}
-                </p>
+              {/* No card disclaimer */}
+              <p className="mt-4 text-center text-gray-500 text-sm font-body">
+                {t('pricing.noCard')}
+              </p>
 
-                {/* Annual toggle */}
-                <div className="mt-8 border-t border-gray-100 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => setShowAnnual(!showAnnual)}
-                    className="flex w-full items-center justify-center gap-2 text-sm text-gray-500 transition-colors duration-200 hover:text-indigo-600"
+              {/* Annual toggle */}
+              <div className="mt-8 border-t border-white/[0.08] pt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAnnual(!showAnnual)}
+                  className="flex w-full items-center justify-center gap-2 text-sm text-gray-500 font-body transition-colors duration-200 hover:text-gray-300"
+                >
+                  <div
+                    className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors duration-200 ${
+                      showAnnual ? 'bg-indigo-600' : 'bg-white/[0.1]'
+                    }`}
                   >
                     <div
-                      className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors duration-200 ${
-                        showAnnual ? 'bg-indigo-600' : 'bg-gray-200'
+                      className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                        showAnnual ? 'translate-x-[14px]' : 'translate-x-0'
                       }`}
-                    >
-                      <div
-                        className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                          showAnnual ? 'translate-x-[14px]' : 'translate-x-0'
-                        }`}
-                      />
-                    </div>
-                    <span>{t('pricing.annual')}</span>
-                  </button>
-                  {showAnnual && (
-                    <p className="mt-2 text-center">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                        <svg
-                          className="h-3.5 w-3.5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 6L9 17l-5-5" />
-                        </svg>
-                        {t('pricing.annualSaving')}
-                      </span>
-                    </p>
-                  )}
-                </div>
+                    />
+                  </div>
+                  <span>{t('pricing.annual')}</span>
+                </button>
+                {showAnnual && (
+                  <p className="mt-2 text-center">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-sm font-medium text-emerald-400">
+                      <svg
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      {t('pricing.annualSaving')}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
           </div>
-        </motion.div>
+        </BlurFade>
       </div>
     </section>
   );

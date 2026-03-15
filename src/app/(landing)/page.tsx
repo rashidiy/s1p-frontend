@@ -15,7 +15,7 @@ const CTAFooter = dynamic(() => import('./components/CTAFooter'));
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[#08090a] font-body">
       <Navbar />
       <HeroSection />
       <PainPoints />

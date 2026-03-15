@@ -1,3 +1,10 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 function getLocale(): string {
   if (typeof document !== 'undefined') {
     const cookie = document.cookie.split(';').find(c => c.trim().startsWith('locale='));

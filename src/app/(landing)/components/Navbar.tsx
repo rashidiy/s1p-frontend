@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { type Locale, locales } from '@/i18n/config';
+import { ShimmerButton } from './magicui/shimmer-button';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   ru: 'RU',
@@ -82,24 +83,24 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
+          ? 'bg-[#08090a]/80 backdrop-blur-xl border-b border-white/[0.06] shadow-2xl shadow-black/20'
           : 'bg-transparent'
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 no-underline">
+        <Link href="/" className="flex items-center gap-2.5 no-underline group">
           <div
-            className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px]"
-            style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
+            className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] transition-transform duration-300 group-hover:scale-105"
+            style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1, #818CF8)' }}
           >
             <span className="text-[11px] font-bold tracking-wider text-white">
               S1P
             </span>
           </div>
-          <span className="text-xl font-bold text-gray-900">S1P</span>
+          <span className="text-xl font-display font-bold text-white">S1P</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -109,7 +110,7 @@ export default function Navbar() {
               key={key}
               href={href}
               onClick={(e) => handleSmoothScroll(e, href)}
-              className="text-sm font-medium text-gray-600 transition-colors duration-200 hover:text-gray-900"
+              className="text-sm font-medium text-gray-400 transition-colors duration-200 hover:text-white"
             >
               {t(`nav.${key}`)}
             </a>
@@ -123,7 +124,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-400 transition-colors duration-200 hover:bg-white/[0.06] hover:text-white"
             >
               <svg
                 className="h-4 w-4"
@@ -157,7 +158,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1 w-24 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-lg"
+                  className="absolute right-0 top-full mt-1 w-24 overflow-hidden rounded-xl border border-white/[0.1] bg-[#12131a]/95 backdrop-blur-xl py-1 shadow-2xl shadow-black/40"
                 >
                   {locales.map((loc) => (
                     <button
@@ -166,8 +167,8 @@ export default function Navbar() {
                       onClick={() => handleLocaleChange(loc)}
                       className={`flex w-full items-center px-3 py-2 text-sm transition-colors duration-150 ${
                         loc === locale
-                          ? 'bg-indigo-50 font-semibold text-indigo-700'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-indigo-500/20 font-semibold text-indigo-400'
+                          : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'
                       }`}
                     >
                       {LOCALE_LABELS[loc]}
@@ -181,18 +182,21 @@ export default function Navbar() {
           {/* Phone Number */}
           <a
             href={`tel:${t('nav.phone').replace(/\s/g, '')}`}
-            className="text-sm font-medium text-gray-600 transition-colors duration-200 hover:text-gray-900"
+            className="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-gray-300"
           >
             {t('nav.phone')}
           </a>
 
-          {/* CTA Button */}
-          <Link
-            href="/register"
-            className="inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
-            style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
-          >
-            {t('nav.tryFree')}
+          {/* CTA ShimmerButton */}
+          <Link href="/register">
+            <ShimmerButton
+              background="rgba(99, 102, 241, 0.15)"
+              shimmerColor="#818CF8"
+              borderRadius="12px"
+              className="px-5 py-2.5 text-sm font-semibold"
+            >
+              {t('nav.tryFree')}
+            </ShimmerButton>
           </Link>
         </div>
 
@@ -200,22 +204,22 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="relative z-50 flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-gray-100 lg:hidden"
+          className="relative z-50 flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-white/[0.06] lg:hidden"
           aria-label="Toggle menu"
         >
           <div className="flex h-5 w-5 flex-col items-center justify-center">
             <span
-              className={`block h-0.5 w-5 rounded-full bg-gray-700 transition-all duration-300 ${
+              className={`block h-0.5 w-5 rounded-full bg-gray-300 transition-all duration-300 ${
                 mobileMenuOpen ? 'translate-y-[3px] rotate-45' : '-translate-y-1'
               }`}
             />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-gray-700 transition-all duration-300 ${
+              className={`block h-0.5 w-5 rounded-full bg-gray-300 transition-all duration-300 ${
                 mobileMenuOpen ? 'opacity-0' : 'opacity-100'
               }`}
             />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-gray-700 transition-all duration-300 ${
+              className={`block h-0.5 w-5 rounded-full bg-gray-300 transition-all duration-300 ${
                 mobileMenuOpen ? '-translate-y-[3px] -rotate-45' : 'translate-y-1'
               }`}
             />
@@ -233,7 +237,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
 
@@ -243,7 +247,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="absolute left-0 right-0 top-full z-40 border-b border-gray-200 bg-white px-4 pb-6 pt-2 shadow-xl lg:hidden"
+              className="absolute left-0 right-0 top-full z-40 border-b border-white/[0.06] bg-[#08090a]/95 backdrop-blur-xl px-4 pb-6 pt-2 shadow-2xl lg:hidden"
             >
               <div className="flex flex-col gap-1">
                 {NAV_LINKS.map(({ key, href }) => (
@@ -251,14 +255,14 @@ export default function Navbar() {
                     key={key}
                     href={href}
                     onClick={(e) => handleSmoothScroll(e, href)}
-                    className="rounded-xl px-4 py-3 text-base font-medium text-gray-700 transition-colors duration-150 hover:bg-gray-50"
+                    className="rounded-xl px-4 py-3 text-base font-medium text-gray-300 transition-colors duration-150 hover:bg-white/[0.06] hover:text-white"
                   >
                     {t(`nav.${key}`)}
                   </a>
                 ))}
               </div>
 
-              <div className="my-3 border-t border-gray-100" />
+              <div className="my-3 border-t border-white/[0.06]" />
 
               {/* Language Options — Mobile */}
               <div className="flex items-center gap-2 px-4 py-2">
@@ -269,8 +273,8 @@ export default function Navbar() {
                     onClick={() => handleLocaleChange(loc)}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
                       loc === locale
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-indigo-500/20 text-indigo-400'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
                     }`}
                   >
                     {LOCALE_LABELS[loc]}
@@ -281,7 +285,7 @@ export default function Navbar() {
               {/* Phone — Mobile */}
               <a
                 href={`tel:${t('nav.phone').replace(/\s/g, '')}`}
-                className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium text-gray-600"
+                className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium text-gray-500"
               >
                 <svg
                   className="h-4 w-4"
@@ -298,14 +302,18 @@ export default function Navbar() {
               </a>
 
               {/* CTA — Mobile */}
-              <Link
-                href="/register"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mt-2 flex w-full items-center justify-center rounded-xl px-5 py-3 text-base font-semibold text-white shadow-md shadow-indigo-500/25"
-                style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
-              >
-                {t('nav.tryFree')}
-              </Link>
+              <div className="mt-2 px-4">
+                <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="block">
+                  <ShimmerButton
+                    background="rgba(99, 102, 241, 0.15)"
+                    shimmerColor="#818CF8"
+                    borderRadius="12px"
+                    className="w-full px-5 py-3 text-base font-semibold"
+                  >
+                    {t('nav.tryFree')}
+                  </ShimmerButton>
+                </Link>
+              </div>
             </motion.div>
           </>
         )}
