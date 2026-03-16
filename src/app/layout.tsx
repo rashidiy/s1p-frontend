@@ -25,6 +25,7 @@ export const metadata: Metadata = {
     title: "S1P - CRM for Call Centers",
     description: "CRM platform for call centers with Telegram integration.",
   },
+  manifest: "/manifest.json",
 };
 
 export default async function RootLayout({

@@ -1,0 +1,16 @@
+{
+  "name": "S1P - CRM for Call Centers",
+  "short_name": "S1P",
+  "description": "CRM platform for call centers with Telegram integration",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4338CA",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
