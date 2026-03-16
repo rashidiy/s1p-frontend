@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Alert, Progress, Spin, Tag } from 'antd';
+import { Alert, Button, Progress, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
 
@@ -16,6 +16,7 @@ export default function ContractStatusPage() {
   const t = useTranslations('settings');
   const tFields = useTranslations('fields');
   const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
   const tRoles = useTranslations('roles');
 
   useEffect(() => {
@@ -61,7 +62,20 @@ export default function ContractStatusPage() {
     </div>
   );
 
-  if (!contract || error) {
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(''); setLoading(true); loadContractStatus(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
+
+  if (!contract) {
     return (
       <div className="space-y-6">
         <div className="page-header">

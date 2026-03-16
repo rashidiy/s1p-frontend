@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Tag, Select, Pagination, Alert } from 'antd';
+import { Button, Tag, Select, Pagination, Alert, message } from 'antd';
 import { FileTextOutlined, PlusOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractResponse } from '@/types/api';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 
 const statusTagColors: Record<string, string> = { active: 'green', expired: 'default', cancelled: 'red', pending: 'orange' };
@@ -39,7 +39,7 @@ export default function OwnerContractsPage() {
       const result = await apiClient.getContracts({ page, page_size: 20, status: statusFilter || undefined, payment_status: paymentFilter || undefined });
       if (Array.isArray(result)) { setContracts(result); setTotalPages(1); }
       else { setContracts(result.items || []); setTotalPages(result.total_pages || 1); }
-    } catch (err: unknown) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); }
+    } catch (err: unknown) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); message.error(tErrors('failedToLoadContracts')); }
     finally { setLoading(false); }
   };
 
@@ -90,9 +90,18 @@ export default function OwnerContractsPage() {
           options={[{ label: tPaymentStatuses('paid'), value: 'paid' }, { label: tPaymentStatuses('pending'), value: 'pending' }, { label: tPaymentStatuses('overdue'), value: 'overdue' }, { label: tPaymentStatuses('failed'), value: 'failed' }]} />
       </div>
 
-      {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
+      {error && !loading && (
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <ErrorCharacter height={115} />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+          <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+          <Button type="primary" className="mt-4" onClick={() => { setError(''); setLoading(true); loadContracts(); }}>
+            {tActions('tryAgain')}
+          </Button>
+        </div>
+      )}
 
-      {contracts.length > 0 ? (
+      {!error && contracts.length > 0 ? (
         <>
           <div className="space-y-3">
             {contracts.map((contract) => (
@@ -124,7 +133,7 @@ export default function OwnerContractsPage() {
           </div>
           {totalPages > 1 && <div className="flex justify-center"><Pagination current={page} total={totalPages * 20} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
         </>
-      ) : !loading && (
+      ) : !loading && !error && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter height={115} variant="thinking" />
           <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noContractsYet')}</h3>

@@ -158,7 +158,8 @@
     "creating": "Yaratilmoqda...",
     "done": "Tayyor",
     "yes": "Ha",
-    "no": "Yo'q"
+    "no": "Yo'q",
+    "tryAgain": "Qayta urinib ko'ring"
   },
   "entities": {
     "contact": "Kontakt",
@@ -409,7 +410,9 @@
     "failedToLoadWebhooks": "Vebhuklarni yuklab bo'lmadi",
     "failedToSaveWebhook": "Vebhukni saqlab bo'lmadi",
     "failedToDeleteWebhook": "Vebhukni o'chirib bo'lmadi",
-    "failedToLoadDeliveries": "Yetkazish jurnalini yuklab bo'lmadi"
+    "failedToLoadDeliveries": "Yetkazish jurnalini yuklab bo'lmadi",
+    "somethingWentWrong": "Xatolik yuz berdi",
+    "tryAgainLater": "Iltimos, keyinroq urinib ko'ring"
   },
   "fields": {
     "firstName": "Ism",
@@ -798,7 +801,6 @@
     "inviteLinkDesc": "Bu havolani jamoangiz bilan ulashing",
     "copyInviteLink": "Havolani nusxalash",
     "inviteLinkCopied": "Havola nusxalandi!",
-    "groupName": "Guruh nomi",
     "notificationLanguage": "Bildirishnoma tili",
     "notificationLanguageDesc": "Telegram xabarlarining tili",
     "sendRecordings": "Yozuvlarni yuborish",

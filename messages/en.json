@@ -158,7 +158,8 @@
     "creating": "Creating...",
     "done": "Done",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "tryAgain": "Try Again"
   },
   "entities": {
     "contact": "Contact",
@@ -409,7 +410,9 @@
     "failedToLoadWebhooks": "Failed to load webhook endpoints",
     "failedToSaveWebhook": "Failed to save webhook endpoint",
     "failedToDeleteWebhook": "Failed to delete webhook endpoint",
-    "failedToLoadDeliveries": "Failed to load delivery log"
+    "failedToLoadDeliveries": "Failed to load delivery log",
+    "somethingWentWrong": "Something went wrong",
+    "tryAgainLater": "Please try again later"
   },
   "fields": {
     "firstName": "First Name",
@@ -798,7 +801,6 @@
     "inviteLinkDesc": "Share this link with your team to join the notification group",
     "copyInviteLink": "Copy Link",
     "inviteLinkCopied": "Invite link copied!",
-    "groupName": "Group Name",
     "notificationLanguage": "Notification Language",
     "notificationLanguageDesc": "Language for Telegram notification messages",
     "sendRecordings": "Send Recordings",

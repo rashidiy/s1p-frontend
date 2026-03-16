@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import type { OperatorDashboard } from '@/types/api';
 import { useAuthStore } from '@/store/auth';
+import { ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 
 const statCards = [
@@ -54,6 +55,7 @@ const statCards = [
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { user } = useAuthStore();
   const t = useTranslations('dashboard');
   const tErrors = useTranslations('errors');
@@ -61,10 +63,12 @@ export default function DashboardPage() {
 
   const loadDashboard = useCallback(async () => {
     try {
+      setError(false);
       const data = await apiClient.getMyDashboard();
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
+      setError(true);
       message.error(tErrors('failedToLoadDashboard'));
     } finally {
       setLoading(false);
@@ -75,6 +79,19 @@ export default function DashboardPage() {
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadDashboard(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
