@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Button, Input } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
@@ -20,6 +20,8 @@ export default function OwnerSetPasswordPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const t = useTranslations('auth');
+
+  useEffect(() => { document.title = `${t('setPassword')} | S1P`; }, [t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

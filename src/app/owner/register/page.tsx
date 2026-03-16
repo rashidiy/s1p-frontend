@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Alert, Button } from 'antd';
@@ -8,6 +9,8 @@ import { useTranslations } from 'next-intl';
 
 export default function OwnerRegisterPage() {
   const t = useTranslations('auth');
+
+  useEffect(() => { document.title = `${t('ownerRegistration')} | S1P`; }, [t]);
 
   return (
     <AuthLayout

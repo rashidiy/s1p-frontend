@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Alert, Button, Input } from 'antd';
 import { KeyOutlined } from '@ant-design/icons';
@@ -13,6 +13,8 @@ export default function OwnerForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const t = useTranslations('auth');
+
+  useEffect(() => { document.title = `${t('forgotPassword')} | S1P`; }, [t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

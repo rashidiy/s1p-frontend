@@ -22,6 +22,8 @@ export default function LoginPage() {
   const setUser = useAuthStore((state) => state.setUser);
   const t = useTranslations('auth');
 
+  useEffect(() => { document.title = `${t('login')} | S1P`; }, [t]);
+
   // Telegram OTP state
   const [step, setStep] = useState<TelegramStep>('idle');
   const [challengeId, setChallengeId] = useState('');
