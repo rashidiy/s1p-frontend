@@ -87,13 +87,13 @@ describe('API Client', () => {
   });
 
   describe('logout', () => {
-    it('removes tokens from localStorage', () => {
+    it('removes tokens from localStorage', async () => {
       localStorage.setItem('access_token', 'token');
       localStorage.setItem('refresh_token', 'refresh');
       localStorage.setItem('user', 'data');
       localStorage.setItem('user_type', 'company_user');
 
-      apiClient.logout();
+      await apiClient.logout();
 
       expect(localStorage.getItem('access_token')).toBeNull();
       expect(localStorage.getItem('refresh_token')).toBeNull();

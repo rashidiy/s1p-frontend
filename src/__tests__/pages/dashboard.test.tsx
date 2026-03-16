@@ -122,16 +122,16 @@ describe('Dashboard Page', () => {
 
     render(<DashboardPage />);
 
-    // Wait for the error to be handled
+    // Wait for the error to be handled — page should show error state with retry
     await vi.waitFor(() => {
-      expect(message.error).toHaveBeenCalledWith('Failed to load dashboard');
+      expect(message.error).toHaveBeenCalledWith('failedToLoadDashboard');
     });
 
-    // Page should still render (not crash) — it shows the loaded state with null dashboard
-    // The stat values would be 0
+    // Page should show error state UI (not crash)
     await vi.waitFor(() => {
-      const zeros = screen.getAllByText('0');
-      expect(zeros.length).toBeGreaterThan(0);
+      // Error state shows "somethingWentWrong" text and "tryAgain" button
+      expect(screen.getByText('somethingWentWrong')).toBeInTheDocument();
+      expect(screen.getByText('tryAgain')).toBeInTheDocument();
     });
   });
 });

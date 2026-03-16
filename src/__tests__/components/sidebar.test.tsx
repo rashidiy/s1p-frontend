@@ -85,14 +85,14 @@ describe('Sidebar', () => {
 
     render(<Sidebar />);
 
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Companies')).toBeInTheDocument();
-    expect(screen.getByText('Contracts')).toBeInTheDocument();
+    expect(screen.getByText('dashboard')).toBeInTheDocument();
+    expect(screen.getByText('companies')).toBeInTheDocument();
+    expect(screen.getByText('contracts')).toBeInTheDocument();
 
     // Should not have company-specific items
-    expect(screen.queryByText('Contacts')).not.toBeInTheDocument();
-    expect(screen.queryByText('Leads')).not.toBeInTheDocument();
-    expect(screen.queryByText('Team')).not.toBeInTheDocument();
+    expect(screen.queryByText('contacts')).not.toBeInTheDocument();
+    expect(screen.queryByText('leads')).not.toBeInTheDocument();
+    expect(screen.queryByText('team')).not.toBeInTheDocument();
   });
 
   it('renders base company nav for operators', () => {
@@ -114,17 +114,17 @@ describe('Sidebar', () => {
 
     render(<Sidebar />);
 
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Contacts')).toBeInTheDocument();
-    expect(screen.getByText('Leads')).toBeInTheDocument();
-    expect(screen.getByText('Deals')).toBeInTheDocument();
-    expect(screen.getByText('Tasks')).toBeInTheDocument();
-    expect(screen.getByText('Calls')).toBeInTheDocument();
+    expect(screen.getByText('dashboard')).toBeInTheDocument();
+    expect(screen.getByText('contacts')).toBeInTheDocument();
+    expect(screen.getByText('leads')).toBeInTheDocument();
+    expect(screen.getByText('deals')).toBeInTheDocument();
+    expect(screen.getByText('tasks')).toBeInTheDocument();
+    expect(screen.getByText('calls')).toBeInTheDocument();
 
     // Should not have admin/manager items
-    expect(screen.queryByText('Team')).not.toBeInTheDocument();
-    expect(screen.queryByText('Analytics')).not.toBeInTheDocument();
-    expect(screen.queryByText('Permission Groups')).not.toBeInTheDocument();
+    expect(screen.queryByText('team')).not.toBeInTheDocument();
+    expect(screen.queryByText('analytics')).not.toBeInTheDocument();
+    expect(screen.queryByText('permissionGroups')).not.toBeInTheDocument();
   });
 
   it('shows admin nav items for admins', () => {
@@ -147,10 +147,10 @@ describe('Sidebar', () => {
     render(<Sidebar />);
 
     // Admin nav items (admin also gets hasPermissionString returning true for all)
-    expect(screen.getByText('Team')).toBeInTheDocument();
-    expect(screen.getByText('Permission Groups')).toBeInTheDocument();
-    expect(screen.getByText('Telegram')).toBeInTheDocument();
-    expect(screen.getByText('Analytics')).toBeInTheDocument();
+    expect(screen.getByText('team')).toBeInTheDocument();
+    expect(screen.getByText('permissionGroups')).toBeInTheDocument();
+    expect(screen.getByText('telegram')).toBeInTheDocument();
+    expect(screen.getByText('analytics')).toBeInTheDocument();
   });
 
   it('shows analytics for managers', () => {
@@ -172,10 +172,10 @@ describe('Sidebar', () => {
 
     render(<Sidebar />);
 
-    expect(screen.getByText('Analytics')).toBeInTheDocument();
+    expect(screen.getByText('analytics')).toBeInTheDocument();
     // Manager does NOT get admin items
-    expect(screen.queryByText('Team')).not.toBeInTheDocument();
-    expect(screen.queryByText('Permission Groups')).not.toBeInTheDocument();
+    expect(screen.queryByText('team')).not.toBeInTheDocument();
+    expect(screen.queryByText('permissionGroups')).not.toBeInTheDocument();
   });
 
   it('filters items based on permission strings', () => {
@@ -199,14 +199,14 @@ describe('Sidebar', () => {
     render(<Sidebar />);
 
     // Dashboard has no permission requirement
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Contacts')).toBeInTheDocument();
-    expect(screen.getByText('Leads')).toBeInTheDocument();
+    expect(screen.getByText('dashboard')).toBeInTheDocument();
+    expect(screen.getByText('contacts')).toBeInTheDocument();
+    expect(screen.getByText('leads')).toBeInTheDocument();
 
     // These should be filtered out
-    expect(screen.queryByText('Deals')).not.toBeInTheDocument();
-    expect(screen.queryByText('Tasks')).not.toBeInTheDocument();
-    expect(screen.queryByText('Calls')).not.toBeInTheDocument();
+    expect(screen.queryByText('deals')).not.toBeInTheDocument();
+    expect(screen.queryByText('tasks')).not.toBeInTheDocument();
+    expect(screen.queryByText('calls')).not.toBeInTheDocument();
   });
 
   it('shows user initials in avatar', () => {
