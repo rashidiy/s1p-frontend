@@ -19,6 +19,7 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
   '/owner/dashboard': 'dashboard',
   '/owner/companies': 'companies',
   '/owner/contracts': 'contracts',
+  '/owner/settings': 'settings',
   '/owner/profile': 'profile',
 };
 
@@ -46,15 +47,22 @@ export default function OwnerLayout({
   const pathname = usePathname() ?? '/owner/dashboard';
   const tNav = useTranslations('nav');
 
+  const isPublicPath = PUBLIC_OWNER_PATHS.some((path) => pathname.startsWith(path));
+  const pageTitle = isPublicPath ? '' : tNav(getPageTitleKey(pathname));
+
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname]);
 
-  if (PUBLIC_OWNER_PATHS.some((path) => pathname.startsWith(path))) {
+  useEffect(() => {
+    if (pageTitle) {
+      document.title = `${pageTitle} | S1P`;
+    }
+  }, [pageTitle]);
+
+  if (isPublicPath) {
     return <>{children}</>;
   }
-
-  const pageTitle = tNav(getPageTitleKey(pathname));
 
   return (
     <ProtectedRoute requireAuth requireOwner>

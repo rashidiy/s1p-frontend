@@ -21,6 +21,8 @@ export default function TelegramRegisterPage() {
   const setUser = useAuthStore((state) => state.setUser);
   const t = useTranslations('auth');
 
+  useEffect(() => { document.title = `${t('register')} | S1P`; }, [t]);
+
   // Step tracking
   const [step, setStep] = useState<Step>('code');
 

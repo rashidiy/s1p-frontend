@@ -20,6 +20,10 @@ const PAGE_TITLE_KEYS: Record<string, { ns: string; key: string }> = {
   '/settings/permission-groups': { ns: 'nav', key: 'permissionGroups' },
   '/settings/contract': { ns: 'nav', key: 'contract' },
   '/settings/telegram': { ns: 'nav', key: 'telegram' },
+  '/settings/custom-fields': { ns: 'nav', key: 'customFields' },
+  '/settings/api-keys': { ns: 'nav', key: 'apiKeys' },
+  '/settings/webhooks': { ns: 'nav', key: 'webhooks' },
+  '/settings': { ns: 'nav', key: 'settings' },
   '/profile': { ns: 'nav', key: 'profile' },
 };
 
@@ -47,6 +51,11 @@ export default function CompanyLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname() ?? '/dashboard';
   const pageTitle = usePageTitle(pathname);
+
+  // Set document title
+  useEffect(() => {
+    document.title = `${pageTitle} | S1P`;
+  }, [pageTitle]);
 
   // Close mobile sidebar on route change
   useEffect(() => {
