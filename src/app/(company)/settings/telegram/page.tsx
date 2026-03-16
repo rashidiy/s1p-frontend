@@ -235,8 +235,49 @@ export default function TelegramSettingsPage() {
   if (loading) {
     return (
       <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
-        <div style={{ textAlign: 'center', padding: '60px' }}>
-          <Spin size="large" />
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="page-header">
+            <div>
+              <div className="h-4 w-64 bg-gray-100 rounded animate-pulse" />
+            </div>
+          </div>
+          {/* Connection status skeleton */}
+          <div className="glass-card p-5">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-24 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-50 rounded animate-pulse" />
+              </div>
+              <div className="h-8 w-28 bg-gray-100 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          {/* Toggle card skeletons */}
+          {[1, 2].map((i) => (
+            <div key={i} className="glass-card p-5">
+              <div className="flex justify-between items-center">
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-3 w-48 bg-gray-50 rounded animate-pulse" />
+                </div>
+                <div className="h-6 w-11 bg-gray-100 rounded-full animate-pulse" />
+              </div>
+            </div>
+          ))}
+          {/* Notifications section skeleton */}
+          {[1, 2].map((section) => (
+            <div key={`section-${section}`} className="glass-card p-5 space-y-4">
+              <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
+              {[1, 2, 3].map((row) => (
+                <div key={row} className="flex justify-between items-center py-2">
+                  <div className="space-y-2">
+                    <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-3 w-44 bg-gray-50 rounded animate-pulse" />
+                  </div>
+                  <div className="h-6 w-11 bg-gray-100 rounded-full animate-pulse" />
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </ProtectedRoute>
     );
