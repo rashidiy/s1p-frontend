@@ -31,6 +31,14 @@ export function formatDateTime(date: string | Date, locale?: string): string {
   }).format(new Date(date))
 }
 
+export function formatCurrency(amount: number, currency = 'USD'): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+}
+
+export function formatNumber(n: number): string {
+  return new Intl.NumberFormat('en-US').format(n);
+}
+
 export function getErrorMessage(err: unknown, fallback: string = 'Something went wrong'): string {
   const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
   if (Array.isArray(detail)) {

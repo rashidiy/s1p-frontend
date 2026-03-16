@@ -15,6 +15,7 @@ import { WelcomeCharacter, ErrorCharacter } from '@/components/illustrations';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency } from '@/lib/utils';
 
 export default function OwnerDashboardPage() {
   const [dashboard, setDashboard] = useState<OwnerDashboard | null>(null);
@@ -109,7 +110,7 @@ export default function OwnerDashboardPage() {
           { label: t('dashboard.totalCompanies'), value: dashboard?.this_month?.total_companies || 0, sub: t('dashboard.activeCount', { count: dashboard?.this_month?.active_companies || 0 }), icon: <BankOutlined />, color: '#6366f1', href: '/owner/companies' },
           { label: t('dashboard.totalUsers'), value: dashboard?.this_month?.total_users || 0, sub: t('dashboard.acrossAllCompanies'), icon: <TeamOutlined />, color: '#3b82f6', href: '/owner/companies' },
           { label: t('dashboard.totalCalls30d'), value: dashboard?.this_month?.total_calls || 0, sub: t('dashboard.last30Days'), icon: <ThunderboltOutlined />, color: '#14b8a6', href: '/owner/companies' },
-          { label: t('dashboard.revenueMRR'), value: `$${dashboard?.this_month?.total_revenue?.toLocaleString() || 0}`, sub: t('dashboard.monthlyRecurring'), icon: <RiseOutlined />, color: '#f97316', href: '/owner/contracts' },
+          { label: t('dashboard.revenueMRR'), value: formatCurrency(dashboard?.this_month?.total_revenue || 0), sub: t('dashboard.monthlyRecurring'), icon: <RiseOutlined />, color: '#f97316', href: '/owner/contracts' },
         ].map((card) => (
           <Link key={card.label} href={card.href}>
             <div className="glass-card p-5 group hover:shadow-lg transition-all duration-200 cursor-pointer">

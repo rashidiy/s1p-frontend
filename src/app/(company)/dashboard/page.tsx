@@ -11,6 +11,7 @@ import {
   ArrowRightOutlined,
 } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
+import { formatCurrency } from '@/lib/utils';
 import { apiClient } from '@/lib/api';
 import type { OperatorDashboard } from '@/types/api';
 import { useAuthStore } from '@/store/auth';
@@ -134,7 +135,7 @@ export default function DashboardPage() {
       case 'deals':
         return {
           value: stats?.deals.total_deals || 0,
-          sub: `$${stats?.deals.total_value?.toLocaleString() || 0}`,
+          sub: formatCurrency(stats?.deals.total_value || 0),
         };
       case 'tasks':
         return {

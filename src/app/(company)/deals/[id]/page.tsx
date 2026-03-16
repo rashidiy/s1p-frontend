@@ -11,6 +11,7 @@ import type { DealResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 export default function DealDetailPage() {
   const params = useParams()!;
@@ -345,7 +346,7 @@ export default function DealDetailPage() {
                   <div className="flex items-center gap-2">
                     <DollarOutlined style={{ fontSize: 20, color: '#16a34a' }} />
                     <span className="text-2xl font-bold text-green-600">
-                      ${deal.amount.toLocaleString()}
+                      {formatCurrency(deal.amount)}
                     </span>
                     {deal.currency && <span className="text-gray-500">{deal.currency}</span>}
                   </div>
@@ -355,7 +356,7 @@ export default function DealDetailPage() {
                       <span className="font-medium">{deal.probability}%</span>
                       {deal.weighted_value != null && (
                         <span className="text-sm text-gray-500">
-                          (${deal.weighted_value.toLocaleString()})
+                          ({formatCurrency(deal.weighted_value)})
                         </span>
                       )}
                     </div>
@@ -381,13 +382,13 @@ export default function DealDetailPage() {
                   {deal.expected_close_date && (
                     <div className="text-sm">
                       <span className="text-gray-500">{tFields('expectedCloseDate')}: </span>
-                      <span>{new Date(deal.expected_close_date).toLocaleDateString()}</span>
+                      <span>{formatDate(deal.expected_close_date)}</span>
                     </div>
                   )}
                   {deal.closed_date && (
                     <div className="text-sm">
                       <span className="text-gray-500">{tFields('close')}: </span>
-                      <span>{new Date(deal.closed_date).toLocaleDateString()}</span>
+                      <span>{formatDate(deal.closed_date)}</span>
                     </div>
                   )}
                   {deal.tags && deal.tags.length > 0 && (
@@ -446,15 +447,15 @@ export default function DealDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('amount')}</span>
-                <span className="font-medium">${deal.amount.toLocaleString()}</span>
+                <span className="font-medium">{formatCurrency(deal.amount)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('created')}</span>
-                <span>{new Date(deal.created_at).toLocaleDateString()}</span>
+                <span>{formatDate(deal.created_at)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('updated')}</span>
-                <span>{new Date(deal.updated_at).toLocaleDateString()}</span>
+                <span>{formatDate(deal.updated_at)}</span>
               </div>
             </div>
           </div>

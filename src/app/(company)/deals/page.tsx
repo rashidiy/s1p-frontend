@@ -10,6 +10,7 @@ import { EmptyStateCharacter } from '@/components/illustrations';
 import DealsPipelineView from '@/components/deals/DealsPipelineView';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 const stageColors: Record<string, string> = {
   prospecting: 'blue', qualification: 'gold', proposal: 'orange', negotiation: 'purple', won: 'green', lost: 'red',
@@ -140,10 +141,10 @@ export default function DealsPage() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-lg font-bold text-green-600"><DollarOutlined /> ${deal.amount.toLocaleString()}</span>
+                    <span className="flex items-center gap-1 text-lg font-bold text-green-600"><DollarOutlined /> {formatCurrency(deal.amount)}</span>
                     {deal.probability && <span className="text-sm text-gray-600 flex items-center gap-1"><RiseOutlined /> {deal.probability}%</span>}
                   </div>
-                  {deal.expected_close_date && <p className="text-sm text-gray-600">{new Date(deal.expected_close_date).toLocaleDateString()}</p>}
+                  {deal.expected_close_date && <p className="text-sm text-gray-600">{formatDate(deal.expected_close_date)}</p>}
                   {deal.assigned_to_name && <p className="text-sm text-gray-600">{t('owner')}: <span className="font-medium">{deal.assigned_to_name}</span></p>}
                   <div className="flex gap-2 pt-2">
                     <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>

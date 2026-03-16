@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/auth';
 import { ErrorCharacter } from '@/components/illustrations/ErrorCharacter';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
 import { useTranslations } from 'next-intl';
+import { formatCurrency } from '@/lib/utils';
 
 const OUTCOME_CHART_COLORS: Record<string, string> = {
   interested: '#22c55e', appointment_scheduled: '#16a34a', follow_up: '#06b6d4',
@@ -240,7 +241,7 @@ export default function AnalyticsPage() {
                   {(myStats?.deals.total_deals || 0).toLocaleString()}
                 </div>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                  ${(myStats?.deals.total_value || 0).toLocaleString()}
+                  {formatCurrency(myStats?.deals.total_value || 0)}
                 </p>
               </div>
             </div>
@@ -442,7 +443,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
-                    ${(teamStats?.deals.total_value || 0).toLocaleString()}
+                    {formatCurrency(teamStats?.deals.total_value || 0)}
                   </div>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     {t('dealsWon', { count: teamStats?.deals.won || 0 })}

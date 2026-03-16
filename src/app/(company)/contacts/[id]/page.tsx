@@ -10,6 +10,7 @@ import type { ContactResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 interface ActivityTimelineItem {
   type: string;
@@ -102,7 +103,7 @@ export default function ContactDetailPage() {
       }
       if (data?.deals) {
         for (const deal of data.deals) {
-          timeline.push({ type: 'deal', description: `Deal: ${deal.title} ($${deal.amount})`, created_at: deal.created_at, link: deal.id ? `/deals/${deal.id}` : undefined });
+          timeline.push({ type: 'deal', description: `Deal: ${deal.title} (${formatCurrency(deal.amount || 0)})`, created_at: deal.created_at, link: deal.id ? `/deals/${deal.id}` : undefined });
         }
       }
       if (data?.calls) {
@@ -329,7 +330,7 @@ export default function ContactDetailPage() {
                     </div>
                   )}
                   <div className="text-sm text-gray-500 pt-2">
-                    {tFields('created')}: {new Date(contact.created_at).toLocaleDateString()}
+                    {tFields('created')}: {formatDate(contact.created_at)}
                   </div>
                 </div>
               )}

@@ -7,6 +7,7 @@ import { apiClient } from '@/lib/api';
 import type { DealResponse } from '@/types/api';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 const PIPELINE_STAGES = ['prospecting', 'qualification', 'proposal', 'negotiation'] as const;
 
@@ -106,7 +107,7 @@ export default function DealsPipelineView() {
                 </span>
               </div>
               <span className="text-xs text-gray-500 font-medium">
-                ${summary.total.toLocaleString()}
+                {formatCurrency(summary.total)}
               </span>
             </div>
 
@@ -123,7 +124,7 @@ export default function DealsPipelineView() {
 
                   <div className="flex items-center gap-1 text-green-600 font-bold text-base mb-2">
                     <DollarOutlined className="text-xs" />
-                    ${(deal.amount ?? 0).toLocaleString()}
+                    {formatCurrency(deal.amount ?? 0)}
                   </div>
 
                   {deal.contact_name && (
@@ -143,7 +144,7 @@ export default function DealsPipelineView() {
                     {deal.expected_close_date && (
                       <span className="flex items-center gap-1 text-xs text-gray-400">
                         <CalendarOutlined className="text-[10px]" />
-                        {new Date(deal.expected_close_date).toLocaleDateString()}
+                        {formatDate(deal.expected_close_date)}
                       </span>
                     )}
                   </div>

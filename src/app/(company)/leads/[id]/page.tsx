@@ -11,6 +11,7 @@ import type { LeadResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 export default function LeadDetailPage() {
   const t = useTranslations('leads');
@@ -257,7 +258,7 @@ export default function LeadDetailPage() {
                   {lead.estimated_value && (
                     <div className="flex items-center gap-2">
                       <DollarOutlined style={{ color: '#16a34a' }} />
-                      <span className="text-lg font-semibold">${lead.estimated_value.toLocaleString()}</span>
+                      <span className="text-lg font-semibold">{formatCurrency(lead.estimated_value)}</span>
                       {lead.currency && <span className="text-gray-500">{lead.currency}</span>}
                     </div>
                   )}
@@ -294,7 +295,7 @@ export default function LeadDetailPage() {
                     </div>
                   )}
                   <div className="text-sm text-gray-500 pt-2">
-                    {tFields('created')}: {new Date(lead.created_at).toLocaleDateString()}
+                    {tFields('created')}: {formatDate(lead.created_at)}
                   </div>
                 </div>
               )}
@@ -345,11 +346,11 @@ export default function LeadDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('created')}</span>
-                <span>{new Date(lead.created_at).toLocaleDateString()}</span>
+                <span>{formatDate(lead.created_at)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('updated')}</span>
-                <span>{new Date(lead.updated_at).toLocaleDateString()}</span>
+                <span>{formatDate(lead.updated_at)}</span>
               </div>
             </div>
           </div>
