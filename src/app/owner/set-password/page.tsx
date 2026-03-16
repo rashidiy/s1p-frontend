@@ -49,7 +49,7 @@ export default function OwnerSetPasswordPage() {
       localStorage.removeItem('temporary_token');
       setUser(response, 'owner');
       router.push('/owner/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, t('failedToSetPassword')));
     } finally {
       setLoading(false);

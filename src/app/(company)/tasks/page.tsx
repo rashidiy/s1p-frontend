@@ -33,6 +33,7 @@ export default function TasksPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadTasks(); }, [page, search, status]);
 
   const loadTasks = async () => {

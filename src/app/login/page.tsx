@@ -64,6 +64,7 @@ export default function LoginPage() {
         localStorage.removeItem('user_type');
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- stable refs: router, setUser, t
   }, [searchParams]);
 
   const stopPolling = useCallback(() => {
@@ -112,7 +113,7 @@ export default function LoginPage() {
           // Ignore poll errors, keep trying
         }
       }, POLL_INTERVAL);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, t('telegramLoginFailed')));
     } finally {
       setLoading(false);
@@ -128,7 +129,7 @@ export default function LoginPage() {
       const response = await apiClient.verifyOtp({ challenge_id: challengeId, otp });
       setUser(response, 'company_user');
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStep('enter_otp');
       setOtp('');
       setError(getErrorMessage(err, t('telegramOtpFailed')));
@@ -146,6 +147,7 @@ export default function LoginPage() {
     if (otp.length === OTP_LENGTH && step === 'enter_otp') {
       handleVerifyOtp();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only runs when challenge status changes
   }, [otp]);
 
   // Reset to start

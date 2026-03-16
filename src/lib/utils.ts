@@ -31,10 +31,10 @@ export function formatDateTime(date: string | Date, locale?: string): string {
   }).format(new Date(date))
 }
 
-export function getErrorMessage(err: any, fallback: string = 'Something went wrong'): string {
-  const detail = err?.response?.data?.detail;
+export function getErrorMessage(err: unknown, fallback: string = 'Something went wrong'): string {
+  const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
   if (Array.isArray(detail)) {
-    return detail.map((e: any) => e.msg || JSON.stringify(e)).join(', ');
+    return detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(', ');
   }
   if (typeof detail === 'string') {
     return detail;

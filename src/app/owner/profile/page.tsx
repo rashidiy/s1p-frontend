@@ -40,6 +40,7 @@ export default function OwnerProfilePage() {
 
   useEffect(() => {
     loadProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadProfile = async () => {
@@ -81,7 +82,7 @@ export default function OwnerProfilePage() {
           setUser(userData, 'owner');
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToUpdateProfile')));
     } finally {
       setSaving(false);
@@ -111,8 +112,8 @@ export default function OwnerProfilePage() {
       });
       setPasswordMessage(tErrors('passwordChanged'));
       setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
-    } catch (err: any) {
-      setPasswordError(err.response?.data?.detail || tErrors('failedToChangePassword'));
+    } catch (err: unknown) {
+      setPasswordError(getErrorMessage(err, tErrors('failedToChangePassword')));
     } finally {
       setChangingPassword(false);
     }

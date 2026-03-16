@@ -28,6 +28,7 @@ export default function ContractDetailPage() {
 
   useEffect(() => {
     loadContract();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [contractId]);
 
   const loadContract = async () => {

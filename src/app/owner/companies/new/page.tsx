@@ -40,7 +40,7 @@ export default function NewCompanyPage() {
         provider_config: config,
       });
       router.push('/owner/companies');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateCompany')));
     } finally {
       setIsLoading(false);

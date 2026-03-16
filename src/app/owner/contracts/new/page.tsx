@@ -37,6 +37,7 @@ export default function NewContractPage() {
 
   useEffect(() => {
     loadCompanies();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadCompanies = async () => {
@@ -71,7 +72,7 @@ export default function NewContractPage() {
         auto_renew: false,
       });
       router.push(`/owner/contracts/${contract.id}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateContract')));
     } finally {
       setLoading(false);

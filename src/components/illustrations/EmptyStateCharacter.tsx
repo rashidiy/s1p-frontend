@@ -25,6 +25,7 @@ interface Props {
 
 export function EmptyStateCharacter({ height = 115, className, variant = 'default' }: Props) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- decorative illustration, no optimization needed
     <img
       src={`/illustrations/bot-${variant}.png`}
       alt="S1P Bot"

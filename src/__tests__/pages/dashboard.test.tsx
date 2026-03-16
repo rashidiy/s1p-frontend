@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 const mockGetMyDashboard = vi.fn();
 vi.mock('@/lib/api', () => ({
   apiClient: {
-    getMyDashboard: (...args: any[]) => mockGetMyDashboard(...args),
+    getMyDashboard: (...args: unknown[]) => mockGetMyDashboard(...args),
     getMyProfile: vi.fn(),
     getOwnerProfile: vi.fn(),
     logout: vi.fn(),
@@ -14,15 +14,15 @@ vi.mock('@/lib/api', () => ({
 
 // Mock recharts
 vi.mock('recharts', () => ({
-  AreaChart: ({ children }: any) => <div data-testid="area-chart">{children}</div>,
+  AreaChart: ({ children }: { children?: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
   Area: () => <div />,
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
   Tooltip: () => <div />,
 }));
 
 // Mock antd
 vi.mock('antd', () => ({
-  Button: ({ children, icon, ...props }: any) => <button {...props}>{icon}{children}</button>,
+  Button: ({ children, icon, ...props }: { children?: React.ReactNode; icon?: React.ReactNode; [key: string]: unknown }) => <button {...props}>{icon}{children}</button>,
   message: {
     error: vi.fn(),
     success: vi.fn(),

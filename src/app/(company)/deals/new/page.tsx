@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import type { ContactResponse, LeadResponse, UserResponse } from '@/types/api';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Alert, Button, DatePicker, Input, Select, message } from 'antd';
@@ -33,6 +34,7 @@ export default function NewDealPage() {
 
   useEffect(() => {
     loadUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadUsers = async () => {
@@ -88,8 +90,8 @@ export default function NewDealPage() {
         assigned_to: assignedTo || null,
       });
       router.push(`/deals/${result.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToCreateDeal'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToCreateDeal')));
     } finally {
       setIsLoading(false);
     }

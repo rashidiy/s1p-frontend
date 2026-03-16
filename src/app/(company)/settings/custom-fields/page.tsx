@@ -68,6 +68,7 @@ export default function CustomFieldsPage() {
 
   useEffect(() => {
     loadFields();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when entity type changes
   }, [activeEntityType]);
 
   const loadFields = async () => {

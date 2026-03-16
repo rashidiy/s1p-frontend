@@ -82,7 +82,7 @@ export default function TelegramRegisterPage() {
       if (result.invite_phone) setPhone(result.invite_phone);
 
       setStep('telegram');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setCodeError(getErrorMessage(err, t('telegramRegisterInvalidCode')));
     } finally {
       setCodeLoading(false);
@@ -171,7 +171,7 @@ export default function TelegramRegisterPage() {
       }
 
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitError(getErrorMessage(err, t('telegramRegisterFailed')));
     } finally {
       setSubmitLoading(false);

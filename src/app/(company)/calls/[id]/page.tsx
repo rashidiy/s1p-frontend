@@ -11,6 +11,14 @@ import { CALL_DIRECTION_LABELS, CALL_STATUS_LABELS } from '@/lib/constants';
 import type { CallEventResponse } from '@/types/api';
 import Link from 'next/link';
 
+interface SearchResult { id: string; label: string; }
+
+interface AutoLinkSuggestions {
+  contacts?: Array<{ id: string; first_name?: string; last_name?: string; phone?: string }>;
+  leads?: Array<{ id: string; title?: string }>;
+  deals?: Array<{ id: string; title?: string }>;
+}
+
 const OUTCOME_KEYS = [
   { value: 'interested', key: 'interested', group: 'positive' },
   { value: 'appointment_scheduled', key: 'appointmentScheduled', group: 'positive' },
@@ -72,13 +80,14 @@ export default function CallDetailPage() {
   const [savingOutcome, setSavingOutcome] = useState(false);
   const [linkType, setLinkType] = useState<'contact' | 'lead' | 'deal'>('contact');
   const [linkEntityId, setLinkEntityId] = useState('');
-  const [linkSearchResults, setLinkSearchResults] = useState<any[]>([]);
+  const [linkSearchResults, setLinkSearchResults] = useState<SearchResult[]>([]);
   const [linking, setLinking] = useState(false);
-  const [suggestions, setSuggestions] = useState<any>(null);
+  const [suggestions, setSuggestions] = useState<AutoLinkSuggestions | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
     loadCall();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [callId]);
 
   const loadCall = async () => {
@@ -121,7 +130,7 @@ export default function CallDetailPage() {
     if (!linkEntityId) return;
     setLinking(true);
     try {
-      const linkData: any = {};
+      const linkData: Record<string, string> = {};
       linkData[linkType + '_id'] = linkEntityId;
       await apiClient.linkCall(callId, linkData);
       message.success(t('callLinked'));
@@ -137,7 +146,7 @@ export default function CallDetailPage() {
 
   const handleLinkSuggestion = async (type: string, id: string) => {
     try {
-      const linkData: any = {};
+      const linkData: Record<string, string> = {};
       linkData[type + '_id'] = id;
       await apiClient.linkCall(callId, linkData);
       message.success(t('callLinked'));
@@ -154,16 +163,16 @@ export default function CallDetailPage() {
     }
     setSearchLoading(true);
     try {
-      let results: any[] = [];
+      let results: SearchResult[] = [];
       if (linkType === 'contact') {
         const res = await apiClient.getContacts({ search: query, page: 1, page_size: 10 });
-        results = res.items.map((c: any) => ({ id: c.id, label: `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || c.phone || tCommon('unknown') }));
+        results = res.items.map((c) => ({ id: c.id, label: `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || c.phone || tCommon('unknown') }));
       } else if (linkType === 'lead') {
         const res = await apiClient.getLeads({ search: query, page: 1, page_size: 10 });
-        results = res.items.map((l: any) => ({ id: l.id, label: l.title || tCommon('unknown') }));
+        results = res.items.map((l) => ({ id: l.id, label: l.title || tCommon('unknown') }));
       } else if (linkType === 'deal') {
         const res = await apiClient.getDeals({ search: query, page: 1, page_size: 10 });
-        results = res.items.map((d: any) => ({ id: d.id, label: d.title || tCommon('unknown') }));
+        results = res.items.map((d) => ({ id: d.id, label: d.title || tCommon('unknown') }));
       }
       setLinkSearchResults(results);
     } catch {
@@ -435,10 +444,10 @@ export default function CallDetailPage() {
             <div className="p-6 pt-0">
               {suggestions ? (
                 <div className="space-y-3">
-                  {suggestions.contacts?.length > 0 && (
+                  {(suggestions.contacts?.length ?? 0) > 0 && (
                     <div>
                       <span className="text-sm font-medium text-gray-600 block mb-2">{tEntities('contacts')}</span>
-                      {suggestions.contacts.map((c: any) => (
+                      {suggestions.contacts!.map((c) => (
                         <div key={c.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{c.first_name || ''} {c.last_name || ''} {c.phone ? `(${c.phone})` : ''}</span>
                           <Button size="small" type="default"   onClick={() => handleLinkSuggestion('contact', c.id)}>
@@ -448,10 +457,10 @@ export default function CallDetailPage() {
                       ))}
                     </div>
                   )}
-                  {suggestions.leads?.length > 0 && (
+                  {(suggestions.leads?.length ?? 0) > 0 && (
                     <div>
                       <span className="text-sm font-medium text-gray-600 block mb-2">{tEntities('leads')}</span>
-                      {suggestions.leads.map((l: any) => (
+                      {suggestions.leads!.map((l) => (
                         <div key={l.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{l.title || tCommon('unknown')}</span>
                           <Button size="small" type="default"   onClick={() => handleLinkSuggestion('lead', l.id)}>
@@ -461,10 +470,10 @@ export default function CallDetailPage() {
                       ))}
                     </div>
                   )}
-                  {suggestions.deals?.length > 0 && (
+                  {(suggestions.deals?.length ?? 0) > 0 && (
                     <div>
                       <span className="text-sm font-medium text-gray-600 block mb-2">{tEntities('deals')}</span>
-                      {suggestions.deals.map((d: any) => (
+                      {suggestions.deals!.map((d) => (
                         <div key={d.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
                           <span>{d.title || tCommon('unknown')}</span>
                           <Button size="small" type="default"   onClick={() => handleLinkSuggestion('deal', d.id)}>

@@ -20,6 +20,7 @@ export default function ContractStatusPage() {
 
   useEffect(() => {
     loadContractStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadContractStatus = async () => {

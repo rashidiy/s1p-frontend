@@ -50,6 +50,7 @@ export default function CallsPage() {
   const [dateTo, setDateTo] = useState('');
   const [myCalls, setMyCalls] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadCallHistory(); }, [page, direction, outcome, dateFrom, dateTo, myCalls]);
 
   const loadCallHistory = async () => {

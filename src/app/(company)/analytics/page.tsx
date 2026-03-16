@@ -84,6 +84,7 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- tErrors is a stable reference from next-intl
   }, [canViewTeamData]);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     loadChartData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadChartData = async () => {

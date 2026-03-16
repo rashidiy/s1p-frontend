@@ -562,7 +562,7 @@ class ApiClient {
     operator_id?: string;
     direction?: string;
     outcome?: string;
-  }): Promise<any> {
+  }): Promise<unknown> {
     const response = await this.client.get('/api/v1/company/calls/statistics', { params });
     return response.data;
   }

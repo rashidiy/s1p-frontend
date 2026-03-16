@@ -30,6 +30,7 @@ export default function OwnerContractsPage() {
   const tPaymentStatuses = useTranslations('paymentStatuses');
   const tCommon = useTranslations('common');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadContracts(); }, [page, statusFilter, paymentFilter]);
 
   const loadContracts = async () => {
@@ -38,7 +39,7 @@ export default function OwnerContractsPage() {
       const result = await apiClient.getContracts({ page, page_size: 20, status: statusFilter || undefined, payment_status: paymentFilter || undefined });
       if (Array.isArray(result)) { setContracts(result); setTotalPages(1); }
       else { setContracts(result.items || []); setTotalPages(result.total_pages || 1); }
-    } catch (err: any) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); }
+    } catch (err: unknown) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); }
     finally { setLoading(false); }
   };
 

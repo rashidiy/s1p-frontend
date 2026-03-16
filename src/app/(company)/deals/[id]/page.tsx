@@ -40,6 +40,7 @@ export default function DealDetailPage() {
   useEffect(() => {
     loadDeal();
     loadNotes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [dealId]);
 
   const loadDeal = async () => {
