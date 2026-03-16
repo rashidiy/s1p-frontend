@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
 import type { DealResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 export default function DealDetailPage() {
@@ -362,7 +363,13 @@ export default function DealDetailPage() {
                   {deal.contact_name && (
                     <div className="flex items-center gap-2">
                       <UserOutlined style={{ color: '#9ca3af' }} />
-                      <span>{deal.contact_name}</span>
+                      {deal.contact_id ? (
+                        <Link href={`/contacts/${deal.contact_id}`} className="text-indigo-600 hover:underline">
+                          {deal.contact_name}
+                        </Link>
+                      ) : (
+                        <span>{deal.contact_name}</span>
+                      )}
                     </div>
                   )}
                   {deal.assigned_to_name && (

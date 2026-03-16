@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
 import type { LeadResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 export default function LeadDetailPage() {
@@ -263,7 +264,13 @@ export default function LeadDetailPage() {
                   {lead.contact_name && (
                     <div className="flex items-center gap-2">
                       <UserOutlined style={{ color: '#9ca3af' }} />
-                      <span>{lead.contact_name}</span>
+                      {lead.contact_id ? (
+                        <Link href={`/contacts/${lead.contact_id}`} className="text-indigo-600 hover:underline">
+                          {lead.contact_name}
+                        </Link>
+                      ) : (
+                        <span>{lead.contact_name}</span>
+                      )}
                     </div>
                   )}
                   {lead.pipeline_stage && (
