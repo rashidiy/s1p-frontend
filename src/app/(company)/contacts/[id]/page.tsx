@@ -82,7 +82,25 @@ export default function ContactDetailPage() {
   const loadActivity = async () => {
     try {
       const data = await apiClient.getContactActivity(contactId);
-      setActivity(data);
+      // Backend returns {contact_id, leads: [...], deals: [...], calls: [...]} — flatten into timeline
+      const timeline: any[] = [];
+      if (data?.leads) {
+        for (const lead of data.leads) {
+          timeline.push({ type: 'lead', description: `Lead: ${lead.title} (${lead.status || 'new'})`, created_at: lead.created_at });
+        }
+      }
+      if (data?.deals) {
+        for (const deal of data.deals) {
+          timeline.push({ type: 'deal', description: `Deal: ${deal.title} ($${deal.amount})`, created_at: deal.created_at });
+        }
+      }
+      if (data?.calls) {
+        for (const call of data.calls) {
+          timeline.push({ type: 'call', description: `Call (${call.direction || 'unknown'})`, created_at: call.started_at });
+        }
+      }
+      timeline.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setActivity(timeline);
     } catch (error) {
       console.error('Failed to load activity:', error);
       message.error(tErrors('failedToLoadActivity'));

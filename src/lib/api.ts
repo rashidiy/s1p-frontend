@@ -765,7 +765,8 @@ class ApiClient {
 
   async getEntityNotes(entityType: string, entityId: string) {
     const response = await this.client.get(`/api/v1/company/notes/timeline/${entityType}/${entityId}`);
-    return response.data;
+    // Backend returns {entity_type, entity_id, notes: [...], total} — extract the notes array
+    return response.data?.notes ?? response.data ?? [];
   }
 
   // ============================================================================
