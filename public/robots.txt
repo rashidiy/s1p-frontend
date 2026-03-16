@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /contacts
+Disallow: /leads
+Disallow: /deals
+Disallow: /tasks
+Disallow: /calls
+Disallow: /users
+Disallow: /settings
+Disallow: /profile
+Disallow: /owner
+Disallow: /login
+Disallow: /register
+Disallow: /api
