@@ -19,8 +19,15 @@ vi.mock('antd', () => ({
   Button: ({ children, onClick, icon, ...props }: any) => (
     <button onClick={onClick} {...props}>{icon}{children}</button>
   ),
-  Input: ({ value, onChange, placeholder, ...props }: any) => (
-    <input value={value} onChange={onChange} placeholder={placeholder} {...props} />
+  Input: Object.assign(
+    ({ value, onChange, placeholder, ...props }: any) => (
+      <input value={value} onChange={onChange} placeholder={placeholder} {...props} />
+    ),
+    {
+      Search: ({ value, onChange, placeholder, onSearch, ...props }: any) => (
+        <input value={value} onChange={onChange} placeholder={placeholder} {...props} />
+      ),
+    }
   ),
   Select: ({ value, onChange, options, placeholder, ...props }: any) => (
     <select value={value} onChange={(e: any) => onChange?.(e.target.value)} {...props}>
