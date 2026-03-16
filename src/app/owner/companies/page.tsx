@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Input, Button, Tag, message } from 'antd';
-import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined, ExportOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Input, Button, Tag, Table, message } from 'antd';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import type { CompanyResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+
+const PAGE_SIZE = 50;
 
 function getCompanyUrl(subdomain: string): string {
   const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost';
@@ -21,6 +24,9 @@ export default function CompaniesPage() {
   const [companies, setCompanies] = useState<CompanyResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations('companies');
   const tErrors = useTranslations('errors');
   const tActions = useTranslations('actions');
@@ -29,17 +35,50 @@ export default function CompaniesPage() {
   const tCommon = useTranslations('common');
   const tEntities = useTranslations('entities');
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
-  useEffect(() => { loadCompanies(); }, []);
+  const loadCompanies = useCallback(async (p: number, s: string) => {
+    setLoading(true);
+    try {
+      const data = await apiClient.getOwnerCompanies({
+        search: s || undefined,
+        page: p,
+        page_size: PAGE_SIZE,
+      });
+      setCompanies(data);
+      setHasMore(data.length >= PAGE_SIZE);
+    } catch (error) {
+      console.error('Failed to load companies:', error);
+      message.error(tErrors('failedToLoadCompanies'));
+    } finally {
+      setLoading(false);
+    }
+  }, [tErrors]);
 
-  const loadCompanies = async () => {
-    try { const data = await apiClient.getOwnerCompanies(); setCompanies(data); }
-    catch (error) { console.error('Failed to load companies:', error); message.error(tErrors('failedToLoadCompanies')); }
-    finally { setLoading(false); }
+  useEffect(() => { loadCompanies(1, ''); }, [loadCompanies]);
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setPage(1);
+      loadCompanies(1, value);
+    }, 400);
+  };
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    const newPage = pagination.current || 1;
+    setPage(newPage);
+    loadCompanies(newPage, search);
   };
 
   const toggleCompanyStatus = async (companyId: string, isActive: boolean) => {
-    try { if (isActive) await apiClient.deactivateCompany(companyId); else await apiClient.activateCompany(companyId); loadCompanies(); } catch (error) { console.error('Failed to toggle company status:', error); message.error(tErrors('failedToToggleCompanyStatus')); }
+    try {
+      if (isActive) await apiClient.deactivateCompany(companyId);
+      else await apiClient.activateCompany(companyId);
+      loadCompanies(page, search);
+    } catch (error) {
+      console.error('Failed to toggle company status:', error);
+      message.error(tErrors('failedToToggleCompanyStatus'));
+    }
   };
 
   const handleImpersonate = async (companyId: string) => {
@@ -51,11 +90,92 @@ export default function CompaniesPage() {
     }
   };
 
-  const filteredCompanies = companies.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()) || c.subdomain?.toLowerCase().includes(search.toLowerCase())
-  );
+  const columns: ColumnsType<CompanyResponse> = [
+    {
+      title: tFields('name'),
+      dataIndex: 'name',
+      key: 'name',
+      render: (name: string, record) => (
+        <div className="flex items-center gap-2">
+          <BankOutlined className="text-crm-indigo-600" />
+          <Link href={`/owner/companies/${record.id}`} className="font-medium text-gray-900 hover:text-crm-indigo-600 transition-colors">
+            {name}
+          </Link>
+        </div>
+      ),
+    },
+    {
+      title: tFields('subdomain'),
+      dataIndex: 'subdomain',
+      key: 'subdomain',
+      render: (subdomain: string, record) =>
+        subdomain ? (
+          <button
+            onClick={() => handleImpersonate(record.id)}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-crm-indigo-600 transition-colors cursor-pointer bg-transparent border-none p-0"
+          >
+            <span>{getCompanyUrl(subdomain).replace(/^https?:\/\//, '')}</span>
+            <ExportOutlined style={{ fontSize: 11 }} />
+          </button>
+        ) : (
+          <span className="text-gray-400">&mdash;</span>
+        ),
+    },
+    {
+      title: tStatuses('status'),
+      dataIndex: 'is_active',
+      key: 'status',
+      width: 100,
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? 'green' : 'default'}>
+          {isActive ? tStatuses('active') : tStatuses('inactive')}
+        </Tag>
+      ),
+    },
+    {
+      title: tFields('provider'),
+      dataIndex: 'provider_type',
+      key: 'provider',
+      width: 110,
+      responsive: ['md'],
+      render: (provider: string) => <span className="uppercase text-sm">{provider}</span>,
+    },
+    {
+      title: tEntities('users'),
+      dataIndex: 'users_count',
+      key: 'users',
+      width: 80,
+      render: (count: number) => count || 0,
+    },
+    {
+      title: tFields('created'),
+      dataIndex: 'created_at',
+      key: 'created',
+      width: 120,
+      responsive: ['lg'],
+      render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: tActions('actions'),
+      key: 'actions',
+      width: 160,
+      render: (_: unknown, record) => (
+        <div className="flex gap-2">
+          <Link href={`/owner/companies/${record.id}`}>
+            <Button size="small" icon={<EyeOutlined />}>{tActions('viewDetails')}</Button>
+          </Link>
+          <Button
+            size="small"
+            danger={record.is_active}
+            onClick={() => toggleCompanyStatus(record.id, record.is_active)}
+            icon={record.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />}
+          />
+        </div>
+      ),
+    },
+  ];
 
-  if (loading) return (
+  if (loading && companies.length === 0) return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -65,18 +185,9 @@ export default function CompaniesPage() {
         <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
       </div>
       <div className="h-10 w-80 bg-gray-50 rounded-lg animate-pulse" />
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="glass-card p-5 border-l-4 border-l-gray-100 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-gray-100 rounded-xl animate-pulse" />
-              <div className="space-y-1.5">
-                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
-                <div className="h-3 w-24 bg-gray-50 rounded animate-pulse" />
-              </div>
-            </div>
-            <div className="h-5 w-16 bg-gray-50 rounded animate-pulse" />
-          </div>
+      <div className="space-y-3">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-14 bg-gray-50 rounded-lg animate-pulse" />
         ))}
       </div>
     </div>
@@ -86,45 +197,21 @@ export default function CompaniesPage() {
     <div className="space-y-6">
       <div className="page-header">
         <p className="page-subtitle">{t('subtitle')}</p>
-        <Link href="/owner/companies/new"><Button type="primary" icon={<PlusOutlined />}>{t('addCompany')}</Button></Link>
+        <Link href="/owner/companies/new">
+          <Button type="primary" icon={<PlusOutlined />}>{t('addCompany')}</Button>
+        </Link>
       </div>
 
-      <Input.Search placeholder={t('searchCompanies')} value={search} onChange={(e) => setSearch(e.target.value)} allowClear size="large" className="max-w-full sm:max-w-lg" />
+      <Input.Search
+        placeholder={t('searchCompanies')}
+        value={search}
+        onChange={(e) => handleSearch(e.target.value)}
+        allowClear
+        size="large"
+        className="max-w-full sm:max-w-lg"
+      />
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredCompanies.map((company) => (
-          <div key={company.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-500 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <BankOutlined className="text-xl text-crm-indigo-600" />
-                <div>
-                  <Link href={`/owner/companies/${company.id}`} className="font-semibold text-gray-900 hover:text-crm-indigo-600 transition-colors">{company.name}</Link>
-                  {company.subdomain ? (
-                    <button onClick={(e) => { e.stopPropagation(); handleImpersonate(company.id); }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-crm-indigo-600 transition-colors cursor-pointer bg-transparent border-none p-0">
-                      <span>{getCompanyUrl(company.subdomain).replace(/^https?:\/\//, '')}</span>
-                      <ExportOutlined style={{ fontSize: 11 }} />
-                    </button>
-                  ) : (
-                    <p className="text-sm text-gray-500">—</p>
-                  )}
-                </div>
-              </div>
-              <Tag color={company.is_active ? 'green' : 'default'}>{company.is_active ? tStatuses('active') : tStatuses('inactive')}</Tag>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm"><span className="text-gray-600">{tFields('provider')}</span><span className="font-medium uppercase">{company.provider_type}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-600">{tEntities('users')}</span><span className="font-medium">{company.users_count || 0}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-600">{tFields('created')}</span><span className="font-medium">{new Date(company.created_at).toLocaleDateString()}</span></div>
-              <div className="flex gap-2 pt-2">
-                <Link href={`/owner/companies/${company.id}`} className="flex-1"><Button block>{tActions('viewDetails')}</Button></Link>
-                <Button danger={company.is_active} onClick={() => toggleCompanyStatus(company.id, company.is_active)} icon={company.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredCompanies.length === 0 && (
+      {!loading && companies.length === 0 ? (
         <div className="glass-card py-16 flex flex-col items-center justify-center">
           <EmptyStateCharacter height={115} variant="no-deals" />
           <h3 className="mt-5 text-lg font-semibold text-gray-800">
@@ -134,6 +221,21 @@ export default function CompaniesPage() {
             {search ? tCommon('tryAdjustingSearch') : t('getStartedDescription')}
           </p>
         </div>
+      ) : (
+        <Table<CompanyResponse>
+          columns={columns}
+          dataSource={companies}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: page,
+            pageSize: PAGE_SIZE,
+            total: hasMore ? page * PAGE_SIZE + 1 : (page - 1) * PAGE_SIZE + companies.length,
+            showSizeChanger: false,
+          }}
+          onChange={handleTableChange}
+          scroll={{ x: 700 }}
+        />
       )}
     </div>
   );
