@@ -123,7 +123,7 @@ export default function DealsPipelineView() {
 
                   <div className="flex items-center gap-1 text-green-600 font-bold text-base mb-2">
                     <DollarOutlined className="text-xs" />
-                    ${deal.amount.toLocaleString()}
+                    ${(deal.amount ?? 0).toLocaleString()}
                   </div>
 
                   {deal.contact_name && (
