@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Input, Pagination, Button, Tag, Checkbox, Select, message } from 'antd';
 import { PlusOutlined, CalendarOutlined, UserOutlined, ExclamationCircleOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 import type { TaskResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -18,6 +19,7 @@ export default function TasksPage() {
   const tStatuses = useTranslations('statuses');
   const tCommon = useTranslations('common');
 
+  const { hasPermissionString } = useAuthStore();
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -96,7 +98,9 @@ export default function TasksPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/tasks/new"><Button type="primary" icon={<PlusOutlined />}>{t('addTask')}</Button></Link>
+        {hasPermissionString('tasks.write') && (
+          <Link href="/tasks/new"><Button type="primary" icon={<PlusOutlined />}>{t('addTask')}</Button></Link>
+        )}
       </div>
       <p className="page-subtitle">{t('subtitle')}</p>
 
@@ -114,6 +118,7 @@ export default function TasksPage() {
               checked={task.status === 'completed'}
               onChange={() => toggleTaskComplete(task.id, task.status === 'completed')}
               className="mt-1 shrink-0"
+              disabled={!hasPermissionString('tasks.write')}
             />
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2">

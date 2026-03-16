@@ -13,6 +13,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 import type { ContactResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -35,6 +36,7 @@ export default function ContactsPage() {
   const tCommon = useTranslations('common');
   const tFields = useTranslations('fields');
   const router = useRouter();
+  const { hasPermissionString } = useAuthStore();
 
   const [data, setData] = useState<PaginatedResponse<ContactResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -180,9 +182,11 @@ export default function ContactsPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/contacts/new">
-          <Button type="primary" icon={<PlusOutlined />}>{t('addContact')}</Button>
-        </Link>
+        {hasPermissionString('contacts.write') && (
+          <Link href="/contacts/new">
+            <Button type="primary" icon={<PlusOutlined />}>{t('addContact')}</Button>
+          </Link>
+        )}
       </div>
       <p className="page-subtitle">{t('subtitle')}</p>
 

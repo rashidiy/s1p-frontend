@@ -11,6 +11,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 import type { LeadResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -38,6 +39,7 @@ export default function LeadsPage() {
   const tStatuses = useTranslations('statuses');
   const tFields = useTranslations('fields');
   const router = useRouter();
+  const { hasPermissionString } = useAuthStore();
 
   const [data, setData] = useState<PaginatedResponse<LeadResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,7 +147,7 @@ export default function LeadsPage() {
           <Link href={`/leads/${record.id}`}>
             <Button size="small">{tActions('view')}</Button>
           </Link>
-          {record.status !== 'converted' && (
+          {record.status !== 'converted' && hasPermissionString('leads.write') && hasPermissionString('deals.write') && (
             <Button size="small" type="primary" onClick={(e) => handleConvert(e, record.id)}>{tActions('convert')}</Button>
           )}
         </div>
@@ -189,7 +191,9 @@ export default function LeadsPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <Link href="/leads/new"><Button type="primary" icon={<PlusOutlined />}>{t('addLead')}</Button></Link>
+        {hasPermissionString('leads.write') && (
+          <Link href="/leads/new"><Button type="primary" icon={<PlusOutlined />}>{t('addLead')}</Button></Link>
+        )}
       </div>
       <p className="page-subtitle">{t('subtitle')}</p>
 
@@ -247,7 +251,7 @@ export default function LeadsPage() {
                   {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
                   <div className="flex gap-2 pt-2">
                     <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
-                    {lead.status !== 'converted' && <Button type="primary" onClick={(e) => handleConvert(e, lead.id)}>{tActions('convert')}</Button>}
+                    {lead.status !== 'converted' && hasPermissionString('leads.write') && hasPermissionString('deals.write') && <Button type="primary" onClick={(e) => handleConvert(e, lead.id)}>{tActions('convert')}</Button>}
                   </div>
                 </div>
               </div>

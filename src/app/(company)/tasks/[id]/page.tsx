@@ -6,6 +6,7 @@ import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, CheckOutl
 import { Alert, Button, Input, Modal, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -20,6 +21,7 @@ const statusColors: Record<string, string> = {
 export default function TaskDetailPage() {
   const params = useParams()!;
   const router = useRouter();
+  const { hasPermissionString } = useAuthStore();
   const id = params.id as string;
 
   const t = useTranslations('tasks');
@@ -200,7 +202,7 @@ export default function TaskDetailPage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {!editing && (
+          {hasPermissionString('tasks.write') && !editing && (
             <Button type="default"  onClick={() => setEditing(true)}>
               <EditOutlined style={{ marginRight: 8 }} />
               {tActions('edit')}
@@ -397,20 +399,24 @@ export default function TaskDetailPage() {
               <h3 className="text-base font-semibold leading-none tracking-tight">{tDashboard('quickActions')}</h3>
             </div>
             <div className="p-6 pt-0 space-y-3">
-              <Button type="default"
-                className="w-full"
-                onClick={handleComplete}
-                disabled={completing || task.status === 'completed'}>
-                <CheckOutlined style={{ marginRight: 8 }} />
-                {completing ? `${tStatuses('completed')}...` : task.status === 'completed' ? tStatuses('completed') : tStatuses('completed')}
-              </Button>
-              <Button type="primary" danger
-                className="w-full"
-                onClick={handleDelete}
-                disabled={deleting}>
-                <DeleteOutlined style={{ marginRight: 8 }} />
-                {deleting ? `${tActions('delete')}...` : t('deleteTask')}
-              </Button>
+              {hasPermissionString('tasks.write') && (
+                <Button type="default"
+                  className="w-full"
+                  onClick={handleComplete}
+                  disabled={completing || task.status === 'completed'}>
+                  <CheckOutlined style={{ marginRight: 8 }} />
+                  {completing ? `${tStatuses('completed')}...` : task.status === 'completed' ? tStatuses('completed') : tStatuses('completed')}
+                </Button>
+              )}
+              {hasPermissionString('tasks.delete') && (
+                <Button type="primary" danger
+                  className="w-full"
+                  onClick={handleDelete}
+                  disabled={deleting}>
+                  <DeleteOutlined style={{ marginRight: 8 }} />
+                  {deleting ? `${tActions('delete')}...` : t('deleteTask')}
+                </Button>
+              )}
             </div>
           </div>
         </div>

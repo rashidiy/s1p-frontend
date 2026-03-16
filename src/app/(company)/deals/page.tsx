@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Input, Pagination, Button, Tag, Select, Segmented, message } from 'antd';
 import { PlusOutlined, DollarOutlined, RiseOutlined, UserOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 import type { DealResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import DealsPipelineView from '@/components/deals/DealsPipelineView';
@@ -28,6 +29,7 @@ export default function DealsPage() {
   const tStatuses = useTranslations('statuses');
   const tCommon = useTranslations('common');
 
+  const { hasPermissionString } = useAuthStore();
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialView);
   const [data, setData] = useState<PaginatedResponse<DealResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,7 +101,9 @@ export default function DealsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div className="flex items-center gap-3">
-          <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>{t('addDeal')}</Button></Link>
+          {hasPermissionString('deals.write') && (
+            <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>{t('addDeal')}</Button></Link>
+          )}
           <Segmented
             value={viewMode}
             onChange={handleViewChange}
@@ -142,7 +146,7 @@ export default function DealsPage() {
                   {deal.assigned_to_name && <p className="text-sm text-gray-600">{t('owner')}: <span className="font-medium">{deal.assigned_to_name}</span></p>}
                   <div className="flex gap-2 pt-2">
                     <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
-                    {deal.stage !== 'won' && deal.stage !== 'lost' && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>}
+                    {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>}
                   </div>
                 </div>
               </div>
