@@ -14,7 +14,7 @@ import {
 import { Button, Input, Switch, Tag, Modal, Table, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import type {
   WebhookEndpointResponse,
   WebhookDeliveryResponse,
@@ -39,6 +39,7 @@ const EVENT_COLORS: Record<string, string> = {
 export default function WebhooksPage() {
   const [endpoints, setEndpoints] = useState<WebhookEndpointResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -64,11 +65,13 @@ export default function WebhooksPage() {
   }, []);
 
   const loadData = async () => {
+    setError(false);
     try {
       const data = await apiClient.getWebhookEndpoints();
       setEndpoints(data.items);
     } catch (error) {
       console.error('Failed to load webhook endpoints:', error);
+      setError(true);
       message.error(tErrors('failedToLoadWebhooks'));
     } finally {
       setLoading(false);
@@ -102,12 +105,14 @@ export default function WebhooksPage() {
           secret: formData.secret || undefined,
           is_active: formData.is_active,
         });
+        message.success(t('endpointUpdated'));
       } else {
         await apiClient.createWebhookEndpoint({
           url: formData.url,
           events: formData.events,
           secret: formData.secret,
         });
+        message.success(t('endpointCreated'));
       }
       setShowForm(false);
       loadData();
@@ -129,6 +134,7 @@ export default function WebhooksPage() {
       onOk: async () => {
         try {
           await apiClient.deleteWebhookEndpoint(endpointId);
+          message.success(t('endpointDeleted'));
           loadData();
         } catch (error) {
           console.error('Failed to delete webhook endpoint:', error);
@@ -215,6 +221,19 @@ export default function WebhooksPage() {
       render: (date: string) => new Date(date).toLocaleString(),
     },
   ];
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadData(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="space-y-6">

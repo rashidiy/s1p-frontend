@@ -158,7 +158,8 @@
     "creating": "Создание...",
     "done": "Готово",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "tryAgain": "Попробовать снова"
   },
   "entities": {
     "contact": "Контакт",
@@ -407,7 +408,9 @@
     "failedToLoadWebhooks": "Не удалось загрузить вебхуки",
     "failedToSaveWebhook": "Не удалось сохранить вебхук",
     "failedToDeleteWebhook": "Не удалось удалить вебхук",
-    "failedToLoadDeliveries": "Не удалось загрузить журнал доставки"
+    "failedToLoadDeliveries": "Не удалось загрузить журнал доставки",
+    "somethingWentWrong": "Что-то пошло не так",
+    "tryAgainLater": "Пожалуйста, попробуйте позже"
   },
   "fields": {
     "firstName": "Имя",
@@ -792,7 +795,6 @@
     "inviteLinkDesc": "Поделитесь ссылкой с командой для вступления в группу",
     "copyInviteLink": "Копировать ссылку",
     "inviteLinkCopied": "Ссылка скопирована!",
-    "groupName": "Название группы",
     "notificationLanguage": "Язык уведомлений",
     "notificationLanguageDesc": "Язык сообщений в Telegram",
     "sendRecordings": "Отправлять записи",

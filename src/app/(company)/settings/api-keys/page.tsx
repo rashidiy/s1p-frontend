@@ -5,12 +5,13 @@ import { PlusOutlined, DeleteOutlined, KeyOutlined, CopyOutlined, WarningOutline
 import { Button, Input, Modal, Tag, Typography, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import type { ApiKeyResponse, ApiKeyCreateResponse } from '@/types/api';
 
 export default function ApiKeysPage() {
   const [keys, setKeys] = useState<ApiKeyResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
@@ -28,11 +29,13 @@ export default function ApiKeysPage() {
   }, []);
 
   const loadKeys = async () => {
+    setError(false);
     try {
       const data = await apiClient.getApiKeys();
       setKeys(data.items);
     } catch (error) {
       console.error('Failed to load API keys:', error);
+      setError(true);
       message.error(tErrors('failedToLoadApiKeys'));
     } finally {
       setLoading(false);
@@ -76,6 +79,19 @@ export default function ApiKeysPage() {
       },
     });
   };
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadKeys(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="space-y-6">

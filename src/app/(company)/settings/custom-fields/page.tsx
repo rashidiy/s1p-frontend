@@ -14,7 +14,7 @@ import {
 import { Button, Input, Select, Switch, Tag, Modal, message, Segmented } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import type {
   CustomFieldDefinitionResponse,
   CustomFieldDefinitionCreate,
@@ -42,6 +42,7 @@ const FIELD_TYPE_COLORS: Record<string, string> = {
 export default function CustomFieldsPage() {
   const [fields, setFields] = useState<CustomFieldDefinitionResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeEntityType, setActiveEntityType] = useState<string>(ENTITY_TYPES[0]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -73,11 +74,13 @@ export default function CustomFieldsPage() {
 
   const loadFields = async () => {
     setLoading(true);
+    setError(false);
     try {
       const data = await apiClient.getCustomFields(activeEntityType);
       setFields(data);
     } catch (error) {
       console.error('Failed to load custom fields:', error);
+      setError(true);
       message.error(tErrors('failedToLoadCustomFields'));
     } finally {
       setLoading(false);
@@ -212,6 +215,19 @@ export default function CustomFieldsPage() {
     label: tEntities(et),
     value: et,
   }));
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadFields(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="space-y-6">

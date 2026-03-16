@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { OwnerDashboard } from '@/types/api';
-import { WelcomeCharacter } from '@/components/illustrations';
+import { WelcomeCharacter, ErrorCharacter } from '@/components/illustrations';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -19,6 +19,7 @@ import { useTranslations } from 'next-intl';
 export default function OwnerDashboardPage() {
   const [dashboard, setDashboard] = useState<OwnerDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { user } = useAuthStore();
   const t = useTranslations();
 
@@ -28,16 +29,31 @@ export default function OwnerDashboardPage() {
   }, []);
 
   const loadDashboard = async () => {
+    setError(false);
     try {
       const data = await apiClient.getOwnerDashboard();
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
+      setError(true);
       message.error(t('errors.failedToLoadDashboard'));
     } finally {
       setLoading(false);
     }
   };
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('errors.somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{t('errors.tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadDashboard(); }}>
+          {t('actions.tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

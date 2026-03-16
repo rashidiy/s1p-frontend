@@ -5,7 +5,7 @@ import { Input, Pagination, Button, Tag, Checkbox, Select, message } from 'antd'
 import { PlusOutlined, CalendarOutlined, UserOutlined, ExclamationCircleOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { TaskResponse, PaginatedResponse } from '@/types/api';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
@@ -20,6 +20,7 @@ export default function TasksPage() {
 
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<string>('');
@@ -37,10 +38,11 @@ export default function TasksPage() {
   useEffect(() => { loadTasks(); }, [page, search, status]);
 
   const loadTasks = async () => {
+    setError(false);
     try {
       const result = await apiClient.getTasks({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load tasks:', error); message.error(tErrors('failedToLoadTasks')); }
+    } catch (error) { console.error('Failed to load tasks:', error); setError(true); message.error(tErrors('failedToLoadTasks')); }
     finally { setLoading(false); }
   };
 
@@ -49,6 +51,19 @@ export default function TasksPage() {
   };
 
   const isOverdue = (dueDate?: string | null) => dueDate ? new Date(dueDate) < new Date() : false;
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadTasks(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="space-y-6">

@@ -5,13 +5,14 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutline
 import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
 
 export default function PermissionGroupsPage() {
   const [groups, setGroups] = useState<PermissionGroupResponse[]>([]);
   const [availablePerms, setAvailablePerms] = useState<AvailablePermission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -32,6 +33,7 @@ export default function PermissionGroupsPage() {
   }, []);
 
   const loadData = async () => {
+    setError(false);
     try {
       const [groupsData, permsData] = await Promise.all([
         apiClient.getPermissionGroups(),
@@ -41,6 +43,7 @@ export default function PermissionGroupsPage() {
       setAvailablePerms(permsData);
     } catch (error) {
       console.error('Failed to load permission groups:', error);
+      setError(true);
       message.error(tErrors('failedToLoadPermissionGroups'));
     } finally {
       setLoading(false);
@@ -72,6 +75,7 @@ export default function PermissionGroupsPage() {
         await apiClient.createPermissionGroup(formData);
       }
       setShowForm(false);
+      message.success(t('groupSaved'));
       loadData();
     } catch (error) {
       console.error('Failed to save permission group:', error);
@@ -91,6 +95,7 @@ export default function PermissionGroupsPage() {
       onOk: async () => {
         try {
           await apiClient.deletePermissionGroup(groupId);
+          message.success(t('groupDeleted'));
           loadData();
         } catch (error) {
           console.error('Failed to delete permission group:', error);
@@ -114,6 +119,19 @@ export default function PermissionGroupsPage() {
     (acc[p.category] ||= []).push(p);
     return acc;
   }, {});
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadData(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="space-y-6">

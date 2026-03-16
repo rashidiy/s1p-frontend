@@ -16,7 +16,7 @@ import {
   CALL_DIRECTION_OPTIONS,
 } from '@/lib/constants';
 import type { CallEventResponse, PaginatedResponse } from '@/types/api';
-import { EmptyStateCharacter } from '@/components/illustrations';
+import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 
 const OUTCOME_OPTIONS = [
   { value: 'interested', label: 'Interested' },
@@ -43,6 +43,7 @@ export default function CallsPage() {
   const tErrors = useTranslations('errors');
   const [data, setData] = useState<PaginatedResponse<CallEventResponse> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [page, setPage] = useState(1);
   const [direction, setDirection] = useState('');
   const [outcome, setOutcome] = useState('');
@@ -55,10 +56,11 @@ export default function CallsPage() {
 
   const loadCallHistory = async () => {
     setLoading(true);
+    setError(false);
     try {
       const result = await apiClient.getCallHistory({ page, page_size: 20, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load call history:', error); message.error(tErrors('failedToLoadCalls')); }
+    } catch (error) { console.error('Failed to load call history:', error); setError(true); message.error(tErrors('failedToLoadCalls')); }
     finally { setLoading(false); }
   };
 
@@ -84,6 +86,21 @@ export default function CallsPage() {
     if (dir === 'outbound') return <PhoneOutgoing style={{ color: '#3b82f6' }} />;
     return <PhoneOutlined />;
   };
+
+  const tActions = useTranslations('actions');
+
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadCallHistory(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
