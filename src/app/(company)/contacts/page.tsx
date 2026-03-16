@@ -55,6 +55,7 @@ export default function ContactsPage() {
   };
 
   useEffect(() => {
+    if (!searchInput) return;
     const timer = setTimeout(() => {
       setSearch(searchInput);
       setPage(1);
@@ -194,7 +195,11 @@ export default function ContactsPage() {
         <Input.Search
           placeholder={t('searchContacts')}
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={(e) => {
+            const v = e.target.value;
+            setSearchInput(v);
+            if (!v) { setSearch(''); setPage(1); }
+          }}
           allowClear
           size="large"
           className="w-full md:max-w-lg"

@@ -59,6 +59,7 @@ export default function LeadsPage() {
   };
 
   useEffect(() => {
+    if (!searchInput) return;
     const timer = setTimeout(() => {
       setSearch(searchInput);
       setPage(1);
@@ -198,7 +199,7 @@ export default function LeadsPage() {
       <p className="page-subtitle">{t('subtitle')}</p>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-        <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
+        <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => { const v = e.target.value; setSearchInput(v); if (!v) { setSearch(''); setPage(1); } }} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: tStatuses('new'), value: 'new' }, { label: tStatuses('contacted'), value: 'contacted' }, { label: tStatuses('qualified'), value: 'qualified' }, { label: tStatuses('converted'), value: 'converted' }, { label: tStatuses('lost'), value: 'lost' }]}
         />

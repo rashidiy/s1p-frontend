@@ -50,15 +50,26 @@ export default function CallsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [myCalls, setMyCalls] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!searchInput) return;
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  useEffect(() => { loadCallHistory(); }, [page, direction, outcome, dateFrom, dateTo, myCalls]);
+  useEffect(() => { loadCallHistory(); }, [page, search, direction, outcome, dateFrom, dateTo, myCalls]);
 
   const loadCallHistory = async () => {
     setLoading(true);
     setError(false);
     try {
-      const result = await apiClient.getCallHistory({ page, page_size: 20, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
+      const result = await apiClient.getCallHistory({ page, page_size: 20, search: search || undefined, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
     } catch (error) { console.error('Failed to load call history:', error); setError(true); message.error(tErrors('failedToLoadCalls')); }
     finally { setLoading(false); }
@@ -105,6 +116,19 @@ export default function CallsPage() {
   return (
     <div className="space-y-6">
       <p className="page-subtitle">{t('subtitle')}</p>
+
+      <Input.Search
+        placeholder={t('searchCalls')}
+        value={searchInput}
+        onChange={(e) => {
+          const v = e.target.value;
+          setSearchInput(v);
+          if (!v) { setSearch(''); setPage(1); }
+        }}
+        allowClear
+        size="large"
+        className="w-full md:max-w-lg"
+      />
 
       <div className="glass-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -195,7 +219,7 @@ export default function CallsPage() {
             <EmptyStateCharacter height={115} variant="no-calls" />
             <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noCallsFound')}</h3>
             <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-              {direction || outcome || dateFrom || dateTo || myCalls ? tCommon('tryAdjustingFilters') : t('getStarted')}
+              {search || direction || outcome || dateFrom || dateTo || myCalls ? tCommon('tryAdjustingFilters') : t('getStarted')}
             </p>
           </div>
         )}

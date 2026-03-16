@@ -45,6 +45,7 @@ export default function DealsPage() {
   };
 
   useEffect(() => {
+    if (!searchInput) return;
     const timer = setTimeout(() => {
       setSearch(searchInput);
       setPage(1);
@@ -121,7 +122,7 @@ export default function DealsPage() {
       ) : (
         <>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Input.Search placeholder={t('searchDeals')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
+            <Input.Search placeholder={t('searchDeals')} value={searchInput} onChange={(e) => { const v = e.target.value; setSearchInput(v); if (!v) { setSearch(''); setPage(1); } }} allowClear size="large" className="w-full md:max-w-lg" />
             <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder={t('allStages')} allowClear className="w-full sm:w-[180px]" size="large"
               options={[{ label: tStatuses('prospecting'), value: 'prospecting' }, { label: tStatuses('qualification'), value: 'qualification' }, { label: tStatuses('proposal'), value: 'proposal' }, { label: tStatuses('negotiation'), value: 'negotiation' }, { label: tStatuses('won'), value: 'won' }, { label: tStatuses('lost'), value: 'lost' }]}
             />

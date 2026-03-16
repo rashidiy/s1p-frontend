@@ -58,6 +58,11 @@ export default function CompaniesPage() {
   const handleSearch = (value: string) => {
     setSearch(value);
     if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (!value) {
+      setPage(1);
+      loadCompanies(1, '');
+      return;
+    }
     searchTimer.current = setTimeout(() => {
       setPage(1);
       loadCompanies(1, value);
