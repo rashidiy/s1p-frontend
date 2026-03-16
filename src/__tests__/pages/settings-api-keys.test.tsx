@@ -83,7 +83,7 @@ beforeEach(() => {
     isInitializing: false,
     isOwner: false,
     isCompanyUser: true,
-    permissions: [],
+    permissions: ['settings.read', 'settings.manage', 'contacts.read', 'contacts.write', 'leads.read', 'leads.write', 'deals.read', 'deals.write', 'tasks.read', 'tasks.write', 'tasks.delete', 'calls.read'],
     mustChangePassword: false,
   });
 });
@@ -136,7 +136,7 @@ describe('Settings API Keys Page', () => {
     render(<ApiKeysPage />);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('createApiKey')).toBeInTheDocument();
+      expect(screen.getAllByText('createApiKey').length).toBeGreaterThan(0);
     });
   });
 

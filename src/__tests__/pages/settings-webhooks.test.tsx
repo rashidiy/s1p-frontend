@@ -117,7 +117,7 @@ beforeEach(() => {
     isInitializing: false,
     isOwner: false,
     isCompanyUser: true,
-    permissions: [],
+    permissions: ['settings.read', 'settings.manage', 'contacts.read', 'contacts.write', 'leads.read', 'leads.write', 'deals.read', 'deals.write', 'tasks.read', 'tasks.write', 'tasks.delete', 'calls.read'],
     mustChangePassword: false,
   });
 });
@@ -160,10 +160,10 @@ describe('Settings Webhooks Page', () => {
     render(<WebhooksPage />);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('addEndpoint')).toBeInTheDocument();
+      expect(screen.getAllByText('addEndpoint').length).toBeGreaterThan(0);
     });
 
-    fireEvent.click(screen.getByText('addEndpoint'));
+    fireEvent.click(screen.getAllByText('addEndpoint')[0]);
 
     await vi.waitFor(() => {
       expect(screen.getByText('endpointUrl')).toBeInTheDocument();

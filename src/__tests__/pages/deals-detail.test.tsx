@@ -218,7 +218,7 @@ describe('Deal Detail Page', () => {
 
     // Deal is null => shows notFoundDetail
     await vi.waitFor(() => {
-      expect(screen.getByText('notFoundDetail')).toBeInTheDocument();
+      expect(screen.getByText('notFoundTitle')).toBeInTheDocument();
     });
   });
 

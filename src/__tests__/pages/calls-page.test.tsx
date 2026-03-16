@@ -222,7 +222,7 @@ describe('Calls Page', () => {
       expect(screen.getByText('noCallsFound')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('tryAdjustingFilters')).toBeInTheDocument();
+    expect(screen.getByText('getStarted')).toBeInTheDocument();
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
   });
 });

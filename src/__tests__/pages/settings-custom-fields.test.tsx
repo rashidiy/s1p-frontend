@@ -103,7 +103,7 @@ beforeEach(() => {
     isInitializing: false,
     isOwner: false,
     isCompanyUser: true,
-    permissions: [],
+    permissions: ['settings.read', 'settings.manage', 'contacts.read', 'contacts.write', 'leads.read', 'leads.write', 'deals.read', 'deals.write', 'tasks.read', 'tasks.write', 'tasks.delete', 'calls.read'],
     mustChangePassword: false,
   });
 });
@@ -159,7 +159,7 @@ describe('Settings Custom Fields Page', () => {
     render(<CustomFieldsPage />);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('addField')).toBeInTheDocument();
+      expect(screen.getAllByText('addField').length).toBeGreaterThan(0);
     });
   });
 

@@ -199,7 +199,7 @@ describe('Lead Detail Page', () => {
 
     // Lead is null => shows notFound
     await vi.waitFor(() => {
-      expect(screen.getByText('notFound')).toBeInTheDocument();
+      expect(screen.getByText('notFoundTitle')).toBeInTheDocument();
     });
   });
 

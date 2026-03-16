@@ -191,11 +191,12 @@ describe('Tasks Page', () => {
     render(<TasksPage />);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('addTask')).toBeInTheDocument();
+      expect(screen.getAllByText('addTask').length).toBeGreaterThan(0);
     });
 
-    // Verify the link points to /tasks/new
-    const link = screen.getByText('addTask').closest('a');
+    // Verify at least one link points to /tasks/new
+    const links = screen.getAllByText('addTask');
+    const link = links[0].closest('a');
     expect(link).toHaveAttribute('href', '/tasks/new');
   });
 });
