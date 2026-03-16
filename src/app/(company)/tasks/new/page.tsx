@@ -9,6 +9,7 @@ import { Alert, Button, DatePicker, Input, Select, message } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils';
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -62,8 +63,8 @@ export default function NewTaskPage() {
         assigned_to: assignedTo || null,
       });
       router.push(`/tasks/${result.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToCreateTask'));
+    } catch (err) {
+      setError(getErrorMessage(err, tErrors('failedToCreateTask')));
     } finally {
       setIsLoading(false);
     }
