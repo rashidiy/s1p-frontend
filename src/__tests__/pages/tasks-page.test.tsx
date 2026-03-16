@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { useAuthStore } from '@/store/auth';
 
 // Mock apiClient
 const mockGetTasks = vi.fn();
@@ -78,6 +79,10 @@ import TasksPage from '@/app/(company)/tasks/page';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  useAuthStore.setState({
+    permissions: ['tasks.read', 'tasks.write', 'tasks.delete'],
+    isAuthenticated: true,
+  });
 });
 
 describe('Tasks Page', () => {
