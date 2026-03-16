@@ -23,7 +23,7 @@ const statCards = [
     labelKey: 'totalCalls' as const,
     icon: <PhoneOutlined />,
     href: '/calls',
-    iconBg: '#EEF2FF',
+    iconBgVar: 'var(--icon-bg-indigo)',
     iconColor: '#4338CA',
   },
   {
@@ -31,7 +31,7 @@ const statCards = [
     labelKey: 'totalLeads' as const,
     icon: <RiseOutlined />,
     href: '/leads',
-    iconBg: '#F0FDF4',
+    iconBgVar: 'var(--icon-bg-green)',
     iconColor: '#10B981',
   },
   {
@@ -39,7 +39,7 @@ const statCards = [
     labelKey: 'totalDeals' as const,
     icon: <FundProjectionScreenOutlined />,
     href: '/deals',
-    iconBg: '#EFF6FF',
+    iconBgVar: 'var(--icon-bg-blue)',
     iconColor: '#2563EB',
   },
   {
@@ -47,7 +47,7 @@ const statCards = [
     labelKey: 'completedTasks' as const,
     icon: <CheckSquareOutlined />,
     href: '/tasks',
-    iconBg: '#FFFBEB',
+    iconBgVar: 'var(--icon-bg-amber)',
     iconColor: '#F59E0B',
   },
 ];
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                     width: 44,
                     height: 44,
                     borderRadius: 12,
-                    background: card.iconBg,
+                    background: card.iconBgVar,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -228,7 +228,7 @@ export default function DashboardPage() {
                   style={{
                     fontSize: 12,
                     fontWeight: 500,
-                    color: '#4338CA',
+                    color: 'var(--accent-link)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                   style={{
                     fontWeight: 700,
                     fontSize: item.highlight ? 18 : 14,
-                    color: item.highlight ? '#4338CA' : 'var(--text-primary)',
+                    color: item.highlight ? 'var(--accent-link)' : 'var(--text-primary)',
                   }}
                 >
                   {item.value}

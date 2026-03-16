@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { useThemeStore } from '@/store/theme';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
 import { useTranslations } from 'next-intl';
 
@@ -66,8 +67,18 @@ export default function AnalyticsPage() {
   });
   const [chartsLoading, setChartsLoading] = useState(true);
   const { isAdmin, isManager } = useAuthStore();
+  const isDark = useThemeStore((s) => s.resolved === 'dark');
 
   const canViewTeamData = isAdmin() || isManager();
+
+  const chartGridColor = isDark ? '#2c2c30' : '#e2e8f0';
+  const tooltipStyle = {
+    borderRadius: '12px',
+    border: isDark ? '1px solid #2c2c30' : 'none',
+    boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.1)',
+    backgroundColor: isDark ? '#242428' : '#ffffff',
+    color: isDark ? '#ededf0' : undefined,
+  };
 
   const loadDashboards = useCallback(async () => {
     try {
@@ -298,10 +309,10 @@ export default function AnalyticsPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={chartData.callTrends.length > 0 ? chartData.callTrends : SAMPLE_TREND_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+                    <XAxis dataKey="date" tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <YAxis tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <Tooltip contentStyle={tooltipStyle} />
                     <Legend />
                     <Line type="monotone" dataKey="total" stroke="#6366f1" name={t('totalCalls')} strokeWidth={2} dot={{ r: 4 }} />
                     <Line type="monotone" dataKey="inbound" stroke="#22c55e" name={t('inbound')} strokeWidth={2} dot={{ r: 4 }} />
@@ -319,10 +330,10 @@ export default function AnalyticsPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={chartData.teamPerformance.length > 0 ? chartData.teamPerformance : SAMPLE_TEAM_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <YAxis tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <Tooltip contentStyle={tooltipStyle} />
                     <Legend />
                     <Bar dataKey="calls" fill="#6366f1" name={t('totalCalls')} radius={[4, 4, 0, 0]} />
                     <Bar dataKey="answered" fill="#22c55e" name={t('answered')} radius={[4, 4, 0, 0]} />
@@ -352,7 +363,7 @@ export default function AnalyticsPage() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                     </Pie>
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                    <Tooltip contentStyle={tooltipStyle} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>

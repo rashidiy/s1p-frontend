@@ -154,7 +154,7 @@ export default function CallsPage() {
         ) : data && data.items.length > 0 ? (
           <div className="divide-y divide-gray-100">
             {data.items.map((call) => (
-              <div key={call.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3 hover:bg-white/50 transition-colors cursor-pointer" onClick={() => router.push(`/calls/${call.id}`)}>
+              <div key={call.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/calls/${call.id}`)}>
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
                   <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction)}</span>
                   <div className="min-w-0">
