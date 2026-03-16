@@ -1,17 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Button, Tag, Select, message } from 'antd';
-import { PlusOutlined, UserOutlined, DollarOutlined } from '@ant-design/icons';
+import { Input, Pagination, Button, Tag, Select, Table, Segmented, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import {
+  PlusOutlined,
+  UserOutlined,
+  DollarOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { LeadResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+
+type ViewMode = 'cards' | 'table';
+
+const VIEW_MODE_KEY = 'leads_view_mode';
 
 const statusColors: Record<string, string> = {
   new: 'blue', contacted: 'gold', qualified: 'green', converted: 'purple', lost: 'red',
 };
+
+function getInitialViewMode(): ViewMode {
+  if (typeof window === 'undefined') return 'table';
+  return (localStorage.getItem(VIEW_MODE_KEY) as ViewMode) || 'table';
+}
 
 export default function LeadsPage() {
   const t = useTranslations('leads');
@@ -20,6 +37,7 @@ export default function LeadsPage() {
   const tCommon = useTranslations('common');
   const tStatuses = useTranslations('statuses');
   const tFields = useTranslations('fields');
+  const router = useRouter();
 
   const [data, setData] = useState<PaginatedResponse<LeadResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +45,16 @@ export default function LeadsPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<string>('');
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+
+  useEffect(() => {
+    setViewMode(getInitialViewMode());
+  }, []);
+
+  const handleViewChange = (value: ViewMode) => {
+    setViewMode(value);
+    localStorage.setItem(VIEW_MODE_KEY, value);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,6 +74,84 @@ export default function LeadsPage() {
     } catch (error) { console.error('Failed to load leads:', error); message.error(tErrors('failedToLoadLeads')); }
     finally { setLoading(false); }
   };
+
+  const handleConvert = async (e: React.MouseEvent, leadId: string) => {
+    e.stopPropagation();
+    try {
+      await apiClient.convertLead(leadId, true);
+      loadLeads();
+    } catch {
+      message.error(tErrors('failedToConvertLead'));
+    }
+  };
+
+  const columns: ColumnsType<LeadResponse> = [
+    {
+      title: tFields('title'),
+      dataIndex: 'title',
+      key: 'title',
+      sorter: (a, b) => a.title.localeCompare(b.title),
+      render: (value: string) => <span className="font-medium">{value}</span>,
+    },
+    {
+      title: tFields('contact'),
+      dataIndex: 'contact_name',
+      key: 'contact_name',
+      responsive: ['md'],
+      render: (value: string | null) =>
+        value ? (
+          <span className="flex items-center gap-1"><UserOutlined className="text-xs text-gray-400" /> {value}</span>
+        ) : <span className="text-gray-300">-</span>,
+    },
+    {
+      title: tFields('status'),
+      dataIndex: 'status',
+      key: 'status',
+      width: 120,
+      render: (value: string | null) =>
+        value ? <Tag color={statusColors[value.toLowerCase()] || 'default'}>{value}</Tag> : <span className="text-gray-300">-</span>,
+    },
+    {
+      title: tFields('estimatedValue'),
+      dataIndex: 'estimated_value',
+      key: 'estimated_value',
+      responsive: ['lg'],
+      width: 130,
+      align: 'right',
+      render: (value: number | null) =>
+        value ? <span className="font-semibold text-green-600">${value.toLocaleString()}</span> : <span className="text-gray-300">-</span>,
+    },
+    {
+      title: tFields('assignedTo'),
+      dataIndex: 'assigned_to_name',
+      key: 'assigned_to_name',
+      responsive: ['xl'],
+      render: (value: string | null) => value || <span className="text-gray-300">-</span>,
+    },
+    {
+      title: tFields('created'),
+      dataIndex: 'created_at',
+      key: 'created_at',
+      responsive: ['xl'],
+      width: 110,
+      render: (value: string) => new Date(value).toLocaleDateString(),
+    },
+    {
+      title: '',
+      key: 'actions',
+      width: 160,
+      render: (_, record) => (
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <Link href={`/leads/${record.id}`}>
+            <Button size="small">{tActions('view')}</Button>
+          </Link>
+          {record.status !== 'converted' && (
+            <Button size="small" type="primary" onClick={(e) => handleConvert(e, record.id)}>{tActions('convert')}</Button>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   if (loading) return (
     <div className="space-y-6">
@@ -87,38 +193,70 @@ export default function LeadsPage() {
       </div>
       <p className="page-subtitle">{t('subtitle')}</p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
         <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: tStatuses('new'), value: 'new' }, { label: tStatuses('contacted'), value: 'contacted' }, { label: tStatuses('qualified'), value: 'qualified' }, { label: tStatuses('converted'), value: 'converted' }, { label: tStatuses('lost'), value: 'lost' }]}
         />
+        <Segmented
+          value={viewMode}
+          onChange={(value) => handleViewChange(value as ViewMode)}
+          options={[
+            { label: tCommon('cardView'), value: 'cards', icon: <AppstoreOutlined /> },
+            { label: tCommon('tableView'), value: 'table', icon: <UnorderedListOutlined /> },
+          ]}
+        />
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {data?.items.map((lead) => (
-          <div key={lead.id} className="glass-card p-5 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-semibold text-gray-900">{lead.title}</h3>
-                {lead.contact_name && <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><UserOutlined className="text-xs" /> {lead.contact_name}</p>}
-              </div>
-              {lead.status && <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{lead.status}</Tag>}
+      {viewMode === 'table' ? (
+        <>
+          <Table<LeadResponse>
+            columns={columns}
+            dataSource={data?.items ?? []}
+            rowKey="id"
+            pagination={false}
+            onRow={(record) => ({
+              onClick: () => router.push(`/leads/${record.id}`),
+              style: { cursor: 'pointer' },
+            })}
+            size="middle"
+            scroll={{ x: 600 }}
+          />
+          {data && data.total_pages > 1 && (
+            <div className="flex justify-center">
+              <Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} />
             </div>
-            <div className="space-y-2">
-              {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}
-              {lead.pipeline_stage && <p className="text-sm text-gray-600">{tFields('stage')}: <span className="font-medium">{lead.pipeline_stage}</span></p>}
-              {lead.assigned_to_name && <p className="text-sm text-gray-600">{tFields('assigned')}: <span className="font-medium">{lead.assigned_to_name}</span></p>}
-              {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
-              <div className="flex gap-2 pt-2">
-                <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
-                {lead.status !== 'converted' && <Button type="primary" onClick={async () => { try { await apiClient.convertLead(lead.id, true); loadLeads(); } catch (err) { message.error(tErrors('failedToConvertLead')); } }}>{tActions('convert')}</Button>}
+          )}
+        </>
+      ) : (
+        <>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {data?.items.map((lead) => (
+              <div key={lead.id} className="glass-card p-5 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{lead.title}</h3>
+                    {lead.contact_name && <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><UserOutlined className="text-xs" /> {lead.contact_name}</p>}
+                  </div>
+                  {lead.status && <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{lead.status}</Tag>}
+                </div>
+                <div className="space-y-2">
+                  {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}
+                  {lead.pipeline_stage && <p className="text-sm text-gray-600">{tFields('stage')}: <span className="font-medium">{lead.pipeline_stage}</span></p>}
+                  {lead.assigned_to_name && <p className="text-sm text-gray-600">{tFields('assigned')}: <span className="font-medium">{lead.assigned_to_name}</span></p>}
+                  {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
+                  <div className="flex gap-2 pt-2">
+                    <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
+                    {lead.status !== 'converted' && <Button type="primary" onClick={(e) => handleConvert(e, lead.id)}>{tActions('convert')}</Button>}
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+          {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+        </>
+      )}
 
       {data?.items.length === 0 && (
         <div className="glass-card py-16 flex flex-col items-center justify-center">

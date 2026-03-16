@@ -315,7 +315,9 @@
     "allStatuses": "Barcha holatlar",
     "all": "Hammasi",
     "crmPlatform": "CRM Platforma",
-    "customerRelationshipManagement": "Mijozlar bilan munosabatlarni boshqarish"
+    "customerRelationshipManagement": "Mijozlar bilan munosabatlarni boshqarish",
+    "cardView": "Kartochkalar",
+    "tableView": "Jadval"
   },
   "errors": {
     "sessionExpired": "Sessiya muddati tugadi",
