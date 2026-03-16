@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Sidebar } from '@/components/layout/sidebar';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
@@ -51,6 +52,7 @@ export default function CompanyLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname() ?? '/dashboard';
   const pageTitle = usePageTitle(pathname);
+  useKeyboardShortcuts();
 
   // Set document title
   useEffect(() => {
