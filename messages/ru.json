@@ -634,7 +634,9 @@
     "wrongNumber": "Неверный номер",
     "doNotCall": "Не звонить",
     "customerComplaint": "Жалоба клиента",
-    "other": "Другое"
+    "other": "Другое",
+    "attempts": "Попытки",
+    "autoLinkSuggestions": "Предложения для привязки"
   },
   "analytics": {
     "title": "Аналитика",

@@ -634,7 +634,9 @@
     "wrongNumber": "Noto'g'ri raqam",
     "doNotCall": "Qo'ng'iroq qilmang",
     "customerComplaint": "Mijoz shikoyati",
-    "other": "Boshqa"
+    "other": "Boshqa",
+    "attempts": "Urinishlar",
+    "autoLinkSuggestions": "Avtomatik bog'lash takliflari"
   },
   "analytics": {
     "title": "Tahlillar",

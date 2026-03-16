@@ -634,7 +634,9 @@
     "wrongNumber": "Wrong Number",
     "doNotCall": "Do Not Call",
     "customerComplaint": "Customer Complaint",
-    "other": "Other"
+    "other": "Other",
+    "attempts": "Attempts",
+    "autoLinkSuggestions": "Auto-Link Suggestions"
   },
   "analytics": {
     "title": "Analytics",

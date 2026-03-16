@@ -85,6 +85,9 @@ export default function CallDetailPage() {
   const [linking, setLinking] = useState(false);
   const [suggestions, setSuggestions] = useState<AutoLinkSuggestions | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
+  const [loadingRecording, setLoadingRecording] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     loadCall();
@@ -92,6 +95,7 @@ export default function CallDetailPage() {
   }, [callId]);
 
   const loadCall = async () => {
+    setError(false);
     try {
       const data = await apiClient.getCall(callId);
       setCall(data);
@@ -108,6 +112,7 @@ export default function CallDetailPage() {
       }
     } catch (e) {
       console.error(e);
+      setError(true);
       message.error(tErrors('failedToLoadCall'));
     } finally {
       setLoading(false);
@@ -186,10 +191,12 @@ export default function CallDetailPage() {
 
   const formatDuration = (seconds?: number | null) => {
     if (!seconds) return '\u2014';
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    if (mins > 0) return `${mins}m ${secs}s`;
-    return `${secs}s`;
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    if (hrs > 0) return `${hrs}:${pad(mins)}:${pad(secs)}`;
+    return `${mins}:${pad(secs)}`;
   };
 
   const formatTimestamp = (ts?: number | null) => {
@@ -247,9 +254,14 @@ export default function CallDetailPage() {
     return (
       <div className="glass-card py-16 flex flex-col items-center justify-center">
         <EmptyStateCharacter height={115} variant="confused" />
-        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('notFoundTitle')}</h3>
-        <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{tErrors('notFoundSubtitle')}</p>
-        <Button type="primary" className="mt-4" onClick={() => router.push('/calls')}>{tErrors('goBack')}</Button>
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{error ? tCommon('somethingWentWrong') : tErrors('notFoundTitle')}</h3>
+        <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{error ? tErrors('failedToLoadCall') : tErrors('notFoundSubtitle')}</p>
+        <div className="flex gap-3 mt-4">
+          {error && (
+            <Button onClick={() => { setLoading(true); loadCall(); }}>{tCommon('tryAgain')}</Button>
+          )}
+          <Button type="primary" onClick={() => router.push('/calls')}>{tErrors('goBack')}</Button>
+        </div>
       </div>
     );
   }
@@ -312,25 +324,38 @@ export default function CallDetailPage() {
                   <Tag>{call.provider_type}</Tag>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500 block">{tFields('status')}</span>
-                  <span className="font-medium">{call.attempts}</span>
+                  <span className="text-sm text-gray-500 block">{t('attempts')}</span>
+                  <span className="font-medium">{call.attempts ?? '\u2014'}</span>
                 </div>
               </div>
 
               {call.has_recording && (
+                <div className="mt-4 space-y-2">
+                  <span className="text-sm text-gray-500 block">{tFields('recording')}</span>
+                  {recordingUrl ? (
+                    <audio controls src={recordingUrl} className="w-full" />
+                  ) : (
+                    <Button size="small" type="default" loading={loadingRecording}
+                      onClick={async () => {
+                        setLoadingRecording(true);
+                        try {
+                          const recUrl = await apiClient.getCallRecording(callId);
+                          setRecordingUrl(recUrl);
+                        } catch {
+                          message.error(tErrors('failedToLoadRecording'));
+                        } finally {
+                          setLoadingRecording(false);
+                        }
+                      }}
+                    >
+                      {t('playRecording')}
+                    </Button>
+                  )}
+                </div>
+              )}
+              {!call.has_recording && (
                 <div className="mt-4">
-                  <Button size="small" type="default"
-                    onClick={async () => {
-                      try {
-                        const recUrl = await apiClient.getCallRecording(callId);
-                        window.open(recUrl, '_blank');
-                      } catch {
-                        message.error(tErrors('failedToLoadRecording'));
-                      }
-                    }}
-                  >
-                    {t('playRecording')}
-                  </Button>
+                  <span className="text-sm text-gray-500">{t('noRecording')}</span>
                 </div>
               )}
             </div>
@@ -447,7 +472,7 @@ export default function CallDetailPage() {
           {/* Auto-Link Suggestions */}
           <div className="glass-card p-0">
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-base font-semibold leading-none tracking-tight">{t('linkToEntity')}</h3>
+              <h3 className="text-base font-semibold leading-none tracking-tight">{t('autoLinkSuggestions')}</h3>
             </div>
             <div className="p-6 pt-0">
               {suggestions ? (
