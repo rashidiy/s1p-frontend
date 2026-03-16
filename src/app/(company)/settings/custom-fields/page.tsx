@@ -389,6 +389,7 @@ export default function CustomFieldsPage() {
                     disabled={index === 0}
                     onClick={() => handleMoveUp(index)}
                     title={t('moveUp')}
+                    aria-label={t('moveUp')}
                   >
                     <ArrowUpOutlined />
                   </Button>
@@ -398,6 +399,7 @@ export default function CustomFieldsPage() {
                     disabled={index === fields.length - 1}
                     onClick={() => handleMoveDown(index)}
                     title={t('moveDown')}
+                    aria-label={t('moveDown')}
                   >
                     <ArrowDownOutlined />
                   </Button>

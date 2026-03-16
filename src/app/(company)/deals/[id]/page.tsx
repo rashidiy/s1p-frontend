@@ -399,7 +399,7 @@ export default function DealDetailPage() {
                   onChange={(e) => setNewNote(e.target.value)}
                   className="flex-1"
                 />
-                <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                <Button onClick={handleAddNote} disabled={!newNote.trim()} aria-label={tActions('add')}>
                   <PlusOutlined />
                 </Button>
               </div>
