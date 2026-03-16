@@ -32,10 +32,12 @@ export function formatDateTime(date: string | Date, locale?: string): string {
 }
 
 export function formatCurrency(amount: number, currency = 'USD'): string {
+  if (!Number.isFinite(amount)) return '—';
   return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
 }
 
 export function formatNumber(n: number): string {
+  if (!Number.isFinite(n)) return '—';
   return new Intl.NumberFormat('en-US').format(n);
 }
 
