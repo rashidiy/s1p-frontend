@@ -9,7 +9,13 @@ const nextConfig = {
   output: 'standalone',
 
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/media/**',
+      },
+    ],
   },
 
   // Custom headers for subdomain support
