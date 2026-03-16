@@ -89,6 +89,7 @@ export default function NewDealPage() {
         description: description || null,
         assigned_to: assignedTo || null,
       });
+      message.success(t('dealCreated'));
       router.push(`/deals/${result.id}`);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateDeal')));

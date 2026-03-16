@@ -29,6 +29,7 @@ export default function DealDetailPage() {
   const [editing, setEditing] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [reasonInput, setReasonInput] = useState('');
+  const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
@@ -73,6 +74,7 @@ export default function DealDetailPage() {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     try {
       await apiClient.updateDeal(dealId, {
         title: editForm.title || null,
@@ -81,11 +83,14 @@ export default function DealDetailPage() {
         probability: editForm.probability ? parseFloat(editForm.probability) : null,
         expected_close_date: editForm.expected_close_date || null,
       });
+      message.success(t('dealUpdated'));
       setEditing(false);
       loadDeal();
     } catch (error) {
       console.error('Failed to update deal:', error);
       message.error(tErrors('failedToUpdateDeal'));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -114,6 +119,7 @@ export default function DealDetailPage() {
         const reason = input?.value || undefined;
         try {
           await apiClient.markDealWon(dealId, reason);
+          message.success(t('dealMarkedWon'));
           loadDeal();
         } catch (error) {
           console.error('Failed to mark deal as won:', error);
@@ -148,6 +154,7 @@ export default function DealDetailPage() {
         const reason = input?.value || undefined;
         try {
           await apiClient.markDealLost(dealId, reason);
+          message.success(t('dealMarkedLost'));
           loadDeal();
         } catch (error) {
           console.error('Failed to mark deal as lost:', error);
@@ -165,6 +172,7 @@ export default function DealDetailPage() {
         entity_type: 'deal',
         entity_id: dealId,
       });
+      message.success(t('noteAdded'));
       setNewNote('');
       loadNotes();
     } catch (error) {
@@ -183,6 +191,7 @@ export default function DealDetailPage() {
       onOk: async () => {
         try {
           await apiClient.deleteDeal(dealId);
+          message.success(t('dealDeleted'));
           router.push('/deals');
         } catch (error) {
           console.error('Failed to delete deal:', error);
@@ -317,7 +326,7 @@ export default function DealDetailPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>{tActions('save')}</Button>
                     <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>

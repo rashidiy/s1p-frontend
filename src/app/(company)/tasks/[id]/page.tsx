@@ -97,6 +97,7 @@ export default function TaskDetailPage() {
         assigned_to: editForm.assigned_to || null,
         priority: editForm.priority || null,
       } as any);
+      message.success(t('taskUpdated'));
       setEditing(false);
       loadTask();
     } catch (err: unknown) {
@@ -110,6 +111,7 @@ export default function TaskDetailPage() {
     setCompleting(true);
     try {
       await apiClient.completeTask(id);
+      message.success(t('taskUpdated'));
       loadTask();
     } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToUpdateTask')));
@@ -129,6 +131,7 @@ export default function TaskDetailPage() {
         setDeleting(true);
         try {
           await apiClient.deleteTask(id);
+          message.success(t('taskDeleted'));
           router.push('/tasks');
         } catch (err: unknown) {
           setError(getErrorMessage(err, tErrors('failedToDeleteTask')));

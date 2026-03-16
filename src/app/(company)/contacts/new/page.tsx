@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select } from 'antd';
+import { Alert, Button, Input, Select, message } from 'antd';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
@@ -45,6 +45,7 @@ export default function NewContactPage() {
         source: source || null,
         tags,
       });
+      message.success(t('contactCreated'));
       router.push(`/contacts/${result.id}`);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateContact')));

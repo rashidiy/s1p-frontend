@@ -28,6 +28,7 @@ export default function LeadDetailPage() {
   const [editing, setEditing] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [converting, setConverting] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
@@ -70,6 +71,7 @@ export default function LeadDetailPage() {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     try {
       await apiClient.updateLead(leadId, {
         title: editForm.title || null,
@@ -77,11 +79,14 @@ export default function LeadDetailPage() {
         estimated_value: editForm.estimated_value ? parseFloat(editForm.estimated_value) : null,
         source: editForm.source || null,
       });
+      message.success(t('leadUpdated'));
       setEditing(false);
       loadLead();
     } catch (error) {
       console.error('Failed to update lead:', error);
       message.error(tErrors('failedToUpdateLead'));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -95,6 +100,7 @@ export default function LeadDetailPage() {
         setConverting(true);
         try {
           await apiClient.convertLead(leadId, true);
+          message.success(t('leadConverted'));
           loadLead();
         } catch (error) {
           console.error('Failed to convert lead:', error);
@@ -114,6 +120,7 @@ export default function LeadDetailPage() {
         entity_type: 'lead',
         entity_id: leadId,
       });
+      message.success(t('noteAdded'));
       setNewNote('');
       loadNotes();
     } catch (error) {
@@ -132,6 +139,7 @@ export default function LeadDetailPage() {
       onOk: async () => {
         try {
           await apiClient.deleteLead(leadId);
+          message.success(t('leadDeleted'));
           router.push('/leads');
         } catch (error) {
           console.error('Failed to delete lead:', error);
@@ -230,7 +238,7 @@ export default function LeadDetailPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>{tActions('save')}</Button>
                     <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>

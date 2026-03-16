@@ -71,6 +71,7 @@ export default function NewLeadPage() {
         currency,
         assigned_to: assignedTo || null,
       });
+      message.success(t('leadCreated'));
       router.push(`/leads/${result.id}`);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateLead')));

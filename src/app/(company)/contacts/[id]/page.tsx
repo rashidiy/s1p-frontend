@@ -39,6 +39,7 @@ export default function ContactDetailPage() {
   const [callModalVisible, setCallModalVisible] = useState(false);
   const [callPhone, setCallPhone] = useState('');
   const [calling, setCalling] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     first_name: '',
     last_name: '',
@@ -116,6 +117,7 @@ export default function ContactDetailPage() {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     try {
       await apiClient.updateContact(contactId, {
         first_name: editForm.first_name || null,
@@ -126,11 +128,14 @@ export default function ContactDetailPage() {
         position: editForm.position || null,
         source: editForm.source || null,
       });
+      message.success(t('contactUpdated'));
       setEditing(false);
       loadContact();
     } catch (error) {
       console.error('Failed to update contact:', error);
       message.error(tErrors('failedToUpdateContact'));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -142,6 +147,7 @@ export default function ContactDetailPage() {
         entity_type: 'contact',
         entity_id: contactId,
       });
+      message.success(t('noteAdded'));
       setNewNote('');
       loadNotes();
     } catch (error) {
@@ -160,6 +166,7 @@ export default function ContactDetailPage() {
       onOk: async () => {
         try {
           await apiClient.deleteContact(contactId);
+          message.success(t('contactDeleted'));
           router.push('/contacts');
         } catch (error) {
           console.error('Failed to delete contact:', error);
@@ -267,7 +274,7 @@ export default function ContactDetailPage() {
                     <Input value={editForm.source} onChange={(e) => setEditForm({ ...editForm, source: e.target.value })} size="large" />
                   </div>
                   <div className="col-span-1 sm:col-span-2 flex flex-wrap gap-2 pt-3 border-t border-gray-100">
-                    <Button type="primary" onClick={handleSave} icon={<SaveOutlined />}>{tActions('save')}</Button>
+                    <Button type="primary" onClick={handleSave} loading={saving} icon={<SaveOutlined />}>{tActions('save')}</Button>
                     <Button type="default" onClick={() => setEditing(false)} icon={<CloseOutlined />}>{tActions('cancel')}</Button>
                   </div>
                 </div>

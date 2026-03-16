@@ -62,6 +62,7 @@ export default function NewTaskPage() {
         entity_id: entity_id || null,
         assigned_to: assignedTo || null,
       });
+      message.success(t('taskCreated'));
       router.push(`/tasks/${result.id}`);
     } catch (err) {
       setError(getErrorMessage(err, tErrors('failedToCreateTask')));
