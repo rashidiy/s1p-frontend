@@ -923,7 +923,10 @@
     "getStartedDescription": "CRM platformasini boshqarish uchun birinchi kompaniyani yarating",
     "noMatchesFound": "Mos natijalar topilmadi",
     "companyCreated": "Kompaniya muvaffaqiyatli yaratildi",
-    "companyUpdated": "Kompaniya muvaffaqiyatli yangilandi"
+    "companyUpdated": "Kompaniya muvaffaqiyatli yangilandi",
+    "companyActivated": "Kompaniya muvaffaqiyatli faollashtirildi",
+    "companyDeactivated": "Kompaniya muvaffaqiyatli o'chirildi",
+    "usersCount": "Foydalanuvchilar"
   },
   "language": {
     "label": "Til",
@@ -977,7 +980,9 @@
     "storageGb": "Xotira (GB)",
     "createContract": "Shartnoma yaratish",
     "configureContract": "Kompaniya uchun shartnomani sozlang",
-    "contractCreated": "Shartnoma muvaffaqiyatli yaratildi"
+    "contractCreated": "Shartnoma muvaffaqiyatli yaratildi",
+    "contractRenewed": "Shartnoma muvaffaqiyatli yangilandi",
+    "contractCancelled": "Shartnoma muvaffaqiyatli bekor qilindi"
   },
   "landing": {
     "nav": {

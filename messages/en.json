@@ -923,7 +923,10 @@
     "getStartedDescription": "Create your first company to start managing your CRM platform",
     "noMatchesFound": "No matches found",
     "companyCreated": "Company created successfully",
-    "companyUpdated": "Company updated successfully"
+    "companyUpdated": "Company updated successfully",
+    "companyActivated": "Company activated successfully",
+    "companyDeactivated": "Company deactivated successfully",
+    "usersCount": "Users"
   },
   "language": {
     "label": "Language",
@@ -977,7 +980,9 @@
     "storageGb": "Storage (GB)",
     "createContract": "Create Contract",
     "configureContract": "Configure the billing contract for a company",
-    "contractCreated": "Contract created successfully"
+    "contractCreated": "Contract created successfully",
+    "contractRenewed": "Contract renewed successfully",
+    "contractCancelled": "Contract cancelled successfully"
   },
   "landing": {
     "nav": {

@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { getSubdomainUrl } from '@/lib/subdomain';
+import { ErrorCharacter } from '@/components/illustrations';
 import type { CompanyDetailResponse, InviteAdminResponse } from '@/types/api';
 
 export default function CompanyDetailPage() {
@@ -23,6 +24,7 @@ export default function CompanyDetailPage() {
 
   const [company, setCompany] = useState<CompanyDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: '' });
 
@@ -44,12 +46,14 @@ export default function CompanyDetailPage() {
   }, [companyId]);
 
   const loadCompany = async () => {
+    setError(false);
     try {
       const data = await apiClient.getCompanyDetail(companyId);
       setCompany(data);
       setEditForm({ name: data.name });
-    } catch (error) {
-      console.error('Failed to load company:', error);
+    } catch (err) {
+      console.error('Failed to load company:', err);
+      setError(true);
       message.error(tErrors('failedToLoadCompanies'));
     } finally {
       setLoading(false);
@@ -59,10 +63,11 @@ export default function CompanyDetailPage() {
   const handleSave = async () => {
     try {
       await apiClient.updateCompany(companyId, { name: editForm.name });
+      message.success(t('companyUpdated'));
       setEditing(false);
       loadCompany();
-    } catch (error) {
-      console.error('Failed to update company:', error);
+    } catch (err) {
+      console.error('Failed to update company:', err);
       message.error(tErrors('failedToUpdateCompany'));
     }
   };
@@ -72,12 +77,14 @@ export default function CompanyDetailPage() {
     try {
       if (company.is_active) {
         await apiClient.deactivateCompany(companyId);
+        message.success(t('companyDeactivated'));
       } else {
         await apiClient.activateCompany(companyId);
+        message.success(t('companyActivated'));
       }
       loadCompany();
-    } catch (error) {
-      console.error('Failed to toggle company status:', error);
+    } catch (err) {
+      console.error('Failed to toggle company status:', err);
       message.error(tErrors('failedToToggleCompanyStatus'));
     }
   };
@@ -162,7 +169,21 @@ export default function CompanyDetailPage() {
       </div>
     </div>
   );
-  if (!company) return <div className="p-6">{t('companyNotFound')}</div>;
+  if (error || !company) return (
+    <div className="glass-card py-16 flex flex-col items-center justify-center">
+      <ErrorCharacter height={115} />
+      <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('companyNotFound')}</h3>
+      <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+      <div className="flex gap-2 mt-4">
+        <Button type="primary" onClick={() => { setError(false); setLoading(true); loadCompany(); }}>
+          {tActions('tryAgain')}
+        </Button>
+        <Button onClick={() => router.push('/owner/companies')}>
+          {tActions('back')}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -311,6 +332,7 @@ export default function CompanyDetailPage() {
                   { label: tFields('name'), value: company.name },
                   { label: t('subdomain'), value: company.subdomain || '-' },
                   { label: tFields('provider'), value: company.provider_type?.toUpperCase() },
+                  { label: t('usersCount'), value: company.users_count ?? 0 },
                   { label: tFields('created'), value: new Date(company.created_at).toLocaleDateString() },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">

@@ -923,7 +923,10 @@
     "getStartedDescription": "Создайте первую компанию для начала работы с CRM-платформой",
     "noMatchesFound": "Совпадений не найдено",
     "companyCreated": "Компания успешно создана",
-    "companyUpdated": "Компания успешно обновлена"
+    "companyUpdated": "Компания успешно обновлена",
+    "companyActivated": "Компания успешно активирована",
+    "companyDeactivated": "Компания успешно деактивирована",
+    "usersCount": "Пользователи"
   },
   "language": {
     "label": "Язык",
@@ -977,7 +980,9 @@
     "storageGb": "Хранилище (ГБ)",
     "createContract": "Создать договор",
     "configureContract": "Настройте договор для компании",
-    "contractCreated": "Договор успешно создан"
+    "contractCreated": "Договор успешно создан",
+    "contractRenewed": "Договор успешно продлён",
+    "contractCancelled": "Договор успешно отменён"
   },
   "landing": {
     "nav": {

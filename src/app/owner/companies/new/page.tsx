@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select } from 'antd';
+import { Alert, Button, Input, Select, message } from 'antd';
 import Link from 'next/link';
 
 export default function NewCompanyPage() {
@@ -39,6 +39,7 @@ export default function NewCompanyPage() {
         provider_type: providerType,
         provider_config: config,
       });
+      message.success(t('companyCreated'));
       router.push('/owner/companies');
     } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToCreateCompany')));

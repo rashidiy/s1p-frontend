@@ -7,6 +7,7 @@ import { Button, Input, Tag, message, Modal } from 'antd';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
+import { ErrorCharacter } from '@/components/illustrations';
 import type { ContractDetailResponse } from '@/types/api';
 
 export default function ContractDetailPage() {
@@ -21,6 +22,7 @@ export default function ContractDetailPage() {
 
   const [contract, setContract] = useState<ContractDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showRenew, setShowRenew] = useState(false);
   const [renewDate, setRenewDate] = useState('');
   const [renewAmount, setRenewAmount] = useState('');
@@ -32,11 +34,13 @@ export default function ContractDetailPage() {
   }, [contractId]);
 
   const loadContract = async () => {
+    setError(false);
     try {
       const data = await apiClient.getContract(contractId);
       setContract(data);
-    } catch (error) {
-      console.error('Failed to load contract:', error);
+    } catch (err) {
+      console.error('Failed to load contract:', err);
+      setError(true);
       message.error(tErrors('failedToLoadContract'));
     } finally {
       setLoading(false);
@@ -51,10 +55,11 @@ export default function ContractDetailPage() {
         new_end_date: renewDate,
         price: renewAmount ? parseFloat(renewAmount) : undefined,
       });
+      message.success(t('contractRenewed'));
       setShowRenew(false);
       loadContract();
-    } catch (error) {
-      console.error('Failed to renew contract:', error);
+    } catch (err) {
+      console.error('Failed to renew contract:', err);
       message.error(tErrors('failedToRenewContract'));
     } finally {
       setProcessing(false);
@@ -71,9 +76,10 @@ export default function ContractDetailPage() {
         setProcessing(true);
         try {
           await apiClient.cancelContract(contractId);
+          message.success(t('contractCancelled'));
           loadContract();
-        } catch (error) {
-          console.error('Failed to cancel contract:', error);
+        } catch (err) {
+          console.error('Failed to cancel contract:', err);
           message.error(tErrors('failedToCancelContract'));
         } finally {
           setProcessing(false);
@@ -112,7 +118,21 @@ export default function ContractDetailPage() {
       </div>
     </div>
   );
-  if (!contract) return <div className="p-6">{t('contractNotFound')}</div>;
+  if (error || !contract) return (
+    <div className="glass-card py-16 flex flex-col items-center justify-center">
+      <ErrorCharacter height={115} />
+      <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('contractNotFound')}</h3>
+      <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+      <div className="flex gap-2 mt-4">
+        <Button type="primary" onClick={() => { setError(false); setLoading(true); loadContract(); }}>
+          {tActions('tryAgain')}
+        </Button>
+        <Button onClick={() => router.push('/owner/contracts')}>
+          {tActions('back')}
+        </Button>
+      </div>
+    </div>
+  );
 
   const statusColor = CONTRACT_STATUS_COLORS[contract.status] || 'bg-gray-100 text-gray-800';
   const paymentColor = PAYMENT_STATUS_COLORS[contract.payment_status] || 'bg-gray-100 text-gray-800';
