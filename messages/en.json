@@ -560,7 +560,11 @@
     "dealMarkedWon": "Deal marked as won",
     "dealMarkedLost": "Deal marked as lost",
     "noteAdded": "Note added successfully",
-    "writeNote": "Write a note..."
+    "writeNote": "Write a note...",
+    "pipelineView": "Pipeline",
+    "listView": "List",
+    "noDealsInStage": "No deals in this stage",
+    "failedToLoadPipeline": "Failed to load pipeline"
   },
   "tasks": {
     "title": "Tasks",

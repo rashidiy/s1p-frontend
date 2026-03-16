@@ -730,3 +730,96 @@
 .ant-drawer-mask {
   backdrop-filter: blur(2px);
 }
+
+/* ========================================
+   PIPELINE / KANBAN BOARD
+   ======================================== */
+
+.pipeline-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  min-height: 400px;
+}
+
+.pipeline-board::-webkit-scrollbar {
+  height: 6px;
+}
+
+.pipeline-board::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pipeline-board::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+
+.pipeline-column {
+  min-width: 280px;
+  max-width: 320px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pipeline-column-header {
+  padding: 12px 14px;
+  border-top: 3px solid;
+  background: var(--surface);
+  border-radius: 12px 12px 0 0;
+  border-left: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pipeline-column-body {
+  flex: 1;
+  padding: 8px;
+  background: var(--surface-secondary);
+  border-radius: 0 0 12px 12px;
+  border-left: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pipeline-count-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 100px;
+}
+
+.pipeline-deal-card {
+  display: block;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.pipeline-deal-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .pipeline-deal-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Mobile: stack columns vertically */
+@media (max-width: 767px) {
+  .pipeline-board {
+    flex-direction: column;
+  }
+
+  .pipeline-column {
+    min-width: unset;
+    max-width: unset;
+  }
+}

@@ -560,7 +560,11 @@
     "dealMarkedWon": "Сделка отмечена как выигранная",
     "dealMarkedLost": "Сделка отмечена как проигранная",
     "noteAdded": "Заметка успешно добавлена",
-    "writeNote": "Написать заметку..."
+    "writeNote": "Написать заметку...",
+    "pipelineView": "Воронка",
+    "listView": "Список",
+    "noDealsInStage": "Нет сделок на этом этапе",
+    "failedToLoadPipeline": "Не удалось загрузить воронку"
   },
   "tasks": {
     "title": "Задачи",

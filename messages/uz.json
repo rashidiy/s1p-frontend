@@ -560,7 +560,11 @@
     "dealMarkedWon": "Bitim yutilgan deb belgilandi",
     "dealMarkedLost": "Bitim yo'qotilgan deb belgilandi",
     "noteAdded": "Eslatma muvaffaqiyatli qo'shildi",
-    "writeNote": "Eslatma yozing..."
+    "writeNote": "Eslatma yozing...",
+    "pipelineView": "Quvur",
+    "listView": "Ro'yxat",
+    "noDealsInStage": "Bu bosqichda bitimlar yo'q",
+    "failedToLoadPipeline": "Quvurni yuklashda xatolik"
   },
   "tasks": {
     "title": "Vazifalar",
