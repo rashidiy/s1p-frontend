@@ -315,7 +315,9 @@
     "allStatuses": "All Statuses",
     "all": "All",
     "crmPlatform": "CRM Platform",
-    "customerRelationshipManagement": "Customer Relationship Management"
+    "customerRelationshipManagement": "Customer Relationship Management",
+    "cardView": "Cards",
+    "tableView": "Table"
   },
   "errors": {
     "sessionExpired": "Session expired",

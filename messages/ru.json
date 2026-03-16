@@ -315,7 +315,9 @@
     "allStatuses": "Все статусы",
     "all": "Все",
     "crmPlatform": "CRM Платформа",
-    "customerRelationshipManagement": "Управление взаимоотношениями с клиентами"
+    "customerRelationshipManagement": "Управление взаимоотношениями с клиентами",
+    "cardView": "Карточки",
+    "tableView": "Таблица"
   },
   "errors": {
     "sessionExpired": "Сессия истекла",
