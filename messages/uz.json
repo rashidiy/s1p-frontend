@@ -912,7 +912,7 @@
     "inviteTokenOnceWarning": "Bu taklif tokeni faqat bir marta ko'rsatiladi. Xabarni hozir nusxalang.",
     "providerConfiguration": "Provayder sozlamalari",
     "noProviderConfiguration": "Provayder sozlamalari yo'q",
-    "webhook": "Webhook",
+    "webhook": "Vebhuk",
     "url": "URL",
     "token": "Token",
     "cabinetId": "Kabinet ID",
@@ -1029,7 +1029,7 @@
     "features": {
       "title": "Qo'ng'iroqlarni boshqarish uchun kerakli hamma narsa",
       "subtitle": "Har bir qo'ng'iroqni nazorat qilish va sotuvni oshirish vositalari",
-      "telegramBot": "Telegram Bot",
+      "telegramBot": "Telegram bot",
       "telegramBotDesc": "Qo'ng'iroqlar haqida tezkor bildirishnomalar to'g'ridan-to'g'ri Telegramda. Lidlarni tayinlang, qayta ishlanganini belgilang, qayta qo'ng'iroqni boshlang — hammasini messenjerdan chiqmasdan.",
       "crm": "Qo'ng'iroqlar uchun CRM",
       "crmDesc": "Kontaktlar, lidlar, bitimlar, vazifalar. Sozlanadigan bosqichlar bilan sotuv voronkasi.",
