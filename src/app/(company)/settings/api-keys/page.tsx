@@ -24,6 +24,7 @@ export default function ApiKeysPage() {
 
   useEffect(() => {
     loadKeys();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadKeys = async () => {

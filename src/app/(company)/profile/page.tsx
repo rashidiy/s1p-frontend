@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Alert, Button, Input, message as antMessage } from 'antd';
 import type { UserResponse } from '@/types/api';
@@ -41,6 +42,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     loadProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadProfile = async () => {
@@ -83,8 +85,8 @@ export default function ProfilePage() {
           setUser(userData, 'company_user');
         }
       }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToUpdateProfile'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateProfile')));
     } finally {
       setSaving(false);
     }
@@ -113,8 +115,8 @@ export default function ProfilePage() {
       });
       setPasswordMessage(tErrors('passwordChanged'));
       setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
-    } catch (err: any) {
-      setPasswordError(err.response?.data?.detail || tErrors('failedToChangePassword'));
+    } catch (err: unknown) {
+      setPasswordError(getErrorMessage(err, tErrors('failedToChangePassword')));
     } finally {
       setChangingPassword(false);
     }

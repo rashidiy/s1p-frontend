@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, Select } from 'antd';
 import Link from 'next/link';
@@ -45,8 +46,8 @@ export default function NewContactPage() {
         tags,
       });
       router.push(`/contacts/${result.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToCreateContact'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToCreateContact')));
     } finally {
       setIsLoading(false);
     }

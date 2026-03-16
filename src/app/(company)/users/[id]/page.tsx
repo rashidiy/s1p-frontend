@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { Alert, Button, Input, Modal, Select, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
@@ -63,6 +64,7 @@ export default function UserDetailPage() {
 
   useEffect(() => {
     loadUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [userId]);
 
   const loadUser = async () => {
@@ -98,8 +100,8 @@ export default function UserDetailPage() {
       setSuccessMsg(t('userUpdated'));
       setEditing(false);
       loadUser();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToUpdateUser'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateUser')));
     } finally {
       setSaving(false);
     }
@@ -122,8 +124,8 @@ export default function UserDetailPage() {
           }
           setSuccessMsg(t('userStatusUpdated'));
           loadUser();
-        } catch (err: any) {
-          setError(err.response?.data?.detail || tErrors('failedToUpdateUserStatus'));
+        } catch (err: unknown) {
+          setError(getErrorMessage(err, tErrors('failedToUpdateUserStatus')));
         }
       },
     });

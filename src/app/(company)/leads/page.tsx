@@ -36,6 +36,7 @@ export default function LeadsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadLeads(); }, [page, search, status]);
 
   const loadLeads = async () => {

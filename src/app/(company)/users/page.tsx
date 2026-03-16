@@ -51,6 +51,7 @@ export default function UsersPage() {
       setData(result);
     } catch (error) { console.error('Failed to load users:', error); message.error(tErrors('failedToLoadUsers')); }
     finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- tErrors is a stable reference from next-intl
   }, [page, search]);
 
   const loadInviteTokens = useCallback(async () => {
@@ -89,7 +90,7 @@ export default function UsersPage() {
           await apiClient.revokeInviteToken(tokenId);
           message.success(t('telegramTokenRevoked'));
           loadInviteTokens();
-        } catch (err: any) {
+        } catch (err: unknown) {
           message.error(t('telegramRevokeFailed'));
         }
       },
@@ -164,7 +165,7 @@ export default function UsersPage() {
     {
       title: '',
       key: 'actions',
-      render: (_: any, record: InviteTokenListItem) => (
+      render: (_: unknown, record: InviteTokenListItem) => (
         record.status === 'pending' && (
           <Button
             danger

@@ -37,6 +37,7 @@ export default function ContactsPage() {
 
   useEffect(() => {
     loadContacts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   }, [page, search]);
 
   const loadContacts = async () => {

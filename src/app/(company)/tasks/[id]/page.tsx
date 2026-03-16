@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, CheckOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, Modal, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -52,6 +53,7 @@ export default function TaskDetailPage() {
   useEffect(() => {
     loadTask();
     loadUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [id]);
 
   const loadTask = async () => {
@@ -97,8 +99,8 @@ export default function TaskDetailPage() {
       } as any);
       setEditing(false);
       loadTask();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToUpdateTask'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateTask')));
     } finally {
       setSaving(false);
     }
@@ -109,8 +111,8 @@ export default function TaskDetailPage() {
     try {
       await apiClient.completeTask(id);
       loadTask();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || tErrors('failedToUpdateTask'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateTask')));
     } finally {
       setCompleting(false);
     }
@@ -128,8 +130,8 @@ export default function TaskDetailPage() {
         try {
           await apiClient.deleteTask(id);
           router.push('/tasks');
-        } catch (err: any) {
-          setError(err.response?.data?.detail || tErrors('failedToDeleteTask'));
+        } catch (err: unknown) {
+          setError(getErrorMessage(err, tErrors('failedToDeleteTask')));
           setDeleting(false);
         }
       },

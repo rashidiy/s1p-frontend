@@ -60,6 +60,7 @@ export default function WebhooksPage() {
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadData = async () => {

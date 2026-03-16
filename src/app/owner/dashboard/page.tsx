@@ -24,6 +24,7 @@ export default function OwnerDashboardPage() {
 
   useEffect(() => {
     loadDashboard();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadDashboard = async () => {

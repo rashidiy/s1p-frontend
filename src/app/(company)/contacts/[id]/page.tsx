@@ -10,6 +10,13 @@ import type { ContactResponse, NoteResponse } from '@/types/api';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
+interface ActivityTimelineItem {
+  type: string;
+  description?: string;
+  created_at: string;
+  timestamp?: string;
+}
+
 export default function ContactDetailPage() {
   const t = useTranslations('contacts');
   const tFields = useTranslations('fields');
@@ -25,7 +32,7 @@ export default function ContactDetailPage() {
 
   const [contact, setContact] = useState<ContactResponse | null>(null);
   const [notes, setNotes] = useState<NoteResponse[]>([]);
-  const [activity, setActivity] = useState<any[]>([]);
+  const [activity, setActivity] = useState<ActivityTimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [newNote, setNewNote] = useState('');
@@ -46,6 +53,7 @@ export default function ContactDetailPage() {
     loadContact();
     loadNotes();
     loadActivity();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [contactId]);
 
   const loadContact = async () => {
@@ -83,7 +91,7 @@ export default function ContactDetailPage() {
     try {
       const data = await apiClient.getContactActivity(contactId);
       // Backend returns {contact_id, leads: [...], deals: [...], calls: [...]} — flatten into timeline
-      const timeline: any[] = [];
+      const timeline: ActivityTimelineItem[] = [];
       if (data?.leads) {
         for (const lead of data.leads) {
           timeline.push({ type: 'lead', description: `Lead: ${lead.title} (${lead.status || 'new'})`, created_at: lead.created_at });
@@ -374,13 +382,13 @@ export default function ContactDetailPage() {
             <div className="p-6 pt-0">
               {activity.length > 0 ? (
                 <div className="space-y-3">
-                  {activity.map((item: any, idx: number) => (
+                  {activity.map((item: ActivityTimelineItem, idx: number) => (
                     <div key={idx} className="flex items-start gap-3 text-sm">
                       <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                       <div>
                         <p>{item.description || item.type}</p>
                         <p className="text-xs text-gray-500">
-                          {new Date(item.created_at || item.timestamp).toLocaleString()}
+                          {new Date(item.created_at || item.timestamp || '').toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -411,7 +419,7 @@ export default function ContactDetailPage() {
               try {
                 await apiClient.makeCall({ phone_1: callPhone, phone_2: callPhone });
                 setCallModalVisible(false);
-              } catch (err: any) {
+              } catch (err: unknown) {
                 console.error(err);
                 message.error(tErrors('failedToMakeCall'));
               } finally {

@@ -40,7 +40,7 @@ export default function OwnerLoginPage() {
 
       setUser(response, 'owner');
       router.push('/owner/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, t('enterCredentials')));
     } finally {
       setIsLoading(false);

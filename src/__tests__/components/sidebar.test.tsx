@@ -32,12 +32,12 @@ vi.mock('@/store/theme', () => ({
 
 // Mock antd components
 vi.mock('antd', () => {
-  const Layout = { Sider: ({ children, ...props }: any) => <div data-testid="sider" {...props}>{children}</div> };
+  const Layout = { Sider: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div data-testid="sider" {...props}>{children}</div> };
   return {
     Layout,
-    Menu: ({ items, ...props }: any) => (
+    Menu: ({ items, ...props }: { items?: Array<{ key: string; label: string; icon?: React.ReactNode }>; [key: string]: unknown }) => (
       <ul data-testid="nav-menu">
-        {items?.map((item: any) => (
+        {items?.map((item: { key: string; label: string; icon?: React.ReactNode }) => (
           <li key={item.key} data-testid={`nav-item-${item.key}`}>
             {item.icon}
             <span>{item.label}</span>
@@ -45,12 +45,12 @@ vi.mock('antd', () => {
         ))}
       </ul>
     ),
-    Avatar: ({ children, ...props }: any) => <div data-testid="avatar" {...props}>{children}</div>,
-    Popover: ({ children }: any) => <div>{children}</div>,
-    Drawer: ({ children }: any) => <div>{children}</div>,
-    Segmented: ({ options, value, onChange, ...props }: any) => (
+    Avatar: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div data-testid="avatar" {...props}>{children}</div>,
+    Popover: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+    Drawer: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+    Segmented: ({ options, value, onChange, ...props }: { options?: Array<{ value: string; label: string; icon?: React.ReactNode }>; value?: string; onChange?: (val: string) => void; [key: string]: unknown }) => (
       <div data-testid="segmented" {...props}>
-        {options?.map((opt: any) => (
+        {options?.map((opt: { value: string; label: string; icon?: React.ReactNode }) => (
           <button key={typeof opt === 'string' ? opt : opt.value} data-value={typeof opt === 'string' ? opt : opt.value}>
             {typeof opt === 'string' ? opt : opt.label || opt.icon}
           </button>

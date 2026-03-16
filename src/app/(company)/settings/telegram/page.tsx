@@ -72,6 +72,7 @@ export default function TelegramSettingsPage() {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const fetchConfig = async () => {
@@ -87,9 +88,9 @@ export default function TelegramSettingsPage() {
       if (data.setup_status === 'creating') {
         startPolling();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // 404 = not configured yet — not an error
-      if (err?.response?.status === 404) {
+      if ((err as { response?: { status?: number } })?.response?.status === 404) {
         setConfig(null);
       } else {
         setError(getErrorMessage(err, tErrors('failedToLoadTelegramConfig')));
@@ -125,6 +126,7 @@ export default function TelegramSettingsPage() {
         // Ignore poll errors
       }
     }, 3000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchConfig is intentionally excluded to avoid circular dependency
   }, [t]);
 
   const handleToggleChange = (key: keyof UpdateTelegramConfig, value: boolean) => {
@@ -164,9 +166,9 @@ export default function TelegramSettingsPage() {
         language: setupLanguage,
       });
       startPolling();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSettingUp(false);
-      if (err?.response?.status === 503) {
+      if ((err as { response?: { status?: number } })?.response?.status === 503) {
         // Pyrogram not available — fall back to manual
         setSetupMode('manual');
         toast.error(t('setupManualDesc'));

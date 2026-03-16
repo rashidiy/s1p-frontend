@@ -38,6 +38,7 @@ export default function LeadDetailPage() {
   useEffect(() => {
     loadLead();
     loadNotes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [leadId]);
 
   const loadLead = async () => {

@@ -44,7 +44,7 @@ export default function InviteTelegramPage() {
         role,
       });
       setTokenResult(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getErrorMessage(err, tErrors('failedToInviteUser')));
     } finally {
       setIsLoading(false);

@@ -35,6 +35,7 @@ export default function DealsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadDeals(); }, [page, search, stage]);
 
   const loadDeals = async () => {

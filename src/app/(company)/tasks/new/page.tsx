@@ -30,6 +30,7 @@ export default function NewTaskPage() {
 
   useEffect(() => {
     loadUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
 
   const loadUsers = async () => {

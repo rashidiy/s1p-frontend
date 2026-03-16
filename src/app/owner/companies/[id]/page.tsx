@@ -6,6 +6,7 @@ import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAdd
 import { Alert, Button, Input, Tag, message } from 'antd';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import { getSubdomainUrl } from '@/lib/subdomain';
 import type { CompanyDetailResponse, InviteAdminResponse } from '@/types/api';
 
@@ -39,6 +40,7 @@ export default function CompanyDetailPage() {
 
   useEffect(() => {
     loadCompany();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [companyId]);
 
   const loadCompany = async () => {
@@ -92,8 +94,8 @@ export default function CompanyDetailPage() {
       });
       setInviteResult(result);
       setInviteForm({ first_name: '', last_name: '', phone: '' });
-    } catch (error: any) {
-      setInviteMessage(error.response?.data?.detail || tErrors('failedToInviteAdmin'));
+    } catch (error: unknown) {
+      setInviteMessage(getErrorMessage(error, tErrors('failedToInviteAdmin')));
     } finally {
       setInviting(false);
     }

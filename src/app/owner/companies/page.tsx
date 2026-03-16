@@ -5,6 +5,7 @@ import { Input, Button, Tag, message } from 'antd';
 import { BankOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined, ExportOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
+import { getErrorMessage } from '@/lib/utils';
 import type { CompanyResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ export default function CompaniesPage() {
   const tCommon = useTranslations('common');
   const tEntities = useTranslations('entities');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   useEffect(() => { loadCompanies(); }, []);
 
   const loadCompanies = async () => {
@@ -44,8 +46,8 @@ export default function CompaniesPage() {
     try {
       const { url } = await apiClient.impersonateCompany(companyId);
       window.open(url, '_blank');
-    } catch (error: any) {
-      message.error(error.response?.data?.detail || tErrors('failedToAccessCompany'));
+    } catch (error: unknown) {
+      message.error(getErrorMessage(error, tErrors('failedToAccessCompany')));
     }
   };
 
