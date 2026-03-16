@@ -102,7 +102,7 @@ export default function NewLeadPage() {
         <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
+              <Alert type="error" title={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
 
             <div className="space-y-1.5">

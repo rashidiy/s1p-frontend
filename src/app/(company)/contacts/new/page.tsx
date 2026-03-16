@@ -76,7 +76,7 @@ export default function NewContactPage() {
         <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
+              <Alert type="error" title={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -61,7 +61,7 @@ vi.mock('antd', () => ({
       ),
     }
   ),
-  Alert: ({ message: msg, type, ...props }: any) => (
+  Alert: ({ title: msg, message: msg2, type, ...props }: any) => (
     <div data-testid="alert" role="alert" data-type={type}>{msg}</div>
   ),
   ConfigProvider: ({ children }: any) => <div>{children}</div>,

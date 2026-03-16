@@ -170,10 +170,10 @@ export default function OwnerProfilePage() {
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleSaveProfile} className="space-y-5">
             {message && (
-              <Alert type="success" message={message} showIcon className="!rounded-xl" closable onClose={() => setMessage('')} />
+              <Alert type="success" title={message} showIcon className="!rounded-xl" closable onClose={() => setMessage('')} />
             )}
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
+              <Alert type="error" title={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -224,10 +224,10 @@ export default function OwnerProfilePage() {
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
           <form onSubmit={handleChangePassword} className="space-y-5">
             {passwordMessage && (
-              <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" closable onClose={() => setPasswordMessage('')} />
+              <Alert type="success" title={passwordMessage} showIcon className="!rounded-xl" closable onClose={() => setPasswordMessage('')} />
             )}
             {passwordError && (
-              <Alert type="error" message={passwordError} showIcon className="!rounded-xl" closable onClose={() => setPasswordError('')} />
+              <Alert type="error" title={passwordError} showIcon className="!rounded-xl" closable onClose={() => setPasswordError('')} />
             )}
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">{tFields('currentPassword')}</label>

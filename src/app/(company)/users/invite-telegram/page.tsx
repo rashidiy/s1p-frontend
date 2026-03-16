@@ -210,7 +210,7 @@ export default function InviteTelegramPage() {
         <div className="p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" />
+              <Alert type="error" title={error} showIcon className="!rounded-xl" />
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

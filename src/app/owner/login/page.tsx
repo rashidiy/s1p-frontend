@@ -52,7 +52,7 @@ export default function OwnerLoginPage() {
   return (
     <AuthLayout title={t('ownerLogin')} subtitle={t('platformAdminPortal')} icon={<SafetyOutlined style={{ fontSize: 28 }} />}>
       <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
+        {error && <Alert type="error" title={error} showIcon className="!rounded-xl" />}
         <div className="space-y-1.5">
           <label htmlFor="email" className="text-sm font-medium text-gray-700">{t('email')}</label>
           <Input

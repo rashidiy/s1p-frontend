@@ -21,7 +21,7 @@ vi.mock('antd', () => ({
   Button: ({ children, onClick, ...props }: any) => (
     <button onClick={onClick} {...props}>{children}</button>
   ),
-  Alert: ({ message: msg, description, ...props }: any) => (
+  Alert: ({ title: msg, message: msg2, description, ...props }: any) => (
     <div role="alert" {...props}>{msg} {description}</div>
   ),
   Spin: () => <div data-testid="spinner">Loading...</div>,

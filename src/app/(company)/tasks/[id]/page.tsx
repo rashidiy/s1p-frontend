@@ -194,7 +194,7 @@ export default function TaskDetailPage() {
   return (
     <div className="space-y-6">
       {error && (
-        <Alert type="error" message={error} showIcon closable onClose={() => setError('')} className="!rounded-xl" />
+        <Alert type="error" title={error} showIcon closable onClose={() => setError('')} className="!rounded-xl" />
       )}
 
       <div className="page-header">

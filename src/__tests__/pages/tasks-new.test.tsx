@@ -61,7 +61,7 @@ vi.mock('antd', () => ({
   DatePicker: ({ id, value, onChange, ...props }: any) => (
     <input id={id} type="date" data-testid="date-picker" {...props} />
   ),
-  Alert: ({ message: msg, type, ...props }: any) => (
+  Alert: ({ title: msg, message: msg2, type, ...props }: any) => (
     <div role="alert" data-type={type} {...props}>{msg}</div>
   ),
   message: {

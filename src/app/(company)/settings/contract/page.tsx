@@ -109,7 +109,7 @@ export default function ContractStatusPage() {
       {contract.warnings && contract.warnings.length > 0 && (
         <div className="space-y-2">
           {contract.warnings.map((warning, i) => (
-            <Alert key={i} type="warning" message={warning} showIcon icon={<ExclamationCircleOutlined />} className="!rounded-xl" />
+            <Alert key={i} type="warning" title={warning} showIcon icon={<ExclamationCircleOutlined />} className="!rounded-xl" />
           ))}
         </div>
       )}

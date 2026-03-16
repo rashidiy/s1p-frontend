@@ -254,7 +254,7 @@ export default function TelegramRegisterPage() {
         {step === 'code' && (
           <form onSubmit={handleValidateCode} className="space-y-5">
             {codeError && (
-              <Alert type="error" message={codeError} showIcon className="!rounded-xl" closable onClose={() => setCodeError('')} />
+              <Alert type="error" title={codeError} showIcon className="!rounded-xl" closable onClose={() => setCodeError('')} />
             )}
 
             <div className="space-y-1.5">
@@ -293,7 +293,7 @@ export default function TelegramRegisterPage() {
         {step === 'telegram' && challenge && (
           <div className="space-y-5">
             {telegramError && (
-              <Alert type="error" message={telegramError} showIcon className="!rounded-xl" />
+              <Alert type="error" title={telegramError} showIcon className="!rounded-xl" />
             )}
 
             <div className="text-center space-y-2">
@@ -348,7 +348,7 @@ export default function TelegramRegisterPage() {
         {step === 'form' && challenge && (
           <form onSubmit={handleSubmit} className="space-y-5">
             {submitError && (
-              <Alert type="error" message={submitError} showIcon className="!rounded-xl" closable onClose={() => setSubmitError('')} />
+              <Alert type="error" title={submitError} showIcon className="!rounded-xl" closable onClose={() => setSubmitError('')} />
             )}
 
             {/* Avatar area */}

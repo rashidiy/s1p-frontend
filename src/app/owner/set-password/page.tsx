@@ -61,7 +61,7 @@ export default function OwnerSetPasswordPage() {
   return (
     <AuthLayout title={t('setNewPassword')} subtitle={t('setNewPasswordSubtitle')} icon={<LockOutlined style={{ fontSize: 28 }} />}>
       <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <Alert type="error" message={error} showIcon className="!rounded-xl" />}
+        {error && <Alert type="error" title={error} showIcon className="!rounded-xl" />}
         <div className="space-y-1.5">
           <label htmlFor="password" className="text-sm font-medium text-gray-700">{t('newPassword')}</label>
           <Input.Password

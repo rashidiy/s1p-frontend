@@ -206,10 +206,10 @@ export default function UserDetailPage() {
   return (
     <div className="space-y-6">
       {error && (
-        <Alert type="error" message={error} showIcon closable onClose={() => setError('')} className="!rounded-xl" />
+        <Alert type="error" title={error} showIcon closable onClose={() => setError('')} className="!rounded-xl" />
       )}
       {successMsg && (
-        <Alert type="success" message={successMsg} showIcon closable onClose={() => setSuccessMsg('')} className="!rounded-xl" />
+        <Alert type="success" title={successMsg} showIcon closable onClose={() => setSuccessMsg('')} className="!rounded-xl" />
       )}
 
       {/* Header */}

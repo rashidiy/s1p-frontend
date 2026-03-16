@@ -165,7 +165,7 @@ export default function LoginPage() {
   return (
     <AuthLayout title={t('welcomeBack')} subtitle={t('enterCredentials')} icon={<LoginOutlined style={{ fontSize: 28 }} />}>
       <div className="space-y-5">
-        {error && <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
+        {error && <Alert type="error" title={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />}
 
         {/* Telegram OTP Flow */}
         {step === 'idle' && (
