@@ -10,8 +10,9 @@ import {
   SaveOutlined,
   CloseOutlined,
   FormOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Select, Switch, Tag, Modal, message, Segmented } from 'antd';
+import { Button, Input, Select, Switch, Tag, Modal, Tooltip, message, Segmented } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
@@ -265,7 +266,12 @@ export default function CustomFieldsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">{t('customFieldsSubtitle')}</p>
+          <p className="page-subtitle">
+            {t('customFieldsSubtitle')}
+            <Tooltip title={t('customFieldsHelp')}>
+              <QuestionCircleOutlined className="text-gray-400 cursor-help ml-2" />
+            </Tooltip>
+          </p>
         </div>
         <Button onClick={handleCreate}>
           <PlusOutlined style={{ marginRight: 8 }} />

@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined } from '@ant-design/icons';
-import { Alert, Button, Spin, Tabs, message } from 'antd';
+import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Alert, Button, Spin, Tabs, Tooltip as AntTooltip, message } from 'antd';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -181,7 +181,12 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">{t('subtitle')}</p>
+          <p className="page-subtitle">
+            {t('subtitle')}
+            <AntTooltip title={t('analyticsHelp')}>
+              <QuestionCircleOutlined className="text-gray-400 cursor-help ml-2" />
+            </AntTooltip>
+          </p>
         </div>
       </div>
 

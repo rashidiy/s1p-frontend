@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Tag, message } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Tag, Tooltip, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
@@ -168,7 +168,12 @@ export default function PermissionGroupsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">{t('permissionGroupsDescription')}</p>
+          <p className="page-subtitle">
+            {t('permissionGroupsDescription')}
+            <Tooltip title={t('permissionGroupsHelp')}>
+              <QuestionCircleOutlined className="text-gray-400 cursor-help ml-2" />
+            </Tooltip>
+          </p>
         </div>
         <Button onClick={handleCreate}>
           <PlusOutlined style={{ marginRight: 8 }} />

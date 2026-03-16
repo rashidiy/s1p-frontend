@@ -572,7 +572,8 @@
     "pipelineView": "Pipeline",
     "listView": "List",
     "noDealsInStage": "No deals in this stage",
-    "failedToLoadPipeline": "Failed to load pipeline"
+    "failedToLoadPipeline": "Failed to load pipeline",
+    "pipelineHelp": "Drag-free pipeline: click a deal to view details, use edit to change stage"
   },
   "tasks": {
     "title": "Tasks",
@@ -670,7 +671,8 @@
     "totalTasks": "Tasks",
     "total": "total",
     "active": "active",
-    "completedTasks": "completed"
+    "completedTasks": "completed",
+    "analyticsHelp": "Analytics are based on your team's activity this period"
   },
   "users": {
     "title": "Team Members",
@@ -891,7 +893,11 @@
     "eventCallMissed": "Call Missed",
     "eventLeadCreated": "Lead Created",
     "eventDealStageChanged": "Deal Stage Changed",
-    "eventContactCreated": "Contact Created"
+    "eventContactCreated": "Contact Created",
+    "apiKeysHelp": "API keys allow external applications to access your CRM data",
+    "webhooksHelp": "Webhooks send real-time notifications to external URLs when events happen in your CRM",
+    "customFieldsHelp": "Custom fields let you track additional data specific to your business",
+    "permissionGroupsHelp": "Permission groups control what each team member can access"
   },
   "companies": {
     "title": "Companies",

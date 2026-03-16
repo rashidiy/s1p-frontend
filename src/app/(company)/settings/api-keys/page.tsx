@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PlusOutlined, DeleteOutlined, KeyOutlined, CopyOutlined, WarningOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Tag, Typography, message } from 'antd';
+import { PlusOutlined, DeleteOutlined, KeyOutlined, CopyOutlined, WarningOutlined, ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Tag, Tooltip, Typography, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
@@ -137,7 +137,12 @@ export default function ApiKeysPage() {
       {/* Header */}
       <div className="page-header">
         <div>
-          <p className="page-subtitle">{t('apiKeysSubtitle')}</p>
+          <p className="page-subtitle">
+            {t('apiKeysSubtitle')}
+            <Tooltip title={t('apiKeysHelp')}>
+              <QuestionCircleOutlined className="text-gray-400 cursor-help ml-2" />
+            </Tooltip>
+          </p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <PlusOutlined style={{ marginRight: 8 }} />

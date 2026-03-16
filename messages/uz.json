@@ -572,7 +572,8 @@
     "pipelineView": "Quvur",
     "listView": "Ro'yxat",
     "noDealsInStage": "Bu bosqichda bitimlar yo'q",
-    "failedToLoadPipeline": "Quvurni yuklashda xatolik"
+    "failedToLoadPipeline": "Quvurni yuklashda xatolik",
+    "pipelineHelp": "Sudrab bo'lmaydigan quvur: tafsilotlarni ko'rish uchun bitimni bosing, bosqichni o'zgartirish uchun tahrirlashdan foydalaning"
   },
   "tasks": {
     "title": "Vazifalar",
@@ -670,7 +671,8 @@
     "totalTasks": "Vazifalar",
     "total": "jami",
     "active": "faol",
-    "completedTasks": "bajarilgan"
+    "completedTasks": "bajarilgan",
+    "analyticsHelp": "Tahlillar jamoangizning ushbu davrdagi faoliyatiga asoslangan"
   },
   "users": {
     "title": "Jamoa a'zolari",
@@ -891,7 +893,11 @@
     "eventCallMissed": "O'tkazilgan qo'ng'iroq",
     "eventLeadCreated": "Lid yaratildi",
     "eventDealStageChanged": "Bitim bosqichi o'zgardi",
-    "eventContactCreated": "Kontakt yaratildi"
+    "eventContactCreated": "Kontakt yaratildi",
+    "apiKeysHelp": "API kalitlari tashqi ilovalarga CRM ma'lumotlaringizga kirish imkonini beradi",
+    "webhooksHelp": "Vebhuklar CRM'da hodisalar sodir bo'lganda tashqi URL'larga real vaqtda bildirishnomalar yuboradi",
+    "customFieldsHelp": "Maxsus maydonlar biznesingizga xos qo'shimcha ma'lumotlarni kuzatish imkonini beradi",
+    "permissionGroupsHelp": "Ruxsat guruhlari har bir jamoa a'zosi nimaga kirishi mumkinligini boshqaradi"
   },
   "companies": {
     "title": "Kompaniyalar",

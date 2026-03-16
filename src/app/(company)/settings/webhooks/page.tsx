@@ -10,8 +10,9 @@ import {
   ApiOutlined,
   DownOutlined,
   UpOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Switch, Tag, Modal, Table, message } from 'antd';
+import { Button, Input, Switch, Tag, Modal, Table, Tooltip, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
@@ -269,7 +270,12 @@ export default function WebhooksPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <p className="page-subtitle">{t('webhooksSubtitle')}</p>
+          <p className="page-subtitle">
+            {t('webhooksSubtitle')}
+            <Tooltip title={t('webhooksHelp')}>
+              <QuestionCircleOutlined className="text-gray-400 cursor-help ml-2" />
+            </Tooltip>
+          </p>
         </div>
         <Button onClick={handleCreate}>
           <PlusOutlined style={{ marginRight: 8 }} />

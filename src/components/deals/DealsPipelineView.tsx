@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Spin, message } from 'antd';
-import { DollarOutlined, RiseOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Spin, Tooltip, message } from 'antd';
+import { DollarOutlined, RiseOutlined, UserOutlined, CalendarOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import type { DealResponse } from '@/types/api';
 import Link from 'next/link';
@@ -86,7 +86,14 @@ export default function DealsPipelineView() {
   }
 
   return (
-    <div className="pipeline-board">
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <Tooltip title={t('pipelineHelp')}>
+          <QuestionCircleOutlined className="text-gray-400 cursor-help" />
+        </Tooltip>
+        <span>{t('pipelineHelp')}</span>
+      </div>
+      <div className="pipeline-board">
       {PIPELINE_STAGES.map((stage) => {
         const color = STAGE_COLORS[stage];
         const summary = getStageSummary(stage);
@@ -160,6 +167,7 @@ export default function DealsPipelineView() {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
