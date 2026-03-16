@@ -9,8 +9,22 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "S1P - Customer Relationship Management",
-  description: "CRM application for managing customer relationships and calls",
+  title: {
+    default: "S1P - CRM for Call Centers",
+    template: "%s | S1P",
+  },
+  description: "CRM platform for call centers. Manage contacts, leads, deals, and calls with Telegram integration. Built for the CIS market.",
+  openGraph: {
+    title: "S1P - CRM for Call Centers",
+    description: "CRM platform for call centers. Manage contacts, leads, deals, and calls with Telegram integration.",
+    type: "website",
+    siteName: "S1P",
+  },
+  twitter: {
+    card: "summary",
+    title: "S1P - CRM for Call Centers",
+    description: "CRM platform for call centers with Telegram integration.",
+  },
 };
 
 export default async function RootLayout({
