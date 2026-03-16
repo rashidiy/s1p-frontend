@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { PhoneOutlined, RiseOutlined, CheckSquareOutlined, FundProjectionScreenOutlined, TeamOutlined } from '@ant-design/icons';
-import { Alert, Spin, Tabs, message } from 'antd';
+import { Alert, Button, Spin, Tabs, message } from 'antd';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import { useThemeStore } from '@/store/theme';
+import { ErrorCharacter } from '@/components/illustrations/ErrorCharacter';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
 import { useTranslations } from 'next-intl';
 
@@ -55,6 +55,7 @@ const SAMPLE_OUTCOME_DATA = [
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
   const tErrors = useTranslations('errors');
+  const tActions = useTranslations('actions');
   const tDashboard = useTranslations('dashboard');
 
   const [operatorData, setOperatorData] = useState<OperatorDashboard | null>(null);
@@ -66,18 +67,17 @@ export default function AnalyticsPage() {
     outcomeDistribution: [] as Array<{ name: string; value: number; color: string }>,
   });
   const [chartsLoading, setChartsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { isAdmin, isManager } = useAuthStore();
-  const isDark = useThemeStore((s) => s.resolved === 'dark');
 
   const canViewTeamData = isAdmin() || isManager();
 
-  const chartGridColor = isDark ? '#2c2c30' : '#e2e8f0';
   const tooltipStyle = {
     borderRadius: '12px',
-    border: isDark ? '1px solid #2c2c30' : 'none',
-    boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.1)',
-    backgroundColor: isDark ? '#242428' : '#ffffff',
-    color: isDark ? '#ededf0' : undefined,
+    border: '1px solid var(--border-light)',
+    boxShadow: '0 4px 20px var(--tooltip-shadow)',
+    backgroundColor: 'var(--tooltip-bg)',
+    color: 'var(--text-primary)',
   };
 
   const loadDashboards = useCallback(async () => {
@@ -89,9 +89,9 @@ export default function AnalyticsPage() {
         const teamData = await apiClient.getAdminDashboard();
         setAdminData(teamData);
       }
-    } catch (error) {
-      console.error('Failed to load dashboards:', error);
-      message.error(tErrors('failedToLoadAnalytics'));
+    } catch (err) {
+      console.error('Failed to load dashboards:', err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -159,6 +159,19 @@ export default function AnalyticsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadDashboards(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
+
   // Use this_month data for display
   const myStats = operatorData?.this_month;
   const teamStats = adminData?.this_month;
@@ -194,10 +207,10 @@ export default function AnalyticsPage() {
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
-                  {myStats?.calls.total_calls || 0}
+                  {(myStats?.calls.total_calls || 0).toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-400">
-                  {myStats?.calls.answered_calls || 0} {t('answered')}
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  {(myStats?.calls.answered_calls || 0).toLocaleString()} {t('answered')}
                 </p>
               </div>
             </div>
@@ -209,10 +222,10 @@ export default function AnalyticsPage() {
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
-                  {myStats?.leads.total_leads || 0}
+                  {(myStats?.leads.total_leads || 0).toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-400">
-                  {myStats?.leads.converted_leads || 0} {t('converted')}
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  {(myStats?.leads.converted_leads || 0).toLocaleString()} {t('converted')}
                 </p>
               </div>
             </div>
@@ -224,10 +237,10 @@ export default function AnalyticsPage() {
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
-                  {myStats?.deals.total_deals || 0}
+                  {(myStats?.deals.total_deals || 0).toLocaleString()}
                 </div>
-                <p className="text-xs text-green-600">
-                  ${myStats?.deals.total_value?.toLocaleString() || 0}
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  ${(myStats?.deals.total_value || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -239,9 +252,9 @@ export default function AnalyticsPage() {
               </div>
               <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">
-                  {myStats?.tasks.completed_tasks || 0}
+                  {(myStats?.tasks.completed_tasks || 0).toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   {tDashboard('ofTotal', { count: myStats?.tasks.total_tasks || 0 })}
                 </p>
               </div>
@@ -252,17 +265,17 @@ export default function AnalyticsPage() {
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
                 <h3 className="text-base font-semibold leading-none tracking-tight">{t('callStatistics')}</h3>
-                <p className="text-sm text-gray-400">{t('yourCallingPerformance')}</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('yourCallingPerformance')}</p>
               </div>
               <div className="p-6 pt-0 space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('answerRate')}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('answerRate')}</span>
                   <span className="font-semibold">
                     {Math.round(myStats?.calls.success_rate || 0)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('avgDuration')}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('avgDuration')}</span>
                   <span className="font-semibold">
                     {myStats?.calls.average_duration ?
                       `${Math.floor(myStats.calls.average_duration / 60)}m ${myStats.calls.average_duration % 60}s` :
@@ -270,11 +283,11 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('inbound')}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('inbound')}</span>
                   <span className="font-semibold">{myStats?.calls.inbound_calls || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('outbound')}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('outbound')}</span>
                   <span className="font-semibold">{myStats?.calls.outbound_calls || 0}</span>
                 </div>
               </div>
@@ -283,7 +296,7 @@ export default function AnalyticsPage() {
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
                 <h3 className="text-base font-semibold leading-none tracking-tight">{t('performanceScore')}</h3>
-                <p className="text-sm text-gray-400">{t('overallProductivity')}</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('overallProductivity')}</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="flex items-center justify-center py-6">
@@ -291,7 +304,7 @@ export default function AnalyticsPage() {
                     <div className="text-5xl font-bold text-blue-600">
                       {myStats?.productivity_score || 0}
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
                       {tDashboard('totalActivities')}: {myStats?.total_activities || 0}
                     </p>
                   </div>
@@ -309,9 +322,9 @@ export default function AnalyticsPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={chartData.callTrends.length > 0 ? chartData.callTrends : SAMPLE_TREND_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-                    <XAxis dataKey="date" tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
-                    <YAxis tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                    <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
                     <Tooltip contentStyle={tooltipStyle} />
                     <Legend />
                     <Line type="monotone" dataKey="total" stroke="#6366f1" name={t('totalCalls')} strokeWidth={2} dot={{ r: 4 }} />
@@ -330,9 +343,9 @@ export default function AnalyticsPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={chartData.teamPerformance.length > 0 ? chartData.teamPerformance : SAMPLE_TEAM_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
-                    <YAxis tick={{ fontSize: 12, fill: isDark ? '#a0a0a8' : '#64748b' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                    <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
                     <Tooltip contentStyle={tooltipStyle} />
                     <Legend />
                     <Bar dataKey="calls" fill="#6366f1" name={t('totalCalls')} radius={[4, 4, 0, 0]} />
@@ -384,10 +397,10 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
-                    {teamStats?.total_operators || 0}
+                    {(teamStats?.total_operators || 0).toLocaleString()}
                   </div>
-                  <p className="text-xs text-gray-400">
-                    {teamStats?.active_operators || 0} {t('active')}
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    {(teamStats?.active_operators || 0).toLocaleString()} {t('active')}
                   </p>
                 </div>
               </div>
@@ -399,10 +412,10 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
-                    {teamStats?.calls.total_calls || 0}
+                    {(teamStats?.calls.total_calls || 0).toLocaleString()}
                   </div>
-                  <p className="text-xs text-gray-400">
-                    {teamStats?.calls.answered_calls || 0} {t('answered')}
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    {(teamStats?.calls.answered_calls || 0).toLocaleString()} {t('answered')}
                   </p>
                 </div>
               </div>
@@ -414,10 +427,10 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
-                    {teamStats?.leads.total_leads || 0}
+                    {(teamStats?.leads.total_leads || 0).toLocaleString()}
                   </div>
-                  <p className="text-xs text-gray-400">
-                    {teamStats?.leads.converted_leads || 0} {t('converted')}
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    {(teamStats?.leads.converted_leads || 0).toLocaleString()} {t('converted')}
                   </p>
                 </div>
               </div>
@@ -429,9 +442,9 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="p-6 pt-0">
                   <div className="text-2xl font-bold">
-                    ${teamStats?.deals.total_value?.toLocaleString() || 0}
+                    ${(teamStats?.deals.total_value || 0).toLocaleString()}
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     {t('dealsWon', { count: teamStats?.deals.won || 0 })}
                   </p>
                 </div>
@@ -441,7 +454,7 @@ export default function AnalyticsPage() {
             <div className="glass-card p-0">
               <div className="flex flex-col space-y-1.5 p-6">
                 <h3 className="text-base font-semibold leading-none tracking-tight">{t('topPerformers')}</h3>
-                <p className="text-sm text-gray-400">{t('operatorsRankedByPerformance')}</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('operatorsRankedByPerformance')}</p>
               </div>
               <div className="p-6 pt-0">
                 <div className="space-y-4">
@@ -453,7 +466,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div>
                           <p className="font-medium">{performer.name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                             {performer.calls.total_calls} {t('totalCalls').toLowerCase()}, {performer.leads.total_leads} {t('totalLeads').toLowerCase()}
                           </p>
                         </div>
