@@ -155,6 +155,11 @@ export default function TasksPage() {
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
             {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
           </p>
+          {!search && !status && hasPermissionString('tasks.write') && (
+            <Link href="/tasks/new">
+              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addTask')}</Button>
+            </Link>
+          )}
         </div>
       )}
     </div>

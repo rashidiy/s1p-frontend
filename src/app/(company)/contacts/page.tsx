@@ -288,6 +288,11 @@ export default function ContactsPage() {
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
             {search ? tCommon('tryAdjustingSearch') : t('getStarted')}
           </p>
+          {!search && hasPermissionString('contacts.write') && (
+            <Link href="/contacts/new">
+              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addContact')}</Button>
+            </Link>
+          )}
         </div>
       )}
     </div>

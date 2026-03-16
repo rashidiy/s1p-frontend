@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import type { TaskResponse, UserResponse } from '@/types/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
@@ -180,7 +181,14 @@ export default function TaskDetailPage() {
   }
 
   if (!task) {
-    return <div className="p-6">{tErrors('notFoundDetail')}</div>;
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <EmptyStateCharacter height={115} variant="confused" />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('notFoundTitle')}</h3>
+        <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{tErrors('notFoundSubtitle')}</p>
+        <Link href="/tasks"><Button type="primary" className="mt-4">{tErrors('goBack')}</Button></Link>
+      </div>
+    );
   }
 
   return (

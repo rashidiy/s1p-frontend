@@ -195,7 +195,7 @@ export default function CallsPage() {
             <EmptyStateCharacter height={115} variant="no-calls" />
             <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noCallsFound')}</h3>
             <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-              {tCommon('tryAdjustingFilters')}
+              {direction || outcome || dateFrom || dateTo || myCalls ? tCommon('tryAdjustingFilters') : t('getStarted')}
             </p>
           </div>
         )}

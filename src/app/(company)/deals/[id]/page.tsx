@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { DEAL_STAGE_COLORS } from '@/lib/constants';
 import type { DealResponse, NoteResponse } from '@/types/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import { useTranslations } from 'next-intl';
 
 export default function DealDetailPage() {
@@ -227,7 +228,14 @@ export default function DealDetailPage() {
       </div>
     </div>
   );
-  if (!deal) return <div className="p-6">{tErrors('notFoundDetail')}</div>;
+  if (!deal) return (
+    <div className="glass-card py-16 flex flex-col items-center justify-center">
+      <EmptyStateCharacter height={115} variant="confused" />
+      <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('notFoundTitle')}</h3>
+      <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{tErrors('notFoundSubtitle')}</p>
+      <Button type="primary" className="mt-4" onClick={() => router.push('/deals')}>{tErrors('goBack')}</Button>
+    </div>
+  );
 
   const stageColor = DEAL_STAGE_COLORS[deal.stage?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
   const isClosedDeal = deal.stage === 'won' || deal.stage === 'lost';

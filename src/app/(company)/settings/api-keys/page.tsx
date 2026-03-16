@@ -189,6 +189,10 @@ export default function ApiKeysPage() {
           <EmptyStateCharacter height={115} variant="setup" />
           <p className="mt-4 text-lg font-medium text-gray-700">{t('noApiKeysYet')}</p>
           <p className="text-sm text-gray-500">{t('noApiKeysDescription')}</p>
+          <Button onClick={() => setShowCreateModal(true)} className="mt-4">
+            <PlusOutlined style={{ marginRight: 8 }} />
+            {t('createApiKey')}
+          </Button>
         </div>
       )}
 

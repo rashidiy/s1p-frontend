@@ -9,6 +9,7 @@ import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { CALL_DIRECTION_LABELS, CALL_STATUS_LABELS } from '@/lib/constants';
 import type { CallEventResponse } from '@/types/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 
 interface SearchResult { id: string; label: string; }
@@ -243,7 +244,14 @@ export default function CallDetailPage() {
   }
 
   if (!call) {
-    return <div className="p-6">{tCommon('noDataFound')}</div>;
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <EmptyStateCharacter height={115} variant="confused" />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('notFoundTitle')}</h3>
+        <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{tErrors('notFoundSubtitle')}</p>
+        <Button type="primary" className="mt-4" onClick={() => router.push('/calls')}>{tErrors('goBack')}</Button>
+      </div>
+    );
   }
 
   return (

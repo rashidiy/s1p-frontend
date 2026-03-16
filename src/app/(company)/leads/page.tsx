@@ -269,6 +269,11 @@ export default function LeadsPage() {
           <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
             {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
           </p>
+          {!search && !status && hasPermissionString('leads.write') && (
+            <Link href="/leads/new">
+              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addLead')}</Button>
+            </Link>
+          )}
         </div>
       )}
     </div>

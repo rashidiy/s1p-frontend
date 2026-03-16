@@ -430,6 +430,10 @@ export default function WebhooksPage() {
           <EmptyStateCharacter height={115} variant="setup" />
           <p className="mt-4 text-lg font-medium text-gray-700">{t('noEndpointsYet')}</p>
           <p className="text-sm text-gray-500">{t('noEndpointsDescription')}</p>
+          <Button onClick={handleCreate} className="mt-4">
+            <PlusOutlined style={{ marginRight: 8 }} />
+            {t('addEndpoint')}
+          </Button>
         </div>
       )}
     </div>

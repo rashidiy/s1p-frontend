@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { LEAD_STATUS_COLORS } from '@/lib/constants';
 import type { LeadResponse, NoteResponse } from '@/types/api';
+import { EmptyStateCharacter } from '@/components/illustrations';
 import { useTranslations } from 'next-intl';
 
 export default function LeadDetailPage() {
@@ -175,7 +176,14 @@ export default function LeadDetailPage() {
       </div>
     </div>
   );
-  if (!lead) return <div className="p-6">{tErrors('notFound')}</div>;
+  if (!lead) return (
+    <div className="glass-card py-16 flex flex-col items-center justify-center">
+      <EmptyStateCharacter height={115} variant="confused" />
+      <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('notFoundTitle')}</h3>
+      <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">{tErrors('notFoundSubtitle')}</p>
+      <Button type="primary" className="mt-4" onClick={() => router.push('/leads')}>{tErrors('goBack')}</Button>
+    </div>
+  );
 
   const statusColor = LEAD_STATUS_COLORS[lead.status?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
 
