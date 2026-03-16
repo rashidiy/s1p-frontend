@@ -29,6 +29,7 @@ vi.mock('antd', () => {
     ),
     Modal: ModalComponent,
     Tag: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+    Tooltip: ({ children, title }: any) => <span title={title}>{children}</span>,
     Typography: {
       Paragraph: ({ children, ...props }: any) => <p {...props}>{children}</p>,
     },
@@ -48,6 +49,7 @@ vi.mock('@ant-design/icons', () => ({
   CopyOutlined: () => <span>copy-icon</span>,
   WarningOutlined: () => <span>warning-icon</span>,
   ExclamationCircleOutlined: () => <span>excl-icon</span>,
+  QuestionCircleOutlined: () => <span data-testid="icon-question" />,
 }));
 
 // Mock illustrations

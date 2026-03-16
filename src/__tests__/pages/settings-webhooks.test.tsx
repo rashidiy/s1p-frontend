@@ -64,6 +64,7 @@ vi.mock('antd', () => {
         </tbody>
       </table>
     ),
+    Tooltip: ({ children, title }: any) => <span title={title}>{children}</span>,
     message: {
       error: vi.fn(),
       success: vi.fn(),
@@ -82,6 +83,7 @@ vi.mock('@ant-design/icons', () => ({
   ApiOutlined: () => <span>api-icon</span>,
   DownOutlined: () => <span>down-icon</span>,
   UpOutlined: () => <span>up-icon</span>,
+  QuestionCircleOutlined: () => <span data-testid="icon-question" />,
 }));
 
 // Mock illustrations
