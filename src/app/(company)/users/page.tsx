@@ -11,6 +11,7 @@ import type { UserListResponse, InviteTokenListItem, PaginatedResponse } from '@
 import { EmptyStateCharacter } from '@/components/illustrations';
 import { formatDateTime } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const roleColors: Record<string, string> = {
   [UserRole.COMPANY_ADMIN]: 'purple',
@@ -188,7 +189,7 @@ export default function UsersPage() {
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
                 {user.avatar_url ? (
-                  <img src={user.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  <Image src={user.avatar_url} alt="" width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
                 ) : (
                   <div className="h-10 w-10 rounded-full bg-crm-indigo-100 flex items-center justify-center text-crm-indigo-600 font-semibold text-sm">
                     {user.first_name?.[0]?.toUpperCase()}{user.last_name?.[0]?.toUpperCase() || ''}

@@ -533,7 +533,7 @@ export default function TelegramSettingsPage() {
             </Card>
 
             {/* V2 Feature Toggles */}
-            <Card title={t('notifications')}>
+            <Card title={t('advancedFeatures')}>
               <Space direction="vertical" size={0} style={{ width: '100%' }}>
                 {V2_TOGGLES.map((toggle, index) => (
                   <div key={toggle.key}>

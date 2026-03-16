@@ -119,17 +119,14 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
 
   const navigation = getNavigation();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setPopoverOpen(false);
     onMobileClose?.();
-    apiLogout();
+    const { apiClient } = await import('@/lib/api');
+    await apiClient.logout();
     logout();
     setMode('light');
     router.push(isOwner ? '/owner/login' : '/login');
-  };
-
-  const apiLogout = () => {
-    import('@/lib/api').then(({ apiClient }) => apiClient.logout());
   };
 
   const getInitials = (firstName: string, lastName?: string | null) => {

@@ -145,7 +145,16 @@ class ApiClient {
     return this.client.post('/api/v1/auth/reset-password', data);
   }
 
-  logout() {
+  async logout() {
+    try {
+      const userType = typeof window !== 'undefined' ? localStorage.getItem('user_type') : null;
+      const logoutUrl = userType === 'owner'
+        ? '/api/v1/owner/auth/logout'
+        : '/api/v1/auth/logout';
+      await this.client.post(logoutUrl);
+    } catch {
+      // Ignore errors — we're logging out regardless
+    }
     this.clearTokens();
   }
 

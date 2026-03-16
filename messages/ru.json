@@ -759,6 +759,7 @@
     "connectTelegram": "Подключить Telegram",
     "botToken": "Токен бота",
     "notifications": "Уведомления",
+    "advancedFeatures": "Расширенные функции",
     "telegramSubtitle": "Подключение и настройка уведомлений Telegram бота",
     "notConnected": "Не подключено",
     "connected": "Подключено",

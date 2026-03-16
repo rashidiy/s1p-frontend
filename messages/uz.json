@@ -759,6 +759,7 @@
     "connectTelegram": "Telegramni ulash",
     "botToken": "Bot tokeni",
     "notifications": "Bildirishnomalar",
+    "advancedFeatures": "Kengaytirilgan funksiyalar",
     "telegramSubtitle": "Telegram bot bildirishnomalarini ulash va sozlash",
     "notConnected": "Ulanmagan",
     "connected": "Ulangan",

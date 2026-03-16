@@ -759,6 +759,7 @@
     "connectTelegram": "Connect Telegram",
     "botToken": "Bot Token",
     "notifications": "Notifications",
+    "advancedFeatures": "Advanced Features",
     "telegramSubtitle": "Connect and configure Telegram bot notifications",
     "notConnected": "Not Connected",
     "connected": "Connected",
