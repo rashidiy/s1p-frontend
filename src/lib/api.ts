@@ -210,8 +210,8 @@ class ApiClient {
     return response.data;
   }
 
-  async getOwnerCompanies() {
-    const response = await this.client.get<API.CompanyResponse[]>('/api/v1/owner/companies/');
+  async getOwnerCompanies(params?: { search?: string; page?: number; page_size?: number }) {
+    const response = await this.client.get<API.CompanyResponse[]>('/api/v1/owner/companies/', { params });
     return response.data;
   }
 
