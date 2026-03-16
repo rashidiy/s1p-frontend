@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { Alert, Button, Input, message as antMessage } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import type { UserResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
+import { ErrorCharacter } from '@/components/illustrations';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     first_name: '',
@@ -47,6 +49,7 @@ export default function ProfilePage() {
 
   const loadProfile = async () => {
     try {
+      setLoadError(false);
       const data = await apiClient.getMyProfile();
       setProfile(data);
       setProfileForm({
@@ -56,7 +59,7 @@ export default function ProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
-      antMessage.error(tErrors('failedToLoadProfile'));
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -123,10 +126,12 @@ export default function ProfilePage() {
   };
 
   if (loading) return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="h-8 w-32 bg-gray-100 rounded-lg animate-pulse" />
+    <div className="max-w-2xl sm:mx-auto space-y-6">
+      <div>
+        <div className="h-4 w-48 bg-gray-50 rounded animate-pulse" />
+      </div>
       {[1, 2].map((i) => (
-        <div key={i} className="glass-card p-6 space-y-4">
+        <div key={i} className="glass-card p-5 sm:p-8 space-y-5">
           <div className="h-5 w-40 bg-gray-100 rounded animate-pulse" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((j) => (
@@ -141,108 +146,136 @@ export default function ProfilePage() {
     </div>
   );
 
+  if (loadError) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setLoadError(false); setLoading(true); loadProfile(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-2xl sm:mx-auto space-y-6">
       <div className="page-header">
-        <div>
-          <p className="page-subtitle">{t('subtitle')}</p>
-        </div>
+        <p className="page-subtitle">{t('subtitle')}</p>
       </div>
 
-      <div className="glass-card p-0">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-base font-semibold leading-none tracking-tight">{t('personalDetails')}</h3>
-          <p className="text-sm text-gray-400">{t('updatePersonalDetails')}</p>
+      <div className="glass-card overflow-hidden">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
+          <h3 className="text-lg font-semibold text-gray-900">{t('personalDetails')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('updatePersonalDetails')}</p>
         </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleSaveProfile} className="space-y-4">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
+          <form onSubmit={handleSaveProfile} className="space-y-5">
             {message && (
-              <Alert type="success" message={message} showIcon className="!rounded-xl" />
+              <Alert type="success" message={message} showIcon className="!rounded-xl" closable onClose={() => setMessage('')} />
             )}
             {error && (
-              <Alert type="error" message={error} showIcon className="!rounded-xl" />
+              <Alert type="error" message={error} showIcon className="!rounded-xl" closable onClose={() => setError('')} />
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{tFields('firstName')}</label>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">{tFields('firstName')} <span className="text-red-400">*</span></label>
                 <Input
                   value={profileForm.first_name}
                   onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
                   required
+                  size="large"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{tFields('lastName')}</label>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">{tFields('lastName')}</label>
                 <Input
                   value={profileForm.last_name}
                   onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
+                  size="large"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('phone')}</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{tFields('email')}</label>
+              <Input value={profile?.email || ''} disabled size="large" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{tFields('phone')}</label>
               <Input
                 value={profileForm.phone}
                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                size="large"
+                placeholder="+998 90 123 4567"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('role')}</label>
-              <Input value={profile?.role ? tRoles(profile.role as any) : ''} disabled />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{tFields('role')}</label>
+              <Input value={profile?.role ? tRoles(profile.role as any) : ''} disabled size="large" />
             </div>
-            <Button type="primary" htmlType="submit" disabled={saving}>
-              {saving ? tActions('saving') : tActions('saveChanges')}
-            </Button>
+            <div className="pt-2 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" size="large" loading={saving}>
+                {saving ? tActions('saving') : tActions('saveChanges')}
+              </Button>
+            </div>
           </form>
         </div>
       </div>
 
-      <div className="glass-card p-0">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-base font-semibold leading-none tracking-tight">{t('changePassword')}</h3>
-          <p className="text-sm text-gray-400">{t('updatePassword')}</p>
+      <div className="glass-card overflow-hidden">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-7 pb-2">
+          <h3 className="text-lg font-semibold text-gray-900">{t('changePassword')}</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{t('updatePassword')}</p>
         </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleChangePassword} className="space-y-4">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
+          <form onSubmit={handleChangePassword} className="space-y-5">
             {passwordMessage && (
-              <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" />
+              <Alert type="success" message={passwordMessage} showIcon className="!rounded-xl" closable onClose={() => setPasswordMessage('')} />
             )}
             {passwordError && (
-              <Alert type="error" message={passwordError} showIcon className="!rounded-xl" />
+              <Alert type="error" message={passwordError} showIcon className="!rounded-xl" closable onClose={() => setPasswordError('')} />
             )}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('currentPassword')}</label>
-              <Input
-                type="password"
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{tFields('currentPassword')}</label>
+              <Input.Password
                 value={passwordForm.old_password}
                 onChange={(e) => setPasswordForm({ ...passwordForm, old_password: e.target.value })}
                 required
+                size="large"
+                autoComplete="off"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('newPassword')}</label>
-              <Input
-                type="password"
-                value={passwordForm.new_password}
-                onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
-                required
-              />
-              <p className="text-xs text-gray-400">
-                {tAuth('passwordRequirements')}
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">{tFields('newPassword')}</label>
+                <Input.Password
+                  value={passwordForm.new_password}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                  required
+                  size="large"
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">{tFields('confirmNewPassword')}</label>
+                <Input.Password
+                  value={passwordForm.confirm_password}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                  required
+                  size="large"
+                  autoComplete="off"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tFields('confirmNewPassword')}</label>
-              <Input
-                type="password"
-                value={passwordForm.confirm_password}
-                onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
-                required
-              />
+            <p className="text-xs text-gray-400">
+              {tAuth('passwordRequirements')}
+            </p>
+            <div className="pt-2 border-t border-gray-100">
+              <Button type="primary" htmlType="submit" size="large" loading={changingPassword}>
+                {changingPassword ? tActions('changing') : t('changePassword')}
+              </Button>
             </div>
-            <Button type="primary" htmlType="submit" disabled={changingPassword}>
-              {changingPassword ? tActions('changing') : t('changePassword')}
-            </Button>
           </form>
         </div>
       </div>

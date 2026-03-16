@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Card, Switch, Button, Tag, Modal, Space, Typography, Divider, Input, Spin, Alert, Select } from 'antd';
 import {
-  SendOutlined,
   LinkOutlined,
   DisconnectOutlined,
   CheckCircleOutlined,

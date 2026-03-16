@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { Alert, Button, Input, message as antdMessage } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import { useTranslations } from 'next-intl';
 import type { OwnerResponse } from '@/types/api';
+import { ErrorCharacter } from '@/components/illustrations';
 
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
@@ -22,6 +23,7 @@ export default function OwnerProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     first_name: '',
@@ -45,6 +47,7 @@ export default function OwnerProfilePage() {
 
   const loadProfile = async () => {
     try {
+      setLoadError(false);
       const data = await apiClient.getOwnerProfile();
       setProfile(data);
       setProfileForm({
@@ -54,7 +57,7 @@ export default function OwnerProfilePage() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
-      antdMessage.error(tErrors('failedToLoadProfile'));
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -139,6 +142,19 @@ export default function OwnerProfilePage() {
       ))}
     </div>
   );
+
+  if (loadError) {
+    return (
+      <div className="glass-card py-16 flex flex-col items-center justify-center">
+        <ErrorCharacter height={115} />
+        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+        <Button type="primary" className="mt-4" onClick={() => { setLoadError(false); setLoading(true); loadProfile(); }}>
+          {tActions('tryAgain')}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl sm:mx-auto space-y-6">
