@@ -927,6 +927,8 @@
     "companyUpdated": "Kompaniya muvaffaqiyatli yangilandi",
     "companyActivated": "Kompaniya muvaffaqiyatli faollashtirildi",
     "companyDeactivated": "Kompaniya muvaffaqiyatli o'chirildi",
+    "confirmDeactivateCompany": "Kompaniya o'chiriladi va barcha foydalanuvchilar kirishni yo'qotadi. Ishonchingiz komilmi?",
+    "confirmActivateCompany": "Kompaniya qayta faollashtiriladi va foydalanuvchilar uchun kirish tiklanadi.",
     "usersCount": "Foydalanuvchilar"
   },
   "language": {

@@ -927,6 +927,8 @@
     "companyUpdated": "Company updated successfully",
     "companyActivated": "Company activated successfully",
     "companyDeactivated": "Company deactivated successfully",
+    "confirmDeactivateCompany": "This will deactivate the company and all its users will lose access. Are you sure?",
+    "confirmActivateCompany": "This will reactivate the company and restore access for its users.",
     "usersCount": "Users"
   },
   "language": {

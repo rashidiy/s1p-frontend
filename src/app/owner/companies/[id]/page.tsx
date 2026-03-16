@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, BankOutlined, TeamOutlined, SettingOutlined, UserAddOutlined, SaveOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Tag, message } from 'antd';
+import { Alert, Button, Input, Modal, Tag, message } from 'antd';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -20,6 +20,7 @@ export default function CompanyDetailPage() {
   const tActions = useTranslations('actions');
   const tFields = useTranslations('fields');
   const tStatuses = useTranslations('statuses');
+  const tCommon = useTranslations('common');
   const tUsers = useTranslations('users');
 
   const [company, setCompany] = useState<CompanyDetailResponse | null>(null);
@@ -72,21 +73,30 @@ export default function CompanyDetailPage() {
     }
   };
 
-  const handleToggleActive = async () => {
+  const handleToggleActive = () => {
     if (!company) return;
-    try {
-      if (company.is_active) {
-        await apiClient.deactivateCompany(companyId);
-        message.success(t('companyDeactivated'));
-      } else {
-        await apiClient.activateCompany(companyId);
-        message.success(t('companyActivated'));
-      }
-      loadCompany();
-    } catch (err) {
-      console.error('Failed to toggle company status:', err);
-      message.error(tErrors('failedToToggleCompanyStatus'));
-    }
+    Modal.confirm({
+      title: tCommon('areYouSure'),
+      content: company.is_active ? t('confirmDeactivateCompany') : t('confirmActivateCompany'),
+      okText: company.is_active ? tActions('deactivate') : tActions('activate'),
+      cancelText: tActions('cancel'),
+      okButtonProps: company.is_active ? { danger: true } : {},
+      onOk: async () => {
+        try {
+          if (company.is_active) {
+            await apiClient.deactivateCompany(companyId);
+            message.success(t('companyDeactivated'));
+          } else {
+            await apiClient.activateCompany(companyId);
+            message.success(t('companyActivated'));
+          }
+          loadCompany();
+        } catch (err) {
+          console.error('Failed to toggle company status:', err);
+          message.error(tErrors('failedToToggleCompanyStatus'));
+        }
+      },
+    });
   };
 
   const handleInviteAdmin = async (e: React.FormEvent) => {
