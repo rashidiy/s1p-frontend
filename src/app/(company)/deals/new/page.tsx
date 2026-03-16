@@ -40,7 +40,7 @@ export default function NewDealPage() {
   const loadUsers = async () => {
     try {
       const result = await apiClient.getUsers({});
-      setUsers(result.users || []);
+      setUsers(result.items || []);
     } catch {
       message.error(tErrors('failedToLoadUsers'));
     }

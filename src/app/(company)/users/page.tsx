@@ -185,7 +185,7 @@ export default function UsersPage() {
       <Input.Search placeholder={t('searchUsers')} value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} allowClear size="large" className="w-full md:max-w-lg" />
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {data?.users.map((user) => (
+        {data?.items.map((user) => (
           <div key={user.id} className="glass-card p-5 border-l-4 border-l-crm-indigo-400 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
@@ -227,7 +227,7 @@ export default function UsersPage() {
 
       {data && totalPages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
 
-      {data?.users.length === 0 && (
+      {data?.items.length === 0 && (
         <div className="glass-card py-12 flex flex-col items-center justify-center">
           <EmptyStateCharacter height={115} variant="default" />
           <p className="mt-4 text-lg font-medium text-gray-700">{t('noUsersFound')}</p>

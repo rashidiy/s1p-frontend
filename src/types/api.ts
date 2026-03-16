@@ -107,8 +107,9 @@ export type UserResponse = Schema<'UserResponse'> & {
 };
 export type UserDetailResponse = Schema<'UserDetailResponse'>;
 export type UserUpdateRequest = Schema<'UserUpdateRequest'>;
-export type UserListResponse = Omit<Schema<'UserListResponse'>, 'users'> & {
-  users: UserResponse[];
+export type UserListResponse = Omit<Schema<'UserListResponse'>, 'items'> & {
+  items: UserResponse[];
+  total_pages?: number;
 };
 
 // Calls

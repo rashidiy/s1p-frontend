@@ -150,7 +150,7 @@ beforeEach(() => {
 describe('Users Page', () => {
   it('renders user list after data loads', async () => {
     mockGetUsers.mockResolvedValue({
-      users: [
+      items: [
         {
           id: 'u1',
           first_name: 'Alice',
@@ -188,7 +188,7 @@ describe('Users Page', () => {
 
   it('shows invite button for admins', async () => {
     mockGetUsers.mockResolvedValue({
-      users: [],
+      items: [],
       total: 0,
       page: 1,
       page_size: 20,
@@ -204,7 +204,7 @@ describe('Users Page', () => {
   it('hides invite button for operators', async () => {
     setOperatorState();
     mockGetUsers.mockResolvedValue({
-      users: [],
+      items: [],
       total: 0,
       page: 1,
       page_size: 20,
@@ -221,7 +221,7 @@ describe('Users Page', () => {
 
   it('shows empty state when no users', async () => {
     mockGetUsers.mockResolvedValue({
-      users: [],
+      items: [],
       total: 0,
       page: 1,
       page_size: 20,
@@ -238,7 +238,7 @@ describe('Users Page', () => {
 
   it('user card shows role tag', async () => {
     mockGetUsers.mockResolvedValue({
-      users: [
+      items: [
         {
           id: 'u1',
           first_name: 'Alice',
