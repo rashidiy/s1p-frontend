@@ -899,7 +899,9 @@
     "apiKeysHelp": "API kalitlari tashqi ilovalarga CRM ma'lumotlaringizga kirish imkonini beradi",
     "webhooksHelp": "Vebhuklar CRM'da hodisalar sodir bo'lganda tashqi URL'larga real vaqtda bildirishnomalar yuboradi",
     "customFieldsHelp": "Maxsus maydonlar biznesingizga xos qo'shimcha ma'lumotlarni kuzatish imkonini beradi",
-    "permissionGroupsHelp": "Ruxsat guruhlari har bir jamoa a'zosi nimaga kirishi mumkinligini boshqaradi"
+    "permissionGroupsHelp": "Ruxsat guruhlari har bir jamoa a'zosi nimaga kirishi mumkinligini boshqaradi",
+    "general": "Asosiy",
+    "administration": "Boshqaruv"
   },
   "companies": {
     "title": "Kompaniyalar",

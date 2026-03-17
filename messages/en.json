@@ -899,7 +899,9 @@
     "apiKeysHelp": "API keys allow external applications to access your CRM data",
     "webhooksHelp": "Webhooks send real-time notifications to external URLs when events happen in your CRM",
     "customFieldsHelp": "Custom fields let you track additional data specific to your business",
-    "permissionGroupsHelp": "Permission groups control what each team member can access"
+    "permissionGroupsHelp": "Permission groups control what each team member can access",
+    "general": "General",
+    "administration": "Administration"
   },
   "companies": {
     "title": "Companies",

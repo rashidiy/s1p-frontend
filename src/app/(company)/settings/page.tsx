@@ -12,8 +12,12 @@ import {
   FormOutlined,
   KeyOutlined,
   ApiOutlined,
+  SunOutlined,
+  MoonOutlined,
+  LaptopOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Segmented } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/store/auth';
@@ -22,15 +26,16 @@ import { useThemeStore } from '@/store/theme';
 import { locales, type Locale } from '@/i18n/config';
 
 const LOCALE_LABELS: Record<Locale, string> = {
-  ru: 'RU',
-  en: 'EN',
-  uz: 'UZ',
+  ru: 'Русский',
+  en: 'English',
+  uz: 'O\'zbekcha',
 };
 
 export default function SettingsPage() {
   const { hasPermission } = useAuthStore();
   const isAdmin = hasPermission(UserRole.COMPANY_ADMIN);
   const t = useTranslations('settings');
+  const tNav = useTranslations('nav');
   const { mode, setMode } = useThemeStore();
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -40,138 +45,171 @@ export default function SettingsPage() {
     router.refresh();
   };
 
-  const settingsLinks = [
-    {
-      href: '/profile',
-      icon: <UserOutlined style={{ fontSize: 22, color: '#6366f1' }} />,
-      title: t('myProfile'),
-      description: t('myProfileDescription'),
-      bg: 'bg-indigo-50',
-      adminOnly: false,
-    },
+  const adminLinks = [
     {
       href: '/settings/permission-groups',
-      icon: <SafetyOutlined style={{ fontSize: 22, color: '#7c3aed' }} />,
+      icon: <SafetyOutlined />,
+      color: '#7c3aed',
+      bg: 'bg-purple-50',
       title: t('permissionGroups'),
       description: t('permissionGroupsDescription'),
-      bg: 'bg-purple-50',
-      adminOnly: true,
-    },
-    {
-      href: '/settings/contract',
-      icon: <FileTextOutlined style={{ fontSize: 22, color: '#0891b2' }} />,
-      title: t('contractBilling'),
-      description: t('contractBillingDescription'),
-      bg: 'bg-cyan-50',
-      adminOnly: true,
     },
     {
       href: '/settings/custom-fields',
-      icon: <FormOutlined style={{ fontSize: 22, color: '#f59e0b' }} />,
+      icon: <FormOutlined />,
+      color: '#f59e0b',
+      bg: 'bg-amber-50',
       title: t('customFields'),
       description: t('customFieldsDescription'),
-      bg: 'bg-amber-50',
-      adminOnly: true,
-    },
-    {
-      href: '/settings/api-keys',
-      icon: <KeyOutlined style={{ fontSize: 22, color: '#10b981' }} />,
-      title: t('apiKeys'),
-      description: t('apiKeysDescription'),
-      bg: 'bg-emerald-50',
-      adminOnly: true,
-    },
-    {
-      href: '/settings/webhooks',
-      icon: <ApiOutlined style={{ fontSize: 22, color: '#8b5cf6' }} />,
-      title: t('webhooks'),
-      description: t('webhooksDescription'),
-      bg: 'bg-violet-50',
-      adminOnly: true,
     },
     {
       href: '/settings/telegram',
-      icon: <SendOutlined style={{ fontSize: 22, color: '#0ea5e9' }} />,
+      icon: <SendOutlined />,
+      color: '#0ea5e9',
+      bg: 'bg-sky-50',
       title: t('telegramBot'),
       description: t('telegramBotDescription'),
-      bg: 'bg-sky-50',
-      adminOnly: true,
+    },
+    {
+      href: '/settings/api-keys',
+      icon: <KeyOutlined />,
+      color: '#10b981',
+      bg: 'bg-emerald-50',
+      title: t('apiKeys'),
+      description: t('apiKeysDescription'),
+    },
+    {
+      href: '/settings/webhooks',
+      icon: <ApiOutlined />,
+      color: '#8b5cf6',
+      bg: 'bg-violet-50',
+      title: t('webhooks'),
+      description: t('webhooksDescription'),
+    },
+    {
+      href: '/settings/contract',
+      icon: <FileTextOutlined />,
+      color: '#0891b2',
+      bg: 'bg-cyan-50',
+      title: t('contractBilling'),
+      description: t('contractBillingDescription'),
     },
   ];
 
-  const visibleLinks = settingsLinks.filter((l) => !l.adminOnly || isAdmin);
-
-  const themeModes = [
-    { key: 'light' as const, label: t('light') },
-    { key: 'dark' as const, label: t('dark') },
-    { key: 'system' as const, label: t('systemTheme') },
-  ];
-
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="page-header">
-        <div>
-          <p className="page-subtitle">{t('subtitle')}</p>
-        </div>
+    <div className="space-y-8 max-w-3xl">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          {tNav('settings')}
+        </h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+          {t('subtitle')}
+        </p>
       </div>
 
-      {/* Appearance */}
-      <div className="glass-card p-5">
-        <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t('appearance')}</h3>
-        <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{t('appearanceDescription')}</p>
-        <div className="flex gap-2 mt-3">
-          {themeModes.map((tm) => (
-            <Button
-              key={tm.key}
-              type={mode === tm.key ? 'primary' : 'default'}
-              onClick={() => setMode(tm.key)}
-            >
-              {tm.label}
-            </Button>
-          ))}
-        </div>
-      </div>
+      {/* General Section */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+          {t('general') || 'General'}
+        </h2>
 
-      {/* Language */}
-      <div className="glass-card p-5">
-        <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t('language')}</h3>
-        <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{t('languageDescription')}</p>
-        <div className="flex gap-2 mt-3">
-          {locales.map((loc) => (
-            <Button
-              key={loc}
-              type={locale === loc ? 'primary' : 'default'}
-              onClick={() => handleLocaleChange(loc)}
-            >
-              {LOCALE_LABELS[loc]}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        {visibleLinks.map((link) => (
-          <Link key={link.href} href={link.href}>
-            <div className="glass-card p-5 hover:shadow-md transition-all cursor-pointer group hover:-translate-y-0.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${link.bg}`}>
-                    {link.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">{link.title}</h3>
-                    <p className="text-sm text-gray-400 mt-0.5">{link.description}</p>
-                  </div>
+        {/* Profile Link */}
+        <Link href="/profile">
+          <div className="glass-card p-4 hover:shadow-md transition-all cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <UserOutlined style={{ fontSize: 18, color: '#6366f1' }} />
                 </div>
-                <RightOutlined className="text-xs text-gray-300 group-hover:text-gray-500 transition-all duration-200 group-hover:translate-x-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t('myProfile')}</h3>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('myProfileDescription')}</p>
+                </div>
+              </div>
+              <RightOutlined className="text-xs text-gray-300 group-hover:text-gray-500 transition-colors" />
+            </div>
+          </div>
+        </Link>
+
+        {/* Appearance + Language in one card */}
+        <div className="glass-card p-5 space-y-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                <SunOutlined style={{ fontSize: 18, color: '#6b7280' }} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t('appearance')}</h3>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('appearanceDescription')}</p>
               </div>
             </div>
-          </Link>
-        ))}
+            <Segmented
+              value={mode}
+              onChange={(v) => setMode(v as 'light' | 'dark' | 'system')}
+              options={[
+                { value: 'light', icon: <SunOutlined /> },
+                { value: 'dark', icon: <MoonOutlined /> },
+                { value: 'system', icon: <LaptopOutlined /> },
+              ]}
+              size="small"
+            />
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--border-light)' }} />
+
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                <GlobalOutlined style={{ fontSize: 18, color: '#3b82f6' }} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t('language')}</h3>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('languageDescription')}</p>
+              </div>
+            </div>
+            <Segmented
+              value={locale}
+              onChange={(v) => handleLocaleChange(v as string)}
+              options={locales.map((loc) => ({ value: loc, label: LOCALE_LABELS[loc] }))}
+              size="small"
+            />
+          </div>
+        </div>
       </div>
 
+      {/* Administration Section */}
+      {isAdmin && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            {t('administration') || 'Administration'}
+          </h2>
+
+          <div className="glass-card overflow-hidden divide-y" style={{ borderColor: 'var(--border-light)' }}>
+            {adminLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                <div className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 ${link.bg}`}>
+                        <span style={{ fontSize: 16, color: link.color }}>{link.icon}</span>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{link.title}</h3>
+                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{link.description}</p>
+                      </div>
+                    </div>
+                    <RightOutlined className="text-xs text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!isAdmin && (
-        <div className="glass-card p-5 border border-amber-200 bg-amber-50/50">
+        <div className="glass-card p-4 border border-amber-200 bg-amber-50/50">
           <h3 className="text-sm font-semibold text-amber-700 flex items-center gap-2">
             <LockOutlined />
             {t('adminOnlySettings')}
