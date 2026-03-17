@@ -455,7 +455,7 @@ export default function DealDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('updated')}</span>
-                <span>{formatDate(deal.updated_at)}</span>
+                <span>{deal.updated_at ? formatDate(deal.updated_at) : '—'}</span>
               </div>
             </div>
           </div>

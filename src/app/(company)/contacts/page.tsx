@@ -245,7 +245,7 @@ export default function ContactsPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900 truncate">
-                      {contact.first_name} {contact.last_name}
+                      {contact.first_name || ''} {contact.last_name || ''}
                     </h3>
                     {contact.company_name && (
                       <p className="text-sm text-gray-500 flex items-center gap-1 truncate">

@@ -350,7 +350,7 @@ export default function LeadDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('updated')}</span>
-                <span>{formatDate(lead.updated_at)}</span>
+                <span>{lead.updated_at ? formatDate(lead.updated_at) : '—'}</span>
               </div>
             </div>
           </div>

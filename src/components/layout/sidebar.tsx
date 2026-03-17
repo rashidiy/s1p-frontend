@@ -124,9 +124,10 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
     router.push(isOwner ? '/owner/login' : '/login');
   };
 
-  const getInitials = (firstName: string, lastName?: string | null) => {
-    if (!lastName) return firstName.charAt(0).toUpperCase();
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  const getInitials = (firstName?: string | null, lastName?: string | null) => {
+    const f = firstName?.charAt(0) || '';
+    const l = lastName?.charAt(0) || '';
+    return (f + l).toUpperCase() || '?';
   };
 
   const activeKey = navigation.find(
@@ -258,7 +259,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
               </Avatar>
               <div style={{ minWidth: 0 }}>
                 <div className="sidebar-profile-name">
-                  {user.first_name} {user.last_name}
+                  {user.first_name || ''} {user.last_name || ''}
                 </div>
                 <div className="sidebar-profile-email">
                   {user.phone || user.email || ''}

@@ -197,7 +197,7 @@ export default function UsersPage() {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-semibold text-gray-900">{user.first_name} {user.last_name}</h3>
+                  <h3 className="font-semibold text-gray-900">{user.first_name || ''} {user.last_name || ''}</h3>
                   {user.phone && (
                     <p className="text-sm text-gray-500">{user.phone}</p>
                   )}
