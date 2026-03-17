@@ -225,12 +225,6 @@ class ApiClient {
     return response.data;
   }
 
-  async deleteCompany(companyId: string, hard: boolean = false) {
-    return this.client.delete(`/api/v1/owner/companies/${companyId}`, {
-      params: { hard },
-    });
-  }
-
   async activateCompany(companyId: string) {
     const response = await this.client.post<API.CompanyResponse>(`/api/v1/owner/companies/${companyId}/activate`);
     return response.data;
@@ -290,11 +284,6 @@ class ApiClient {
     return response.data;
   }
 
-  async updateContract(contractId: string, data: API.ContractUpdateRequest) {
-    const response = await this.client.put<API.ContractResponse>(`/api/v1/owner/contracts/${contractId}`, data);
-    return response.data;
-  }
-
   async renewContract(contractId: string, data: API.ContractRenewRequest) {
     const response = await this.client.post<API.ContractResponse>(`/api/v1/owner/contracts/${contractId}/renew`, data);
     return response.data;
@@ -309,18 +298,9 @@ class ApiClient {
   // OWNER - ANALYTICS
   // ============================================================================
 
-  async getOwnerPlatformAnalytics(params: API.DateRangeParams & { period?: string }) {
-    const response = await this.client.get<API.PlatformAnalytics>('/api/v1/owner/analytics/platform', { params });
-    return response.data;
-  }
-
   async getOwnerDashboard() {
     const response = await this.client.get<API.OwnerDashboard>('/api/v1/owner/analytics/dashboard');
     return response.data;
-  }
-
-  async clearOwnerCache() {
-    return this.client.delete('/api/v1/owner/analytics/cache');
   }
 
   // ============================================================================
@@ -402,11 +382,6 @@ class ApiClient {
     return response.data;
   }
 
-  async deleteAvatar(): Promise<API.UserResponse> {
-    const response = await this.client.delete<API.UserResponse>('/api/v1/company/users/me/avatar');
-    return response.data;
-  }
-
   // ============================================================================
   // COMPANY - USER MANAGEMENT
   // ============================================================================
@@ -424,12 +399,6 @@ class ApiClient {
   async updateUser(userId: string, data: API.UserUpdateRequest) {
     const response = await this.client.put<API.UserResponse>(`/api/v1/company/users/${userId}`, data);
     return response.data;
-  }
-
-  async deleteUser(userId: string, hard: boolean = false) {
-    return this.client.delete(`/api/v1/company/users/${userId}`, {
-      params: { hard },
-    });
   }
 
   async activateUser(userId: string) {
@@ -493,11 +462,6 @@ class ApiClient {
     return response.data;
   }
 
-  async getCalls(params: { skip?: number; limit?: number }) {
-    const response = await this.client.get<API.CallEventResponse[]>('/api/v1/company/calls/', { params });
-    return response.data;
-  }
-
   async getCall(callId: string) {
     const response = await this.client.get<API.CallEventResponse>(`/api/v1/company/calls/${callId}`);
     return response.data;
@@ -531,39 +495,6 @@ class ApiClient {
 
   async getAutoLinkSuggestions(phoneNumber: string) {
     const response = await this.client.get(`/api/v1/company/calls/auto-link-suggestions/${phoneNumber}`);
-    return response.data;
-  }
-
-  async getSipuniList(): Promise<API.SipuniResponse[]> {
-    const response = await this.client.get('/api/v1/company/calls/sipuni/list');
-    return response.data;
-  }
-
-  async createSipuni(data: API.SipuniCreateRequest): Promise<API.SipuniResponse> {
-    const response = await this.client.post<API.SipuniResponse>('/api/v1/company/calls/sipuni/', data);
-    return response.data;
-  }
-
-  async updateSipuni(data: { id: string } & Partial<API.SipuniCreateRequest>): Promise<API.SipuniResponse> {
-    const { id, ...updateData } = data;
-    const response = await this.client.put<API.SipuniResponse>(`/api/v1/company/calls/sipuni/${id}`, updateData);
-    return response.data;
-  }
-
-  async deleteSipuni(id: number | string): Promise<void> {
-    await this.client.delete(`/api/v1/company/calls/sipuni/${id}`);
-  }
-
-  async getCallStatistics(params?: {
-    sipuni_id?: string;
-    represent?: string;
-    date_from?: string;
-    date_to?: string;
-    operator_id?: string;
-    direction?: string;
-    outcome?: string;
-  }): Promise<Record<string, number | string | Array<Record<string, unknown>>>> {
-    const response = await this.client.get('/api/v1/company/calls/statistics', { params });
     return response.data;
   }
 
@@ -604,11 +535,6 @@ class ApiClient {
     return response.data;
   }
 
-  async bulkCreateContacts(data: API.ContactCreateRequest[]) {
-    const response = await this.client.post<API.ContactResponse[]>('/api/v1/company/contacts/bulk', data);
-    return response.data;
-  }
-
   // ============================================================================
   // COMPANY - LEADS
   // ============================================================================
@@ -642,13 +568,6 @@ class ApiClient {
   async convertLead(leadId: string, createDeal: boolean = true) {
     const response = await this.client.post(`/api/v1/company/leads/${leadId}/convert`, null, {
       params: { create_deal: createDeal },
-    });
-    return response.data;
-  }
-
-  async assignLead(leadId: string, assignedTo: string) {
-    const response = await this.client.post<API.LeadResponse>(`/api/v1/company/leads/${leadId}/assign`, null, {
-      params: { assigned_to: assignedTo },
     });
     return response.data;
   }
@@ -697,11 +616,6 @@ class ApiClient {
     return response.data;
   }
 
-  async getPipelineSummary() {
-    const response = await this.client.get('/api/v1/company/deals/pipeline/summary');
-    return response.data;
-  }
-
   // ============================================================================
   // COMPANY - TASKS
   // ============================================================================
@@ -713,11 +627,6 @@ class ApiClient {
 
   async getTasks(params: API.TaskFilters) {
     const response = await this.client.get<API.PaginatedResponse<API.TaskResponse>>('/api/v1/company/tasks/', { params });
-    return response.data;
-  }
-
-  async getMyTasksToday() {
-    const response = await this.client.get<API.TaskResponse[]>('/api/v1/company/tasks/my-today');
     return response.data;
   }
 
@@ -751,27 +660,6 @@ class ApiClient {
     return response.data;
   }
 
-  async getNotes(params: API.NoteFilters) {
-    const response = await this.client.get<API.PaginatedResponse<API.NoteResponse>>('/api/v1/company/notes/', { params });
-    return response.data;
-  }
-
-  async getNote(noteId: string) {
-    const response = await this.client.get<API.NoteResponse>(`/api/v1/company/notes/${noteId}`);
-    return response.data;
-  }
-
-  async updateNote(noteId: string, data: API.NoteUpdateRequest) {
-    const response = await this.client.put<API.NoteResponse>(`/api/v1/company/notes/${noteId}`, data);
-    return response.data;
-  }
-
-  async deleteNote(noteId: string, hard: boolean = false) {
-    return this.client.delete(`/api/v1/company/notes/${noteId}`, {
-      params: { hard },
-    });
-  }
-
   async getEntityNotes(entityType: string, entityId: string) {
     const response = await this.client.get(`/api/v1/company/notes/timeline/${entityType}/${entityId}`);
     // Backend returns {entity_type, entity_id, notes: [...], total} — extract the notes array
@@ -782,33 +670,14 @@ class ApiClient {
   // COMPANY - ANALYTICS
   // ============================================================================
 
-  async getMyAnalytics(params: API.DateRangeParams & { period?: string }) {
-    const response = await this.client.get<API.OperatorAnalytics>('/api/v1/company/analytics/me', { params });
-    return response.data;
-  }
-
   async getMyDashboard() {
     const response = await this.client.get<API.OperatorDashboard>('/api/v1/company/analytics/me/dashboard');
-    return response.data;
-  }
-
-  async getTeamAnalytics(params: API.DateRangeParams & { period?: string }) {
-    const response = await this.client.get<API.TeamAnalytics>('/api/v1/company/analytics/team', { params });
     return response.data;
   }
 
   async getAdminDashboard() {
     const response = await this.client.get<API.AdminDashboard>('/api/v1/company/analytics/team/dashboard');
     return response.data;
-  }
-
-  async getOperatorAnalytics(userId: string, params: API.DateRangeParams & { period?: string }) {
-    const response = await this.client.get<API.OperatorAnalytics>(`/api/v1/company/analytics/operator/${userId}`, { params });
-    return response.data;
-  }
-
-  async clearAnalyticsCache() {
-    return this.client.delete('/api/v1/company/analytics/cache');
   }
 
   // ============================================================================
@@ -885,11 +754,6 @@ class ApiClient {
 
   async getWebhookDeliveries(endpointId: string, params?: { page?: number; page_size?: number; status?: string }) {
     const response = await this.client.get<API.PaginatedResponse<API.WebhookDeliveryResponse>>(`/api/v1/company/outbound-webhooks/${endpointId}/deliveries`, { params });
-    return response.data;
-  }
-
-  async getWebhookEvents() {
-    const response = await this.client.get<{ events: string[] }>('/api/v1/company/outbound-webhooks/events');
     return response.data;
   }
 

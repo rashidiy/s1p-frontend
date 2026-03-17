@@ -45,25 +45,11 @@ export const TASK_STATUS_KEYS: Record<string, string> = {
   cancelled: 'cancelled',
 };
 
-export const TASK_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-800',
-};
-
 export const TASK_PRIORITY_KEYS: Record<string, string> = {
   low: 'low',
   medium: 'medium',
   high: 'high',
   urgent: 'urgent',
-};
-
-export const TASK_PRIORITY_COLORS: Record<string, string> = {
-  low: 'bg-gray-100 text-gray-800',
-  medium: 'bg-blue-100 text-blue-800',
-  high: 'bg-orange-100 text-orange-800',
-  urgent: 'bg-red-100 text-red-800',
 };
 
 export const CALL_DIRECTION_KEYS: Record<string, string> = {
@@ -132,44 +118,6 @@ export const PAYMENT_STATUS_COLORS: Record<string, string> = {
   overdue: 'bg-red-100 text-red-800',
   failed: 'bg-red-100 text-red-800',
 };
-
-export const USER_ROLE_KEYS: Record<string, string> = {
-  owner: 'owner',
-  company_admin: 'company_admin',
-  company_manager: 'company_manager',
-  company_operator: 'company_operator',
-};
-
-export const LEAD_STATUS_OPTIONS = [
-  { value: 'new', key: 'new' },
-  { value: 'contacted', key: 'contacted' },
-  { value: 'qualified', key: 'qualified' },
-  { value: 'converted', key: 'converted' },
-  { value: 'lost', key: 'lost' },
-];
-
-export const DEAL_STAGE_OPTIONS = [
-  { value: 'prospecting', key: 'prospecting' },
-  { value: 'qualification', key: 'qualification' },
-  { value: 'proposal', key: 'proposal' },
-  { value: 'negotiation', key: 'negotiation' },
-  { value: 'closed_won', key: 'won' },
-  { value: 'closed_lost', key: 'lost' },
-];
-
-export const TASK_STATUS_OPTIONS = [
-  { value: 'pending', key: 'pending' },
-  { value: 'in_progress', key: 'inProgress' },
-  { value: 'completed', key: 'completed' },
-  { value: 'cancelled', key: 'cancelled' },
-];
-
-export const TASK_PRIORITY_OPTIONS = [
-  { value: 'low', key: 'low' },
-  { value: 'medium', key: 'medium' },
-  { value: 'high', key: 'high' },
-  { value: 'urgent', key: 'urgent' },
-];
 
 export const CALL_DIRECTION_OPTIONS = [
   { value: 'inbound', key: 'inbound' },
