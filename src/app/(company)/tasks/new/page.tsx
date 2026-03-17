@@ -117,7 +117,7 @@ export default function NewTaskPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('assignedTo')}</label>
-                <Select allowClear style={{ width: '100%' }} placeholder={tFields('assignedTo')} value={assignedTo || undefined} onChange={(val) => setAssignedTo(val || null)} options={users.map(u => ({ value: u.id, label: `${u.first_name}${u.last_name ? ' ' + u.last_name : ''}` }))} disabled={isLoading} size="large" />
+                <Select allowClear style={{ width: '100%' }} placeholder={tFields('assignedTo')} value={assignedTo || undefined} onChange={(val) => setAssignedTo(val || null)} options={users.map(u => ({ value: u.id, label: `${u.first_name || ''}${u.last_name ? ' ' + u.last_name : ''}`.trim() || '—' }))} disabled={isLoading} size="large" />
               </div>
             </div>
 

@@ -275,7 +275,7 @@ export default function TaskDetailPage() {
                       onChange={(val) => setEditForm({ ...editForm, assigned_to: val || '' })}
                       options={users.map(u => ({
                         value: u.id,
-                        label: `${u.first_name}${u.last_name ? ' ' + u.last_name : ''}`,
+                        label: `${u.first_name || ''}${u.last_name ? ' ' + u.last_name : ''}`.trim() || '—',
                       }))}
                     />
                   </div>

@@ -88,13 +88,13 @@ export default function ContactsPage() {
     {
       title: tFields('name'),
       key: 'name',
-      sorter: (a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`),
+      sorter: (a, b) => `${a.first_name || ''} ${a.last_name || ''}`.localeCompare(`${b.first_name || ''} ${b.last_name || ''}`),
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-crm-indigo-100 shrink-0">
             <UserOutlined className="text-crm-indigo-600 text-xs" />
           </div>
-          <span className="font-medium">{record.first_name} {record.last_name}</span>
+          <span className="font-medium">{record.first_name || ''} {record.last_name || ''}</span>
         </div>
       ),
     },

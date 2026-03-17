@@ -131,7 +131,7 @@ export default function NewDealPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('contact')}</label>
-                <Select showSearch allowClear style={{ width: '100%' }} placeholder={tContacts('searchContacts')} filterOption={false} onSearch={searchContacts} value={contactId || undefined} onChange={(val) => setContactId(val || null)} options={contacts.map(c => ({ value: c.id, label: `${c.first_name}${c.last_name ? ' ' + c.last_name : ''}` }))} disabled={isLoading} size="large" />
+                <Select showSearch allowClear style={{ width: '100%' }} placeholder={tContacts('searchContacts')} filterOption={false} onSearch={searchContacts} value={contactId || undefined} onChange={(val) => setContactId(val || null)} options={contacts.map(c => ({ value: c.id, label: `${c.first_name || ''}${c.last_name ? ' ' + c.last_name : ''}`.trim() || c.email || c.phone || '—' }))} disabled={isLoading} size="large" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('lead')}</label>
@@ -161,7 +161,7 @@ export default function NewDealPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('assignedTo')}</label>
-                <Select allowClear style={{ width: '100%' }} placeholder={tFields('assignedTo')} value={assignedTo || undefined} onChange={(val) => setAssignedTo(val || null)} options={users.map(u => ({ value: u.id, label: `${u.first_name}${u.last_name ? ' ' + u.last_name : ''}` }))} disabled={isLoading} size="large" />
+                <Select allowClear style={{ width: '100%' }} placeholder={tFields('assignedTo')} value={assignedTo || undefined} onChange={(val) => setAssignedTo(val || null)} options={users.map(u => ({ value: u.id, label: `${u.first_name || ''}${u.last_name ? ' ' + u.last_name : ''}`.trim() || '—' }))} disabled={isLoading} size="large" />
               </div>
             </div>
 
