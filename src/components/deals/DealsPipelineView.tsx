@@ -36,7 +36,7 @@ export default function DealsPipelineView() {
     const load = async () => {
       try {
         const [dealsResult, summaryResult] = await Promise.all([
-          apiClient.getDeals({ page: 1, page_size: 1000 }),
+          apiClient.getDeals({ page: 1, page_size: 100 }),
           apiClient.getPipelineSummary(),
         ]);
         setDeals(dealsResult.items);
