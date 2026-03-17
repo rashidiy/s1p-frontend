@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TeamOutlined, SafetyOutlined, CloseOutlined, SaveOutlined, QuestionCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Input, Modal, Tag, Tooltip, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import type { PermissionGroupResponse, AvailablePermission } from '@/types/api';
 
 export default function PermissionGroupsPage() {
@@ -167,6 +168,11 @@ export default function PermissionGroupsPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       <div className="page-header">
         <div>
           <p className="page-subtitle">

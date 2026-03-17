@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { FileTextOutlined, TeamOutlined, CalendarOutlined, SafetyOutlined, ExclamationCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Alert, Button, Progress, Spin, Tag } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
 
@@ -17,6 +18,7 @@ export default function ContractStatusPage() {
   const tFields = useTranslations('fields');
   const tErrors = useTranslations('errors');
   const tActions = useTranslations('actions');
+  const tCommon = useTranslations('common');
   const tRoles = useTranslations('roles');
 
   useEffect(() => {
@@ -100,6 +102,11 @@ export default function ContractStatusPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       <div className="page-header">
         <div>
           <p className="page-subtitle">{t('viewContractStatus')}</p>

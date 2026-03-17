@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PlusOutlined, DeleteOutlined, KeyOutlined, CopyOutlined, WarningOutlined, ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, KeyOutlined, CopyOutlined, WarningOutlined, ExclamationCircleOutlined, QuestionCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Input, Modal, Tag, Tooltip, Typography, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import type { ApiKeyResponse, ApiKeyCreateResponse } from '@/types/api';
 
 export default function ApiKeysPage() {
@@ -126,6 +127,11 @@ export default function ApiKeysPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       {/* Warning banner */}
       <div className="glass-card p-4 border-amber-200 bg-amber-50/50">
         <div className="flex items-start gap-3">

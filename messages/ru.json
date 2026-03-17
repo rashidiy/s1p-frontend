@@ -318,7 +318,8 @@
     "crmPlatform": "CRM Платформа",
     "customerRelationshipManagement": "Управление взаимоотношениями с клиентами",
     "cardView": "Карточки",
-    "tableView": "Таблица"
+    "tableView": "Таблица",
+    "backToSettings": "Назад к настройкам"
   },
   "errors": {
     "sessionExpired": "Сессия истекла",

@@ -7,6 +7,7 @@ import {
   DeleteOutlined,
   SaveOutlined,
   CloseOutlined,
+  ArrowLeftOutlined,
   ApiOutlined,
   DownOutlined,
   UpOutlined,
@@ -16,6 +17,7 @@ import { Button, Input, Switch, Tag, Modal, Table, Tooltip, message } from 'antd
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import type {
   WebhookEndpointResponse,
   WebhookDeliveryResponse,
@@ -268,6 +270,11 @@ export default function WebhooksPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       <div className="page-header">
         <div>
           <p className="page-subtitle">

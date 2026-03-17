@@ -318,7 +318,8 @@
     "crmPlatform": "CRM Platforma",
     "customerRelationshipManagement": "Mijozlar bilan munosabatlarni boshqarish",
     "cardView": "Kartochkalar",
-    "tableView": "Jadval"
+    "tableView": "Jadval",
+    "backToSettings": "Sozlamalarga qaytish"
   },
   "errors": {
     "sessionExpired": "Sessiya muddati tugadi",

@@ -5,6 +5,7 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   SaveOutlined,
@@ -16,6 +17,7 @@ import { Button, Input, Select, Switch, Tag, Modal, Tooltip, message, Segmented 
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import Link from 'next/link';
 import type {
   CustomFieldDefinitionResponse,
   CustomFieldDefinitionCreate,
@@ -264,6 +266,11 @@ export default function CustomFieldsPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       <div className="page-header">
         <div>
           <p className="page-subtitle">

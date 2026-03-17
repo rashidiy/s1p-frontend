@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Card, Switch, Button, Tag, Modal, Space, Typography, Divider, Input, Spin, Alert, Select } from 'antd';
 import {
+  ArrowLeftOutlined,
   LinkOutlined,
   DisconnectOutlined,
   CheckCircleOutlined,
@@ -14,6 +15,7 @@ import {
   RocketOutlined,
   ToolOutlined,
 } from '@ant-design/icons';
+import Link from 'next/link';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
@@ -317,6 +319,11 @@ export default function TelegramSettingsPage() {
   return (
     <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
       <div className="max-w-3xl mx-auto space-y-6">
+        <Link href="/settings">
+          <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+            {tCommon('backToSettings')}
+          </Button>
+        </Link>
         <div className="page-header">
           <div>
             <p className="page-subtitle">{t('telegramSubtitle')}</p>

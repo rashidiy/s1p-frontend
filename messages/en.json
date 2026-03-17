@@ -318,7 +318,8 @@
     "crmPlatform": "CRM Platform",
     "customerRelationshipManagement": "Customer Relationship Management",
     "cardView": "Cards",
-    "tableView": "Table"
+    "tableView": "Table",
+    "backToSettings": "Back to Settings"
   },
   "errors": {
     "sessionExpired": "Session expired",
