@@ -654,7 +654,9 @@
     "customerComplaint": "Mijoz shikoyati",
     "other": "Boshqa",
     "attempts": "Urinishlar",
-    "autoLinkSuggestions": "Avtomatik bog'lash takliflari"
+    "autoLinkSuggestions": "Avtomatik bog'lash takliflari",
+    "callInitiated": "Qo'ng'iroq muvaffaqiyatli boshlandi",
+    "enterPhoneNumber": "Qo'ng'iroq qilish uchun telefon raqamini kiriting"
   },
   "analytics": {
     "title": "Tahlillar",

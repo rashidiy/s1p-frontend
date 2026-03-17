@@ -654,7 +654,9 @@
     "customerComplaint": "Жалоба клиента",
     "other": "Другое",
     "attempts": "Попытки",
-    "autoLinkSuggestions": "Предложения для привязки"
+    "autoLinkSuggestions": "Предложения для привязки",
+    "callInitiated": "Звонок успешно инициирован",
+    "enterPhoneNumber": "Введите номер телефона для звонка"
   },
   "analytics": {
     "title": "Аналитика",

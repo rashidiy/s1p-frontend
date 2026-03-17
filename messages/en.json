@@ -654,7 +654,9 @@
     "customerComplaint": "Customer Complaint",
     "other": "Other",
     "attempts": "Attempts",
-    "autoLinkSuggestions": "Auto-Link Suggestions"
+    "autoLinkSuggestions": "Auto-Link Suggestions",
+    "callInitiated": "Call initiated successfully",
+    "enterPhoneNumber": "Enter the phone number to call"
   },
   "analytics": {
     "title": "Analytics",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, message } from 'antd';
+import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, message } from 'antd';
 import dayjs from 'dayjs';
 import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
@@ -54,6 +54,9 @@ export default function CallsPage() {
   const [myCalls, setMyCalls] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [callModalVisible, setCallModalVisible] = useState(false);
+  const [callPhone, setCallPhone] = useState('');
+  const [calling, setCalling] = useState(false);
 
   useEffect(() => {
     if (!searchInput) return;
@@ -116,7 +119,12 @@ export default function CallsPage() {
 
   return (
     <div className="space-y-6">
-      <p className="page-subtitle">{t('subtitle')}</p>
+      <div className="page-header">
+        <p className="page-subtitle">{t('subtitle')}</p>
+        <Button type="primary" icon={<PhoneOutgoing style={{ color: '#fff' }} />} onClick={() => setCallModalVisible(true)}>
+          {tActions('makeCall')}
+        </Button>
+      </div>
 
       <Input.Search
         placeholder={t('searchCalls')}
@@ -227,6 +235,43 @@ export default function CallsPage() {
       </div>
 
       {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+
+      <Modal
+        title={tActions('makeCall')}
+        open={callModalVisible}
+        onCancel={() => setCallModalVisible(false)}
+        footer={null}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-500">{t('enterPhoneNumber')}</p>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{tFields('phone')}</label>
+            <Input value={callPhone} onChange={(e) => setCallPhone(e.target.value)} placeholder="+1234567890" />
+          </div>
+          <Button
+            type="primary"
+            disabled={calling || !callPhone}
+            loading={calling}
+            onClick={async () => {
+              setCalling(true);
+              try {
+                await apiClient.makeCall({ phone_1: callPhone, phone_2: callPhone });
+                message.success(t('callInitiated'));
+                setCallModalVisible(false);
+                setCallPhone('');
+                loadCallHistory();
+              } catch {
+                message.error(tErrors('failedToMakeCall'));
+              } finally {
+                setCalling(false);
+              }
+            }}
+          >
+            <PhoneOutgoing style={{ marginRight: 8 }} />
+            {calling ? tActions('changing') : tActions('makeCall')}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
