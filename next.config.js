@@ -15,6 +15,11 @@ const nextConfig = {
         hostname: process.env.NEXT_PUBLIC_API_HOSTNAME || 'api.s1p.uz',
         pathname: '/media/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/media/**',
+      },
     ],
   },
 
