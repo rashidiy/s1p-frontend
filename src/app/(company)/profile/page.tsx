@@ -5,6 +5,8 @@ import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Alert, Button, Input } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import Link from 'next/link';
 import type { UserResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
 import { ErrorCharacter } from '@/components/illustrations';
@@ -13,6 +15,7 @@ const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
+  const tCommon = useTranslations('common');
   const tFields = useTranslations('fields');
   const tActions = useTranslations('actions');
   const tErrors = useTranslations('errors');
@@ -161,6 +164,11 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl sm:mx-auto space-y-6">
+      <Link href="/settings">
+        <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
+          {tCommon('backToSettings')}
+        </Button>
+      </Link>
       <div className="page-header">
         <p className="page-subtitle">{t('subtitle')}</p>
       </div>
