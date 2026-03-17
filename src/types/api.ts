@@ -552,6 +552,39 @@ export interface TelegramManualSetupRequest {
 }
 
 // ============================================================================
+// SIPUNI SETUP
+// ============================================================================
+
+export interface SipuniSetupRequest {
+  email: string;
+  password: string;
+}
+
+export interface SipuniManualSetupRequest {
+  cabinet_id: string;
+  security_key: string;
+}
+
+export interface SipuniSetupStatus {
+  setup_status: 'not_started' | 'setting_up' | 'ready' | 'failed';
+  setup_error: string | null;
+  setup_method: 'auto' | 'manual' | null;
+  is_connected: boolean;
+  cabinet_id: string | null;
+  webhook_url: string | null;
+}
+
+export interface SipuniConfig {
+  is_connected: boolean;
+  cabinet_id: string | null;
+  security_key_masked: string | null;
+  webhook_url: string | null;
+  setup_status: 'not_started' | 'setting_up' | 'ready' | 'failed';
+  setup_method: 'auto' | 'manual' | null;
+  services_enabled: { stream: boolean; callback: boolean } | null;
+}
+
+// ============================================================================
 // LEGACY TYPES (still used by integrations/statistics pages)
 // ============================================================================
 

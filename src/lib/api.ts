@@ -795,6 +795,35 @@ class ApiClient {
     return response.data;
   }
 
+  // ============================================================================
+  // COMPANY - SIPUNI SETUP
+  // ============================================================================
+
+  async setupSipuni(data: API.SipuniSetupRequest): Promise<API.SipuniSetupStatus> {
+    const response = await this.client.post<API.SipuniSetupStatus>('/api/v1/company/sipuni/setup', data);
+    return response.data;
+  }
+
+  async getSipuniSetupStatus(): Promise<API.SipuniSetupStatus> {
+    const response = await this.client.get<API.SipuniSetupStatus>('/api/v1/company/sipuni/setup/status');
+    return response.data;
+  }
+
+  async manualSetupSipuni(data: API.SipuniManualSetupRequest): Promise<API.SipuniSetupStatus> {
+    const response = await this.client.post<API.SipuniSetupStatus>('/api/v1/company/sipuni/setup/manual', data);
+    return response.data;
+  }
+
+  async getSipuniConfig(): Promise<API.SipuniConfig> {
+    const response = await this.client.get<API.SipuniConfig>('/api/v1/company/sipuni/config');
+    return response.data;
+  }
+
+  async disconnectSipuni(): Promise<API.SipuniSetupStatus> {
+    const response = await this.client.post<API.SipuniSetupStatus>('/api/v1/company/sipuni/disconnect');
+    return response.data;
+  }
+
 }
 
 export const apiClient = new ApiClient();

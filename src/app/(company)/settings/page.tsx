@@ -16,6 +16,7 @@ import {
   MoonOutlined,
   LaptopOutlined,
   GlobalOutlined,
+  PhoneOutlined,
 } from '@ant-design/icons';
 import { Select, Segmented } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -63,6 +64,14 @@ export default function SettingsPage() {
       bg: 'bg-sky-50',
       title: t('telegramBot'),
       description: t('telegramBotDescription'),
+    },
+    {
+      href: '/settings/sipuni',
+      icon: <PhoneOutlined />,
+      color: '#f97316',
+      bg: 'bg-orange-50',
+      title: t('sipuniSetup'),
+      description: t('sipuniSetupDescription'),
     },
     {
       href: '/settings/api-keys',
