@@ -190,7 +190,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
       </div>
 
       <div style={{ borderTop: '1px solid var(--popover-border)', margin: '4px 0' }} />
-      {isAdmin && (
+      {isAdmin() && (
         <div className="profile-menu-item" onClick={() => { setPopoverOpen(false); router.push('/settings'); }}>
           <SettingOutlined /> {t('settings')}
         </div>
