@@ -35,7 +35,6 @@ export default function OwnerDashboardPage() {
       const data = await apiClient.getOwnerDashboard();
       setDashboard(data);
     } catch (error) {
-      console.error('Failed to load dashboard:', error);
       setError(true);
       message.error(t('errors.failedToLoadDashboard'));
     } finally {

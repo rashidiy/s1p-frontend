@@ -75,7 +75,7 @@ export default function LeadsPage() {
     try {
       const result = await apiClient.getLeads({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load leads:', error); message.error(tErrors('failedToLoadLeads')); }
+    } catch { message.error(tErrors('failedToLoadLeads')); }
     finally { setLoading(false); }
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Card, Switch, Button, Tag, Modal, Space, Typography, Divider, Input, Spin, Alert, Select } from 'antd';
+import { Card, Switch, Button, Tag, Modal, Space, Typography, Divider, Input, Spin, Alert, Select, message } from 'antd';
 import {
   ArrowLeftOutlined,
   LinkOutlined,
@@ -21,8 +21,8 @@ import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
 import type { TelegramConfig, UpdateTelegramConfig, TelegramSetupStatus } from '@/types/api';
-import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils';
+import { LANGUAGE_OPTIONS } from '@/lib/constants';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -37,12 +37,6 @@ const V2_TOGGLES: { key: keyof UpdateTelegramConfig; labelKey: string; descKey: 
   { key: 'send_recordings', labelKey: 'sendRecordings', descKey: 'sendRecordingsDesc' },
   { key: 'daily_digest', labelKey: 'dailyDigest', descKey: 'dailyDigestDesc' },
   { key: 'dm_notifications', labelKey: 'dmNotifications', descKey: 'dmNotificationsDesc' },
-];
-
-const LANGUAGE_OPTIONS = [
-  { value: 'ru', label: 'Русский' },
-  { value: 'en', label: 'English' },
-  { value: 'uz', label: "O'zbek" },
 ];
 
 export default function TelegramSettingsPage() {
@@ -111,7 +105,7 @@ export default function TelegramSettingsPage() {
       if (pollCountRef.current > 40) {
         if (pollRef.current) clearInterval(pollRef.current);
         pollRef.current = null;
-        toast.error(t('setupTimeout'));
+        message.error(t('setupTimeout'));
         return;
       }
 
@@ -147,9 +141,9 @@ export default function TelegramSettingsPage() {
       setConfig(data);
       setPendingChanges({});
       setHasChanges(false);
-      toast.success(t('settingsSaved'));
+      message.success(t('settingsSaved'));
     } catch (err) {
-      toast.error(getErrorMessage(err, tErrors('failedToSaveSettings')));
+      message.error(getErrorMessage(err, tErrors('failedToSaveSettings')));
     } finally {
       setSaving(false);
     }
@@ -157,7 +151,7 @@ export default function TelegramSettingsPage() {
 
   const handleAutomaticSetup = async () => {
     if (!companyNameInput.trim()) {
-      toast.error(t('companyNameRequired'));
+      message.error(t('companyNameRequired'));
       return;
     }
     try {
@@ -172,9 +166,9 @@ export default function TelegramSettingsPage() {
       if ((err as { response?: { status?: number } })?.response?.status === 503) {
         // Pyrogram not available — fall back to manual
         setSetupMode('manual');
-        toast.error(t('setupManualDesc'));
+        message.error(t('setupManualDesc'));
       } else {
-        toast.error(getErrorMessage(err, tErrors('failedToConnectTelegram')));
+        message.error(getErrorMessage(err, tErrors('failedToConnectTelegram')));
       }
     }
   };
@@ -182,16 +176,16 @@ export default function TelegramSettingsPage() {
   const handleManualSetup = async () => {
     const trimmed = chatIdInput.trim();
     if (!trimmed) {
-      toast.error(t('enterChatId'));
+      message.error(t('enterChatId'));
       return;
     }
     try {
       setSettingUp(true);
       await apiClient.manualSetupTelegram(trimmed);
       await fetchConfig();
-      toast.success(t('telegramConnected'));
+      message.success(t('telegramConnected'));
     } catch (err) {
-      toast.error(getErrorMessage(err, tErrors('failedToConnectTelegram')));
+      message.error(getErrorMessage(err, tErrors('failedToConnectTelegram')));
     } finally {
       setSettingUp(false);
     }
@@ -209,9 +203,9 @@ export default function TelegramSettingsPage() {
           await apiClient.disconnectTelegram();
           setConfig(null);
           setSetupMode('choose');
-          toast.success(t('telegramDisconnected'));
+          message.success(t('telegramDisconnected'));
         } catch (err) {
-          toast.error(getErrorMessage(err, tErrors('failedToDisconnectTelegram')));
+          message.error(getErrorMessage(err, tErrors('failedToDisconnectTelegram')));
         }
       },
     });
@@ -220,7 +214,7 @@ export default function TelegramSettingsPage() {
   const handleCopyInviteLink = () => {
     if (config?.invite_link) {
       navigator.clipboard.writeText(config.invite_link);
-      toast.success(t('inviteLinkCopied'));
+      message.success(t('inviteLinkCopied'));
     }
   };
 

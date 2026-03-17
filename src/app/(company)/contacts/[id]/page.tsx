@@ -77,7 +77,6 @@ export default function ContactDetailPage() {
         source: data.source || '',
       });
     } catch (error) {
-      console.error('Failed to load contact:', error);
       message.error(tErrors('failedToLoadContact'));
     } finally {
       setLoading(false);
@@ -89,7 +88,6 @@ export default function ContactDetailPage() {
       const data = await apiClient.getEntityNotes('contact', contactId);
       setNotes(data);
     } catch (error) {
-      console.error('Failed to load notes:', error);
       message.error(tErrors('failedToLoadNotes'));
     }
   };
@@ -117,7 +115,6 @@ export default function ContactDetailPage() {
       timeline.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setActivity(timeline);
     } catch (error) {
-      console.error('Failed to load activity:', error);
       message.error(tErrors('failedToLoadActivity'));
     }
   };
@@ -138,7 +135,6 @@ export default function ContactDetailPage() {
       setEditing(false);
       loadContact();
     } catch (error) {
-      console.error('Failed to update contact:', error);
       message.error(tErrors('failedToUpdateContact'));
     } finally {
       setSaving(false);
@@ -157,7 +153,6 @@ export default function ContactDetailPage() {
       setNewNote('');
       loadNotes();
     } catch (error) {
-      console.error('Failed to add note:', error);
       message.error(tErrors('failedToAddNote'));
     }
   };
@@ -175,7 +170,6 @@ export default function ContactDetailPage() {
           message.success(t('contactDeleted'));
           router.push('/contacts');
         } catch (error) {
-          console.error('Failed to delete contact:', error);
           message.error(tErrors('failedToDeleteContact'));
         }
       },
@@ -446,7 +440,6 @@ export default function ContactDetailPage() {
                 await apiClient.makeCall({ phone_1: callPhone, phone_2: callPhone });
                 setCallModalVisible(false);
               } catch (err: unknown) {
-                console.error(err);
                 message.error(tErrors('failedToMakeCall'));
               } finally {
                 setCalling(false);

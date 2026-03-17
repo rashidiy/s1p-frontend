@@ -46,7 +46,7 @@ export default function TasksPage() {
     try {
       const result = await apiClient.getTasks({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load tasks:', error); setError(true); message.error(tErrors('failedToLoadTasks')); }
+    } catch { setError(true); message.error(tErrors('failedToLoadTasks')); }
     finally { setLoading(false); }
   };
 

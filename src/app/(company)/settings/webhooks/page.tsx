@@ -75,7 +75,6 @@ export default function WebhooksPage() {
       const data = await apiClient.getWebhookEndpoints();
       setEndpoints(data.items);
     } catch (error) {
-      console.error('Failed to load webhook endpoints:', error);
       setError(true);
       message.error(tErrors('failedToLoadWebhooks'));
     } finally {
@@ -122,7 +121,6 @@ export default function WebhooksPage() {
       setShowForm(false);
       loadData();
     } catch (error) {
-      console.error('Failed to save webhook endpoint:', error);
       message.error(tErrors('failedToSaveWebhook'));
     } finally {
       setSaving(false);
@@ -142,7 +140,6 @@ export default function WebhooksPage() {
           message.success(t('endpointDeleted'));
           loadData();
         } catch (error) {
-          console.error('Failed to delete webhook endpoint:', error);
           message.error(tErrors('failedToDeleteWebhook'));
         }
       },
@@ -156,7 +153,6 @@ export default function WebhooksPage() {
       });
       loadData();
     } catch (error) {
-      console.error('Failed to toggle webhook endpoint:', error);
       message.error(tErrors('failedToSaveWebhook'));
     }
   };
@@ -182,7 +178,6 @@ export default function WebhooksPage() {
       const data = await apiClient.getWebhookDeliveries(endpointId);
       setDeliveries(data.items);
     } catch (error) {
-      console.error('Failed to load deliveries:', error);
       message.error(tErrors('failedToLoadDeliveries'));
     } finally {
       setDeliveriesLoading(false);

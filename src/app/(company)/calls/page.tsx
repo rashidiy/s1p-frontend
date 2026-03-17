@@ -73,7 +73,7 @@ export default function CallsPage() {
     try {
       const result = await apiClient.getCallHistory({ page, page_size: 20, search: search || undefined, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load call history:', error); setError(true); message.error(tErrors('failedToLoadCalls')); }
+    } catch { setError(true); message.error(tErrors('failedToLoadCalls')); }
     finally { setLoading(false); }
   };
 
@@ -82,7 +82,6 @@ export default function CallsPage() {
       const blobUrl = await apiClient.getCallRecording(callId);
       window.open(blobUrl, '_blank');
     } catch (err) {
-      console.error('Failed to load recording:', err);
       message.error(tErrors('failedToLoadRecording'));
     }
   };
@@ -207,7 +206,7 @@ export default function CallsPage() {
                       try {
                         await apiClient.setCallOutcome(String(call.id), { outcome: value });
                         loadCallHistory();
-                      } catch (err) { console.error(err); message.error(tErrors('failedToSetOutcome')); }
+                      } catch { message.error(tErrors('failedToSetOutcome')); }
                     }}
                     options={outcomeOptions}
                   />

@@ -42,7 +42,6 @@ export default function ContractDetailPage() {
       const data = await apiClient.getContract(contractId);
       setContract(data);
     } catch (err) {
-      console.error('Failed to load contract:', err);
       setError(true);
       message.error(tErrors('failedToLoadContract'));
     } finally {
@@ -62,7 +61,6 @@ export default function ContractDetailPage() {
       setShowRenew(false);
       loadContract();
     } catch (err) {
-      console.error('Failed to renew contract:', err);
       message.error(tErrors('failedToRenewContract'));
     } finally {
       setProcessing(false);
@@ -82,7 +80,6 @@ export default function ContractDetailPage() {
           message.success(t('contractCancelled'));
           loadContract();
         } catch (err) {
-          console.error('Failed to cancel contract:', err);
           message.error(tErrors('failedToCancelContract'));
         } finally {
           setProcessing(false);

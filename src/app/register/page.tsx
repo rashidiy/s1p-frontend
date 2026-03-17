@@ -168,7 +168,6 @@ export default function TelegramRegisterPage() {
           await apiClient.uploadAvatar(customAvatarFile);
         } catch {
           // Avatar upload failure is non-critical — proceed to dashboard
-          console.error('Failed to upload custom avatar');
         }
       }
 

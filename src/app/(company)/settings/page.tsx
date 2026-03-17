@@ -24,12 +24,7 @@ import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
 import { useThemeStore } from '@/store/theme';
 import { locales, type Locale } from '@/i18n/config';
-
-const LANGUAGE_OPTIONS = [
-  { value: 'ru', label: 'Русский' },
-  { value: 'en', label: 'English' },
-  { value: 'uz', label: "O'zbek" },
-];
+import { LANGUAGE_OPTIONS } from '@/lib/constants';
 
 export default function SettingsPage() {
   const { hasPermission } = useAuthStore();

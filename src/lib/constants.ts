@@ -181,3 +181,9 @@ export const BILLING_PERIOD_OPTIONS = [
   { value: 'monthly', key: 'monthly' },
   { value: 'yearly', key: 'yearly' },
 ];
+
+export const LANGUAGE_OPTIONS = [
+  { value: 'ru', label: 'Русский' },
+  { value: 'en', label: 'English' },
+  { value: 'uz', label: "O'zbek" },
+];

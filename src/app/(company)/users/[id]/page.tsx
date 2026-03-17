@@ -79,7 +79,6 @@ export default function UserDetailPage() {
         role: data.role || '',
       });
     } catch (err) {
-      console.error('Failed to load user:', err);
       setError(tErrors('failedToLoadUser'));
     } finally {
       setLoading(false);

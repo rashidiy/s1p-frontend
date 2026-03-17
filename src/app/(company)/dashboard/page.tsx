@@ -68,7 +68,6 @@ export default function DashboardPage() {
       const data = await apiClient.getMyDashboard();
       setDashboard(data);
     } catch (error) {
-      console.error('Failed to load dashboard:', error);
       setError(true);
       message.error(tErrors('failedToLoadDashboard'));
     } finally {

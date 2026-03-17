@@ -84,7 +84,6 @@ export default function CustomFieldsPage() {
       const data = await apiClient.getCustomFields(activeEntityType);
       setFields(data);
     } catch (error) {
-      console.error('Failed to load custom fields:', error);
       setError(true);
       message.error(tErrors('failedToLoadCustomFields'));
     } finally {
@@ -141,7 +140,6 @@ export default function CustomFieldsPage() {
       setShowForm(false);
       loadFields();
     } catch (error) {
-      console.error('Failed to save custom field:', error);
       message.error(tErrors('failedToSaveCustomField'));
     } finally {
       setSaving(false);
@@ -161,7 +159,6 @@ export default function CustomFieldsPage() {
           message.success(t('fieldDeleted'));
           loadFields();
         } catch (error) {
-          console.error('Failed to delete custom field:', error);
           message.error(tErrors('failedToDeleteCustomField'));
         }
       },
@@ -178,7 +175,6 @@ export default function CustomFieldsPage() {
       setFields(reordered);
       message.success(t('fieldsReordered'));
     } catch (error) {
-      console.error('Failed to reorder fields:', error);
       message.error(tErrors('failedToReorderFields'));
     }
   };
@@ -193,7 +189,6 @@ export default function CustomFieldsPage() {
       setFields(reordered);
       message.success(t('fieldsReordered'));
     } catch (error) {
-      console.error('Failed to reorder fields:', error);
       message.error(tErrors('failedToReorderFields'));
     }
   };

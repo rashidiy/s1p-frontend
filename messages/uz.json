@@ -688,7 +688,8 @@
     "total": "jami",
     "active": "faol",
     "completedTasks": "bajarilgan",
-    "analyticsHelp": "Tahlillar jamoangizning ushbu davrdagi faoliyatiga asoslangan"
+    "analyticsHelp": "Tahlillar jamoangizning ushbu davrdagi faoliyatiga asoslangan",
+    "noDataAvailable": "Ma'lumotlar mavjud emas"
   },
   "users": {
     "title": "Jamoa a'zolari",
@@ -971,7 +972,9 @@
     "updatePassword": "Parolingizni yangilang",
     "passwordMismatch": "Parollar mos kelmaydi",
     "passwordTooShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
-    "updateProfile": "Profilni yangilash"
+    "updateProfile": "Profilni yangilash",
+    "profileUpdated": "Profil yangilandi",
+    "passwordChanged": "Parol o'zgartirildi"
   },
   "ownerContracts": {
     "manageContracts": "Kompaniya shartnomalari va to'lovlarni boshqarish",

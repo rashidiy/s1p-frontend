@@ -46,7 +46,6 @@ export default function CompaniesPage() {
       setCompanies(data);
       setHasMore(data.length >= PAGE_SIZE);
     } catch (error) {
-      console.error('Failed to load companies:', error);
       message.error(tErrors('failedToLoadCompanies'));
     } finally {
       setLoading(false);
@@ -81,7 +80,6 @@ export default function CompaniesPage() {
       else await apiClient.activateCompany(companyId);
       loadCompanies(page, search);
     } catch (error) {
-      console.error('Failed to toggle company status:', error);
       message.error(tErrors('failedToToggleCompanyStatus'));
     }
   };

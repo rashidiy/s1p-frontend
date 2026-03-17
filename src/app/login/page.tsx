@@ -238,7 +238,7 @@ export default function LoginPage() {
         {step === 'verifying' && (
           <div className="text-center space-y-4">
             <div className="animate-spin inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
-            <p className="text-gray-600">{t('signingIn')}...</p>
+            <p className="text-gray-600">{t('signingIn')}</p>
           </div>
         )}
 

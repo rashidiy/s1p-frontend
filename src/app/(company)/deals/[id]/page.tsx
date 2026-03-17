@@ -60,7 +60,6 @@ export default function DealDetailPage() {
         expected_close_date: data.expected_close_date || '',
       });
     } catch (error) {
-      console.error('Failed to load deal:', error);
       message.error(tErrors('failedToLoadDeal'));
     } finally {
       setLoading(false);
@@ -72,7 +71,6 @@ export default function DealDetailPage() {
       const data = await apiClient.getEntityNotes('deal', dealId);
       setNotes(data);
     } catch (error) {
-      console.error('Failed to load notes:', error);
       message.error(tErrors('failedToLoadNotes'));
     }
   };
@@ -91,7 +89,6 @@ export default function DealDetailPage() {
       setEditing(false);
       loadDeal();
     } catch (error) {
-      console.error('Failed to update deal:', error);
       message.error(tErrors('failedToUpdateDeal'));
     } finally {
       setSaving(false);
@@ -126,7 +123,6 @@ export default function DealDetailPage() {
           message.success(t('dealMarkedWon'));
           loadDeal();
         } catch (error) {
-          console.error('Failed to mark deal as won:', error);
           message.error(tErrors('failedToMarkDealAsWon'));
         }
       },
@@ -161,7 +157,6 @@ export default function DealDetailPage() {
           message.success(t('dealMarkedLost'));
           loadDeal();
         } catch (error) {
-          console.error('Failed to mark deal as lost:', error);
           message.error(tErrors('failedToMarkDealAsLost'));
         }
       },
@@ -180,7 +175,6 @@ export default function DealDetailPage() {
       setNewNote('');
       loadNotes();
     } catch (error) {
-      console.error('Failed to add note:', error);
       message.error(tErrors('failedToAddNote'));
     }
   };
@@ -198,7 +192,6 @@ export default function DealDetailPage() {
           message.success(t('dealDeleted'));
           router.push('/deals');
         } catch (error) {
-          console.error('Failed to delete deal:', error);
           message.error(tErrors('failedToDeleteDeal'));
         }
       },

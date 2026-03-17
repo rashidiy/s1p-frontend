@@ -46,7 +46,6 @@ export default function PermissionGroupsPage() {
       const perms = Array.isArray(permsData) ? permsData : (permsData as { permissions?: string[] }).permissions?.map((p: string) => ({ key: p, category: p.split('.')[0], label: p })) ?? [];
       setAvailablePerms(perms);
     } catch (error) {
-      console.error('Failed to load permission groups:', error);
       setError(true);
       message.error(tErrors('failedToLoadPermissionGroups'));
     } finally {
@@ -82,7 +81,6 @@ export default function PermissionGroupsPage() {
       message.success(t('groupSaved'));
       loadData();
     } catch (error) {
-      console.error('Failed to save permission group:', error);
       message.error(tErrors('failedToSavePermissionGroup'));
     } finally {
       setSaving(false);
@@ -102,7 +100,6 @@ export default function PermissionGroupsPage() {
           message.success(t('groupDeleted'));
           loadData();
         } catch (error) {
-          console.error('Failed to delete permission group:', error);
           message.error(tErrors('failedToDeletePermissionGroup'));
         }
       },

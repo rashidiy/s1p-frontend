@@ -109,11 +109,10 @@ export default function CallDetailPage() {
           const sugg = await apiClient.getAutoLinkSuggestions(phone);
           setSuggestions(sugg);
         } catch {
-          console.error('Failed to load auto-link suggestions');
+          // Auto-link suggestions are optional — silently skip
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
       setError(true);
       message.error(tErrors('failedToLoadCall'));
     } finally {

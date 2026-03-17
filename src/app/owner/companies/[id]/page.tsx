@@ -53,7 +53,6 @@ export default function CompanyDetailPage() {
       setCompany(data);
       setEditForm({ name: data.name });
     } catch (err) {
-      console.error('Failed to load company:', err);
       setError(true);
       message.error(tErrors('failedToLoadCompanies'));
     } finally {
@@ -68,7 +67,6 @@ export default function CompanyDetailPage() {
       setEditing(false);
       loadCompany();
     } catch (err) {
-      console.error('Failed to update company:', err);
       message.error(tErrors('failedToUpdateCompany'));
     }
   };
@@ -92,7 +90,6 @@ export default function CompanyDetailPage() {
           }
           loadCompany();
         } catch (err) {
-          console.error('Failed to toggle company status:', err);
           message.error(tErrors('failedToToggleCompanyStatus'));
         }
       },

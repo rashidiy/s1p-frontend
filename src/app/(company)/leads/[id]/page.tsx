@@ -56,7 +56,6 @@ export default function LeadDetailPage() {
         source: data.source || '',
       });
     } catch (error) {
-      console.error('Failed to load lead:', error);
       message.error(tErrors('failedToLoadLead'));
     } finally {
       setLoading(false);
@@ -68,7 +67,6 @@ export default function LeadDetailPage() {
       const data = await apiClient.getEntityNotes('lead', leadId);
       setNotes(data);
     } catch (error) {
-      console.error('Failed to load notes:', error);
       message.error(tErrors('failedToLoadNotes'));
     }
   };
@@ -86,7 +84,6 @@ export default function LeadDetailPage() {
       setEditing(false);
       loadLead();
     } catch (error) {
-      console.error('Failed to update lead:', error);
       message.error(tErrors('failedToUpdateLead'));
     } finally {
       setSaving(false);
@@ -106,7 +103,6 @@ export default function LeadDetailPage() {
           message.success(t('leadConverted'));
           loadLead();
         } catch (error) {
-          console.error('Failed to convert lead:', error);
           message.error(tErrors('failedToConvertLead'));
         } finally {
           setConverting(false);
@@ -127,7 +123,6 @@ export default function LeadDetailPage() {
       setNewNote('');
       loadNotes();
     } catch (error) {
-      console.error('Failed to add note:', error);
       message.error(tErrors('failedToAddNote'));
     }
   };
@@ -145,7 +140,6 @@ export default function LeadDetailPage() {
           message.success(t('leadDeleted'));
           router.push('/leads');
         } catch (error) {
-          console.error('Failed to delete lead:', error);
           message.error(tErrors('failedToDeleteLead'));
         }
       },

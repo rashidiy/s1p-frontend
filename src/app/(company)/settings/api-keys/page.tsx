@@ -37,7 +37,6 @@ export default function ApiKeysPage() {
       const data = await apiClient.getApiKeys();
       setKeys(data.items);
     } catch (error) {
-      console.error('Failed to load API keys:', error);
       setError(true);
       message.error(tErrors('failedToLoadApiKeys'));
     } finally {
@@ -55,7 +54,6 @@ export default function ApiKeysPage() {
       message.success(t('apiKeyCreated'));
       loadKeys();
     } catch (error) {
-      console.error('Failed to create API key:', error);
       message.error(tErrors('failedToCreateApiKey'));
     } finally {
       setCreating(false);
@@ -76,7 +74,6 @@ export default function ApiKeysPage() {
           message.success(t('apiKeyRevoked'));
           loadKeys();
         } catch (error) {
-          console.error('Failed to revoke API key:', error);
           message.error(tErrors('failedToRevokeApiKey'));
         }
       },

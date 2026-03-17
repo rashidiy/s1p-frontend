@@ -46,7 +46,6 @@ export default function NewContractPage() {
       const data = await apiClient.getOwnerCompanies();
       setCompanies(data);
     } catch (err) {
-      console.error('Failed to load companies:', err);
       message.error(tErrors('failedToLoadCompanies'));
     }
   };

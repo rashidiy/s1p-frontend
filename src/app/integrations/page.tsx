@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 export default function IntegrationsPage() {
   const t = useTranslations('common');
 
-  useEffect(() => { document.title = 'Integrations | S1P'; }, []);
+  useEffect(() => { document.title = `${t('comingSoon')} | S1P`; }, [t]);
 
   return (
     <div style={{ padding: '24px' }}>

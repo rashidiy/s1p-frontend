@@ -7,6 +7,7 @@ import { Alert, Button, Input, Modal, Select, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
+import type * as API from '@/types/api';
 import type { TaskResponse, UserResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -100,7 +101,7 @@ export default function TaskDetailPage() {
         entity_id: editForm.entity_id || null,
         assigned_to: editForm.assigned_to || null,
         priority: editForm.priority || null,
-      } as any);
+      } as API.TaskUpdateRequest);
       message.success(t('taskUpdated'));
       setEditing(false);
       loadTask();

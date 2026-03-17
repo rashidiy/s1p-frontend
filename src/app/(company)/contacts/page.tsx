@@ -77,7 +77,6 @@ export default function ContactsPage() {
       });
       setData(result);
     } catch (error) {
-      console.error('Failed to load contacts:', error);
       message.error(tErrors('failedToLoadContacts'));
     } finally {
       setLoading(false);

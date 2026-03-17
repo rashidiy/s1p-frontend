@@ -20,38 +20,6 @@ const OUTCOME_CHART_COLORS: Record<string, string> = {
   busy: '#ef4444', not_interested: '#dc2626', other: '#94a3b8',
 };
 
-// TODO [Phase 2]: Replace with real API call once backend provides direction-split trend data.
-// Backend currently has GET /api/v1/company/analytics/team/dashboard → AdminDashboard.calls_trend
-// which returns [{date, calls}] (total only). Need a new endpoint or extend calls_trend to include
-// inbound/outbound breakdown: GET /api/v1/company/calls/trends?split_by=direction
-const SAMPLE_TREND_DATA = [
-  { date: 'Mon', total: 42, inbound: 28, outbound: 14 },
-  { date: 'Tue', total: 58, inbound: 35, outbound: 23 },
-  { date: 'Wed', total: 45, inbound: 30, outbound: 15 },
-  { date: 'Thu', total: 67, inbound: 40, outbound: 27 },
-  { date: 'Fri', total: 73, inbound: 48, outbound: 25 },
-  { date: 'Sat', total: 29, inbound: 18, outbound: 11 },
-  { date: 'Sun', total: 15, inbound: 10, outbound: 5 },
-];
-
-// TODO [Phase 2]: Replace with real API call once backend provides per-operator call stats.
-// Need: GET /api/v1/company/analytics/team/operators → [{name, total_calls, answered_calls}]
-// AdminDashboard.top_operators_by_calls exists but uses company-wide stats, not per-operator.
-const SAMPLE_TEAM_DATA = [
-  { name: 'Alice', calls: 28, answered: 22 },
-  { name: 'Bob', calls: 35, answered: 29 },
-  { name: 'Carol', calls: 19, answered: 16 },
-  { name: 'Dave', calls: 42, answered: 38 },
-];
-
-// Fallback when getCallOutcomesSummary returns no data
-const SAMPLE_OUTCOME_DATA = [
-  { name: 'Interested', value: 24, color: '#22c55e' },
-  { name: 'No Answer', value: 18, color: '#f97316' },
-  { name: 'Follow Up', value: 15, color: '#06b6d4' },
-  { name: 'Not Interested', value: 8, color: '#ef4444' },
-  { name: 'Other', value: 12, color: '#94a3b8' },
-];
 
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
@@ -90,8 +58,7 @@ export default function AnalyticsPage() {
         const teamData = await apiClient.getAdminDashboard();
         setAdminData(teamData);
       }
-    } catch (err) {
-      console.error('Failed to load dashboards:', err);
+    } catch {
       setError(true);
     } finally {
       setLoading(false);
@@ -118,16 +85,11 @@ export default function AnalyticsPage() {
             value: val as number,
             color: OUTCOME_CHART_COLORS[key] || '#94a3b8',
           }))
-        : SAMPLE_OUTCOME_DATA;
+        : [];
 
       setChartData(prev => ({ ...prev, outcomeDistribution: outcomeData }));
     } catch {
       message.error(tErrors('failedToLoadChartData'));
-      setChartData({
-        callTrends: SAMPLE_TREND_DATA,
-        teamPerformance: SAMPLE_TEAM_DATA,
-        outcomeDistribution: SAMPLE_OUTCOME_DATA,
-      });
     } finally {
       setChartsLoading(false);
     }
@@ -190,13 +152,6 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <Alert
-        message={t('sampleDataNote')}
-        description="Call Volume Trends and Team Performance charts display sample data — the backend API endpoints for direction-split trends and per-operator stats are not yet available (Phase 2). The stat cards, Call Outcome Distribution, and Top Performers sections use real data from your account."
-        type="warning"
-        showIcon
-        closable
-      />
 
       <Tabs
         defaultActiveKey="my"
@@ -325,9 +280,9 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-semibold gradient-text mb-4">{t('callVolumeTrends')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[300px]"><Spin /></div>
-              ) : (
+              ) : chartData.callTrends.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData.callTrends.length > 0 ? chartData.callTrends : SAMPLE_TREND_DATA}>
+                  <LineChart data={chartData.callTrends}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
                     <XAxis dataKey="date" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
                     <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
@@ -338,6 +293,8 @@ export default function AnalyticsPage() {
                     <Line type="monotone" dataKey="outbound" stroke="#f97316" name={t('outbound')} strokeWidth={2} dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-sm" style={{ color: 'var(--text-muted)' }}>{t('noDataAvailable')}</div>
               )}
             </div>
 
@@ -346,9 +303,9 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-semibold gradient-text mb-4">{t('teamPerformance')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[280px]"><Spin /></div>
-              ) : (
+              ) : chartData.teamPerformance.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={chartData.teamPerformance.length > 0 ? chartData.teamPerformance : SAMPLE_TEAM_DATA}>
+                  <BarChart data={chartData.teamPerformance}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
                     <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
@@ -358,6 +315,8 @@ export default function AnalyticsPage() {
                     <Bar dataKey="answered" fill="#22c55e" name={t('answered')} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[280px] text-sm" style={{ color: 'var(--text-muted)' }}>{t('noDataAvailable')}</div>
               )}
             </div>
 
@@ -366,19 +325,18 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-semibold gradient-text mb-4">{t('callOutcomeDistribution')}</h3>
               {chartsLoading ? (
                 <div className="flex items-center justify-center h-[280px]"><Spin /></div>
-              ) : (
+              ) : chartData.outcomeDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
                     <Pie
-                      data={chartData.outcomeDistribution.length > 0 ? chartData.outcomeDistribution : SAMPLE_OUTCOME_DATA}
+                      data={chartData.outcomeDistribution}
                       cx="50%" cy="50%"
                       outerRadius={100}
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       labelLine={false}
                     >
-                      {(chartData.outcomeDistribution.length > 0 ? chartData.outcomeDistribution : SAMPLE_OUTCOME_DATA)
-                        .map((entry, index) => (
+                      {chartData.outcomeDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                     </Pie>
@@ -386,6 +344,8 @@ export default function AnalyticsPage() {
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[280px] text-sm" style={{ color: 'var(--text-muted)' }}>{t('noDataAvailable')}</div>
               )}
             </div>
           </div>

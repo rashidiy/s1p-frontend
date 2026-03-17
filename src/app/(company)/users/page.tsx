@@ -49,7 +49,7 @@ export default function UsersPage() {
     try {
       const result = await apiClient.getUsers({ page, page_size: 20, search: search || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load users:', error); message.error(tErrors('failedToLoadUsers')); }
+    } catch { message.error(tErrors('failedToLoadUsers')); }
     finally { setLoading(false); }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- tErrors is a stable reference from next-intl
   }, [page, search]);
@@ -64,8 +64,8 @@ export default function UsersPage() {
         status: inviteStatusFilter,
       });
       setInviteTokens(result);
-    } catch (error) {
-      console.error('Failed to load invite tokens:', error);
+    } catch {
+      // Invite tokens are supplementary — silently fail
     } finally {
       setInviteLoading(false);
     }
@@ -90,7 +90,7 @@ export default function UsersPage() {
           await apiClient.revokeInviteToken(tokenId);
           message.success(t('telegramTokenRevoked'));
           loadInviteTokens();
-        } catch (err: unknown) {
+        } catch {
           message.error(t('telegramRevokeFailed'));
         }
       },

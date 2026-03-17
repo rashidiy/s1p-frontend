@@ -60,8 +60,7 @@ export default function ProfilePage() {
         last_name: data.last_name || '',
         phone: data.phone || '',
       });
-    } catch (err) {
-      console.error('Failed to load profile:', err);
+    } catch {
       setLoadError(true);
     } finally {
       setLoading(false);
@@ -76,7 +75,7 @@ export default function ProfilePage() {
     try {
       const updated = await apiClient.updateMyProfile(profileForm);
       setProfile(updated);
-      setMessage(tErrors('profileUpdated'));
+      setMessage(t('profileUpdated'));
       // Update stored user data
       if (typeof window !== 'undefined') {
         const userStr = localStorage.getItem('user');
@@ -119,7 +118,7 @@ export default function ProfilePage() {
         old_password: passwordForm.old_password,
         new_password: passwordForm.new_password,
       });
-      setPasswordMessage(tErrors('passwordChanged'));
+      setPasswordMessage(t('passwordChanged'));
       setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
     } catch (err: unknown) {
       setPasswordError(getErrorMessage(err, tErrors('failedToChangePassword')));

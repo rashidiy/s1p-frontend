@@ -40,7 +40,7 @@ export default function OwnerContractsPage() {
       const result = await apiClient.getContracts({ page, page_size: 20, status: statusFilter || undefined, payment_status: paymentFilter || undefined });
       if (Array.isArray(result)) { setContracts(result); setTotalPages(1); }
       else { setContracts(result.items || []); setTotalPages(result.total_pages || 1); }
-    } catch (err: unknown) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); message.error(tErrors('failedToLoadContracts')); }
+    } catch (err: unknown) { setError(getErrorMessage(err, tErrors('failedToLoadContracts'))); }
     finally { setLoading(false); }
   };
 

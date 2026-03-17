@@ -65,7 +65,7 @@ export default function DealsPage() {
     try {
       const result = await apiClient.getDeals({ page, page_size: 20, search: search || undefined, stage: stage || undefined });
       setData(result);
-    } catch (error) { console.error('Failed to load deals:', error); message.error(tErrors('failedToLoadDeals')); }
+    } catch { message.error(tErrors('failedToLoadDeals')); }
     finally { setLoading(false); }
   };
 

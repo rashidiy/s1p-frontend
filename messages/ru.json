@@ -688,7 +688,8 @@
     "total": "всего",
     "active": "активные",
     "completedTasks": "выполнено",
-    "analyticsHelp": "Аналитика основана на активности вашей команды за этот период"
+    "analyticsHelp": "Аналитика основана на активности вашей команды за этот период",
+    "noDataAvailable": "Нет данных"
   },
   "users": {
     "title": "Участники команды",
@@ -971,7 +972,9 @@
     "updatePassword": "Обновите ваш пароль",
     "passwordMismatch": "Пароли не совпадают",
     "passwordTooShort": "Пароль должен быть не менее 8 символов",
-    "updateProfile": "Обновить профиль"
+    "updateProfile": "Обновить профиль",
+    "profileUpdated": "Профиль обновлён",
+    "passwordChanged": "Пароль изменён"
   },
   "ownerContracts": {
     "manageContracts": "Управление договорами и оплатой компаний",

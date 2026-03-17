@@ -56,7 +56,6 @@ export default function OwnerProfilePage() {
         phone: data.phone || '',
       });
     } catch (err) {
-      console.error('Failed to load profile:', err);
       setLoadError(true);
     } finally {
       setLoading(false);

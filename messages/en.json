@@ -688,7 +688,8 @@
     "total": "total",
     "active": "active",
     "completedTasks": "completed",
-    "analyticsHelp": "Analytics are based on your team's activity this period"
+    "analyticsHelp": "Analytics are based on your team's activity this period",
+    "noDataAvailable": "No data available"
   },
   "users": {
     "title": "Team Members",
@@ -971,7 +972,9 @@
     "updatePassword": "Update your password",
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 8 characters",
-    "updateProfile": "Update Profile"
+    "updateProfile": "Update Profile",
+    "profileUpdated": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully"
   },
   "ownerContracts": {
     "manageContracts": "Manage company contracts and billing",
