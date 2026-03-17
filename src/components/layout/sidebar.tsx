@@ -64,7 +64,6 @@ const managerNavigation: NavItem[] = [
 
 const adminNavigation: NavItem[] = [
   { nameKey: 'team', href: '/users', icon: <TeamOutlined /> },
-  { nameKey: 'settings', href: '/settings', icon: <SettingOutlined /> },
 ];
 
 interface SidebarProps {
