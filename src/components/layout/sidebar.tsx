@@ -23,6 +23,7 @@ import {
   FormOutlined,
   KeyOutlined,
   ApiOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/auth';
 import { useThemeStore } from '@/store/theme';
@@ -63,12 +64,7 @@ const managerNavigation: NavItem[] = [
 
 const adminNavigation: NavItem[] = [
   { nameKey: 'team', href: '/users', icon: <TeamOutlined /> },
-  { nameKey: 'permissionGroups', href: '/settings/permission-groups', icon: <SafetyOutlined /> },
-  { nameKey: 'customFields', href: '/settings/custom-fields', icon: <FormOutlined /> },
-  { nameKey: 'apiKeys', href: '/settings/api-keys', icon: <KeyOutlined /> },
-  { nameKey: 'webhooks', href: '/settings/webhooks', icon: <ApiOutlined /> },
-  { nameKey: 'contract', href: '/settings/contract', icon: <FileTextOutlined /> },
-  { nameKey: 'telegram', href: '/settings/telegram', icon: <SendOutlined /> },
+  { nameKey: 'settings', href: '/settings', icon: <SettingOutlined /> },
 ];
 
 interface SidebarProps {
@@ -195,6 +191,11 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
       </div>
 
       <div style={{ borderTop: '1px solid var(--popover-border)', margin: '4px 0' }} />
+      {isAdmin && (
+        <div className="profile-menu-item" onClick={() => { setPopoverOpen(false); router.push('/settings'); }}>
+          <SettingOutlined /> {t('settings')}
+        </div>
+      )}
       <div className="profile-menu-item profile-menu-item--danger" onClick={handleLogout}>
         <LogoutOutlined /> {t('logout')}
       </div>

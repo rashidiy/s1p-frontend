@@ -480,7 +480,7 @@ class ApiClient {
   }
 
   async getAvailablePermissions() {
-    const response = await this.client.get<API.AvailablePermission[]>('/api/v1/company/permission-groups/available-permissions');
+    const response = await this.client.get<API.AvailablePermission[]>('/api/v1/company/permission-groups/permissions');
     return response.data;
   }
 
