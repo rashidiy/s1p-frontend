@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Button, Tag, Select, Segmented, message } from 'antd';
+import { Input, Pagination, Button, Tag, Select, Segmented, Table, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DollarOutlined, RiseOutlined, UserOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { DealResponse, PaginatedResponse } from '@/types/api';
@@ -31,6 +33,7 @@ export default function DealsPage() {
   const tCommon = useTranslations('common');
 
   const { hasPermissionString } = useAuthStore();
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialView);
   const [data, setData] = useState<PaginatedResponse<DealResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,31 +132,56 @@ export default function DealsPage() {
             />
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {data?.items.map((deal) => (
-              <div key={deal.id} className="glass-card p-5 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{deal.title}</h3>
-                    {deal.contact_name && <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><UserOutlined className="text-xs" /> {deal.contact_name}</p>}
+          <Table<DealResponse>
+            columns={[
+              {
+                title: t('title'), key: 'title', render: (_, deal) => (
+                  <Link href={`/deals/${deal.id}`} className="font-medium text-gray-900 hover:text-crm-indigo-600">{deal.title}</Link>
+                ),
+              },
+              {
+                title: t('contact'), dataIndex: 'contact_name', key: 'contact', responsive: ['md'],
+                render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+              },
+              {
+                title: t('stage'), dataIndex: 'stage', key: 'stage', width: 130,
+                render: (v: string) => v ? <Tag color={stageColors[v.toLowerCase()] || 'default'}>{tStatuses(v.toLowerCase())}</Tag> : '—',
+              },
+              {
+                title: t('amount'), dataIndex: 'amount', key: 'amount', width: 130,
+                render: (v: number) => <span className="font-bold text-green-600">{formatCurrency(v ?? 0)}</span>,
+              },
+              {
+                title: t('probability'), dataIndex: 'probability', key: 'probability', width: 80, responsive: ['lg'],
+                render: (v: number | null) => v != null ? `${v}%` : '—',
+              },
+              {
+                title: t('closeDate'), dataIndex: 'expected_close_date', key: 'close', width: 120, responsive: ['lg'],
+                render: (v: string | null) => v ? formatDate(v) : '—',
+              },
+              {
+                title: t('assignedTo'), dataIndex: 'assigned_to_name', key: 'assigned', responsive: ['xl'],
+                render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+              },
+              {
+                title: '', key: 'actions', width: 140,
+                render: (_, deal) => (
+                  <div className="flex gap-2">
+                    <Link href={`/deals/${deal.id}`}><Button size="small">{tActions('view')}</Button></Link>
+                    {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && (
+                      <Button size="small" type="primary" onClick={async (e) => { e.stopPropagation(); try { await apiClient.markDealWon(deal.id); loadDeals(); } catch { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>
+                    )}
                   </div>
-                  {deal.stage && <Tag color={stageColors[deal.stage.toLowerCase()] || 'default'}>{deal.stage}</Tag>}
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-lg font-bold text-green-600"><DollarOutlined /> {formatCurrency(deal.amount)}</span>
-                    {deal.probability && <span className="text-sm text-gray-600 flex items-center gap-1"><RiseOutlined /> {deal.probability}%</span>}
-                  </div>
-                  {deal.expected_close_date && <p className="text-sm text-gray-600">{formatDate(deal.expected_close_date)}</p>}
-                  {deal.assigned_to_name && <p className="text-sm text-gray-600">{t('owner')}: <span className="font-medium">{deal.assigned_to_name}</span></p>}
-                  <div className="flex gap-2 pt-2">
-                    <Link href={`/deals/${deal.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
-                    {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && <Button type="primary" onClick={async () => { try { await apiClient.markDealWon(deal.id); loadDeals(); } catch (err) { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                ),
+              },
+            ] as ColumnsType<DealResponse>}
+            dataSource={data?.items ?? []}
+            rowKey="id"
+            pagination={false}
+            onRow={(record) => ({ onClick: () => router.push(`/deals/${record.id}`), style: { cursor: 'pointer' } })}
+            size="middle"
+            scroll={{ x: 600 }}
+          />
 
           {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
 

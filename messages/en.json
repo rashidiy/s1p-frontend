@@ -573,7 +573,8 @@
     "listView": "List",
     "noDealsInStage": "No deals in this stage",
     "failedToLoadPipeline": "Failed to load pipeline",
-    "pipelineHelp": "Drag-free pipeline: click a deal to view details, use edit to change stage"
+    "pipelineHelp": "Drag-free pipeline: click a deal to view details, use edit to change stage",
+    "dealMoved": "Deal moved successfully"
   },
   "tasks": {
     "title": "Tasks",

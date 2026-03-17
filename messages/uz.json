@@ -573,7 +573,8 @@
     "listView": "Ro'yxat",
     "noDealsInStage": "Bu bosqichda bitimlar yo'q",
     "failedToLoadPipeline": "Quvurni yuklashda xatolik",
-    "pipelineHelp": "Sudrab bo'lmaydigan quvur: tafsilotlarni ko'rish uchun bitimni bosing, bosqichni o'zgartirish uchun tahrirlashdan foydalaning"
+    "pipelineHelp": "Sudrab bo'lmaydigan quvur: tafsilotlarni ko'rish uchun bitimni bosing, bosqichni o'zgartirish uchun tahrirlashdan foydalaning",
+    "dealMoved": "Bitim koʻchirildi"
   },
   "tasks": {
     "title": "Vazifalar",
