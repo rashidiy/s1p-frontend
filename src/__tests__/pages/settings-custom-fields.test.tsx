@@ -70,6 +70,7 @@ vi.mock('@ant-design/icons', () => ({
   CloseOutlined: () => <span>close-icon</span>,
   FormOutlined: () => <span>form-icon</span>,
   QuestionCircleOutlined: () => <span data-testid="icon-question" />,
+  ArrowLeftOutlined: () => <span data-testid="icon-arrow-left" />,
 }));
 
 // Mock illustrations

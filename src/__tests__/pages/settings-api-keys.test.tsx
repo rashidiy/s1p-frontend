@@ -50,6 +50,7 @@ vi.mock('@ant-design/icons', () => ({
   WarningOutlined: () => <span>warning-icon</span>,
   ExclamationCircleOutlined: () => <span>excl-icon</span>,
   QuestionCircleOutlined: () => <span data-testid="icon-question" />,
+  ArrowLeftOutlined: () => <span data-testid="icon-arrow-left" />,
 }));
 
 // Mock illustrations

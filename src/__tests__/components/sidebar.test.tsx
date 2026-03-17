@@ -146,10 +146,8 @@ describe('Sidebar', () => {
 
     render(<Sidebar />);
 
-    // Admin nav items (admin also gets hasPermissionString returning true for all)
+    // Admin nav items
     expect(screen.getByText('team')).toBeInTheDocument();
-    expect(screen.getByText('permissionGroups')).toBeInTheDocument();
-    expect(screen.getByText('telegram')).toBeInTheDocument();
     expect(screen.getByText('analytics')).toBeInTheDocument();
   });
 
