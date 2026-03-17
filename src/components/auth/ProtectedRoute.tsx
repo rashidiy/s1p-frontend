@@ -43,12 +43,9 @@ export function ProtectedRoute({
       return;
     }
 
-    if (mustChangePassword) {
-      if (isOwner) {
-        router.push('/owner/set-password');
-      } else {
-        router.push('/set-password');
-      }
+    // Only owner uses email+password auth; company users use Telegram OTP only
+    if (mustChangePassword && isOwner) {
+      router.push('/owner/set-password');
       return;
     }
 
