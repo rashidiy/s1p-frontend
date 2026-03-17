@@ -40,7 +40,8 @@ export default function PermissionGroupsPage() {
         apiClient.getAvailablePermissions(),
       ]);
       setGroups(groupsData.groups);
-      setAvailablePerms(permsData);
+      const perms = Array.isArray(permsData) ? permsData : (permsData as { permissions?: string[] }).permissions?.map((p: string) => ({ key: p, category: p.split('.')[0], label: p })) ?? [];
+      setAvailablePerms(perms);
     } catch (error) {
       console.error('Failed to load permission groups:', error);
       setError(true);
