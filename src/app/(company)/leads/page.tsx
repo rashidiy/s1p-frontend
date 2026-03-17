@@ -17,6 +17,7 @@ import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { LEAD_STATUS_KEYS } from '@/lib/constants';
 
 type ViewMode = 'cards' | 'table';
 
@@ -112,7 +113,7 @@ export default function LeadsPage() {
       key: 'status',
       width: 120,
       render: (value: string | null) =>
-        value ? <Tag color={statusColors[value.toLowerCase()] || 'default'}>{value}</Tag> : <span className="text-gray-300">-</span>,
+        value ? <Tag color={statusColors[value.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[value.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[value.toLowerCase()]) : value}</Tag> : <span className="text-gray-300">-</span>,
     },
     {
       title: tFields('estimatedValue'),
@@ -243,7 +244,7 @@ export default function LeadsPage() {
                     <h3 className="font-semibold text-gray-900">{lead.title}</h3>
                     {lead.contact_name && <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><UserOutlined className="text-xs" /> {lead.contact_name}</p>}
                   </div>
-                  {lead.status && <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{lead.status}</Tag>}
+                  {lead.status && <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[lead.status.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[lead.status.toLowerCase()]) : lead.status}</Tag>}
                 </div>
                 <div className="space-y-2">
                   {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}

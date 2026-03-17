@@ -320,7 +320,8 @@
     "customerRelationshipManagement": "Управление взаимоотношениями с клиентами",
     "cardView": "Карточки",
     "tableView": "Таблица",
-    "backToSettings": "Назад к настройкам"
+    "backToSettings": "Назад к настройкам",
+    "noDataAvailable": "Нет данных"
   },
   "errors": {
     "sessionExpired": "Сессия истекла",
@@ -419,6 +420,10 @@
     "somethingWentWrong": "Что-то пошло не так",
     "tryAgainLater": "Пожалуйста, попробуйте позже"
   },
+  "messages": {
+    "profileUpdated": "Профиль успешно обновлен",
+    "passwordChanged": "Пароль успешно изменен"
+  },
   "fields": {
     "firstName": "Имя",
     "lastName": "Фамилия",
@@ -475,7 +480,12 @@
     "endDate": "Дата окончания",
     "maxUsers": "Макс. пользователей",
     "currentUsers": "Текущие пользователи",
-    "updated": "Обновлено"
+    "updated": "Обновлено",
+    "autoRenew": "Автопродление",
+    "totalCalls": "Всего звонков",
+    "totalLeads": "Лиды",
+    "totalDeals": "Сделки",
+    "totalTasks": "Задачи"
   },
   "contacts": {
     "title": "Контакты",
@@ -505,7 +515,10 @@
     "contactDeleted": "Контакт успешно удален",
     "noteAdded": "Заметка успешно добавлена",
     "makeCall": "Позвонить",
-    "writeNote": "Написать заметку..."
+    "writeNote": "Написать заметку...",
+    "activityLead": "Лид: {title} ({status})",
+    "activityDeal": "Сделка: {title} ({amount})",
+    "activityCall": "Звонок ({direction})"
   },
   "leads": {
     "title": "Лиды",
@@ -1012,7 +1025,11 @@
       "subtitle": "CRM + Telegram бот для колл-центров. Мгновенные уведомления, управление лидами, аналитика — всё в одном месте.",
       "cta": "Попробовать бесплатно",
       "watchDemo": "Посмотреть демо",
-      "integrationStrip": "Интеграция с вашей телефонией"
+      "integrationStrip": "Интеграция с вашей телефонией",
+      "badge": "CRM #1 для колл-центров",
+      "statusNew": "Новый",
+      "statusContacted": "Связались",
+      "statusQualified": "Квалиф."
     },
     "pain": {
       "title": "Вы теряете клиентов",
@@ -1080,7 +1097,8 @@
       "cta": "Начать бесплатно — 14 дней",
       "noCard": "Без привязки карты. Отмена в любой момент.",
       "annual": "Годовой план: 2 900 000 сум/год",
-      "annualSaving": "экономия 580 000 сум"
+      "annualSaving": "экономия 580 000 сум",
+      "freeTrialBadge": "14 дней бесплатно"
     },
     "testimonials": {
       "title": "Что говорят наши клиенты",

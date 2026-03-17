@@ -9,6 +9,7 @@ import type { TaskResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { TASK_PRIORITY_KEYS } from '@/lib/constants';
 
 const priorityColors: Record<string, string> = { high: 'red', medium: 'orange', low: 'green' };
 
@@ -18,6 +19,7 @@ export default function TasksPage() {
   const tErrors = useTranslations('errors');
   const tStatuses = useTranslations('statuses');
   const tCommon = useTranslations('common');
+  const tPriorities = useTranslations('priorities');
 
   const { hasPermissionString } = useAuthStore();
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
@@ -127,7 +129,7 @@ export default function TasksPage() {
                   {task.description && <p className="text-sm text-gray-600 mt-1 line-clamp-2">{task.description}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {task.priority && <Tag color={priorityColors[task.priority.toLowerCase()] || 'default'}>{task.priority}</Tag>}
+                  {task.priority && <Tag color={priorityColors[task.priority.toLowerCase()] || 'default'}>{TASK_PRIORITY_KEYS[task.priority.toLowerCase()] ? tPriorities(TASK_PRIORITY_KEYS[task.priority.toLowerCase()]) : task.priority}</Tag>}
                   {task.due_date && isOverdue(task.due_date) && task.status !== 'completed' && <ExclamationCircleOutlined className="text-red-500" />}
                 </div>
               </div>

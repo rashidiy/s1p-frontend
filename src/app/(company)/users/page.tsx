@@ -97,7 +97,7 @@ export default function UsersPage() {
     });
   };
 
-  const formatRole = (role: string) => role.replace('company_', '').replace('_', ' ').toUpperCase();
+  const formatRole = (role: string) => tRoles(role as any) || role.replace('company_', '').replace('_', ' ').toUpperCase();
 
   if (loading) return (
     <div className="space-y-6">

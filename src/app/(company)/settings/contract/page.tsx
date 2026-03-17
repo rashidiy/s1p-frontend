@@ -210,8 +210,8 @@ export default function ContractStatusPage() {
         <div className="p-6 pt-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-500">{tFields('status')}</span>
-              <p className="font-medium">{contract.auto_renew ? 'Yes' : 'No'}</p>
+              <span className="text-gray-500">{tFields('autoRenew')}</span>
+              <p className="font-medium">{contract.auto_renew ? tActions('yes') : tActions('no')}</p>
             </div>
             <div>
               <span className="text-gray-500">{tFields('plan')}</span>

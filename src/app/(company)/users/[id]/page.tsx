@@ -131,8 +131,7 @@ export default function UserDetailPage() {
     });
   };
 
-  const formatRole = (role: string) =>
-    role.replace('company_', '').replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const formatRole = (role: string) => tRoles(role as any) || role.replace('company_', '').replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   if (loading) {
     return (
@@ -391,7 +390,7 @@ export default function UserDetailPage() {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">{tContractStatuses('suspended')}</span>
                 <Tag color={user.is_suspended ? 'red' : 'green'}>
-                  {user.is_suspended ? 'Yes' : 'No'}
+                  {user.is_suspended ? tActions('yes') : tActions('no')}
                 </Tag>
               </div>
               {user.language && (

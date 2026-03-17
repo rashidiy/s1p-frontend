@@ -320,7 +320,8 @@
     "customerRelationshipManagement": "Mijozlar bilan munosabatlarni boshqarish",
     "cardView": "Kartochkalar",
     "tableView": "Jadval",
-    "backToSettings": "Sozlamalarga qaytish"
+    "backToSettings": "Sozlamalarga qaytish",
+    "noDataAvailable": "Ma'lumot mavjud emas"
   },
   "errors": {
     "sessionExpired": "Sessiya muddati tugadi",
@@ -419,6 +420,10 @@
     "somethingWentWrong": "Xatolik yuz berdi",
     "tryAgainLater": "Iltimos, keyinroq urinib ko'ring"
   },
+  "messages": {
+    "profileUpdated": "Profil muvaffaqiyatli yangilandi",
+    "passwordChanged": "Parol muvaffaqiyatli o'zgartirildi"
+  },
   "fields": {
     "firstName": "Ism",
     "lastName": "Familiya",
@@ -475,7 +480,12 @@
     "endDate": "Tugash sanasi",
     "maxUsers": "Maks. foydalanuvchilar",
     "currentUsers": "Joriy foydalanuvchilar",
-    "updated": "Yangilangan"
+    "updated": "Yangilangan",
+    "autoRenew": "Avtouzaytirish",
+    "totalCalls": "Jami qo'ng'iroqlar",
+    "totalLeads": "Lidlar",
+    "totalDeals": "Bitimlar",
+    "totalTasks": "Vazifalar"
   },
   "contacts": {
     "title": "Kontaktlar",
@@ -505,7 +515,10 @@
     "contactDeleted": "Kontakt muvaffaqiyatli o'chirildi",
     "noteAdded": "Eslatma muvaffaqiyatli qo'shildi",
     "makeCall": "Qo'ng'iroq qilish",
-    "writeNote": "Eslatma yozing..."
+    "writeNote": "Eslatma yozing...",
+    "activityLead": "Lid: {title} ({status})",
+    "activityDeal": "Bitim: {title} ({amount})",
+    "activityCall": "Qo'ng'iroq ({direction})"
   },
   "leads": {
     "title": "Lidlar",
@@ -1012,7 +1025,11 @@
       "subtitle": "Qo'ng'iroq markazlari uchun CRM + Telegram bot. Tezkor bildirishnomalar, lidlarni boshqarish, analitika — barchasi bir joyda.",
       "cta": "Bepul sinab ko'rish",
       "watchDemo": "Demoni ko'rish",
-      "integrationStrip": "Telefoniyangiz bilan integratsiya"
+      "integrationStrip": "Telefoniyangiz bilan integratsiya",
+      "badge": "Qo'ng'iroq markazlari uchun #1 CRM",
+      "statusNew": "Yangi",
+      "statusContacted": "Bog'lanildi",
+      "statusQualified": "Malakali"
     },
     "pain": {
       "title": "Siz mijozlarni yo'qotyapsiz",
@@ -1080,7 +1097,8 @@
       "cta": "Bepul boshlash — 14 kun",
       "noCard": "Karta bog'lash shart emas. Istalgan vaqtda bekor qilish.",
       "annual": "Yillik reja: 2 900 000 so'm/yil",
-      "annualSaving": "580 000 so'm tejash"
+      "annualSaving": "580 000 so'm tejash",
+      "freeTrialBadge": "14 kun bepul"
     },
     "testimonials": {
       "title": "Mijozlarimiz nima deydi",

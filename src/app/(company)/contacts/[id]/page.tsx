@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeftOutlined, MailOutlined, PhoneOutlined, FundProjectionScreenOutlined, UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Tag, message, App } from 'antd';
+import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import type { ContactResponse, NoteResponse } from '@/types/api';
@@ -11,6 +11,7 @@ import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { LEAD_STATUS_KEYS, CALL_DIRECTION_KEYS } from '@/lib/constants';
 
 interface ActivityTimelineItem {
   type: string;
@@ -27,6 +28,8 @@ export default function ContactDetailPage() {
   const tErrors = useTranslations('errors');
   const tCommon = useTranslations('common');
   const tEntities = useTranslations('entities');
+  const tStatuses = useTranslations('statuses');
+  const tDirections = useTranslations('directions');
 
   const params = useParams()!;
   const router = useRouter();
@@ -98,17 +101,17 @@ export default function ContactDetailPage() {
       const timeline: ActivityTimelineItem[] = [];
       if (data?.leads) {
         for (const lead of data.leads) {
-          timeline.push({ type: 'lead', description: `Lead: ${lead.title} (${lead.status || 'new'})`, created_at: lead.created_at, link: lead.id ? `/leads/${lead.id}` : undefined });
+          timeline.push({ type: 'lead', description: t('activityLead', { title: lead.title, status: LEAD_STATUS_KEYS[lead.status] ? tStatuses(LEAD_STATUS_KEYS[lead.status]) : (lead.status || tStatuses('new')) }), created_at: lead.created_at, link: lead.id ? `/leads/${lead.id}` : undefined });
         }
       }
       if (data?.deals) {
         for (const deal of data.deals) {
-          timeline.push({ type: 'deal', description: `Deal: ${deal.title} (${formatCurrency(deal.amount || 0)})`, created_at: deal.created_at, link: deal.id ? `/deals/${deal.id}` : undefined });
+          timeline.push({ type: 'deal', description: t('activityDeal', { title: deal.title, amount: formatCurrency(deal.amount || 0) }), created_at: deal.created_at, link: deal.id ? `/deals/${deal.id}` : undefined });
         }
       }
       if (data?.calls) {
         for (const call of data.calls) {
-          timeline.push({ type: 'call', description: `Call (${call.direction || 'unknown'})`, created_at: call.started_at, link: call.id ? `/calls/${call.id}` : undefined });
+          timeline.push({ type: 'call', description: t('activityCall', { direction: CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : (call.direction || tCommon('unknown')) }), created_at: call.started_at, link: call.id ? `/calls/${call.id}` : undefined });
         }
       }
       timeline.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

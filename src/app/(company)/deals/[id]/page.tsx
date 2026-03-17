@@ -6,7 +6,7 @@ import { ArrowLeftOutlined, DollarOutlined, UserOutlined, EditOutlined, SaveOutl
 import { Button, Input, Modal, Tag, message } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import { DEAL_STAGE_COLORS } from '@/lib/constants';
+import { DEAL_STAGE_COLORS, DEAL_STAGE_KEYS } from '@/lib/constants';
 import type { DealResponse, NoteResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -25,6 +25,7 @@ export default function DealDetailPage() {
   const tErrors = useTranslations('errors');
   const tCommon = useTranslations('common');
   const tEntities = useTranslations('entities');
+  const tStatuses = useTranslations('statuses');
 
   const [deal, setDeal] = useState<DealResponse | null>(null);
   const [notes, setNotes] = useState<NoteResponse[]>([]);
@@ -250,7 +251,7 @@ export default function DealDetailPage() {
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             {tActions('back')}
           </Button>
-          {deal.stage && <Tag className={stageColor}>{deal.stage}</Tag>}
+          {deal.stage && <Tag className={stageColor}>{DEAL_STAGE_KEYS[deal.stage.toLowerCase()] ? tStatuses(DEAL_STAGE_KEYS[deal.stage.toLowerCase()]) : deal.stage}</Tag>}
         </div>
         <div className="flex flex-wrap gap-2">
           {!isClosedDeal && hasPermissionString('deals.write') && (
@@ -443,7 +444,7 @@ export default function DealDetailPage() {
             <div className="p-6 pt-0 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('stage')}</span>
-                <Tag className={stageColor}>{deal.stage || 'N/A'}</Tag>
+                <Tag className={stageColor}>{deal.stage ? (DEAL_STAGE_KEYS[deal.stage.toLowerCase()] ? tStatuses(DEAL_STAGE_KEYS[deal.stage.toLowerCase()]) : deal.stage) : 'N/A'}</Tag>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('amount')}</span>

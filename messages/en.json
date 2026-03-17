@@ -320,7 +320,8 @@
     "customerRelationshipManagement": "Customer Relationship Management",
     "cardView": "Cards",
     "tableView": "Table",
-    "backToSettings": "Back to Settings"
+    "backToSettings": "Back to Settings",
+    "noDataAvailable": "No data available"
   },
   "errors": {
     "sessionExpired": "Session expired",
@@ -419,6 +420,10 @@
     "somethingWentWrong": "Something went wrong",
     "tryAgainLater": "Please try again later"
   },
+  "messages": {
+    "profileUpdated": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully"
+  },
   "fields": {
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -475,7 +480,12 @@
     "endDate": "End Date",
     "maxUsers": "Max Users",
     "currentUsers": "Current Users",
-    "updated": "Updated"
+    "updated": "Updated",
+    "autoRenew": "Auto Renew",
+    "totalCalls": "Total Calls",
+    "totalLeads": "Leads",
+    "totalDeals": "Deals",
+    "totalTasks": "Tasks"
   },
   "contacts": {
     "title": "Contacts",
@@ -505,7 +515,10 @@
     "contactDeleted": "Contact deleted successfully",
     "noteAdded": "Note added successfully",
     "makeCall": "Make Call",
-    "writeNote": "Write a note..."
+    "writeNote": "Write a note...",
+    "activityLead": "Lead: {title} ({status})",
+    "activityDeal": "Deal: {title} ({amount})",
+    "activityCall": "Call ({direction})"
   },
   "leads": {
     "title": "Leads",
@@ -1012,7 +1025,11 @@
       "subtitle": "CRM + Telegram bot for call centers. Instant notifications, lead management, analytics — all in one place.",
       "cta": "Start free trial",
       "watchDemo": "Watch demo",
-      "integrationStrip": "Integrates with your telephony"
+      "integrationStrip": "Integrates with your telephony",
+      "badge": "CRM #1 for call centers",
+      "statusNew": "New",
+      "statusContacted": "Contacted",
+      "statusQualified": "Qualified"
     },
     "pain": {
       "title": "You're losing customers",
@@ -1080,7 +1097,8 @@
       "cta": "Start free — 14 days",
       "noCard": "No credit card required. Cancel anytime.",
       "annual": "Annual plan: $290/year",
-      "annualSaving": "save $58"
+      "annualSaving": "save $58",
+      "freeTrialBadge": "14 days free"
     },
     "testimonials": {
       "title": "What our clients say",

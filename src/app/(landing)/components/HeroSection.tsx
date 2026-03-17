@@ -29,10 +29,10 @@ const MOCK_LEADS = [
   { name: 'Нодира Р.', phone: '+998 93 •••', status: 'qualified' },
 ];
 
-const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  new: { label: 'Новый', color: 'bg-indigo-500/20 text-indigo-400' },
-  contacted: { label: 'Связались', color: 'bg-amber-500/20 text-amber-400' },
-  qualified: { label: 'Квалиф.', color: 'bg-emerald-500/20 text-emerald-400' },
+const STATUS_COLORS: Record<string, string> = {
+  new: 'bg-indigo-500/20 text-indigo-400',
+  contacted: 'bg-amber-500/20 text-amber-400',
+  qualified: 'bg-emerald-500/20 text-emerald-400',
 };
 
 function PhoneIcon() {
@@ -74,8 +74,15 @@ const STAT_CARDS = [
   { value: 12, labelKey: 'dashboard.completedTasks', icon: CheckIcon, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', accent: 'text-amber-400' },
 ];
 
+const STATUS_LABEL_KEYS: Record<string, string> = {
+  new: 'statusNew',
+  contacted: 'statusContacted',
+  qualified: 'statusQualified',
+};
+
 function CRMDashboardCard() {
   const tDashboard = useTranslations();
+  const tHero = useTranslations('landing.hero');
 
   return (
     <BlurFade delay={0.4} direction="left" duration={0.8} blur="12px">
@@ -156,8 +163,8 @@ function CRMDashboardCard() {
                       <div className="text-[10px] text-gray-600 font-body">{lead.phone}</div>
                     </div>
                   </div>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_MAP[lead.status].color}`}>
-                    {STATUS_MAP[lead.status].label}
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_COLORS[lead.status]}`}>
+                    {tHero(STATUS_LABEL_KEYS[lead.status])}
                   </span>
                 </div>
               ))}
@@ -226,7 +233,7 @@ export default function HeroSection() {
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.06] px-4 py-1.5 backdrop-blur-sm">
                 <SparkleIcon />
                 <span className="text-sm font-body text-gray-300">
-                  CRM #1 для колл-центров
+                  {t('hero.badge')}
                 </span>
               </div>
             </BlurFade>

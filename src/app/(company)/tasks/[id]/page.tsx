@@ -11,6 +11,7 @@ import type { TaskResponse, UserResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { TASK_STATUS_KEYS, TASK_PRIORITY_KEYS } from '@/lib/constants';
 
 const priorityColors: Record<string, string> = {
   low: 'green', medium: 'blue', high: 'orange', urgent: 'red',
@@ -206,7 +207,7 @@ export default function TaskDetailPage() {
             </Button>
           </Link>
           {task.status && (
-            <Tag color={statusColors[task.status] || 'default'}>{task.status.replace('_', ' ')}</Tag>
+            <Tag color={statusColors[task.status] || 'default'}>{TASK_STATUS_KEYS[task.status] ? tStatuses(TASK_STATUS_KEYS[task.status]) : task.status}</Tag>
           )}
         </div>
         <div className="flex flex-wrap gap-2">
@@ -365,7 +366,7 @@ export default function TaskDetailPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">{tFields('priority')}</span>
                 {task.priority ? (
-                  <Tag color={priorityColors[task.priority] || 'default'}>{task.priority}</Tag>
+                  <Tag color={priorityColors[task.priority] || 'default'}>{TASK_PRIORITY_KEYS[task.priority] ? tPriorities(TASK_PRIORITY_KEYS[task.priority]) : task.priority}</Tag>
                 ) : (
                   <span className="text-sm text-gray-400">{tCommon('noDataFound')}</span>
                 )}
@@ -373,7 +374,7 @@ export default function TaskDetailPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">{tFields('status')}</span>
                 {task.status ? (
-                  <Tag color={statusColors[task.status] || 'default'}>{task.status.replace('_', ' ')}</Tag>
+                  <Tag color={statusColors[task.status] || 'default'}>{TASK_STATUS_KEYS[task.status] ? tStatuses(TASK_STATUS_KEYS[task.status]) : task.status}</Tag>
                 ) : (
                   <span className="text-sm text-gray-400">{tCommon('unknown')}</span>
                 )}

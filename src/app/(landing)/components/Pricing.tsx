@@ -41,7 +41,7 @@ export default function Pricing() {
             {/* Free trial badge */}
             <div className="absolute right-6 top-6 z-10">
               <div className="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">
-                14 дней бесплатно
+                {t('pricing.freeTrialBadge')}
               </div>
             </div>
 
