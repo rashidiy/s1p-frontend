@@ -116,7 +116,7 @@ export type UserListResponse = Omit<Schema<'UserListResponse'>, 'items'> & {
 export type CallRequest = Schema<'CallRequest'>;
 export type CallResponse = Schema<'CallResponse'>;
 export type CallEventResponse = Schema<'CallEventResponse'> & {
-  // Fields present in DB model but missing from backend response schema — remove when backend adds them
+  // Backend now returns these fields — remove this override after running `npm run sync:api`
   outcome?: string | null;
   disposition_notes?: string | null;
   deal_id?: string | null;
