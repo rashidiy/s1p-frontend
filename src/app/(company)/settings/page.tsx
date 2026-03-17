@@ -17,7 +17,7 @@ import {
   LaptopOutlined,
   GlobalOutlined,
 } from '@ant-design/icons';
-import { Segmented } from 'antd';
+import { Select, Segmented } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/store/auth';
@@ -25,17 +25,16 @@ import { UserRole } from '@/types/api';
 import { useThemeStore } from '@/store/theme';
 import { locales, type Locale } from '@/i18n/config';
 
-const LOCALE_LABELS: Record<Locale, string> = {
-  ru: 'Русский',
-  en: 'English',
-  uz: 'O\'zbekcha',
-};
+const LANGUAGE_OPTIONS = [
+  { value: 'ru', label: 'Русский' },
+  { value: 'en', label: 'English' },
+  { value: 'uz', label: "O'zbek" },
+];
 
 export default function SettingsPage() {
   const { hasPermission } = useAuthStore();
   const isAdmin = hasPermission(UserRole.COMPANY_ADMIN);
   const t = useTranslations('settings');
-  const tNav = useTranslations('nav');
   const { mode, setMode } = useThemeStore();
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -97,21 +96,14 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="space-y-8 max-w-3xl">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-          {tNav('settings')}
-        </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-          {t('subtitle')}
-        </p>
-      </div>
+    <div className="space-y-8">
+      {/* Subtitle only — page title comes from layout */}
+      <p className="page-subtitle">{t('subtitle')}</p>
 
       {/* General Section */}
       <div className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          {t('general') || 'General'}
+        <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+          {t('general')}
         </h2>
 
         {/* Profile Link */}
@@ -132,11 +124,12 @@ export default function SettingsPage() {
           </div>
         </Link>
 
-        {/* Appearance + Language in one card */}
+        {/* Appearance + Language */}
         <div className="glass-card p-5 space-y-5">
-          <div className="flex items-start justify-between gap-4">
+          {/* Appearance */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
                 <SunOutlined style={{ fontSize: 18, color: '#6b7280' }} />
               </div>
               <div>
@@ -152,15 +145,15 @@ export default function SettingsPage() {
                 { value: 'dark', icon: <MoonOutlined /> },
                 { value: 'system', icon: <LaptopOutlined /> },
               ]}
-              size="small"
             />
           </div>
 
           <div style={{ borderTop: '1px solid var(--border-light)' }} />
 
-          <div className="flex items-start justify-between gap-4">
+          {/* Language — uses Select dropdown to match Telegram settings pattern */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
                 <GlobalOutlined style={{ fontSize: 18, color: '#3b82f6' }} />
               </div>
               <div>
@@ -168,11 +161,11 @@ export default function SettingsPage() {
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('languageDescription')}</p>
               </div>
             </div>
-            <Segmented
+            <Select
               value={locale}
-              onChange={(v) => handleLocaleChange(v as string)}
-              options={locales.map((loc) => ({ value: loc, label: LOCALE_LABELS[loc] }))}
-              size="small"
+              onChange={handleLocaleChange}
+              options={LANGUAGE_OPTIONS}
+              style={{ width: 160 }}
             />
           </div>
         </div>
@@ -181,8 +174,8 @@ export default function SettingsPage() {
       {/* Administration Section */}
       {isAdmin && (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-            {t('administration') || 'Administration'}
+          <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            {t('administration')}
           </h2>
 
           <div className="glass-card overflow-hidden divide-y" style={{ borderColor: 'var(--border-light)' }}>
