@@ -6,7 +6,7 @@ import { FileTextOutlined, PlusOutlined, DollarOutlined, CalendarOutlined } from
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
-import { CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
+import { CONTRACT_STATUS_KEYS, BILLING_PERIOD_KEYS, PAYMENT_STATUS_KEYS } from '@/lib/constants';
 import type { ContractResponse } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -28,6 +28,7 @@ export default function OwnerContractsPage() {
   const tStatuses = useTranslations('statuses');
   const tContractStatuses = useTranslations('contractStatuses');
   const tPaymentStatuses = useTranslations('paymentStatuses');
+  const tBilling = useTranslations('billing');
   const tCommon = useTranslations('common');
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
@@ -118,12 +119,12 @@ export default function OwnerContractsPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-3 sm:gap-6 pl-14 sm:pl-0">
                     <div className="sm:text-right">
-                      <div className="flex items-center gap-1"><DollarOutlined className="text-green-600" /><span className="font-bold text-lg">{contract.price}</span><span className="text-gray-400 text-sm">/{BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase() || contract.billing_period}</span></div>
+                      <div className="flex items-center gap-1"><DollarOutlined className="text-green-600" /><span className="font-bold text-lg">{contract.price}</span><span className="text-gray-400 text-sm">/{BILLING_PERIOD_KEYS[contract.billing_period] ? tBilling(BILLING_PERIOD_KEYS[contract.billing_period]).toLowerCase() : contract.billing_period}</span></div>
                       <div className="flex items-center gap-1 text-xs text-gray-400 mt-1"><CalendarOutlined /> {new Date(contract.start_date).toLocaleDateString()} - {new Date(contract.end_date).toLocaleDateString()}</div>
                     </div>
                     <div className="flex sm:flex-col gap-1">
-                      <Tag color={statusTagColors[contract.status] || 'default'}>{CONTRACT_STATUS_LABELS[contract.status] || contract.status}</Tag>
-                      <Tag color={paymentTagColors[contract.payment_status] || 'default'}>{PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}</Tag>
+                      <Tag color={statusTagColors[contract.status] || 'default'}>{CONTRACT_STATUS_KEYS[contract.status] ? tContractStatuses(CONTRACT_STATUS_KEYS[contract.status]) : contract.status}</Tag>
+                      <Tag color={paymentTagColors[contract.payment_status] || 'default'}>{PAYMENT_STATUS_KEYS[contract.payment_status] ? tPaymentStatuses(PAYMENT_STATUS_KEYS[contract.payment_status]) : contract.payment_status}</Tag>
                     </div>
                     <Link href={`/owner/contracts/${contract.id}`}><Button>{tActions('view')}</Button></Link>
                   </div>

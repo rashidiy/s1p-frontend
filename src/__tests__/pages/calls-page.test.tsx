@@ -82,13 +82,13 @@ vi.mock('dayjs', () => {
 
 // Mock constants
 vi.mock('@/lib/constants', () => ({
-  CALL_DIRECTION_LABELS: { inbound: 'Inbound', outbound: 'Outbound' },
+  CALL_DIRECTION_KEYS: { inbound: 'inbound', outbound: 'outbound' },
   CALL_DIRECTION_COLORS: { inbound: 'green', outbound: 'blue' },
-  CALL_STATUS_LABELS: { answered: 'Answered', missed: 'Missed' },
+  CALL_STATUS_KEYS: { answered: 'answered', missed: 'missed' },
   CALL_STATUS_COLORS: { answered: 'green', missed: 'red' },
   CALL_DIRECTION_OPTIONS: [
-    { label: 'Inbound', value: 'inbound' },
-    { label: 'Outbound', value: 'outbound' },
+    { key: 'inbound', value: 'inbound' },
+    { key: 'outbound', value: 'outbound' },
   ],
 }));
 

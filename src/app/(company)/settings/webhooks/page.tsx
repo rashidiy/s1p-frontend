@@ -17,11 +17,13 @@ import { Button, Input, Switch, Tag, Modal, Table, Tooltip, message } from 'antd
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import Link from 'next/link';
 import type {
   WebhookEndpointResponse,
   WebhookDeliveryResponse,
 } from '@/types/api';
+import { UserRole } from '@/types/api';
 
 const EVENT_LABELS: Record<string, string> = {
   'call.completed': 'eventCallCompleted',
@@ -227,48 +229,53 @@ export default function WebhooksPage() {
 
   if (error) {
     return (
-      <div className="glass-card py-16 flex flex-col items-center justify-center">
-        <ErrorCharacter height={115} />
-        <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
-        <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
-        <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadData(); }}>
-          {tActions('tryAgain')}
-        </Button>
-      </div>
+      <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <ErrorCharacter height={115} />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{tErrors('somethingWentWrong')}</h3>
+          <p className="text-sm text-gray-400 mt-1">{tErrors('tryAgainLater')}</p>
+          <Button type="primary" className="mt-4" onClick={() => { setError(false); setLoading(true); loadData(); }}>
+            {tActions('tryAgain')}
+          </Button>
+        </div>
+      </ProtectedRoute>
     );
   }
 
   if (loading) return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
-          <div className="h-4 w-56 bg-gray-50 rounded animate-pulse mt-2" />
+    <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+            <div className="h-4 w-56 bg-gray-50 rounded animate-pulse mt-2" />
+          </div>
+          <div className="h-9 w-36 bg-gray-100 rounded-lg animate-pulse" />
         </div>
-        <div className="h-9 w-36 bg-gray-100 rounded-lg animate-pulse" />
-      </div>
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="glass-card p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="h-5 w-64 bg-gray-100 rounded animate-pulse" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-card p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-64 bg-gray-100 rounded animate-pulse" />
+                <div className="flex gap-2">
+                  <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
+                  <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
+                </div>
+              </div>
               <div className="flex gap-2">
-                <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
-                <div className="h-7 w-7 bg-gray-50 rounded animate-pulse" />
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="h-5 w-24 bg-gray-50 rounded animate-pulse" />
+                ))}
               </div>
             </div>
-            <div className="flex gap-2">
-              {[1, 2, 3].map((j) => (
-                <div key={j} className="h-5 w-24 bg-gray-50 rounded animate-pulse" />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 
   return (
+    <ProtectedRoute requireRole={UserRole.COMPANY_ADMIN}>
     <div className="space-y-6">
       <Link href="/settings">
         <Button type="text" icon={<ArrowLeftOutlined />} className="mb-2">
@@ -450,5 +457,6 @@ export default function WebhooksPage() {
         </div>
       )}
     </div>
+    </ProtectedRoute>
   );
 }

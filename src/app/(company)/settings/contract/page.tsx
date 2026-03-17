@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 import Link from 'next/link';
-import { CONTRACT_STATUS_COLORS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
+import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_KEYS, BILLING_PERIOD_KEYS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_KEYS } from '@/lib/constants';
 import type { ContractStatusResponse } from '@/types/api';
 
 export default function ContractStatusPage() {
@@ -20,6 +20,9 @@ export default function ContractStatusPage() {
   const tActions = useTranslations('actions');
   const tCommon = useTranslations('common');
   const tRoles = useTranslations('roles');
+  const tBilling = useTranslations('billing');
+  const tPaymentStatuses = useTranslations('paymentStatuses');
+  const tContractStatuses = useTranslations('contractStatuses');
 
   useEffect(() => {
     loadContractStatus();
@@ -129,7 +132,7 @@ export default function ContractStatusPage() {
             <h3 className="text-base font-semibold leading-none tracking-tight text-2xl">{contract.name}</h3>
           </div>
           <div className="p-6 pt-0">
-            <Tag className={statusColor}>{contract.status.replace('_', ' ')}</Tag>
+            <Tag className={statusColor}>{CONTRACT_STATUS_KEYS[contract.status] ? tContractStatuses(CONTRACT_STATUS_KEYS[contract.status]) : contract.status}</Tag>
           </div>
         </div>
 
@@ -137,12 +140,12 @@ export default function ContractStatusPage() {
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
             <p className="text-sm text-gray-400">{tFields('billingPeriod')}</p>
             <h3 className="text-base font-semibold leading-none tracking-tight text-xl capitalize">
-              {BILLING_PERIOD_LABELS[contract.billing_period] || contract.billing_period}
+              {BILLING_PERIOD_KEYS[contract.billing_period] ? tBilling(BILLING_PERIOD_KEYS[contract.billing_period]) : contract.billing_period}
             </h3>
           </div>
           <div className="p-6 pt-0">
             <Tag className={paymentColor}>
-              {PAYMENT_STATUS_LABELS[contract.payment_status] || contract.payment_status}
+              {PAYMENT_STATUS_KEYS[contract.payment_status] ? tPaymentStatuses(PAYMENT_STATUS_KEYS[contract.payment_status]) : contract.payment_status}
             </Tag>
           </div>
         </div>

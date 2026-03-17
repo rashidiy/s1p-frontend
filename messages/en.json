@@ -202,7 +202,8 @@
     "busy": "Busy",
     "noAnswer": "No Answer",
     "congestion": "Congestion",
-    "unavailable": "Unavailable"
+    "unavailable": "Unavailable",
+    "answered": "Answered"
   },
   "priorities": {
     "low": "Low",

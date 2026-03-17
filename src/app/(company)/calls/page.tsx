@@ -9,36 +9,38 @@ import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import {
-  CALL_DIRECTION_LABELS,
+  CALL_DIRECTION_KEYS,
   CALL_DIRECTION_COLORS,
-  CALL_STATUS_LABELS,
+  CALL_STATUS_KEYS,
   CALL_STATUS_COLORS,
   CALL_DIRECTION_OPTIONS,
 } from '@/lib/constants';
 import type { CallEventResponse, PaginatedResponse } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 
-const OUTCOME_OPTIONS = [
-  { value: 'interested', label: 'Interested' },
-  { value: 'appointment_scheduled', label: 'Appointment Scheduled' },
-  { value: 'follow_up', label: 'Follow Up' },
-  { value: 'sale_made', label: 'Sale Made' },
-  { value: 'no_answer', label: 'No Answer' },
-  { value: 'left_voicemail', label: 'Left Voicemail' },
-  { value: 'busy', label: 'Busy' },
-  { value: 'callback_requested', label: 'Callback Requested' },
-  { value: 'information_provided', label: 'Information Provided' },
-  { value: 'not_interested', label: 'Not Interested' },
-  { value: 'wrong_number', label: 'Wrong Number' },
-  { value: 'do_not_call', label: 'Do Not Call' },
-  { value: 'customer_complaint', label: 'Customer Complaint' },
-  { value: 'other', label: 'Other' },
-];
-
 export default function CallsPage() {
   const router = useRouter();
   const t = useTranslations('calls');
   const tFields = useTranslations('fields');
+  const tDirections = useTranslations('directions');
+  const tStatuses = useTranslations('statuses');
+
+  const outcomeOptions = [
+    { value: 'interested', label: t('interested') },
+    { value: 'appointment_scheduled', label: t('appointmentScheduled') },
+    { value: 'follow_up', label: t('followUp') },
+    { value: 'sale_made', label: t('saleMade') },
+    { value: 'no_answer', label: t('noAnswer') },
+    { value: 'left_voicemail', label: t('leftVoicemail') },
+    { value: 'busy', label: t('busy') },
+    { value: 'callback_requested', label: t('callbackRequested') },
+    { value: 'information_provided', label: t('informationProvided') },
+    { value: 'not_interested', label: t('notInterested') },
+    { value: 'wrong_number', label: t('wrongNumber') },
+    { value: 'do_not_call', label: t('doNotCall') },
+    { value: 'customer_complaint', label: t('customerComplaint') },
+    { value: 'other', label: t('other') },
+  ];
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('errors');
   const [data, setData] = useState<PaginatedResponse<CallEventResponse> | null>(null);
@@ -135,12 +137,12 @@ export default function CallsPage() {
           <div>
             <label className="text-xs text-gray-500 block mb-1">{tFields('direction')}</label>
             <Select value={direction || undefined} onChange={(v) => { setDirection(v || ''); setPage(1); }} placeholder={t('allDirections')} allowClear style={{ width: '100%' }}
-              options={CALL_DIRECTION_OPTIONS.map((o) => ({ label: o.label, value: o.value }))} />
+              options={CALL_DIRECTION_OPTIONS.map((o) => ({ label: tDirections(o.key), value: o.value }))} />
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">{tFields('outcome')}</label>
             <Select value={outcome || undefined} onChange={(v) => { setOutcome(v || ''); setPage(1); }} placeholder={t('allOutcomes')} allowClear style={{ width: '100%' }}
-              options={OUTCOME_OPTIONS} />
+              options={outcomeOptions} />
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">{tFields('from')}</label>
@@ -184,8 +186,8 @@ export default function CallsPage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm sm:text-base">{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
-                      {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_LABELS[call.direction] || call.direction}</Tag>}
-                      {call.state && <Tag>{CALL_STATUS_LABELS[call.state] || call.state}</Tag>}
+                      {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction}</Tag>}
+                      {call.state && <Tag>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-500 mt-1 flex-wrap">
                       <span>{new Date(call.created_at).toLocaleString()}</span>
@@ -207,7 +209,7 @@ export default function CallsPage() {
                         loadCallHistory();
                       } catch (err) { console.error(err); message.error(tErrors('failedToSetOutcome')); }
                     }}
-                    options={OUTCOME_OPTIONS}
+                    options={outcomeOptions}
                   />
                   {call.has_recording && <Button type="text" icon={<PlayCircleOutlined />} onClick={(e) => { e.stopPropagation(); handlePlayRecording(String(call.id)); }} />}
                 </div>

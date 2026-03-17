@@ -6,7 +6,7 @@ import { ArrowLeftOutlined, FileTextOutlined, DollarOutlined, CalendarOutlined, 
 import { Button, Input, Tag, message, Modal } from 'antd';
 import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
-import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_LABELS, BILLING_PERIOD_LABELS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
+import { CONTRACT_STATUS_COLORS, CONTRACT_STATUS_KEYS, BILLING_PERIOD_KEYS, PAYMENT_STATUS_COLORS, PAYMENT_STATUS_KEYS } from '@/lib/constants';
 import { ErrorCharacter } from '@/components/illustrations';
 import type { ContractDetailResponse } from '@/types/api';
 
@@ -19,6 +19,9 @@ export default function ContractDetailPage() {
   const tActions = useTranslations('actions');
   const tFields = useTranslations('fields');
   const tEntities = useTranslations('entities');
+  const tContractStatuses = useTranslations('contractStatuses');
+  const tPaymentStatuses = useTranslations('paymentStatuses');
+  const tBilling = useTranslations('billing');
 
   const [contract, setContract] = useState<ContractDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,7 +148,7 @@ export default function ContractDetailPage() {
             <ArrowLeftOutlined style={{ marginRight: 4 }} />
             {tActions('back')}
           </Button>
-          <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
+          <Tag className={statusColor}>{tContractStatuses(CONTRACT_STATUS_KEYS[contract.status])}</Tag>
         </div>
         <div className="flex gap-2">
           {contract.status === 'active' && (
@@ -198,7 +201,7 @@ export default function ContractDetailPage() {
               <span className="text-xl sm:text-2xl font-bold">{contract.price}</span>
             </div>
             <p className="text-xs text-gray-500">
-              {contract.currency} / {BILLING_PERIOD_LABELS[contract.billing_period]?.toLowerCase()}
+              {contract.currency} / {BILLING_PERIOD_KEYS[contract.billing_period] ? tBilling(BILLING_PERIOD_KEYS[contract.billing_period]).toLowerCase() : contract.billing_period}
             </p>
           </div>
         </div>
@@ -253,15 +256,15 @@ export default function ContractDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">{tFields('status')}</span>
-                <Tag className={statusColor}>{CONTRACT_STATUS_LABELS[contract.status]}</Tag>
+                <Tag className={statusColor}>{tContractStatuses(CONTRACT_STATUS_KEYS[contract.status])}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">{t('payment')}</span>
-                <Tag className={paymentColor}>{PAYMENT_STATUS_LABELS[contract.payment_status]}</Tag>
+                <Tag className={paymentColor}>{tPaymentStatuses(PAYMENT_STATUS_KEYS[contract.payment_status])}</Tag>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">{tFields('billingPeriod')}</span>
-                <span>{BILLING_PERIOD_LABELS[contract.billing_period]}</span>
+                <span>{BILLING_PERIOD_KEYS[contract.billing_period] ? tBilling(BILLING_PERIOD_KEYS[contract.billing_period]) : contract.billing_period}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">{t('autoRenew')}</span>

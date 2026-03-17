@@ -7,7 +7,7 @@ import { ArrowLeftOutlined, PhoneOutlined, LinkOutlined, SearchOutlined } from '
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { CALL_DIRECTION_LABELS, CALL_STATUS_LABELS } from '@/lib/constants';
+import { CALL_DIRECTION_KEYS, CALL_STATUS_KEYS } from '@/lib/constants';
 import type { CallEventResponse } from '@/types/api';
 import { EmptyStateCharacter } from '@/components/illustrations';
 import Link from 'next/link';
@@ -73,6 +73,8 @@ export default function CallDetailPage() {
   const tErrors = useTranslations('errors');
   const tCommon = useTranslations('common');
   const tEntities = useTranslations('entities');
+  const tDirections = useTranslations('directions');
+  const tStatuses = useTranslations('statuses');
 
   const [call, setCall] = useState<CallEventResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -277,7 +279,7 @@ export default function CallDetailPage() {
           </Button>
           {call.direction && (
             <Tag color={call.direction === 'inbound' ? 'blue' : call.direction === 'outbound' ? 'green' : 'default'}>
-              {CALL_DIRECTION_LABELS[call.direction] || call.direction}
+              {CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction}
             </Tag>
           )}
         </div>
@@ -306,7 +308,7 @@ export default function CallDetailPage() {
                 <div>
                   <span className="text-sm text-gray-500 block">{tFields('status')}</span>
                   {call.state ? (
-                    <Tag color={stateColors[call.state] || 'default'}>{CALL_STATUS_LABELS[call.state] || call.state}</Tag>
+                    <Tag color={stateColors[call.state] || 'default'}>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>
                   ) : (
                     <span className="text-gray-400">{'\u2014'}</span>
                   )}
@@ -551,12 +553,12 @@ export default function CallDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">{tFields('direction')}</span>
-                <span className="font-medium">{call.direction ? CALL_DIRECTION_LABELS[call.direction] || call.direction : '\u2014'}</span>
+                <span className="font-medium">{call.direction ? (CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction) : '\u2014'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">{tFields('status')}</span>
                 {call.state ? (
-                  <Tag color={stateColors[call.state] || 'default'}>{CALL_STATUS_LABELS[call.state] || call.state}</Tag>
+                  <Tag color={stateColors[call.state] || 'default'}>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>
                 ) : (
                   <span className="text-gray-400">{'\u2014'}</span>
                 )}

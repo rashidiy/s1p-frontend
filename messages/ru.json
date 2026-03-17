@@ -202,7 +202,8 @@
     "busy": "Занято",
     "noAnswer": "Нет ответа",
     "congestion": "Перегрузка",
-    "unavailable": "Недоступен"
+    "unavailable": "Недоступен",
+    "answered": "Отвечен"
   },
   "priorities": {
     "low": "Низкий",

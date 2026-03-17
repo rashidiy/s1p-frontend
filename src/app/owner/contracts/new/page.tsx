@@ -20,6 +20,7 @@ export default function NewContractPage() {
   const tErrors = useTranslations('errors');
   const tActions = useTranslations('actions');
   const tFields = useTranslations('fields');
+  const tBilling = useTranslations('billing');
 
   const [form, setForm] = useState({
     company_id: '',
@@ -134,7 +135,7 @@ export default function NewContractPage() {
                   onChange={(v) => setForm({ ...form, billing_period: v as 'monthly' | 'yearly' })}
                   size="large"
                   style={{ width: "100%" }}
-                  options={BILLING_PERIOD_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                  options={BILLING_PERIOD_OPTIONS.map((o) => ({ value: o.value, label: tBilling(o.key) }))}
                 />
               </div>
               <div className="space-y-1.5">

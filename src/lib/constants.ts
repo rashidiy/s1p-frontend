@@ -1,13 +1,15 @@
 // ============================================================================
-// DISPLAY LABELS & COLORS
+// I18N KEY MAPS & COLORS
 // ============================================================================
+// *_KEYS maps store i18n translation keys (not display strings).
+// Consumers resolve at render time: tStatuses(LEAD_STATUS_KEYS[status])
 
-export const LEAD_STATUS_LABELS: Record<string, string> = {
-  new: 'New',
-  contacted: 'Contacted',
-  qualified: 'Qualified',
-  converted: 'Converted',
-  lost: 'Lost',
+export const LEAD_STATUS_KEYS: Record<string, string> = {
+  new: 'new',
+  contacted: 'contacted',
+  qualified: 'qualified',
+  converted: 'converted',
+  lost: 'lost',
 };
 
 export const LEAD_STATUS_COLORS: Record<string, string> = {
@@ -18,13 +20,13 @@ export const LEAD_STATUS_COLORS: Record<string, string> = {
   lost: 'bg-red-100 text-red-800',
 };
 
-export const DEAL_STAGE_LABELS: Record<string, string> = {
-  prospecting: 'Prospecting',
-  qualification: 'Qualification',
-  proposal: 'Proposal',
-  negotiation: 'Negotiation',
-  closed_won: 'Won',
-  closed_lost: 'Lost',
+export const DEAL_STAGE_KEYS: Record<string, string> = {
+  prospecting: 'prospecting',
+  qualification: 'qualification',
+  proposal: 'proposal',
+  negotiation: 'negotiation',
+  closed_won: 'won',
+  closed_lost: 'lost',
 };
 
 export const DEAL_STAGE_COLORS: Record<string, string> = {
@@ -36,11 +38,11 @@ export const DEAL_STAGE_COLORS: Record<string, string> = {
   closed_lost: 'bg-red-100 text-red-800',
 };
 
-export const TASK_STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending',
-  in_progress: 'In Progress',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
+export const TASK_STATUS_KEYS: Record<string, string> = {
+  pending: 'pending',
+  in_progress: 'inProgress',
+  completed: 'completed',
+  cancelled: 'cancelled',
 };
 
 export const TASK_STATUS_COLORS: Record<string, string> = {
@@ -50,11 +52,11 @@ export const TASK_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-gray-100 text-gray-800',
 };
 
-export const TASK_PRIORITY_LABELS: Record<string, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  urgent: 'Urgent',
+export const TASK_PRIORITY_KEYS: Record<string, string> = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent',
 };
 
 export const TASK_PRIORITY_COLORS: Record<string, string> = {
@@ -64,10 +66,10 @@ export const TASK_PRIORITY_COLORS: Record<string, string> = {
   urgent: 'bg-red-100 text-red-800',
 };
 
-export const CALL_DIRECTION_LABELS: Record<string, string> = {
-  inbound: 'Inbound',
-  outbound: 'Outbound',
-  internal: 'Internal',
+export const CALL_DIRECTION_KEYS: Record<string, string> = {
+  inbound: 'inbound',
+  outbound: 'outbound',
+  internal: 'internal',
 };
 
 export const CALL_DIRECTION_COLORS: Record<string, string> = {
@@ -76,13 +78,13 @@ export const CALL_DIRECTION_COLORS: Record<string, string> = {
   internal: 'bg-gray-100 text-gray-800',
 };
 
-export const CALL_STATUS_LABELS: Record<string, string> = {
-  ANSWER: 'Answered',
-  BUSY: 'Busy',
-  NOANSWER: 'No Answer',
-  CANCEL: 'Cancelled',
-  CONGESTION: 'Congestion',
-  CHANUNAVAIL: 'Unavailable',
+export const CALL_STATUS_KEYS: Record<string, string> = {
+  ANSWER: 'answered',
+  BUSY: 'busy',
+  NOANSWER: 'noAnswer',
+  CANCEL: 'cancelled',
+  CONGESTION: 'congestion',
+  CHANUNAVAIL: 'unavailable',
 };
 
 export const CALL_STATUS_COLORS: Record<string, string> = {
@@ -94,13 +96,13 @@ export const CALL_STATUS_COLORS: Record<string, string> = {
   CHANUNAVAIL: 'bg-red-100 text-red-800',
 };
 
-export const CONTRACT_STATUS_LABELS: Record<string, string> = {
-  active: 'Active',
-  warning: 'Warning',
-  grace_period: 'Grace Period',
-  expired: 'Expired',
-  suspended: 'Suspended',
-  cancelled: 'Cancelled',
+export const CONTRACT_STATUS_KEYS: Record<string, string> = {
+  active: 'active',
+  warning: 'warning',
+  grace_period: 'grace_period',
+  expired: 'expired',
+  suspended: 'suspended',
+  cancelled: 'cancelled',
 };
 
 export const CONTRACT_STATUS_COLORS: Record<string, string> = {
@@ -112,16 +114,16 @@ export const CONTRACT_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-gray-100 text-gray-800',
 };
 
-export const BILLING_PERIOD_LABELS: Record<string, string> = {
-  monthly: 'Monthly',
-  yearly: 'Yearly',
+export const BILLING_PERIOD_KEYS: Record<string, string> = {
+  monthly: 'monthly',
+  yearly: 'yearly',
 };
 
-export const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  paid: 'Paid',
-  pending: 'Pending',
-  overdue: 'Overdue',
-  failed: 'Failed',
+export const PAYMENT_STATUS_KEYS: Record<string, string> = {
+  paid: 'paid',
+  pending: 'pending',
+  overdue: 'overdue',
+  failed: 'failed',
 };
 
 export const PAYMENT_STATUS_COLORS: Record<string, string> = {
@@ -131,51 +133,51 @@ export const PAYMENT_STATUS_COLORS: Record<string, string> = {
   failed: 'bg-red-100 text-red-800',
 };
 
-export const USER_ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner',
-  company_admin: 'Admin',
-  company_manager: 'Manager',
-  company_operator: 'Operator',
+export const USER_ROLE_KEYS: Record<string, string> = {
+  owner: 'owner',
+  company_admin: 'company_admin',
+  company_manager: 'company_manager',
+  company_operator: 'company_operator',
 };
 
 export const LEAD_STATUS_OPTIONS = [
-  { value: 'new', label: 'New' },
-  { value: 'contacted', label: 'Contacted' },
-  { value: 'qualified', label: 'Qualified' },
-  { value: 'converted', label: 'Converted' },
-  { value: 'lost', label: 'Lost' },
+  { value: 'new', key: 'new' },
+  { value: 'contacted', key: 'contacted' },
+  { value: 'qualified', key: 'qualified' },
+  { value: 'converted', key: 'converted' },
+  { value: 'lost', key: 'lost' },
 ];
 
 export const DEAL_STAGE_OPTIONS = [
-  { value: 'prospecting', label: 'Prospecting' },
-  { value: 'qualification', label: 'Qualification' },
-  { value: 'proposal', label: 'Proposal' },
-  { value: 'negotiation', label: 'Negotiation' },
-  { value: 'closed_won', label: 'Won' },
-  { value: 'closed_lost', label: 'Lost' },
+  { value: 'prospecting', key: 'prospecting' },
+  { value: 'qualification', key: 'qualification' },
+  { value: 'proposal', key: 'proposal' },
+  { value: 'negotiation', key: 'negotiation' },
+  { value: 'closed_won', key: 'won' },
+  { value: 'closed_lost', key: 'lost' },
 ];
 
 export const TASK_STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'pending', key: 'pending' },
+  { value: 'in_progress', key: 'inProgress' },
+  { value: 'completed', key: 'completed' },
+  { value: 'cancelled', key: 'cancelled' },
 ];
 
 export const TASK_PRIORITY_OPTIONS = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
+  { value: 'low', key: 'low' },
+  { value: 'medium', key: 'medium' },
+  { value: 'high', key: 'high' },
+  { value: 'urgent', key: 'urgent' },
 ];
 
 export const CALL_DIRECTION_OPTIONS = [
-  { value: 'inbound', label: 'Inbound' },
-  { value: 'outbound', label: 'Outbound' },
-  { value: 'internal', label: 'Internal' },
+  { value: 'inbound', key: 'inbound' },
+  { value: 'outbound', key: 'outbound' },
+  { value: 'internal', key: 'internal' },
 ];
 
 export const BILLING_PERIOD_OPTIONS = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'yearly', label: 'Yearly' },
+  { value: 'monthly', key: 'monthly' },
+  { value: 'yearly', key: 'yearly' },
 ];

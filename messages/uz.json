@@ -202,7 +202,8 @@
     "busy": "Band",
     "noAnswer": "Javob yo'q",
     "congestion": "Tiqilinch",
-    "unavailable": "Mavjud emas"
+    "unavailable": "Mavjud emas",
+    "answered": "Javob berilgan"
   },
   "priorities": {
     "low": "Past",
