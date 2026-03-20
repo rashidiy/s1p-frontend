@@ -16,6 +16,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  other: {
+    'theme-color': '#08090a',
+  },
   title: 'S1P — CRM for Call Centers | Manage Calls, Leads & Deals',
   description:
     'All-in-one CRM platform for call centers. Track calls, capture leads, close deals, and integrate with Telegram — built for Uzbekistan and the CIS market.',

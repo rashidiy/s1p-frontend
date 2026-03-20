@@ -27,8 +27,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   other: {
-    "theme-color": "#08090a",
-    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "theme-color": "#ffffff",
   },
 };
 
@@ -42,12 +41,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <head>
-        <meta name="theme-color" content="#08090a" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </head>
-      <body className={inter.className} style={{ backgroundColor: '#08090a' }}>
+      <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
           <AntdProvider>{children}</AntdProvider>
         </NextIntlClientProvider>
