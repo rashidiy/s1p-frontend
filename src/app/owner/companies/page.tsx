@@ -111,12 +111,11 @@ export default function CompaniesPage() {
       title: tFields('subdomain'),
       dataIndex: 'subdomain',
       key: 'subdomain',
-      render: (subdomain: string) =>
+      render: (subdomain: string, record) =>
         subdomain ? (
           <a
-            href={getCompanyUrl(subdomain)}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#"
+            onClick={(e) => { e.preventDefault(); handleImpersonate(record.id); }}
             className="flex items-center gap-1 text-sm text-crm-indigo-600 hover:text-crm-indigo-700 transition-colors"
           >
             <span>{subdomain}.s1p.uz</span>
