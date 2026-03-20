@@ -26,6 +26,10 @@ export const metadata: Metadata = {
     description: "CRM platform for call centers with Telegram integration.",
   },
   manifest: "/manifest.json",
+  other: {
+    "theme-color": "#08090a",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
 };
 
 export default async function RootLayout({
