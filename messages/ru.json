@@ -204,7 +204,8 @@
     "noAnswer": "Нет ответа",
     "congestion": "Перегрузка",
     "unavailable": "Недоступен",
-    "answered": "Отвечен"
+    "answered": "Отвечен",
+    "status": "Статус"
   },
   "priorities": {
     "low": "Низкий",
@@ -490,7 +491,8 @@
     "totalCalls": "Всего звонков",
     "totalLeads": "Лиды",
     "totalDeals": "Сделки",
-    "totalTasks": "Задачи"
+    "totalTasks": "Задачи",
+    "subdomain": "Поддомен"
   },
   "contacts": {
     "title": "Контакты",

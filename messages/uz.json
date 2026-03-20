@@ -204,7 +204,8 @@
     "noAnswer": "Javob yo'q",
     "congestion": "Tiqilinch",
     "unavailable": "Mavjud emas",
-    "answered": "Javob berilgan"
+    "answered": "Javob berilgan",
+    "status": "Holat"
   },
   "priorities": {
     "low": "Past",
@@ -490,7 +491,8 @@
     "totalCalls": "Jami qo'ng'iroqlar",
     "totalLeads": "Lidlar",
     "totalDeals": "Bitimlar",
-    "totalTasks": "Vazifalar"
+    "totalTasks": "Vazifalar",
+    "subdomain": "Subdomen"
   },
   "contacts": {
     "title": "Kontaktlar",

@@ -204,7 +204,8 @@
     "noAnswer": "No Answer",
     "congestion": "Congestion",
     "unavailable": "Unavailable",
-    "answered": "Answered"
+    "answered": "Answered",
+    "status": "Status"
   },
   "priorities": {
     "low": "Low",
@@ -490,7 +491,8 @@
     "totalCalls": "Total Calls",
     "totalLeads": "Leads",
     "totalDeals": "Deals",
-    "totalTasks": "Tasks"
+    "totalTasks": "Tasks",
+    "subdomain": "Subdomain"
   },
   "contacts": {
     "title": "Contacts",

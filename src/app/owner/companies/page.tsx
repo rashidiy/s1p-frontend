@@ -111,15 +111,17 @@ export default function CompaniesPage() {
       title: tFields('subdomain'),
       dataIndex: 'subdomain',
       key: 'subdomain',
-      render: (subdomain: string, record) =>
+      render: (subdomain: string) =>
         subdomain ? (
-          <button
-            onClick={() => handleImpersonate(record.id)}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-crm-indigo-600 transition-colors cursor-pointer bg-transparent border-none p-0"
+          <a
+            href={getCompanyUrl(subdomain)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-sm text-crm-indigo-600 hover:text-crm-indigo-700 transition-colors"
           >
-            <span>{getCompanyUrl(subdomain).replace(/^https?:\/\//, '')}</span>
+            <span>{subdomain}.s1p.uz</span>
             <ExportOutlined style={{ fontSize: 11 }} />
-          </button>
+          </a>
         ) : (
           <span className="text-gray-400">&mdash;</span>
         ),
