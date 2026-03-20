@@ -85,10 +85,18 @@ export default function CompaniesPage() {
   };
 
   const handleImpersonate = async (companyId: string) => {
+    // Open blank tab synchronously (Safari blocks window.open from async callbacks)
+    const tab = window.open('about:blank', '_blank');
     try {
       const { url } = await apiClient.impersonateCompany(companyId);
-      window.open(url, '_blank');
+      if (tab) {
+        tab.location.href = url;
+      } else {
+        // Fallback if popup was still blocked
+        window.location.href = url;
+      }
     } catch (error: unknown) {
+      if (tab) tab.close();
       message.error(getErrorMessage(error, tErrors('failedToAccessCompany')));
     }
   };
