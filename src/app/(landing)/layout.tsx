@@ -68,12 +68,15 @@ export default function LandingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${unbounded.variable} ${manrope.variable}`}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      {children}
-    </div>
+    <>
+      <style>{`html, body { background-color: #08090a !important; }`}</style>
+      <div className={`${unbounded.variable} ${manrope.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </div>
+    </>
   );
 }
