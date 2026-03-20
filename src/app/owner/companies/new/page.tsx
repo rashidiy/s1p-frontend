@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Alert, Button, Input, Select, message } from 'antd';
+import { Alert, Button, Input, Select, Switch, message } from 'antd';
 import Link from 'next/link';
 
 export default function NewCompanyPage() {
@@ -14,6 +14,7 @@ export default function NewCompanyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [providerType, setProviderType] = useState<string>('sipuni');
+  const [connectNow, setConnectNow] = useState(false);
   const t = useTranslations('companies');
   const tErrors = useTranslations('errors');
   const tActions = useTranslations('actions');
@@ -26,19 +27,28 @@ export default function NewCompanyPage() {
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
     const subdomain = formData.get('subdomain') as string;
-    const cabinetId = formData.get('cabinet_id') as string;
-    const securityKey = formData.get('security_key') as string;
 
     try {
-      const config: Record<string, string> = {};
-      if (cabinetId) config.cabinet_id = cabinetId;
-      if (securityKey) config.security_key = securityKey;
-      await apiClient.createCompany({
+      const payload: Record<string, unknown> = {
         name,
         subdomain: subdomain || null,
         provider_type: providerType,
-        provider_config: config,
-      });
+        provider_config: {},
+      };
+
+      if (connectNow && providerType === 'sipuni') {
+        const sipuniLogin = formData.get('sipuni_login') as string;
+        const sipuniPassword = formData.get('sipuni_password') as string;
+        if (!sipuniLogin || !sipuniPassword) {
+          setError(t('enterSipuniCredentials'));
+          setIsLoading(false);
+          return;
+        }
+        payload.sipuni_login = sipuniLogin;
+        payload.sipuni_password = sipuniPassword;
+      }
+
+      await apiClient.createCompany(payload as Parameters<typeof apiClient.createCompany>[0]);
       message.success(t('companyCreated'));
       router.push('/owner/companies');
     } catch (err: unknown) {
@@ -112,28 +122,37 @@ export default function NewCompanyPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5">
-                <label htmlFor="cabinet_id" className="text-sm font-medium text-gray-700">{t('cabinetId')}</label>
-                <Input
-                  id="cabinet_id"
-                  name="cabinet_id"
-                  placeholder="12345"
-                  size="large"
-                  disabled={isLoading}
-                />
+            {providerType === 'sipuni' && (
+              <div className="flex items-center gap-3 py-2">
+                <Switch checked={connectNow} onChange={setConnectNow} />
+                <span className="text-sm text-gray-600">{t('connectSipuniNow')}</span>
               </div>
-              <div className="space-y-1.5">
-                <label htmlFor="security_key" className="text-sm font-medium text-gray-700">{t('securityKey')}</label>
-                <Input.Password
-                  id="security_key"
-                  name="security_key"
-                  placeholder="your-secret-key"
-                  size="large"
-                  disabled={isLoading}
-                />
+            )}
+
+            {connectNow && providerType === 'sipuni' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="space-y-1.5">
+                  <label htmlFor="sipuni_login" className="text-sm font-medium text-gray-700">{t('sipuniLogin')}</label>
+                  <Input
+                    id="sipuni_login"
+                    name="sipuni_login"
+                    placeholder="email@example.com"
+                    size="large"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="sipuni_password" className="text-sm font-medium text-gray-700">{t('sipuniPassword')}</label>
+                  <Input.Password
+                    id="sipuni_password"
+                    name="sipuni_password"
+                    placeholder="********"
+                    size="large"
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
               <Button type="primary" htmlType="submit" size="large" loading={isLoading}>
