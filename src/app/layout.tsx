@@ -42,7 +42,12 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <body className={inter.className}>
+      <head>
+        <meta name="theme-color" content="#08090a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body className={inter.className} style={{ backgroundColor: '#08090a' }}>
         <NextIntlClientProvider messages={messages}>
           <AntdProvider>{children}</AntdProvider>
         </NextIntlClientProvider>
