@@ -11,22 +11,22 @@ export function middleware(request: NextRequest) {
   // Normalize host for parsing (strip port)
   const [hostname] = host.split(':');
 
-  // Bare localhost/127.0.0.1 — allow landing page at root, block app routes
-  if (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1'
-  ) {
+  // Bare domain (no subdomain) — serve landing page, block app routes
+  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost';
+  const isBareHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === baseDomain;
+
+  if (isBareHost) {
     const { pathname } = request.nextUrl;
     // Allow landing page and public assets
     if (pathname === '/' || pathname.startsWith('/_next') || pathname.startsWith('/static') || pathname === '/favicon.ico') {
       return NextResponse.next();
     }
-    // Allow public auth routes on bare localhost too
+    // Allow public auth routes on bare domain too
     const publicOnBare = ['/login', '/register', '/set-password', '/forgot-password'];
     if (publicOnBare.some(route => pathname.startsWith(route))) {
       return NextResponse.next();
     }
-    // App routes require a subdomain
+    // App routes require a subdomain — redirect to landing
     return NextResponse.redirect(new URL('/', request.url));
   }
 
