@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, message, Segmented, Switch } from 'antd';
 import dayjs from 'dayjs';
-import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { PhoneOutlined, LoadingOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
@@ -73,6 +73,9 @@ export default function CallsPage() {
   const [contactSearching, setContactSearching] = useState(false);
   const [sipOperators, setSipOperators] = useState<SipuniOperator[]>([]);
   const [operatorsLoading, setOperatorsLoading] = useState(false);
+  const [playingCallId, setPlayingCallId] = useState<string | null>(null);
+  const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user, isOperator } = useAuthStore();
 
   useEffect(() => {
@@ -246,11 +249,34 @@ export default function CallsPage() {
   };
 
   const handlePlayRecording = async (callId: string) => {
+    // Toggle off
+    if (playingCallId === callId) {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      setPlayingCallId(null);
+      return;
+    }
+    // Stop previous
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setLoadingAudio(callId);
+    setPlayingCallId(callId);
     try {
       const blobUrl = await apiClient.getCallRecording(callId);
-      window.open(blobUrl, '_blank');
-    } catch (err) {
+      // Create a real DOM audio element for reliable mobile playback
+      const el = document.createElement('audio');
+      el.src = blobUrl;
+      el.preload = 'auto';
+      el.onended = () => { setPlayingCallId(null); audioRef.current = null; };
+      audioRef.current = el;
+      await el.play();
+    } catch {
       message.error(tErrors('failedToLoadRecording'));
+      setPlayingCallId(null);
+    } finally {
+      setLoadingAudio(null);
     }
   };
 
@@ -383,7 +409,28 @@ export default function CallsPage() {
                     }}
                     options={outcomeOptions}
                   />
-                  {call.has_recording && <Button type="text" icon={<PlayCircleOutlined />} onClick={(e) => { e.stopPropagation(); handlePlayRecording(String(call.id)); }} />}
+                  {call.has_recording && call.state === 'ANSWER' && (
+                    <button
+                      className="relative flex items-center justify-center w-7 h-7 rounded-full border transition-colors"
+                      style={{
+                        borderColor: 'hsl(var(--primary))',
+                        color: 'hsl(var(--primary))',
+                        background: 'transparent',
+                      }}
+                      onClick={(e) => { e.stopPropagation(); handlePlayRecording(String(call.id)); }}
+                    >
+                      {loadingAudio === String(call.id) ? (
+                        <LoadingOutlined style={{ fontSize: 12 }} />
+                      ) : playingCallId === String(call.id) ? (
+                        <>
+                          <span className="absolute inset-[-3px] rounded-full animate-spin" style={{ border: '1.5px solid transparent', borderTopColor: 'hsl(var(--primary))' }} />
+                          <svg width="10" height="10" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="1" width="3.5" height="12" rx="1" /><rect x="8.5" y="1" width="3.5" height="12" rx="1" /></svg>
+                        </>
+                      ) : (
+                        <svg width="10" height="10" viewBox="0 0 14 14" fill="currentColor"><path d="M3 1.5a.5.5 0 0 1 .75-.43l9 5.5a.5.5 0 0 1 0 .86l-9 5.5A.5.5 0 0 1 3 12.5v-11z" /></svg>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

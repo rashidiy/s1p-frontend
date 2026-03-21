@@ -478,11 +478,15 @@ class ApiClient {
   }
 
   async getCallRecording(callId: string): Promise<string> {
-    // Backend streams audio via StreamingResponse — fetch as blob and return an object URL
+    // Backend proxies audio from provider — fetch as blob and return an object URL
     const response = await this.client.get(`/api/v1/company/recordings/${callId}`, {
       responseType: 'blob',
     });
-    return URL.createObjectURL(response.data);
+    // Ensure blob has correct MIME type for mobile Safari/Chrome audio playback
+    const blob = response.data instanceof Blob
+      ? new Blob([response.data], { type: response.data.type || 'audio/mpeg' })
+      : new Blob([response.data], { type: 'audio/mpeg' });
+    return URL.createObjectURL(blob);
   }
 
   async setCallOutcome(callId: string, data: API.CallOutcomeUpdate) {

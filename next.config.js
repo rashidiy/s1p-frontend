@@ -60,6 +60,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: http:",
               `connect-src 'self' ${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'} https:${isDev ? ' http://localhost:*' : ''}`,
+              "media-src 'self' blob:",
               "frame-ancestors 'none'",
             ].join('; '),
           },

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Input, Select, Spin, Tag, message } from 'antd';
-import { ArrowLeftOutlined, PhoneOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, PhoneOutlined, LinkOutlined, SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
@@ -89,12 +89,73 @@ export default function CallDetailPage() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [loadingRecording, setLoadingRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioElRef = useRef<HTMLAudioElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const loadedRef = useRef(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     loadCall();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when ID changes
   }, [callId]);
+
+  // Auto-load recording — try direct URL (native seeking), fall back to blob on error
+  useEffect(() => {
+    if (call?.has_recording && !loadedRef.current) {
+      loadedRef.current = true;
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+      setRecordingUrl(`${apiBase}/api/v1/company/recordings/${callId}`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [call?.has_recording]);
+
+  // If direct URL fails (401 — cookies not sent), fall back to blob
+  const handleAudioError = useCallback(() => {
+    if (recordingUrl && !recordingUrl.startsWith('blob:')) {
+      apiClient.getCallRecording(callId)
+        .then(setRecordingUrl)
+        .catch(() => {});
+    }
+  }, [recordingUrl, callId]);
+
+  const togglePlay = useCallback(() => {
+    const el = audioElRef.current;
+    if (!el) return;
+    if (el.paused) { el.play(); } else { el.pause(); }
+  }, []);
+
+  const seekToPosition = useCallback((clientX: number) => {
+    const el = audioElRef.current;
+    const bar = progressRef.current;
+    if (!el || !bar || !el.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    el.currentTime = ratio * el.duration;
+    setCurrentTime(el.currentTime);
+  }, []);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    seekToPosition(e.clientX);
+  }, [seekToPosition]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.buttons === 0 && e.pressure === 0) return;
+    seekToPosition(e.clientX);
+  }, [seekToPosition]);
+
+  const formatTime = (secs: number) => {
+    if (!secs || !isFinite(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const progress = duration ? (currentTime / duration) * 100 : 0;
 
   const loadCall = async () => {
     setError(false);
@@ -334,24 +395,60 @@ export default function CallDetailPage() {
                 <div className="mt-4 space-y-2">
                   <span className="text-sm text-gray-500 block">{tFields('recording')}</span>
                   {recordingUrl ? (
-                    <audio controls src={recordingUrl} className="w-full" />
-                  ) : (
-                    <Button size="small" type="default" loading={loadingRecording}
-                      onClick={async () => {
-                        setLoadingRecording(true);
-                        try {
-                          const recUrl = await apiClient.getCallRecording(callId);
-                          setRecordingUrl(recUrl);
-                        } catch {
-                          message.error(tErrors('failedToLoadRecording'));
-                        } finally {
-                          setLoadingRecording(false);
-                        }
-                      }}
-                    >
-                      {t('playRecording')}
-                    </Button>
-                  )}
+                    <div className="flex items-center gap-3 rounded-xl border border-[var(--border-light)] bg-[var(--surface-secondary)] px-3 py-2.5">
+                      {/* Hidden native audio element — browser handles buffering & playback */}
+                      <audio
+                        ref={audioElRef}
+                        src={recordingUrl}
+                        preload="auto"
+                        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+                        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+                        onError={handleAudioError}
+                        className="hidden"
+                      />
+                      <button
+                        onClick={togglePlay}
+                        className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 transition-colors border"
+                        style={{
+                          borderColor: 'hsl(var(--primary))',
+                          color: 'hsl(var(--primary))',
+                          background: 'transparent',
+                        }}
+                      >
+                        {isPlaying ? (
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="1" width="3.5" height="12" rx="1" /><rect x="8.5" y="1" width="3.5" height="12" rx="1" /></svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M3 1.5a.5.5 0 0 1 .75-.43l9 5.5a.5.5 0 0 1 0 .86l-9 5.5A.5.5 0 0 1 3 12.5v-11z" /></svg>
+                        )}
+                      </button>
+                      <div
+                        ref={progressRef}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        className="flex-1 py-3 cursor-pointer relative touch-none select-none"
+                      >
+                        <div className="h-1 rounded-full relative" style={{ background: 'var(--border-light)' }}>
+                          <div
+                            className="absolute inset-y-0 left-0 rounded-full"
+                            style={{ width: `${progress}%`, background: 'hsl(var(--primary))' }}
+                          />
+                        </div>
+                        <div
+                          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                          style={{
+                            left: `calc(${progress}% - 6px)`,
+                            background: 'hsl(var(--primary))',
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs tabular-nums shrink-0" style={{ color: 'var(--text-muted)' }}>
+                        {formatTime(currentTime)}/{formatTime(duration)}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
               )}
               {!call.has_recording && (
