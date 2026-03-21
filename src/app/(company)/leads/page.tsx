@@ -214,7 +214,20 @@ export default function LeadsPage() {
         />
       </div>
 
-      {viewMode === 'table' ? (
+      {data?.items.length === 0 ? (
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter height={115} variant="no-results" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noLeadsFound')}</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
+          </p>
+          {!search && !status && hasPermissionString('leads.write') && (
+            <Link href="/leads/new">
+              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addLead')}</Button>
+            </Link>
+          )}
+        </div>
+      ) : viewMode === 'table' ? (
         <>
           <Table<LeadResponse>
             columns={columns}
@@ -262,21 +275,6 @@ export default function LeadsPage() {
 
           {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
         </>
-      )}
-
-      {data?.items.length === 0 && (
-        <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter height={115} variant="no-results" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noLeadsFound')}</h3>
-          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search || status ? tCommon('tryAdjustingFilters') : t('getStarted')}
-          </p>
-          {!search && !status && hasPermissionString('leads.write') && (
-            <Link href="/leads/new">
-              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addLead')}</Button>
-            </Link>
-          )}
-        </div>
       )}
     </div>
   );
