@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runner
     profiles: [prod]
     container_name: s1p-frontend
     restart: unless-stopped

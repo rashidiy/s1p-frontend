@@ -1035,6 +1035,8 @@
     "personalDetails": "Shaxsiy ma'lumotlar",
     "updatePersonalDetails": "Shaxsiy ma'lumotlaringizni yangilang",
     "securitySection": "Xavfsizlik",
+    "uploadAvatar": "Rasm yuklash",
+    "removeAvatar": "O'chirish",
     "changePassword": "Parolni o'zgartirish",
     "updatePassword": "Parolingizni yangilang",
     "passwordMismatch": "Parollar mos kelmaydi",

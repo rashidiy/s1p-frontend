@@ -1035,6 +1035,8 @@
     "personalDetails": "Personal Details",
     "updatePersonalDetails": "Update your personal information",
     "securitySection": "Security",
+    "uploadAvatar": "Upload photo",
+    "removeAvatar": "Remove",
     "changePassword": "Change Password",
     "updatePassword": "Update your password",
     "passwordMismatch": "Passwords do not match",

@@ -1035,6 +1035,8 @@
     "personalDetails": "Личные данные",
     "updatePersonalDetails": "Обновите вашу личную информацию",
     "securitySection": "Безопасность",
+    "uploadAvatar": "Загрузить фото",
+    "removeAvatar": "Удалить",
     "changePassword": "Изменить пароль",
     "updatePassword": "Обновите ваш пароль",
     "passwordMismatch": "Пароли не совпадают",
