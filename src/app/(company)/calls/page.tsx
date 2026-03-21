@@ -87,14 +87,20 @@ export default function CallsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
   useEffect(() => { loadCallHistory(); }, [page, search, direction, outcome, dateFrom, dateTo, myCalls]);
 
-  const loadCallHistory = async () => {
-    setLoading(true);
-    setError(false);
+  // Auto-refresh every 5 seconds to show ringing/answer states quickly
+  useEffect(() => {
+    const interval = setInterval(() => { loadCallHistory(true); }, 5000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, search, direction, outcome, dateFrom, dateTo, myCalls]);
+
+  const loadCallHistory = async (silent = false) => {
+    if (!silent) { setLoading(true); setError(false); }
     try {
       const result = await apiClient.getCallHistory({ page, page_size: 20, search: search || undefined, direction: direction || undefined, outcome: outcome || undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined, my_calls: myCalls || undefined });
       setData(result);
-    } catch { setError(true); message.error(tErrors('failedToLoadCalls')); }
-    finally { setLoading(false); }
+    } catch { if (!silent) { setError(true); message.error(tErrors('failedToLoadCalls')); } }
+    finally { if (!silent) setLoading(false); }
   };
 
   const recentNumbers = useMemo(() => {
