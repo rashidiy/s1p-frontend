@@ -132,60 +132,7 @@ export default function DealsPage() {
             />
           </div>
 
-          <Table<DealResponse>
-            columns={[
-              {
-                title: t('title'), key: 'title', render: (_, deal) => (
-                  <Link href={`/deals/${deal.id}`} className="font-medium text-gray-900 hover:text-crm-indigo-600">{deal.title}</Link>
-                ),
-              },
-              {
-                title: t('contact'), dataIndex: 'contact_name', key: 'contact', responsive: ['md'],
-                render: (v: string | null) => v || <span className="text-gray-300">—</span>,
-              },
-              {
-                title: t('stage'), dataIndex: 'stage', key: 'stage', width: 130,
-                render: (v: string) => v ? <Tag color={stageColors[v.toLowerCase()] || 'default'}>{tStatuses(v.toLowerCase())}</Tag> : '—',
-              },
-              {
-                title: t('amount'), dataIndex: 'amount', key: 'amount', width: 130,
-                render: (v: number) => <span className="font-bold text-green-600">{formatCurrency(v ?? 0)}</span>,
-              },
-              {
-                title: t('probability'), dataIndex: 'probability', key: 'probability', width: 80, responsive: ['lg'],
-                render: (v: number | null) => v != null ? `${v}%` : '—',
-              },
-              {
-                title: t('closeDate'), dataIndex: 'expected_close_date', key: 'close', width: 120, responsive: ['lg'],
-                render: (v: string | null) => v ? formatDate(v) : '—',
-              },
-              {
-                title: t('assignedTo'), dataIndex: 'assigned_to_name', key: 'assigned', responsive: ['xl'],
-                render: (v: string | null) => v || <span className="text-gray-300">—</span>,
-              },
-              {
-                title: '', key: 'actions', width: 140,
-                render: (_, deal) => (
-                  <div className="flex gap-2">
-                    <Link href={`/deals/${deal.id}`}><Button size="small">{tActions('view')}</Button></Link>
-                    {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && (
-                      <Button size="small" type="primary" onClick={async (e) => { e.stopPropagation(); try { await apiClient.markDealWon(deal.id); loadDeals(); } catch { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>
-                    )}
-                  </div>
-                ),
-              },
-            ] as ColumnsType<DealResponse>}
-            dataSource={data?.items ?? []}
-            rowKey="id"
-            pagination={false}
-            onRow={(record) => ({ onClick: () => router.push(`/deals/${record.id}`), style: { cursor: 'pointer' } })}
-            size="middle"
-            scroll={{ x: 600 }}
-          />
-
-          {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
-
-          {data?.items.length === 0 && (
+          {data?.items.length === 0 ? (
             <div className="glass-card py-16 flex flex-col items-center justify-center">
               <EmptyStateCharacter height={115} variant="no-deals" />
               <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noDealsFound')}</h3>
@@ -198,6 +145,61 @@ export default function DealsPage() {
                 </Link>
               )}
             </div>
+          ) : (
+            <>
+              <Table<DealResponse>
+                columns={[
+                  {
+                    title: t('title'), key: 'title', render: (_, deal) => (
+                      <Link href={`/deals/${deal.id}`} className="font-medium text-gray-900 hover:text-crm-indigo-600">{deal.title}</Link>
+                    ),
+                  },
+                  {
+                    title: t('contact'), dataIndex: 'contact_name', key: 'contact', responsive: ['md'],
+                    render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+                  },
+                  {
+                    title: t('stage'), dataIndex: 'stage', key: 'stage', width: 130,
+                    render: (v: string) => v ? <Tag color={stageColors[v.toLowerCase()] || 'default'}>{tStatuses(v.toLowerCase())}</Tag> : '—',
+                  },
+                  {
+                    title: t('amount'), dataIndex: 'amount', key: 'amount', width: 130,
+                    render: (v: number) => <span className="font-bold text-green-600">{formatCurrency(v ?? 0)}</span>,
+                  },
+                  {
+                    title: t('probability'), dataIndex: 'probability', key: 'probability', width: 80, responsive: ['lg'],
+                    render: (v: number | null) => v != null ? `${v}%` : '—',
+                  },
+                  {
+                    title: t('closeDate'), dataIndex: 'expected_close_date', key: 'close', width: 120, responsive: ['lg'],
+                    render: (v: string | null) => v ? formatDate(v) : '—',
+                  },
+                  {
+                    title: t('assignedTo'), dataIndex: 'assigned_to_name', key: 'assigned', responsive: ['xl'],
+                    render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+                  },
+                  {
+                    title: '', key: 'actions', width: 140,
+                    render: (_, deal) => (
+                      <div className="flex gap-2">
+                        <Link href={`/deals/${deal.id}`}><Button size="small">{tActions('view')}</Button></Link>
+                        {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && (
+                          <Button size="small" type="primary" onClick={async (e) => { e.stopPropagation(); try { await apiClient.markDealWon(deal.id); loadDeals(); } catch { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>
+                        )}
+                      </div>
+                    ),
+                  },
+                ] as ColumnsType<DealResponse>}
+                dataSource={data?.items ?? []}
+                rowKey="id"
+                pagination={false}
+                onRow={(record) => ({ onClick: () => router.push(`/deals/${record.id}`), style: { cursor: 'pointer' } })}
+                size="middle"
+                scroll={{ x: 600 }}
+              />
+
+              {data && data.total_pages > 1 && <div className="flex justify-center"><Pagination current={page} total={data.total} pageSize={20} onChange={(p) => setPage(p)} showSizeChanger={false} /></div>}
+            </>
           )}
         </>
       )}

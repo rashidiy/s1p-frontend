@@ -213,7 +213,20 @@ export default function ContactsPage() {
         />
       </div>
 
-      {viewMode === 'table' ? (
+      {data?.items.length === 0 ? (
+        <div className="glass-card py-16 flex flex-col items-center justify-center">
+          <EmptyStateCharacter height={115} variant="no-contacts" />
+          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noContactsFound')}</h3>
+          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
+            {search ? tCommon('tryAdjustingSearch') : t('getStarted')}
+          </p>
+          {!search && hasPermissionString('contacts.write') && (
+            <Link href="/contacts/new">
+              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addContact')}</Button>
+            </Link>
+          )}
+        </div>
+      ) : viewMode === 'table' ? (
         <>
           <Table<ContactResponse>
             columns={columns}
@@ -283,21 +296,6 @@ export default function ContactsPage() {
             </div>
           )}
         </>
-      )}
-
-      {data?.items.length === 0 && (
-        <div className="glass-card py-16 flex flex-col items-center justify-center">
-          <EmptyStateCharacter height={115} variant="no-contacts" />
-          <h3 className="mt-5 text-lg font-semibold text-gray-800">{t('noContactsFound')}</h3>
-          <p className="text-sm text-gray-400 mt-1 max-w-xs text-center">
-            {search ? tCommon('tryAdjustingSearch') : t('getStarted')}
-          </p>
-          {!search && hasPermissionString('contacts.write') && (
-            <Link href="/contacts/new">
-              <Button type="primary" icon={<PlusOutlined />} className="mt-4">{t('addContact')}</Button>
-            </Link>
-          )}
-        </div>
       )}
     </div>
   );
