@@ -89,7 +89,7 @@ export default function CallsPage() {
 
   // Auto-refresh every 5 seconds to show ringing/answer states quickly
   useEffect(() => {
-    const interval = setInterval(() => { loadCallHistory(true); }, 5000);
+    const interval = setInterval(() => { loadCallHistory(true); }, 3000);
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, direction, outcome, dateFrom, dateTo, myCalls]);
