@@ -104,9 +104,14 @@ export type CompanyUpdateRequest = Schema<'CompanyUpdateRequest'>;
 export type UserInviteRequest = Schema<'UserInviteRequest'>;
 export type UserResponse = Schema<'UserResponse'> & {
   avatar_url?: string | null;
+  sip_extension?: string | null;
 };
-export type UserDetailResponse = Schema<'UserDetailResponse'>;
-export type UserUpdateRequest = Schema<'UserUpdateRequest'>;
+export type UserDetailResponse = Schema<'UserDetailResponse'> & {
+  sip_extension?: string | null;
+};
+export type UserUpdateRequest = Schema<'UserUpdateRequest'> & {
+  sip_extension?: string | null;
+};
 export type UserListResponse = Omit<Schema<'UserListResponse'>, 'items'> & {
   items: UserResponse[];
   total_pages?: number;
@@ -311,6 +316,7 @@ export interface InviteTokenCreateRequest {
   role?: string;
   permissions?: string[];
   permission_group_id?: string | null;
+  sip_extension?: string | null;
 }
 
 export interface InviteTokenResponse {
@@ -582,6 +588,12 @@ export interface SipuniConfig {
   setup_status: 'not_started' | 'setting_up' | 'ready' | 'failed';
   setup_method: 'auto' | 'manual' | null;
   services_enabled: { stream: boolean; callback: boolean } | null;
+}
+
+export interface SipuniOperator {
+  extension: string;
+  name: string;
+  status: string;
 }
 
 // ============================================================================

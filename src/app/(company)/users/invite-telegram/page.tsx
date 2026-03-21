@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { ArrowLeftOutlined, CopyOutlined, CheckOutlined, WarningOutlined } from 
 import { Alert, Button, Input, Select, Typography } from 'antd';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import type { SipuniOperator } from '@/types/api';
 
 const { Text } = Typography;
 
@@ -21,10 +22,21 @@ export default function InviteTelegramPage() {
   const [role, setRole] = useState<string>(UserRole.COMPANY_OPERATOR);
   const [tokenResult, setTokenResult] = useState<InviteTokenResponse | null>(null);
   const [copied, setCopied] = useState(false);
+  const [sipExtension, setSipExtension] = useState<string | undefined>(undefined);
+  const [sipOperators, setSipOperators] = useState<SipuniOperator[]>([]);
+  const [operatorsLoading, setOperatorsLoading] = useState(false);
   const t = useTranslations('users');
   const tFields = useTranslations('fields');
   const tActions = useTranslations('actions');
   const tErrors = useTranslations('errors');
+
+  useEffect(() => {
+    setOperatorsLoading(true);
+    apiClient.getSipuniOperators()
+      .then(setSipOperators)
+      .catch(() => setSipOperators([]))
+      .finally(() => setOperatorsLoading(false));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +54,7 @@ export default function InviteTelegramPage() {
         last_name: last_name || null,
         phone,
         role,
+        sip_extension: sipExtension || null,
       });
       setTokenResult(result);
     } catch (err: unknown) {
@@ -263,6 +276,24 @@ export default function InviteTelegramPage() {
                 {t('operatorDescription')}
               </p>
             </div>
+
+            {sipOperators.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('sipExtension')}</label>
+                <Select
+                  value={sipExtension}
+                  onChange={setSipExtension}
+                  placeholder={t('sipExtension')}
+                  allowClear
+                  loading={operatorsLoading}
+                  style={{ width: '100%' }}
+                  options={sipOperators.map((op) => ({
+                    value: op.extension,
+                    label: `${op.extension} — ${op.name}`,
+                  }))}
+                />
+              </div>
+            )}
 
             <div className="flex space-x-3">
               <Button type="primary" htmlType="submit" disabled={isLoading}>

@@ -15,7 +15,7 @@ vi.mock('@/lib/api', () => ({
     updateContact: (...args: unknown[]) => mockUpdateContact(...args),
     deleteContact: (...args: unknown[]) => mockDeleteContact(...args),
     createNote: vi.fn(),
-    makeCall: vi.fn(),
+    callExternal: vi.fn(),
     getMyProfile: vi.fn(),
     getOwnerProfile: vi.fn(),
     logout: vi.fn(),

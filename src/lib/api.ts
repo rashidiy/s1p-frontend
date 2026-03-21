@@ -457,8 +457,18 @@ class ApiClient {
   // COMPANY - CALLS
   // ============================================================================
 
-  async makeCall(data: API.CallRequest) {
-    const response = await this.client.post<API.CallResponse>('/api/v1/company/calls/', data);
+  async callExternal(data: API.CallRequest) {
+    const response = await this.client.post<API.CallResponse>('/api/v1/company/calls/sipuni/external', data);
+    return response.data;
+  }
+
+  async callNumber(data: API.CallNumberRequest) {
+    const response = await this.client.post<API.CallResponse>('/api/v1/company/calls/sipuni/number', data);
+    return response.data;
+  }
+
+  async callTree(data: API.CallTreeRequest) {
+    const response = await this.client.post<API.CallResponse>('/api/v1/company/calls/sipuni/tree', data);
     return response.data;
   }
 
@@ -821,6 +831,11 @@ class ApiClient {
 
   async disconnectSipuni(): Promise<API.SipuniSetupStatus> {
     const response = await this.client.post<API.SipuniSetupStatus>('/api/v1/company/sipuni/disconnect');
+    return response.data;
+  }
+
+  async getSipuniOperators(): Promise<API.SipuniOperator[]> {
+    const response = await this.client.get<API.SipuniOperator[]>('/api/v1/company/calls/sipuni/operators');
     return response.data;
   }
 

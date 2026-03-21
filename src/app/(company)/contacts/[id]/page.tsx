@@ -437,7 +437,7 @@ export default function ContactDetailPage() {
             onClick={async () => {
               setCalling(true);
               try {
-                await apiClient.makeCall({ phone_1: callPhone, phone_2: callPhone });
+                await apiClient.callExternal({ phone_1: callPhone, phone_2: callPhone });
                 setCallModalVisible(false);
               } catch (err: unknown) {
                 message.error(tErrors('failedToMakeCall'));

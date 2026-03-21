@@ -18,7 +18,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
-import type { UserDetailResponse } from '@/types/api';
+import type { UserDetailResponse, SipuniOperator } from '@/types/api';
 
 const roleColors: Record<string, string> = {
   [UserRole.COMPANY_ADMIN]: 'purple',
@@ -60,7 +60,9 @@ export default function UserDetailPage() {
     last_name: '',
     phone: '',
     role: '',
+    sip_extension: '',
   });
+  const [sipOperators, setSipOperators] = useState<SipuniOperator[]>([]);
 
   useEffect(() => {
     loadUser();
@@ -77,6 +79,7 @@ export default function UserDetailPage() {
         last_name: data.last_name || '',
         phone: data.phone || '',
         role: data.role || '',
+        sip_extension: data.sip_extension || '',
       });
     } catch (err) {
       setError(tErrors('failedToLoadUser'));
@@ -95,6 +98,7 @@ export default function UserDetailPage() {
         last_name: editForm.last_name || null,
         phone: editForm.phone || null,
         role: editForm.role || null,
+        sip_extension: editForm.sip_extension || null,
       });
       setSuccessMsg(t('userUpdated'));
       setEditing(false);
@@ -238,7 +242,12 @@ export default function UserDetailPage() {
         {canManageUsers && (
           <div className="flex flex-wrap gap-2">
             {!editing && (
-              <Button type="default"  onClick={() => setEditing(true)}>
+              <Button type="default" onClick={() => {
+                setEditing(true);
+                apiClient.getSipuniOperators()
+                  .then(setSipOperators)
+                  .catch(() => setSipOperators([]));
+              }}>
                 <EditOutlined style={{ marginRight: 8 }} />
                 {tActions('edit')}
               </Button>
@@ -310,6 +319,20 @@ export default function UserDetailPage() {
                       ]}
                     />
                   </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('sipExtension')}</label>
+                    <Select
+                      style={{ width: '100%' }}
+                      value={editForm.sip_extension || undefined}
+                      onChange={(val) => setEditForm({ ...editForm, sip_extension: val || '' })}
+                      allowClear
+                      placeholder={t('sipExtension')}
+                      options={sipOperators.map((op) => ({
+                        value: op.extension,
+                        label: `${op.extension} — ${op.name}`,
+                      }))}
+                    />
+                  </div>
                   <div className="flex gap-2">
                     <Button onClick={handleSave} disabled={saving}>
                       <SaveOutlined style={{ marginRight: 8 }} />
@@ -329,6 +352,15 @@ export default function UserDetailPage() {
                       <div>
                         <div className="text-xs text-gray-500">{tFields('phone')}</div>
                         <div className="font-medium">{user.phone}</div>
+                      </div>
+                    </div>
+                  )}
+                  {user.sip_extension && (
+                    <div className="flex items-center gap-3">
+                      <PhoneOutlined className="text-gray-400" />
+                      <div>
+                        <div className="text-xs text-gray-500">{t('sipExtension')}</div>
+                        <div className="font-medium">{user.sip_extension}</div>
                       </div>
                     </div>
                   )}
