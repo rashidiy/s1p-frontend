@@ -67,7 +67,7 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function formatTimeAgo(dateStr: string, t: (key: string, params?: Record<string, unknown>) => string): string {
+function formatTimeAgo(dateStr: string, t: any): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return t('justNow');
