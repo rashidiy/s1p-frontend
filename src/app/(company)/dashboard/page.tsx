@@ -9,8 +9,6 @@ import {
   CheckSquareOutlined,
   ArrowRightOutlined,
   ClockCircleOutlined,
-  PhoneIncoming,
-  PhoneFilled,
 } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils';
