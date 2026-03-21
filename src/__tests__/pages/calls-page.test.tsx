@@ -8,6 +8,10 @@ vi.mock('@/lib/api', () => ({
     getCallHistory: (...args: unknown[]) => mockGetCallHistory(...args),
     getCallRecording: vi.fn(),
     setCallOutcome: vi.fn(),
+    getContacts: vi.fn().mockResolvedValue({ items: [] }),
+    callExternal: vi.fn(),
+    callNumber: vi.fn(),
+    callTree: vi.fn(),
     getMyProfile: vi.fn(),
     getOwnerProfile: vi.fn(),
     logout: vi.fn(),
@@ -45,6 +49,19 @@ vi.mock('antd', () => ({
   Checkbox: ({ children, checked, onChange, ...props }: any) => (
     <label><input type="checkbox" checked={checked} onChange={onChange} {...props} />{children}</label>
   ),
+  Modal: ({ children, open, title, ...props }: any) => open ? (
+    <div data-testid="modal"><div>{title}</div>{children}</div>
+  ) : null,
+  Segmented: ({ value, onChange, options, ...props }: any) => (
+    <div data-testid="segmented" {...props}>
+      {options?.map((o: any) => (
+        <button key={o.value} onClick={() => onChange?.(o.value)} data-active={value === o.value}>{o.label}</button>
+      ))}
+    </div>
+  ),
+  Switch: ({ checked, onChange, ...props }: any) => (
+    <input type="checkbox" checked={checked} onChange={(e: any) => onChange?.(e.target.checked)} {...props} />
+  ),
   message: {
     error: vi.fn(),
     success: vi.fn(),
@@ -57,6 +74,7 @@ vi.mock('@ant-design/icons', () => ({
   PhoneOutlined: () => <span>phone-icon</span>,
   PlayCircleOutlined: () => <span>play-icon</span>,
   ClockCircleOutlined: () => <span>clock-icon</span>,
+  SearchOutlined: () => <span>search-icon</span>,
 }));
 
 // Mock custom icons

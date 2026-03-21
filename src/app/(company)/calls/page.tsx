@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, message } from 'antd';
+import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, message, Segmented, Switch } from 'antd';
 import dayjs from 'dayjs';
-import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { PhoneOutlined, PlayCircleOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import { useAuthStore } from '@/store/auth';
 import {
   CALL_DIRECTION_KEYS,
   CALL_DIRECTION_COLORS,
@@ -15,8 +16,10 @@ import {
   CALL_STATUS_COLORS,
   CALL_DIRECTION_OPTIONS,
 } from '@/lib/constants';
-import type { CallEventResponse, PaginatedResponse } from '@/types/api';
+import type { CallEventResponse, ContactResponse, PaginatedResponse, SipuniOperator } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
+
+type CallType = 'external' | 'number' | 'tree';
 
 export default function CallsPage() {
   const router = useRouter();
@@ -55,8 +58,22 @@ export default function CallsPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [callModalVisible, setCallModalVisible] = useState(false);
-  const [callPhone, setCallPhone] = useState('');
   const [calling, setCalling] = useState(false);
+  const [callType, setCallType] = useState<CallType>('external');
+  const [phone1, setPhone1] = useState('');
+  const [phone2, setPhone2] = useState('');
+  const [operatorSip, setOperatorSip] = useState('');
+  const [reverse, setReverse] = useState(false);
+  const [antiaon, setAntiaon] = useState(false);
+  const [treeId, setTreeId] = useState('');
+  const [attemptDuration, setAttemptDuration] = useState(30);
+  const [phoneError, setPhoneError] = useState('');
+  const [contactSearchValue, setContactSearchValue] = useState('');
+  const [contactOptions, setContactOptions] = useState<{ label: string; value: string }[]>([]);
+  const [contactSearching, setContactSearching] = useState(false);
+  const [sipOperators, setSipOperators] = useState<SipuniOperator[]>([]);
+  const [operatorsLoading, setOperatorsLoading] = useState(false);
+  const { user, isOperator } = useAuthStore();
 
   useEffect(() => {
     if (!searchInput) return;
@@ -78,6 +95,148 @@ export default function CallsPage() {
       setData(result);
     } catch { setError(true); message.error(tErrors('failedToLoadCalls')); }
     finally { setLoading(false); }
+  };
+
+  const recentNumbers = useMemo(() => {
+    if (!data?.items) return [];
+    const seen = new Set<string>();
+    const nums: string[] = [];
+    for (const call of data.items) {
+      for (const ph of [call.phone_2, call.phone_1]) {
+        if (ph && !seen.has(ph)) {
+          seen.add(ph);
+          nums.push(ph);
+          if (nums.length >= 5) return nums;
+        }
+      }
+    }
+    return nums;
+  }, [data]);
+
+  const isValidPhone = (phone: string) => /^\+\d{7,15}$/.test(phone);
+
+  const contactSearchTimer = useRef<ReturnType<typeof setTimeout>>();
+  const contactSearchCounter = useRef(0);
+
+  const handleContactSearch = useCallback((value: string) => {
+    setContactSearchValue(value);
+    if (value.length < 2) { setContactOptions([]); setContactSearching(false); return; }
+    setContactSearching(true);
+    clearTimeout(contactSearchTimer.current);
+    contactSearchTimer.current = setTimeout(async () => {
+      const requestId = ++contactSearchCounter.current;
+      try {
+        const result = await apiClient.getContacts({ search: value, page: 1, page_size: 10 });
+        if (requestId !== contactSearchCounter.current) return;
+        setContactOptions(
+          result.items.map((c: ContactResponse) => {
+            const phone = c.phone || '';
+            return { label: `${c.first_name || ''} ${c.last_name || ''} ${phone}`.trim(), value: phone };
+          }).filter((o: { value: string }) => o.value)
+        );
+      } catch {
+        if (requestId === contactSearchCounter.current) setContactOptions([]);
+      } finally {
+        if (requestId === contactSearchCounter.current) setContactSearching(false);
+      }
+    }, 300);
+  }, []);
+
+  const loadSipOperators = useCallback(async () => {
+    setOperatorsLoading(true);
+    try {
+      const ops = await apiClient.getSipuniOperators();
+      setSipOperators(ops);
+    } catch {
+      setSipOperators([]);
+    } finally {
+      setOperatorsLoading(false);
+    }
+  }, []);
+
+  const openCallModal = useCallback(() => {
+    setCallModalVisible(true);
+    loadSipOperators();
+    if (isOperator() && user?.sip_extension) {
+      setOperatorSip(user.sip_extension);
+    }
+  }, [isOperator, user, loadSipOperators]);
+
+  const resetCallModal = () => {
+    setCallType('external');
+    setPhone1('');
+    setPhone2('');
+    setOperatorSip('');
+    setReverse(false);
+    setAntiaon(false);
+    setTreeId('');
+    setAttemptDuration(30);
+    setPhoneError('');
+    setContactSearchValue('');
+    setContactOptions([]);
+    setSipOperators([]);
+  };
+
+  const handleMakeCall = async () => {
+    setPhoneError('');
+
+    if (callType === 'external') {
+      if (!isValidPhone(phone1) || !isValidPhone(phone2)) {
+        setPhoneError(t('invalidPhone'));
+        return;
+      }
+    } else {
+      if (!isValidPhone(phone2)) {
+        setPhoneError(t('invalidPhone'));
+        return;
+      }
+      if (callType === 'tree' && !treeId.trim()) {
+        setPhoneError(t('treeId') + ' required');
+        return;
+      }
+    }
+
+    if (!operatorSip.trim()) {
+      setPhoneError(t('operatorSip') + ' required');
+      return;
+    }
+
+    setCalling(true);
+    try {
+      let result;
+      if (callType === 'external') {
+        result = await apiClient.callExternal({ phone_1: phone1, phone_2: phone2, operator_id: operatorSip });
+      } else if (callType === 'number') {
+        result = await apiClient.callNumber({
+          phone: phone2,
+          operator_id: operatorSip,
+          reverse,
+          antiaon,
+        });
+      } else {
+        result = await apiClient.callTree({
+          phone: phone2,
+          operator_id: operatorSip,
+          tree: treeId,
+          reverse,
+          call_attempt_time: attemptDuration,
+        });
+      }
+
+      if (result.success) {
+        message.success(t('callSuccess', { callId: result.call_id ?? '' }));
+        setCallModalVisible(false);
+        resetCallModal();
+        loadCallHistory();
+      } else {
+        message.error(result.error || result.message || tErrors('failedToMakeCall'));
+      }
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      message.error(detail || tErrors('failedToMakeCall'));
+    } finally {
+      setCalling(false);
+    }
   };
 
   const handlePlayRecording = async (callId: string) => {
@@ -121,7 +280,7 @@ export default function CallsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <p className="page-subtitle">{t('subtitle')}</p>
-        <Button type="primary" icon={<PhoneOutgoing style={{ color: '#fff' }} />} onClick={() => setCallModalVisible(true)}>
+        <Button type="primary" icon={<PhoneOutgoing style={{ color: '#fff' }} />} onClick={openCallModal}>
           {tActions('makeCall')}
         </Button>
       </div>
@@ -239,33 +398,182 @@ export default function CallsPage() {
       <Modal
         title={tActions('makeCall')}
         open={callModalVisible}
-        onCancel={() => setCallModalVisible(false)}
+        onCancel={() => { setCallModalVisible(false); resetCallModal(); }}
         footer={null}
+        width={520}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-500">{t('enterPhoneNumber')}</p>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{tFields('phone')}</label>
-            <Input value={callPhone} onChange={(e) => setCallPhone(e.target.value)} placeholder="+1234567890" />
+          <Segmented
+            block
+            value={callType}
+            onChange={(v) => { setCallType(v as CallType); setPhoneError(''); }}
+            options={[
+              { label: t('quickCall'), value: 'external' },
+              { label: t('sipCall'), value: 'number' },
+              { label: t('ivrTree'), value: 'tree' },
+            ]}
+          />
+
+          <div className="space-y-1">
+            <label className="text-xs text-gray-500">{t('searchContact')}</label>
+            <Select
+              showSearch
+              value={contactSearchValue || undefined}
+              placeholder={t('searchContact')}
+              filterOption={false}
+              onSearch={handleContactSearch}
+              onChange={(value) => {
+                setPhone2(value || '');
+                setContactSearchValue('');
+                setContactOptions([]);
+              }}
+              loading={contactSearching}
+              options={contactOptions}
+              notFoundContent={contactSearching ? null : undefined}
+              style={{ width: '100%' }}
+              suffixIcon={<SearchOutlined />}
+              allowClear
+            />
           </div>
+
+          {recentNumbers.length > 0 && (
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">{t('recentNumbers')}</label>
+              <div className="flex flex-wrap gap-1">
+                {recentNumbers.map((num) => (
+                  <Tag
+                    key={num}
+                    className="cursor-pointer"
+                    onClick={() => setPhone2(num)}
+                  >
+                    {num}
+                  </Tag>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {callType === 'external' && (
+            <>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('callerPhone')}</label>
+                <Input value={phone1} onChange={(e) => setPhone1(e.target.value)} placeholder="+998901234567" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('receiverPhone')}</label>
+                <Input value={phone2} onChange={(e) => setPhone2(e.target.value)} placeholder="+998901234567" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('operatorSip')}</label>
+                <Select
+                  showSearch
+                  value={operatorSip || undefined}
+                  onChange={(v) => setOperatorSip(v || '')}
+                  placeholder={t('selectOperator')}
+                  disabled={isOperator()}
+                  loading={operatorsLoading}
+                  options={sipOperators.map((op) => ({
+                    value: op.extension,
+                    label: `${op.extension} — ${op.name}`,
+                  }))}
+                  style={{ width: '100%' }}
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                />
+              </div>
+            </>
+          )}
+
+          {callType === 'number' && (
+            <>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('destinationPhone')}</label>
+                <Input value={phone2} onChange={(e) => setPhone2(e.target.value)} placeholder="+998901234567" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('operatorSip')}</label>
+                <Select
+                  showSearch
+                  value={operatorSip || undefined}
+                  onChange={(v) => setOperatorSip(v || '')}
+                  placeholder={t('selectOperator')}
+                  disabled={isOperator()}
+                  loading={operatorsLoading}
+                  options={sipOperators.map((op) => ({
+                    value: op.extension,
+                    label: `${op.extension} — ${op.name}`,
+                  }))}
+                  style={{ width: '100%' }}
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                />
+              </div>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch size="small" checked={reverse} onChange={setReverse} />
+                  {t('reverseCallOrder')}
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch size="small" checked={antiaon} onChange={setAntiaon} />
+                  {t('hideCallerId')}
+                </label>
+              </div>
+            </>
+          )}
+
+          {callType === 'tree' && (
+            <>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('destinationPhone')}</label>
+                <Input value={phone2} onChange={(e) => setPhone2(e.target.value)} placeholder="+998901234567" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('operatorSip')}</label>
+                <Select
+                  showSearch
+                  value={operatorSip || undefined}
+                  onChange={(v) => setOperatorSip(v || '')}
+                  placeholder={t('selectOperator')}
+                  disabled={isOperator()}
+                  loading={operatorsLoading}
+                  options={sipOperators.map((op) => ({
+                    value: op.extension,
+                    label: `${op.extension} — ${op.name}`,
+                  }))}
+                  style={{ width: '100%' }}
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('treeId')}</label>
+                <Input value={treeId} onChange={(e) => setTreeId(e.target.value)} placeholder="000-913898" />
+              </div>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch size="small" checked={reverse} onChange={setReverse} />
+                  {t('reverseCallOrder')}
+                </label>
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">{t('attemptDuration')}</label>
+                <Input type="number" min={30} value={attemptDuration} onChange={(e) => setAttemptDuration(Math.max(30, Number(e.target.value) || 30))} />
+              </div>
+            </>
+          )}
+
+          <p className="text-xs text-gray-400">{t('phoneHint')}</p>
+          {phoneError && <p className="text-xs text-red-500">{phoneError}</p>}
+
           <Button
             type="primary"
-            disabled={calling || !callPhone}
+            block
+            disabled={calling}
             loading={calling}
-            onClick={async () => {
-              setCalling(true);
-              try {
-                await apiClient.makeCall({ phone_1: callPhone, phone_2: callPhone });
-                message.success(t('callInitiated'));
-                setCallModalVisible(false);
-                setCallPhone('');
-                loadCallHistory();
-              } catch {
-                message.error(tErrors('failedToMakeCall'));
-              } finally {
-                setCalling(false);
-              }
-            }}
+            onClick={handleMakeCall}
           >
             <PhoneOutgoing style={{ marginRight: 8 }} />
             {calling ? tActions('changing') : tActions('makeCall')}
