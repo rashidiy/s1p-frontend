@@ -382,6 +382,11 @@ class ApiClient {
     return response.data;
   }
 
+  async deleteAvatar(): Promise<API.UserResponse> {
+    const response = await this.client.delete<API.UserResponse>('/api/v1/company/users/me/avatar');
+    return response.data;
+  }
+
   // ============================================================================
   // COMPANY - USER MANAGEMENT
   // ============================================================================

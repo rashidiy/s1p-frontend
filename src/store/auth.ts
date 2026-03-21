@@ -11,6 +11,7 @@ interface AuthUser {
   last_name?: string | null;
   phone?: string | null;
   sip_extension?: string | null;
+  avatar_url?: string | null;
   telegram_user_id?: number | null;
   role?: UserRole;
   company_id?: string;
@@ -159,6 +160,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             sip_extension: profile.sip_extension ?? null,
             role: profile.role as UserRole,
             company_id: profile.company_id ?? undefined,
+            avatar_url: (profile as any).avatar_url ?? null,
             company_subdomain: (profile as any).company_subdomain ?? null,
             is_active: profile.is_active,
             created_at: profile.created_at,

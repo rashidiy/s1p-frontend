@@ -248,14 +248,15 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
             <div className="sidebar-profile-trigger">
               <Avatar
                 size={36}
+                src={user.avatar_url || undefined}
                 style={{
-                  backgroundColor: '#4338CA',
+                  backgroundColor: user.avatar_url ? undefined : '#4338CA',
                   color: 'white',
                   fontWeight: 600,
                   flexShrink: 0,
                 }}
               >
-                {getInitials(user.first_name, user.last_name)}
+                {!user.avatar_url && getInitials(user.first_name, user.last_name)}
               </Avatar>
               <div style={{ minWidth: 0 }}>
                 <div className="sidebar-profile-name">

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { getErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Alert, Button, Input } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CameraOutlined, DeleteOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { UserResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
 import { ErrorCharacter } from '@/components/illustrations';
@@ -29,6 +30,8 @@ export default function ProfilePage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState(false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profileForm, setProfileForm] = useState({
     first_name: '',
@@ -49,6 +52,33 @@ export default function ProfilePage() {
     loadProfile();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- load on mount only
   }, []);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarLoading(true);
+    try {
+      const updated = await apiClient.uploadAvatar(file);
+      setProfile(updated);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateProfile')));
+    } finally {
+      setAvatarLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    setAvatarLoading(true);
+    try {
+      const updated = await apiClient.deleteAvatar();
+      setProfile(updated);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, tErrors('failedToUpdateProfile')));
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -178,7 +208,37 @@ export default function ProfilePage() {
           <p className="text-sm text-gray-400 mt-0.5">{t('updatePersonalDetails')}</p>
         </div>
         <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4">
-          <form onSubmit={handleSaveProfile} className="space-y-5">
+          {/* Avatar section */}
+          <div className="flex items-center gap-5 pb-5 border-b border-gray-100">
+            <div className="relative">
+              {profile?.avatar_url ? (
+                <Image src={profile.avatar_url} alt="Avatar" width={80} height={80} className="w-20 h-20 rounded-full object-cover" unoptimized />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-crm-indigo-100 flex items-center justify-center text-crm-indigo-600 font-bold text-2xl">
+                  {profile?.first_name?.[0]?.toUpperCase()}{profile?.last_name?.[0]?.toUpperCase() || ''}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button icon={<CameraOutlined />} onClick={() => fileInputRef.current?.click()} loading={avatarLoading}>
+                {t('uploadAvatar') || 'Upload photo'}
+              </Button>
+              {profile?.avatar_url && (
+                <Button danger size="small" icon={<DeleteOutlined />} onClick={handleDeleteAvatar} loading={avatarLoading}>
+                  {t('removeAvatar') || 'Remove'}
+                </Button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveProfile} className="space-y-5 pt-5">
             {message && (
               <Alert type="success" title={message} showIcon className="!rounded-xl" closable onClose={() => setMessage('')} />
             )}
