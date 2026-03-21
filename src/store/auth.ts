@@ -78,10 +78,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setUser: (user, userType) => {
     let permissions: string[] = [];
     if (user) {
-      // From login response: decode JWT for permissions
+      // From login response: decode JWT for permissions and role
       if (user.credentials?.access) {
         const parsed = parseJwtPermissions(user.credentials.access);
         permissions = parsed.permissions;
+        // Set role from JWT if not already on the user object
+        if (parsed.role && !user.role) {
+          user.role = parsed.role as UserRole;
+        }
       }
       // From /me endpoint response: use permissions array directly
       else if (Array.isArray(user.permissions)) {
