@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Tag, Result } from 'antd';
+import { Spin, Result } from 'antd';
 import {
   PhoneOutlined,
   RiseOutlined,
   FundProjectionScreenOutlined,
   ClockCircleOutlined,
   WarningOutlined,
-  ArrowRightOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -50,38 +49,36 @@ export default function MiniAppDashboard() {
     return <Result status="error" subTitle="Failed to load dashboard" />;
   }
 
-  const today = data?.today as Record<string, number> | undefined;
-  const recentLeads = (data?.recent_leads ?? []) as Array<Record<string, unknown>>;
-  const upcomingTasks = (data?.upcoming_tasks ?? []) as Array<Record<string, unknown>>;
-
   const stats = [
     {
       icon: <PhoneOutlined style={{ color: '#4338CA' }} />,
-      value: today?.total_calls ?? 0,
+      value: data?.today?.calls?.total_calls ?? 0,
       label: 'Calls',
       tap: () => router.push('/miniapp/calls'),
     },
     {
       icon: <WarningOutlined style={{ color: '#EF4444' }} />,
-      value: today?.missed_calls ?? 0,
+      value: data?.today?.calls?.missed_calls ?? 0,
       label: 'Missed',
       tap: () => router.push('/miniapp/calls'),
     },
     {
       icon: <RiseOutlined style={{ color: '#10B981' }} />,
-      value: today?.new_leads ?? 0,
+      value: data?.pending_leads ?? 0,
       label: 'Leads',
       tap: () => router.push('/miniapp/leads'),
     },
     {
       icon: <FundProjectionScreenOutlined style={{ color: '#2563EB' }} />,
-      value: today?.active_deals ?? 0,
+      value: data?.active_deals ?? 0,
       label: 'Deals',
       tap: () => router.push('/miniapp/deals'),
     },
   ];
 
   const greeting = user?.first_name ? `${user.first_name}` : '';
+  const recentCalls = data?.recent_calls ?? [];
+  const recentTasks = data?.recent_tasks ?? [];
 
   return (
     <div>
@@ -109,26 +106,20 @@ export default function MiniAppDashboard() {
         ))}
       </div>
 
-      {/* Recent leads */}
-      {recentLeads.length > 0 && (
+      {/* Recent calls */}
+      {recentCalls.length > 0 && (
         <>
           <div className="miniapp-section-title" style={{ marginTop: 16 }}>
-            Recent Leads
+            Recent Calls
           </div>
           <div className="miniapp-list">
-            {recentLeads.slice(0, 5).map((lead) => (
-              <div
-                key={lead.id as string}
-                className="miniapp-list-item"
-                onClick={() => router.push(`/miniapp/leads/${lead.id}`)}
-              >
-                <RiseOutlined style={{ fontSize: 18, color: '#10B981' }} />
+            {recentCalls.slice(0, 5).map((call, i) => (
+              <div key={i} className="miniapp-list-item">
+                <PhoneOutlined style={{ fontSize: 18, color: '#4338CA' }} />
                 <div className="miniapp-list-item-content">
-                  <div className="miniapp-list-item-title">{(lead.title as string) || 'Untitled'}</div>
-                  <div className="miniapp-list-item-sub">{(lead.source as string) || ''}</div>
-                </div>
-                <div className="miniapp-list-item-right">
-                  <ArrowRightOutlined />
+                  <div className="miniapp-list-item-title">
+                    {(call.phone_1 as string) || (call.phone_2 as string) || '—'}
+                  </div>
                 </div>
               </div>
             ))}
@@ -137,31 +128,25 @@ export default function MiniAppDashboard() {
       )}
 
       {/* Recent tasks */}
-      {upcomingTasks.length > 0 && (
+      {recentTasks.length > 0 && (
         <>
           <div className="miniapp-section-title" style={{ marginTop: 16 }}>
             Tasks
           </div>
           <div className="miniapp-list">
-            {upcomingTasks.slice(0, 5).map((task) => (
-              <div key={task.id as string} className="miniapp-list-item">
+            {recentTasks.slice(0, 5).map((task, i) => (
+              <div key={i} className="miniapp-list-item">
                 <ClockCircleOutlined style={{ fontSize: 18, color: '#F59E0B' }} />
                 <div className="miniapp-list-item-content">
                   <div className="miniapp-list-item-title">{task.title as string}</div>
-                  <div className="miniapp-list-item-sub">
-                    {task.due_date ? new Date(task.due_date as string).toLocaleDateString() : ''}
-                  </div>
                 </div>
-                <Tag color={task.status === 'completed' ? 'green' : 'default'} style={{ margin: 0 }}>
-                  {task.status as string}
-                </Tag>
               </div>
             ))}
           </div>
         </>
       )}
 
-      {!recentLeads.length && !upcomingTasks.length && (
+      {!recentCalls.length && !recentTasks.length && data?.today?.calls?.total_calls === 0 && (
         <div className="miniapp-empty">No activity today</div>
       )}
     </div>

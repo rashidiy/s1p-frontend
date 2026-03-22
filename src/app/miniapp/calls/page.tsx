@@ -52,10 +52,9 @@ export default function MiniAppCalls() {
   return (
     <div className="miniapp-list">
       {calls.map((call) => {
-        const isMissed = call.status === 'missed' || !call.duration_sec;
+        const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
         const isInbound = call.direction === 'inbound';
         const phone = call.phone_1 || call.phone_2 || '—';
-        const name = (call as Record<string, unknown>).contact_name as string || phone;
 
         return (
           <div key={call.id} className="miniapp-list-item">
@@ -69,14 +68,14 @@ export default function MiniAppCalls() {
             />
             <div className="miniapp-list-item-content">
               <div className="miniapp-list-item-title" style={{ color: isMissed ? '#EF4444' : undefined }}>
-                {name}
+                {phone}
               </div>
               <div className="miniapp-list-item-sub">
-                {phone !== name ? `${phone} · ` : ''}{formatDuration(call.duration_sec)}
+                {formatDuration(call.billing_sec)}
               </div>
             </div>
             <div className="miniapp-list-item-right">
-              {call.created_at ? formatTime(call.created_at) : ''}
+              {formatTime(call.created_at)}
             </div>
           </div>
         );
