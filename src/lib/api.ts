@@ -818,6 +818,14 @@ class ApiClient {
   // TELEGRAM MINI APP AUTH
   // ============================================================================
 
+  async miniAppCompanies(initData: string): Promise<Array<{ id: string; name: string; role?: string }>> {
+    const response = await this.client.post<Array<{ id: string; name: string; role?: string }>>(
+      '/api/v1/auth/telegram/miniapp/companies',
+      { init_data: initData },
+    );
+    return response.data;
+  }
+
   async miniAppAuth(initData: string, companyId: string) {
     const response = await this.client.post<{
       access_token: string;

@@ -10,6 +10,7 @@ import {
   FundProjectionScreenOutlined,
   PhoneOutlined,
   UserOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { apiClient } from '@/lib/api';
@@ -29,6 +30,12 @@ const TABS = [
   { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
 ];
 
+interface CompanyOption {
+  id: string;
+  name: string;
+  role?: string;
+}
+
 /** Map API profile response to auth store user shape */
 function profileToUser(profile: UserResponse) {
   return {
@@ -46,8 +53,9 @@ function profileToUser(profile: UserResponse) {
 
 export default function MiniAppLayout({ children }: { children: React.ReactNode }) {
   const { webApp, isReady: sdkReady, isTelegram } = useTelegramWebApp();
-  const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'error'>('loading');
+  const [authState, setAuthState] = useState<'loading' | 'pick_company' | 'authenticated' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
+  const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const pathname = usePathname() ?? '/miniapp';
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,23 +65,50 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   // Security note: this is client-provided but the backend validates that the
   // authenticated telegram_user_id actually belongs to this company before
   // issuing a JWT. Spoofing company_id results in a 401, not cross-tenant access.
-  const companyId = searchParams.get('company_id')
+  const companyIdParam = searchParams.get('company_id')
     || webApp?.initDataUnsafe?.start_param
     || '';
+
+  const authenticateWithCompany = useCallback(async (companyId: string) => {
+    if (!isTelegram || !webApp?.initData) return;
+    try {
+      await apiClient.miniAppAuth(webApp.initData, companyId);
+      const profile = await apiClient.getMyProfile();
+      setUser(profileToUser(profile), 'company_user');
+      setAuthState('authenticated');
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setErrorMsg(detail || 'Authentication failed');
+      setAuthState('error');
+    }
+  }, [isTelegram, webApp, setUser]);
 
   const authenticate = useCallback(async () => {
     if (!sdkReady) return;
 
-    // In Telegram: use initData HMAC auth
-    if (isTelegram && webApp?.initData && companyId) {
+    // In Telegram with company_id — direct auth
+    if (isTelegram && webApp?.initData && companyIdParam) {
+      await authenticateWithCompany(companyIdParam);
+      return;
+    }
+
+    // In Telegram without company_id — fetch companies list
+    if (isTelegram && webApp?.initData && !companyIdParam) {
       try {
-        await apiClient.miniAppAuth(webApp.initData, companyId);
-        const profile = await apiClient.getMyProfile();
-        setUser(profileToUser(profile), 'company_user');
-        setAuthState('authenticated');
-      } catch (err: unknown) {
-        const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-        setErrorMsg(detail || 'Authentication failed');
+        const companiesList = await apiClient.miniAppCompanies(webApp.initData);
+        if (companiesList.length === 0) {
+          setErrorMsg('No companies found for this account');
+          setAuthState('error');
+        } else if (companiesList.length === 1) {
+          // Auto-select single company
+          await authenticateWithCompany(companiesList[0].id);
+        } else {
+          // Show company picker
+          setCompanies(companiesList);
+          setAuthState('pick_company');
+        }
+      } catch {
+        setErrorMsg('Failed to load companies');
         setAuthState('error');
       }
       return;
@@ -85,10 +120,10 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
     } catch {
-      setErrorMsg(isTelegram ? 'No company_id provided' : 'Not authenticated. Open via Telegram.');
+      setErrorMsg('Not authenticated. Open via Telegram.');
       setAuthState('error');
     }
-  }, [sdkReady, isTelegram, webApp, companyId, setUser]);
+  }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany]);
 
   useEffect(() => {
     authenticate();
@@ -119,6 +154,50 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       <div className="miniapp-error">
         <p>{errorMsg}</p>
       </div>
+    );
+  }
+
+  // Company picker
+  if (authState === 'pick_company') {
+    return (
+      <>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
+        <div className="miniapp-shell">
+          <header className="miniapp-header">
+            <div className="miniapp-header-title">S1P</div>
+          </header>
+          <main className="miniapp-content">
+            <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>
+              Select company
+            </div>
+            <div className="miniapp-list">
+              {companies.map((c) => (
+                <div
+                  key={c.id}
+                  className="miniapp-list-item"
+                  onClick={() => {
+                    webApp?.HapticFeedback.impactOccurred('medium');
+                    authenticateWithCompany(c.id);
+                    setAuthState('loading');
+                  }}
+                >
+                  <div className="miniapp-list-item-content">
+                    <div className="miniapp-list-item-title">{c.name}</div>
+                    {c.role && (
+                      <div className="miniapp-list-item-sub">
+                        {c.role.replace('company_', '')}
+                      </div>
+                    )}
+                  </div>
+                  <div className="miniapp-list-item-right">
+                    <RightOutlined />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      </>
     );
   }
 
