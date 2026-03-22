@@ -1,17 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Input, Avatar } from 'antd';
+import { Spin, Input, Avatar, Result } from 'antd';
 import { SearchOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+import type { ContactResponse } from '@/types/api';
 
 export default function MiniAppContacts() {
-  const [contacts, setContacts] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<ContactResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [search, setSearch] = useState('');
   const { webApp } = useTelegramWebApp();
   const router = useRouter();
@@ -22,6 +22,7 @@ export default function MiniAppContacts() {
 
   async function load(q?: string) {
     setLoading(true);
+    setError(false);
     try {
       const res = await apiClient.getContacts({
         page: 1,
@@ -30,7 +31,7 @@ export default function MiniAppContacts() {
       });
       setContacts(res.items || []);
     } catch {
-      // silent
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -56,6 +57,8 @@ export default function MiniAppContacts() {
         <div className="miniapp-loading" style={{ height: 'auto', padding: 40 }}>
           <Spin />
         </div>
+      ) : error ? (
+        <Result status="error" subTitle="Failed to load contacts" />
       ) : contacts.length === 0 ? (
         <div className="miniapp-empty">No contacts found</div>
       ) : (

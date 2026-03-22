@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Tag } from 'antd';
-import { PhoneOutlined, PhoneFilled } from '@ant-design/icons';
+import { Spin, Result } from 'antd';
+import { PhoneOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
+import type { CallEventResponse } from '@/types/api';
 
 export default function MiniAppCalls() {
-  const [calls, setCalls] = useState<any[]>([]);
+  const [calls, setCalls] = useState<CallEventResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -15,7 +17,7 @@ export default function MiniAppCalls() {
         const res = await apiClient.getCallHistory({ page: 1, page_size: 30 });
         setCalls(res.items || []);
       } catch {
-        // silent
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -27,11 +29,15 @@ export default function MiniAppCalls() {
     return <div className="miniapp-loading" style={{ height: 'auto', padding: 40 }}><Spin /></div>;
   }
 
+  if (error) {
+    return <Result status="error" subTitle="Failed to load calls" />;
+  }
+
   if (calls.length === 0) {
     return <div className="miniapp-empty">No calls yet</div>;
   }
 
-  function formatDuration(sec: number | null): string {
+  function formatDuration(sec: number | null | undefined): string {
     if (!sec) return '0:00';
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -46,10 +52,10 @@ export default function MiniAppCalls() {
   return (
     <div className="miniapp-list">
       {calls.map((call) => {
-        const isMissed = call.status === 'missed' || call.duration_sec === 0;
+        const isMissed = call.status === 'missed' || !call.duration_sec;
         const isInbound = call.direction === 'inbound';
         const phone = call.phone_1 || call.phone_2 || '—';
-        const name = call.contact_name || phone;
+        const name = (call as Record<string, unknown>).contact_name as string || phone;
 
         return (
           <div key={call.id} className="miniapp-list-item">

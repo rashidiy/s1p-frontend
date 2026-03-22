@@ -14,6 +14,8 @@ import {
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { UserRole } from '@/types/api';
+import type { UserResponse } from '@/types/api';
 import Script from 'next/script';
 import './miniapp.css';
 
@@ -27,6 +29,21 @@ const TABS = [
   { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
 ];
 
+/** Map API profile response to auth store user shape */
+function profileToUser(profile: UserResponse) {
+  return {
+    id: profile.id,
+    first_name: profile.first_name,
+    last_name: profile.last_name,
+    phone: profile.phone,
+    role: profile.role as UserRole,
+    company_id: profile.company_id ?? undefined,
+    avatar_url: (profile as Record<string, unknown>).avatar_url as string | null ?? null,
+    is_active: profile.is_active,
+    permissions: profile.permissions,
+  };
+}
+
 export default function MiniAppLayout({ children }: { children: React.ReactNode }) {
   const { webApp, isReady: sdkReady, isTelegram } = useTelegramWebApp();
   const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'error'>('loading');
@@ -36,7 +53,10 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const searchParams = useSearchParams();
   const { user, setUser } = useAuthStore();
 
-  // Get company_id from URL params (passed via Mini App start_param or query)
+  // company_id comes from URL params or Telegram start_param.
+  // Security note: this is client-provided but the backend validates that the
+  // authenticated telegram_user_id actually belongs to this company before
+  // issuing a JWT. Spoofing company_id results in a 401, not cross-tenant access.
   const companyId = searchParams.get('company_id')
     || webApp?.initDataUnsafe?.start_param
     || '';
@@ -47,23 +67,13 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     // In Telegram: use initData HMAC auth
     if (isTelegram && webApp?.initData && companyId) {
       try {
-        const result = await apiClient.miniAppAuth(webApp.initData, companyId);
-        // Load full profile
+        await apiClient.miniAppAuth(webApp.initData, companyId);
         const profile = await apiClient.getMyProfile();
-        setUser({
-          id: profile.id,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          phone: profile.phone,
-          role: profile.role as any,
-          company_id: profile.company_id ?? undefined,
-          avatar_url: (profile as any).avatar_url ?? null,
-          is_active: profile.is_active,
-          permissions: profile.permissions,
-        }, 'company_user');
+        setUser(profileToUser(profile), 'company_user');
         setAuthState('authenticated');
-      } catch (err: any) {
-        setErrorMsg(err?.response?.data?.detail || 'Authentication failed');
+      } catch (err: unknown) {
+        const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+        setErrorMsg(detail || 'Authentication failed');
         setAuthState('error');
       }
       return;
@@ -72,17 +82,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     // Outside Telegram (dev mode): try existing session
     try {
       const profile = await apiClient.getMyProfile();
-      setUser({
-        id: profile.id,
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        phone: profile.phone,
-        role: profile.role as any,
-        company_id: profile.company_id ?? undefined,
-        avatar_url: (profile as any).avatar_url ?? null,
-        is_active: profile.is_active,
-        permissions: profile.permissions,
-      }, 'company_user');
+      setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
     } catch {
       setErrorMsg(isTelegram ? 'No company_id provided' : 'Not authenticated. Open via Telegram.');

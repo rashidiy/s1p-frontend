@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Tag } from 'antd';
+import { Spin, Tag, Result } from 'antd';
 import {
   PhoneOutlined,
   RiseOutlined,
@@ -19,6 +19,7 @@ import type { OperatorDashboard } from '@/types/api';
 export default function MiniAppDashboard() {
   const [data, setData] = useState<OperatorDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { user } = useAuthStore();
   const { webApp } = useTelegramWebApp();
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function MiniAppDashboard() {
         const dashboard = await apiClient.getMyDashboard();
         setData(dashboard);
       } catch {
-        // Silent — show empty state
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -45,28 +46,36 @@ export default function MiniAppDashboard() {
     );
   }
 
+  if (error) {
+    return <Result status="error" subTitle="Failed to load dashboard" />;
+  }
+
+  const today = data?.today as Record<string, number> | undefined;
+  const recentLeads = (data?.recent_leads ?? []) as Array<Record<string, unknown>>;
+  const upcomingTasks = (data?.upcoming_tasks ?? []) as Array<Record<string, unknown>>;
+
   const stats = [
     {
       icon: <PhoneOutlined style={{ color: '#4338CA' }} />,
-      value: data?.today?.total_calls ?? 0,
+      value: today?.total_calls ?? 0,
       label: 'Calls',
       tap: () => router.push('/miniapp/calls'),
     },
     {
       icon: <WarningOutlined style={{ color: '#EF4444' }} />,
-      value: data?.today?.missed_calls ?? 0,
+      value: today?.missed_calls ?? 0,
       label: 'Missed',
       tap: () => router.push('/miniapp/calls'),
     },
     {
       icon: <RiseOutlined style={{ color: '#10B981' }} />,
-      value: data?.today?.new_leads ?? 0,
+      value: today?.new_leads ?? 0,
       label: 'Leads',
       tap: () => router.push('/miniapp/leads'),
     },
     {
       icon: <FundProjectionScreenOutlined style={{ color: '#2563EB' }} />,
-      value: data?.today?.active_deals ?? 0,
+      value: today?.active_deals ?? 0,
       label: 'Deals',
       tap: () => router.push('/miniapp/deals'),
     },
@@ -101,22 +110,22 @@ export default function MiniAppDashboard() {
       </div>
 
       {/* Recent leads */}
-      {data?.recent_leads && data.recent_leads.length > 0 && (
+      {recentLeads.length > 0 && (
         <>
           <div className="miniapp-section-title" style={{ marginTop: 16 }}>
             Recent Leads
           </div>
           <div className="miniapp-list">
-            {data.recent_leads.slice(0, 5).map((lead: any) => (
+            {recentLeads.slice(0, 5).map((lead) => (
               <div
-                key={lead.id}
+                key={lead.id as string}
                 className="miniapp-list-item"
                 onClick={() => router.push(`/miniapp/leads/${lead.id}`)}
               >
                 <RiseOutlined style={{ fontSize: 18, color: '#10B981' }} />
                 <div className="miniapp-list-item-content">
-                  <div className="miniapp-list-item-title">{lead.title || 'Untitled'}</div>
-                  <div className="miniapp-list-item-sub">{lead.source || ''}</div>
+                  <div className="miniapp-list-item-title">{(lead.title as string) || 'Untitled'}</div>
+                  <div className="miniapp-list-item-sub">{(lead.source as string) || ''}</div>
                 </div>
                 <div className="miniapp-list-item-right">
                   <ArrowRightOutlined />
@@ -128,23 +137,23 @@ export default function MiniAppDashboard() {
       )}
 
       {/* Recent tasks */}
-      {data?.upcoming_tasks && data.upcoming_tasks.length > 0 && (
+      {upcomingTasks.length > 0 && (
         <>
           <div className="miniapp-section-title" style={{ marginTop: 16 }}>
             Tasks
           </div>
           <div className="miniapp-list">
-            {data.upcoming_tasks.slice(0, 5).map((task: any) => (
-              <div key={task.id} className="miniapp-list-item">
+            {upcomingTasks.slice(0, 5).map((task) => (
+              <div key={task.id as string} className="miniapp-list-item">
                 <ClockCircleOutlined style={{ fontSize: 18, color: '#F59E0B' }} />
                 <div className="miniapp-list-item-content">
-                  <div className="miniapp-list-item-title">{task.title}</div>
+                  <div className="miniapp-list-item-title">{task.title as string}</div>
                   <div className="miniapp-list-item-sub">
-                    {task.due_date ? new Date(task.due_date).toLocaleDateString() : ''}
+                    {task.due_date ? new Date(task.due_date as string).toLocaleDateString() : ''}
                   </div>
                 </div>
                 <Tag color={task.status === 'completed' ? 'green' : 'default'} style={{ margin: 0 }}>
-                  {task.status}
+                  {task.status as string}
                 </Tag>
               </div>
             ))}
@@ -152,7 +161,7 @@ export default function MiniAppDashboard() {
         </>
       )}
 
-      {!data?.recent_leads?.length && !data?.upcoming_tasks?.length && (
+      {!recentLeads.length && !upcomingTasks.length && (
         <div className="miniapp-empty">No activity today</div>
       )}
     </div>
