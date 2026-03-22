@@ -30,6 +30,28 @@ const nextConfig = {
     return [
       // Telegram Mini App — relaxed CSP for Telegram WebView
       {
+        source: '/miniapp',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: https: http:",
+              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'} https:${isDev ? ' http://localhost:*' : ''}`,
+              "media-src 'self' blob:",
+              "frame-ancestors https://web.telegram.org https://*.telegram.org",
+            ].join('; '),
+          },
+        ],
+      },
+      {
         source: '/miniapp/:path*',
         headers: [
           {
