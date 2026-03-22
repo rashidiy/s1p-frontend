@@ -73,9 +73,9 @@ const nextConfig = {
           },
         ],
       },
-      // All other routes — strict CSP
+      // All other routes — strict CSP (exclude miniapp)
       {
-        source: '/:path*',
+        source: '/((?!miniapp).*)',
         headers: [
           {
             key: 'Access-Control-Allow-Methods',
