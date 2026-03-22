@@ -90,24 +90,41 @@ declare global {
 
 /**
  * Hook to access Telegram Web App SDK.
- * Returns null when running outside Telegram (browser dev mode).
+ * Retries detection a few times since the SDK script may load after first render.
  */
 export function useTelegramWebApp() {
   const [webApp, setWebApp] = useState<TelegramWebApp | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      setWebApp(tg);
-      setIsReady(true);
-    } else {
-      // Running outside Telegram (dev mode)
-      setIsReady(true);
+    function tryDetect() {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        setWebApp(tg);
+        setIsReady(true);
+        return true;
+      }
+      return false;
     }
-  }, []);
+
+    // Try immediately
+    if (tryDetect()) return;
+
+    // Retry a few times with small delays (script might still be loading)
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = setInterval(() => {
+      attempts++;
+      if (tryDetect() || attempts >= maxAttempts) {
+        clearInterval(interval);
+        if (!isReady) setIsReady(true); // Give up — not in Telegram
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { webApp, isReady, isTelegram: !!webApp };
 }

@@ -4,6 +4,7 @@ import { AntdProvider } from "@/components/providers/AntdProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "sonner";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -38,10 +39,8 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <head>
-        <script src="https://telegram.org/js/telegram-web-app.js" />
-      </head>
       <body className={inter.className}>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
         <NextIntlClientProvider messages={messages}>
           <AntdProvider>{children}</AntdProvider>
         </NextIntlClientProvider>
