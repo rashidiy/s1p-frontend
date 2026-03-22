@@ -17,8 +17,8 @@ export function middleware(request: NextRequest) {
 
   if (isBareHost) {
     const { pathname } = request.nextUrl;
-    // Allow landing page and public assets
-    if (pathname === '/' || pathname.startsWith('/_next') || pathname.startsWith('/static') || pathname === '/favicon.ico') {
+    // Allow landing page, public assets, and Mini App
+    if (pathname === '/' || pathname.startsWith('/_next') || pathname.startsWith('/static') || pathname === '/favicon.ico' || pathname.startsWith('/miniapp')) {
       return NextResponse.next();
     }
     // Allow public auth routes on bare domain too
