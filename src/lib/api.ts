@@ -815,6 +815,31 @@ class ApiClient {
   }
 
   // ============================================================================
+  // TELEGRAM MINI APP AUTH
+  // ============================================================================
+
+  async miniAppAuth(initData: string, companyId: string) {
+    const response = await this.client.post<{
+      access_token: string;
+      refresh_token: string;
+      user_id: string;
+      first_name: string;
+      last_name?: string;
+    }>('/api/v1/auth/telegram/miniapp', {
+      init_data: initData,
+      company_id: companyId,
+    });
+    if (response.data.access_token) {
+      this.saveTokens({
+        access: response.data.access_token,
+        refresh: response.data.refresh_token,
+      });
+    }
+    this.saveUserType('company_user');
+    return response.data;
+  }
+
+  // ============================================================================
   // COMPANY - SIPUNI SETUP
   // ============================================================================
 

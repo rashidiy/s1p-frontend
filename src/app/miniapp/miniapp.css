@@ -1,0 +1,207 @@
+/* Mini App Shell — full screen, mobile-first, Telegram-native feel */
+
+.miniapp-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* Top bar — minimal, compact */
+.miniapp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  min-height: 48px;
+  flex-shrink: 0;
+}
+
+.miniapp-header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  letter-spacing: -0.5px;
+}
+
+.miniapp-header-avatar {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.miniapp-header-avatar:active {
+  opacity: 0.7;
+}
+
+/* Content area — scrollable */
+.miniapp-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom tab bar — icon-only, no labels */
+.miniapp-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
+.miniapp-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 40px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.miniapp-tab:active {
+  transform: scale(0.9);
+}
+
+.miniapp-tab.active {
+  color: hsl(var(--primary));
+  background: hsla(var(--primary) / 0.1);
+}
+
+/* Loading / Error states */
+.miniapp-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--surface-secondary);
+}
+
+.miniapp-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  height: 100dvh;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
+}
+
+/* Stat cards for dashboard */
+.miniapp-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.miniapp-stat-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.miniapp-stat-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.miniapp-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.miniapp-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Section headers */
+.miniapp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+/* List items */
+.miniapp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.miniapp-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.miniapp-list-item:active {
+  opacity: 0.7;
+}
+
+.miniapp-list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.miniapp-list-item-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniapp-list-item-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.miniapp-list-item-right {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.miniapp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
