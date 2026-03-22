@@ -119,7 +119,14 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
     } catch {
-      setErrorMsg('Not authenticated. Open via Telegram.');
+      // Debug info to diagnose SDK detection issues
+      const hasTg = typeof window !== 'undefined' && !!window.Telegram;
+      const hasWebApp = hasTg && !!window.Telegram?.WebApp;
+      const hasInitData = hasWebApp && !!window.Telegram?.WebApp?.initData;
+      setErrorMsg(
+        `sdk: ${sdkReady}, tg: ${hasTg}, wa: ${hasWebApp}, init: ${hasInitData}, ` +
+        `hook: ${isTelegram}, param: ${companyIdParam || 'none'}`
+      );
       setAuthState('error');
     }
   }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany]);
