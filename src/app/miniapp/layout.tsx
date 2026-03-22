@@ -17,7 +17,6 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
 import type { UserResponse } from '@/types/api';
-import Script from 'next/script';
 import './miniapp.css';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
@@ -160,9 +159,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   // Company picker
   if (authState === 'pick_company') {
     return (
-      <>
-        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-        <div className="miniapp-shell">
+      <div className="miniapp-shell">
           <header className="miniapp-header">
             <div className="miniapp-header-title">S1P</div>
           </header>
@@ -197,7 +194,6 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
             </div>
           </main>
         </div>
-      </>
     );
   }
 
@@ -248,6 +244,5 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
       </div>
-    </>
   );
 }
