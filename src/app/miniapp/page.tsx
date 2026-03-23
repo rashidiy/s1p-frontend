@@ -125,7 +125,7 @@ export default function MiniAppDashboard() {
   ];
 
   const greeting = user?.first_name ? t('dashboard.greeting', { name: user.first_name }) : '';
-  const recentCalls = (data?.recent_calls ?? []) as CallWithDetails[];
+  const recentCalls = (data?.recent_calls ?? []) as unknown as CallWithDetails[];
 
   // Filter missed calls for "Needs Attention" section
   const missedCalls = recentCalls.filter(
