@@ -116,7 +116,7 @@ export default function MiniAppDashboard() {
       color: '#4338CA',
       value: periodData?.calls?.total_calls ?? 0,
       label: t('dashboard.calls'),
-      tap: '/miniapp/calls',
+      tap: '/miniapp/history',
     },
     {
       icon: <WarningOutlined />,
@@ -124,7 +124,7 @@ export default function MiniAppDashboard() {
       color: '#EF4444',
       value: periodData?.calls?.missed_calls ?? 0,
       label: t('dashboard.missed'),
-      tap: '/miniapp/calls',
+      tap: '/miniapp/history',
     },
     {
       icon: <RiseOutlined />,
@@ -317,7 +317,7 @@ export default function MiniAppDashboard() {
               );
             })}
           </div>
-          <div className="miniapp-section-footer" onClick={() => router.push('/miniapp/calls')}>
+          <div className="miniapp-section-footer" onClick={() => router.push('/miniapp/history')}>
             {t('dashboard.viewAll')} <RightOutlined style={{ fontSize: 11, marginLeft: 4 }} />
           </div>
         </div>

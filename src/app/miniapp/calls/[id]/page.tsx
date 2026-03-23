@@ -9,8 +9,6 @@ import {
   SwapOutlined,
   ClockCircleOutlined,
   CalendarOutlined,
-  CustomerServiceOutlined,
-  PhoneFilled,
   CaretRightOutlined,
   PauseOutlined,
 } from '@ant-design/icons';
@@ -20,6 +18,7 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { CallWithDetails } from '@/types/api';
 import { formatDuration, formatDate, formatTime, getAvatarColor, getInitials } from '../../_utils';
+import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 function Skeleton() {
   return (
@@ -38,32 +37,6 @@ function Skeleton() {
         ))}
       </div>
     </div>
-  );
-}
-
-// ============================================================================
-// Bottom Sheet
-// ============================================================================
-
-function BottomSheet({
-  open,
-  onClose,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  if (!open) return null;
-
-  return (
-    <>
-      <div className="miniapp-bottomsheet-overlay" onClick={onClose} />
-      <div className="miniapp-bottomsheet">
-        <div className="miniapp-bottomsheet-handle" />
-        {children}
-      </div>
-    </>
   );
 }
 
@@ -232,7 +205,7 @@ export default function CallDetailPage() {
   const tFields = useTranslations('fields');
 
   const goBack = useCallback(() => {
-    router.push('/miniapp/calls');
+    router.push('/miniapp/history');
   }, [router]);
 
   useEffect(() => {
@@ -430,53 +403,14 @@ export default function CallDetailPage() {
       )}
 
       {/* Bottom sheet for call options */}
-      <BottomSheet open={showCallSheet} onClose={() => setShowCallSheet(false)}>
-        <div
-          className="miniapp-bottomsheet-option"
-          onClick={() => {
-            setShowCallSheet(false);
-            webApp?.HapticFeedback.impactOccurred('medium');
-            try {
-              webApp?.openLink(`tel:${phone}`);
-            } catch {
-              window.location.href = `tel:${phone}`;
-            }
-          }}
-        >
-          <div className="miniapp-bottomsheet-option-icon">
-            <PhoneFilled />
-          </div>
-          <span>{t('calls.phoneCall')}</span>
-        </div>
-        <div
-          className="miniapp-bottomsheet-option"
-          onClick={() => {
-            setShowCallSheet(false);
-            webApp?.HapticFeedback.impactOccurred('medium');
-            router.push(`/miniapp/calls?tab=dial&number=${encodeURIComponent(phone)}&mode=sip`);
-          }}
-        >
-          <div className="miniapp-bottomsheet-option-icon">
-            <CustomerServiceOutlined />
-          </div>
-          <span>{t('calls.sipCall')}</span>
-        </div>
-        <div
-          className="miniapp-bottomsheet-option"
-          onClick={() => {
-            setShowCallSheet(false);
-            webApp?.HapticFeedback.impactOccurred('medium');
-            router.push(
-              `/miniapp/calls?tab=dial&number=${encodeURIComponent(phone)}&mode=external`
-            );
-          }}
-        >
-          <div className="miniapp-bottomsheet-option-icon">
-            <SwapOutlined />
-          </div>
-          <span>{t('calls.externalCall')}</span>
-        </div>
-      </BottomSheet>
+      <CallBottomSheet
+        phone={phone}
+        open={showCallSheet}
+        onClose={() => setShowCallSheet(false)}
+        webApp={webApp}
+        router={router}
+        t={t}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   ContactsOutlined,
   FunnelPlotOutlined,
   PhoneOutlined,
+  ClockCircleOutlined,
   RightOutlined,
 } from '@ant-design/icons';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -18,11 +19,12 @@ import type { UserResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
 import './miniapp.css';
 
-const TABS = [
-  { key: 'home', path: '/miniapp', icon: <HomeOutlined /> },
-  { key: 'contacts', path: '/miniapp/contacts', icon: <ContactsOutlined /> },
-  { key: 'pipeline', path: '/miniapp/pipeline', icon: <FunnelPlotOutlined /> },
+const TABS: Array<{ key: string; path: string; icon: React.ReactNode; center?: boolean }> = [
   { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
+  { key: 'contacts', path: '/miniapp/contacts', icon: <ContactsOutlined /> },
+  { key: 'home', path: '/miniapp', icon: <HomeOutlined />, center: true },
+  { key: 'pipeline', path: '/miniapp/pipeline', icon: <FunnelPlotOutlined /> },
+  { key: 'history', path: '/miniapp/history', icon: <ClockCircleOutlined /> },
 ];
 
 interface CompanyOption {
@@ -59,7 +61,7 @@ function resolveDeepLink(searchParams: URLSearchParams): string | null {
     case 'deal':
       return id ? `/miniapp/deals/${id}` : '/miniapp/pipeline';
     case 'calls':
-      return '/miniapp/calls';
+      return '/miniapp/history';
     case 'pipeline':
       return '/miniapp/pipeline';
     default:
@@ -212,7 +214,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   }, [webApp]);
 
   // Determine if we're on a detail page (hide tab bar)
-  const isDetailPage = /\/miniapp\/(contacts|leads|deals|calls)\/[^/]+/.test(pathname);
+  const isDetailPage = /\/miniapp\/(contacts|leads|deals|calls|history)\/[^/]+/.test(pathname);
   const isProfilePage = pathname === '/miniapp/profile';
 
   if (authState === 'loading') {
@@ -289,16 +291,29 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
             return (
               <button
                 key={tab.key}
-                className={`miniapp-tab ${isActive ? 'active' : ''}`}
+                className={`miniapp-tab ${isActive ? 'active' : ''} ${tab.center ? 'miniapp-tab-center' : ''}`}
                 onClick={() => {
                   webApp?.HapticFeedback.selectionChanged();
                   router.push(tab.path);
                 }}
               >
-                {tab.icon}
-                <span className="miniapp-tab-label">
-                  {t(`tabs.${tab.key}`)}
-                </span>
+                {tab.center ? (
+                  <>
+                    <div className="miniapp-tab-center-circle">
+                      {tab.icon}
+                    </div>
+                    <span className="miniapp-tab-label">
+                      {t(`tabs.${tab.key}`)}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {tab.icon}
+                    <span className="miniapp-tab-label">
+                      {t(`tabs.${tab.key}`)}
+                    </span>
+                  </>
+                )}
               </button>
             );
           })}

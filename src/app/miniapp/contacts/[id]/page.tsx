@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   PhoneOutlined,
   MailOutlined,
+  MessageOutlined,
   RiseOutlined,
   FundProjectionScreenOutlined,
 } from '@ant-design/icons';
@@ -13,6 +14,7 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { ContactResponse } from '@/types/api';
 import { getInitials, getAvatarColor, formatDate } from '../../_utils';
+import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 function Skeleton() {
   return (
@@ -35,6 +37,7 @@ export default function ContactDetailPage() {
   const [contact, setContact] = useState<ContactResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showCallSheet, setShowCallSheet] = useState(false);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tFields = useTranslations('fields');
@@ -69,29 +72,6 @@ export default function ContactDetailPage() {
     }
   }, [webApp, goBack]);
 
-  // MainButton: Call if phone exists
-  const handleCall = useCallback(() => {
-    if (contact?.phone) {
-      webApp?.HapticFeedback.impactOccurred('medium');
-      window.open(`tel:${contact.phone}`, '_self');
-    }
-  }, [contact, webApp]);
-
-  useEffect(() => {
-    if (!webApp || loading) return;
-    if (contact?.phone) {
-      webApp.MainButton.setText(t('actions.call'));
-      webApp.MainButton.show();
-      webApp.MainButton.onClick(handleCall);
-      return () => {
-        webApp.MainButton.offClick(handleCall);
-        webApp.MainButton.hide();
-      };
-    } else {
-      webApp.MainButton.hide();
-    }
-  }, [webApp, loading, contact, handleCall, t]);
-
   if (loading) return <Skeleton />;
 
   if (error || !contact) {
@@ -103,8 +83,24 @@ export default function ContactDetailPage() {
     );
   }
 
-  const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || contact.phone || '—';
+  const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || contact.phone || '\u2014';
   const initials = getInitials(contact.first_name, contact.last_name, contact.phone);
+
+  function handleCallPress() {
+    webApp?.HapticFeedback.impactOccurred('medium');
+    setShowCallSheet(true);
+  }
+
+  function handleMessage() {
+    if (!contact?.phone) return;
+    webApp?.HapticFeedback.impactOccurred('medium');
+    const cleanPhone = contact.phone.startsWith('+') ? contact.phone : `+${contact.phone}`;
+    try {
+      webApp?.openTelegramLink(`https://t.me/${cleanPhone}`);
+    } catch {
+      window.open(`https://t.me/${cleanPhone}`, '_blank');
+    }
+  }
 
   return (
     <div className="miniapp-detail-enter">
@@ -121,12 +117,20 @@ export default function ContactDetailPage() {
         {/* Quick action buttons */}
         <div className="miniapp-detail-actions">
           {contact.phone && (
-            <a href={`tel:${contact.phone}`} className="miniapp-detail-action-btn" onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}>
+            <button className="miniapp-detail-action-btn" onClick={handleCallPress}>
               <div className="miniapp-detail-action-icon">
                 <PhoneOutlined />
               </div>
-              <span className="miniapp-detail-action-label">{t('detail.phone')}</span>
-            </a>
+              <span className="miniapp-detail-action-label">{t('actions.call')}</span>
+            </button>
+          )}
+          {contact.phone && (
+            <button className="miniapp-detail-action-btn" onClick={handleMessage}>
+              <div className="miniapp-detail-action-icon">
+                <MessageOutlined />
+              </div>
+              <span className="miniapp-detail-action-label">{t('actions.message')}</span>
+            </button>
           )}
           {contact.email && (
             <a href={`mailto:${contact.email}`} className="miniapp-detail-action-btn" onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}>
@@ -226,6 +230,18 @@ export default function ContactDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Call bottom sheet */}
+      {contact.phone && (
+        <CallBottomSheet
+          phone={contact.phone}
+          open={showCallSheet}
+          onClose={() => setShowCallSheet(false)}
+          webApp={webApp}
+          router={router}
+          t={t}
+        />
+      )}
     </div>
   );
 }

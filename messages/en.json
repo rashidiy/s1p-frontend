@@ -1290,7 +1290,9 @@
       "callInitiated": "Call initiated",
       "recording": "Recording",
       "speed": "Speed",
-      "selectOperator": "Select operator"
+      "selectOperator": "Select operator",
+      "from": "From",
+      "to": "To"
     },
     "profile": {
       "title": "Profile",
@@ -1338,7 +1340,8 @@
       "home": "Home",
       "contacts": "Contacts",
       "pipeline": "Pipeline",
-      "calls": "Calls",
+      "calls": "Call",
+      "history": "History",
       "profile": "Profile"
     },
     "needsAttention": "Needs Attention",
