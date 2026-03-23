@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   PhoneOutlined,
@@ -9,7 +9,13 @@ import {
   SwapOutlined,
   ClockCircleOutlined,
   CalendarOutlined,
+  CustomerServiceOutlined,
+  PhoneFilled,
+  CaretRightOutlined,
+  PauseOutlined,
 } from '@ant-design/icons';
+import { Spin } from 'antd';
+import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { CallWithDetails } from '@/types/api';
@@ -24,17 +30,203 @@ function Skeleton() {
         <div className="miniapp-skeleton-text" style={{ width: 120, height: 14, borderRadius: 6 }} />
       </div>
       <div className="miniapp-section">
-        {[1, 2, 3, 4].map(i => <div key={i} className="miniapp-info-row"><div className="miniapp-skeleton-text" style={{ width: '30%' }} /><div className="miniapp-skeleton-text" style={{ width: '45%' }} /></div>)}
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="miniapp-info-row">
+            <div className="miniapp-skeleton-text" style={{ width: '30%' }} />
+            <div className="miniapp-skeleton-text" style={{ width: '45%' }} />
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+
+// ============================================================================
+// Bottom Sheet
+// ============================================================================
+
+function BottomSheet({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  if (!open) return null;
+
+  return (
+    <>
+      <div className="miniapp-bottomsheet-overlay" onClick={onClose} />
+      <div className="miniapp-bottomsheet">
+        <div className="miniapp-bottomsheet-handle" />
+        {children}
+      </div>
+    </>
+  );
+}
+
+// ============================================================================
+// Audio Player
+// ============================================================================
+
+function AudioPlayer({
+  callId,
+  webApp,
+  t,
+}: {
+  callId: number;
+  webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [loadError, setLoadError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .getCallRecording(String(callId))
+      .then((url) => {
+        if (!cancelled) setAudioUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [callId]);
+
+  // Cleanup blob URL
+  useEffect(() => {
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+    };
+  }, [audioUrl]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    function onTimeUpdate() {
+      setCurrentTime(audio!.currentTime);
+    }
+    function onLoadedMetadata() {
+      setDuration(audio!.duration);
+    }
+    function onEnded() {
+      setPlaying(false);
+    }
+
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, [audioUrl]);
+
+  function togglePlay() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    webApp?.HapticFeedback.selectionChanged();
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else {
+      audio.play();
+      setPlaying(true);
+    }
+  }
+
+  function cycleSpeed() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    webApp?.HapticFeedback.selectionChanged();
+    const next = speed === 1 ? 1.5 : speed === 1.5 ? 2 : 1;
+    setSpeed(next);
+    audio.playbackRate = next;
+  }
+
+  function handleSeek(e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
+    const bar = progressRef.current;
+    const audio = audioRef.current;
+    if (!bar || !audio || !duration) return;
+
+    const rect = bar.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    audio.currentTime = ratio * duration;
+    setCurrentTime(audio.currentTime);
+  }
+
+  function formatAudioTime(sec: number): string {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  if (loadError) return null;
+  if (!audioUrl) {
+    return (
+      <div className="miniapp-audio-player" style={{ textAlign: 'center' }}>
+        <Spin size="small" />
+      </div>
+    );
+  }
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="miniapp-audio-player">
+      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+      <div className="miniapp-audio-controls">
+        <button className="miniapp-audio-play" onClick={togglePlay}>
+          {playing ? <PauseOutlined /> : <CaretRightOutlined />}
+        </button>
+        <div
+          className="miniapp-audio-progress"
+          ref={progressRef}
+          onClick={handleSeek}
+          onTouchMove={handleSeek}
+        >
+          <div className="miniapp-audio-progress-fill" style={{ width: `${progress}%` }}>
+            <div className="miniapp-audio-progress-handle" />
+          </div>
+        </div>
+        <span className="miniapp-audio-time">
+          {formatAudioTime(currentTime)} / {formatAudioTime(duration)}
+        </span>
+        <button className="miniapp-audio-speed" onClick={cycleSpeed}>
+          {speed}x
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Call Detail Page
+// ============================================================================
 
 export default function CallDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [call, setCall] = useState<CallWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCallSheet, setShowCallSheet] = useState(false);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tFields = useTranslations('fields');
@@ -80,35 +272,36 @@ export default function CallDetailPage() {
   const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
   const isInbound = call.direction === 'inbound';
   const phone = call.phone_2 || call.phone_1 || '';
-  const displayName = call.contact_name || phone || '—';
+  const displayName = call.contact_name || phone || '\u2014';
   const hasContact = !!call.contact_name && !!call.contact_id;
 
   const directionLabel = isInbound ? t('calls.inbound') : t('calls.outbound');
   const stateLabel = isMissed
     ? t('calls.missed')
-    : (call.state === 'ANSWER' ? t('calls.answered') : (call.state || '—'));
+    : call.state === 'ANSWER'
+      ? t('calls.answered')
+      : (call.state || '\u2014');
 
-  function handleCall() {
-    if (!phone) return;
+  function handlePhoneSheet() {
     webApp?.HapticFeedback.impactOccurred('medium');
-    // tel: links don't work in Telegram WebView, use openLink
-    try {
-      webApp?.openLink(`tel:${phone}`);
-    } catch {
-      window.location.href = `tel:${phone}`;
-    }
+    setShowCallSheet(true);
   }
 
   function handleMessage() {
     if (!phone) return;
     webApp?.HapticFeedback.impactOccurred('medium');
-    // t.me/+phone format for Telegram phone lookup
     const cleanPhone = phone.startsWith('+') ? phone : `+${phone}`;
     try {
       webApp?.openTelegramLink(`https://t.me/${cleanPhone}`);
     } catch {
       window.open(`https://t.me/${cleanPhone}`, '_blank');
     }
+  }
+
+  function handleContactNav() {
+    if (!hasContact) return;
+    webApp?.HapticFeedback.impactOccurred('light');
+    router.push(`/miniapp/contacts/${call!.contact_id}`);
   }
 
   return (
@@ -134,24 +327,32 @@ export default function CallDetailPage() {
               color: isMissed ? '#EF4444' : isInbound ? '#10B981' : '#3B82F6',
             }}
           >
-            <PhoneOutlined style={{ fontSize: 28, transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
+            <PhoneOutlined
+              style={{
+                fontSize: 28,
+                transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)',
+              }}
+            />
           </div>
         )}
         <div className={`miniapp-detail-name ${isMissed ? 'miniapp-text-missed' : ''}`}>
           {displayName}
         </div>
         <div className="miniapp-detail-sub">{phone}</div>
-        <span className={`miniapp-badge ${isMissed ? 'miniapp-badge-red' : isInbound ? 'miniapp-badge-green' : 'miniapp-badge-blue'}`}>
+        <span
+          className={`miniapp-badge ${isMissed ? 'miniapp-badge-red' : isInbound ? 'miniapp-badge-green' : 'miniapp-badge-blue'}`}
+        >
           {directionLabel} · {stateLabel}
         </span>
 
-        {/* Action buttons — no labels, icon only */}
+        {/* Action buttons — 3 icons in a row */}
         <div className="miniapp-detail-actions">
           {phone && (
-            <button className="miniapp-detail-action-btn" onClick={handleCall}>
+            <button className="miniapp-detail-action-btn" onClick={handlePhoneSheet}>
               <div className="miniapp-detail-action-icon">
                 <PhoneOutlined />
               </div>
+              <span className="miniapp-detail-action-label">{t('actions.call')}</span>
             </button>
           )}
           {phone && (
@@ -159,19 +360,15 @@ export default function CallDetailPage() {
               <div className="miniapp-detail-action-icon">
                 <MessageOutlined />
               </div>
+              <span className="miniapp-detail-action-label">{t('actions.message')}</span>
             </button>
           )}
           {hasContact && (
-            <button
-              className="miniapp-detail-action-btn"
-              onClick={() => {
-                webApp?.HapticFeedback.impactOccurred('light');
-                router.push(`/miniapp/contacts/${call.contact_id}`);
-              }}
-            >
+            <button className="miniapp-detail-action-btn" onClick={handleContactNav}>
               <div className="miniapp-detail-action-icon">
                 <UserOutlined />
               </div>
+              <span className="miniapp-detail-action-label">{t('detail.contact')}</span>
             </button>
           )}
         </div>
@@ -223,6 +420,63 @@ export default function CallDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Recording section */}
+      {call.has_recording && (
+        <div className="miniapp-section" style={{ marginTop: 8 }}>
+          <div className="miniapp-section-header">{t('calls.recording')}</div>
+          <AudioPlayer callId={call.id} webApp={webApp} t={t} />
+        </div>
+      )}
+
+      {/* Bottom sheet for call options */}
+      <BottomSheet open={showCallSheet} onClose={() => setShowCallSheet(false)}>
+        <div
+          className="miniapp-bottomsheet-option"
+          onClick={() => {
+            setShowCallSheet(false);
+            webApp?.HapticFeedback.impactOccurred('medium');
+            try {
+              webApp?.openLink(`tel:${phone}`);
+            } catch {
+              window.location.href = `tel:${phone}`;
+            }
+          }}
+        >
+          <div className="miniapp-bottomsheet-option-icon">
+            <PhoneFilled />
+          </div>
+          <span>{t('calls.phoneCall')}</span>
+        </div>
+        <div
+          className="miniapp-bottomsheet-option"
+          onClick={() => {
+            setShowCallSheet(false);
+            webApp?.HapticFeedback.impactOccurred('medium');
+            router.push(`/miniapp/calls?tab=dial&number=${encodeURIComponent(phone)}&mode=sip`);
+          }}
+        >
+          <div className="miniapp-bottomsheet-option-icon">
+            <CustomerServiceOutlined />
+          </div>
+          <span>{t('calls.sipCall')}</span>
+        </div>
+        <div
+          className="miniapp-bottomsheet-option"
+          onClick={() => {
+            setShowCallSheet(false);
+            webApp?.HapticFeedback.impactOccurred('medium');
+            router.push(
+              `/miniapp/calls?tab=dial&number=${encodeURIComponent(phone)}&mode=external`
+            );
+          }}
+        >
+          <div className="miniapp-bottomsheet-option-icon">
+            <SwapOutlined />
+          </div>
+          <span>{t('calls.externalCall')}</span>
+        </div>
+      </BottomSheet>
     </div>
   );
 }

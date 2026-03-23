@@ -1279,7 +1279,18 @@
       "today": "Сегодня",
       "yesterday": "Вчера",
       "thisWeek": "На этой неделе",
-      "earlier": "Ранее"
+      "earlier": "Ранее",
+      "makeCall": "Позвонить",
+      "history": "История",
+      "sipCall": "SIP звонок",
+      "externalCall": "Внешний звонок",
+      "phoneCall": "Телефон",
+      "via": "через {ext}",
+      "enterNumber": "Введите номер",
+      "callInitiated": "Звонок инициирован",
+      "recording": "Запись",
+      "speed": "Скорость",
+      "selectOperator": "Выберите оператора"
     },
     "profile": {
       "title": "Профиль",

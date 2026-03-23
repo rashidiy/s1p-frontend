@@ -1,21 +1,42 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { PhoneOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  PhoneOutlined,
+  PlusOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { Spin } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
+import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
-import type { CallWithDetails } from '@/types/api';
+import type { CallWithDetails, SipuniOperator } from '@/types/api';
 import { formatDuration, formatTime, getDateGroup } from '../_utils';
 
 const PAGE_SIZE = 50;
 
+const DIAL_KEYS = [
+  { digit: '1', sub: '' },
+  { digit: '2', sub: 'ABC' },
+  { digit: '3', sub: 'DEF' },
+  { digit: '4', sub: 'GHI' },
+  { digit: '5', sub: 'JKL' },
+  { digit: '6', sub: 'MNO' },
+  { digit: '7', sub: 'PQRS' },
+  { digit: '8', sub: 'TUV' },
+  { digit: '9', sub: 'WXYZ' },
+  { digit: '*', sub: '' },
+  { digit: '0', sub: '+' },
+  { digit: '#', sub: '' },
+];
+
 function SkeletonList() {
   return (
     <div className="miniapp-section" style={{ padding: 0 }}>
-      {[1,2,3,4,5,6].map(i => (
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="miniapp-skeleton-list-item">
           <div className="miniapp-skeleton-circle" />
           <div className="miniapp-skeleton-lines">
@@ -84,7 +105,212 @@ function CreateContactForm({ phone, onSave, onCancel, t }: CreateContactFormProp
   );
 }
 
-export default function MiniAppCalls() {
+// ============================================================================
+// Dialer View
+// ============================================================================
+
+function DialerView({ webApp, t }: {
+  webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const searchParams = useSearchParams();
+  const { user } = useAuthStore();
+
+  const [number, setNumber] = useState(searchParams.get('number') || '');
+  const [mode, setMode] = useState<'sip' | 'external'>(
+    (searchParams.get('mode') as 'sip' | 'external') || 'sip'
+  );
+  const [calling, setCalling] = useState(false);
+  const [operators, setOperators] = useState<SipuniOperator[]>([]);
+  const [selectedOperator, setSelectedOperator] = useState<string>('');
+  const hasSipExtension = !!user?.sip_extension;
+
+  useEffect(() => {
+    if (!hasSipExtension) {
+      apiClient.getSipuniOperators().then(setOperators).catch(() => {});
+    }
+  }, [hasSipExtension]);
+
+  const sipExtension = hasSipExtension
+    ? user!.sip_extension!
+    : selectedOperator;
+
+  function handleKeyPress(digit: string) {
+    webApp?.HapticFeedback.selectionChanged();
+    setNumber((prev) => prev + digit);
+  }
+
+  function handleBackspace() {
+    webApp?.HapticFeedback.selectionChanged();
+    setNumber((prev) => prev.slice(0, -1));
+  }
+
+  function handleLongPressZero() {
+    webApp?.HapticFeedback.selectionChanged();
+    setNumber((prev) => prev + '+');
+  }
+
+  async function handleCall() {
+    if (!number.trim() || !sipExtension || calling) return;
+    setCalling(true);
+    webApp?.HapticFeedback.impactOccurred('medium');
+    try {
+      let result;
+      if (mode === 'sip') {
+        result = await apiClient.callNumber({ phone: number, operator_id: sipExtension });
+      } else {
+        result = await apiClient.callExternal({ phone_1: sipExtension, phone_2: number, operator_id: sipExtension });
+      }
+      webApp?.HapticFeedback.notificationOccurred('success');
+      try {
+        webApp?.showPopup({
+          title: t('calls.callInitiated'),
+          message: `ID: ${result?.id || '—'}`,
+          buttons: [{ type: 'ok' }],
+        });
+      } catch { /* popup may not be available */ }
+    } catch {
+      webApp?.HapticFeedback.notificationOccurred('error');
+      try {
+        webApp?.showPopup({
+          message: t('error.loadFailed'),
+          buttons: [{ type: 'ok' }],
+        });
+      } catch { /* popup may not be available */ }
+    } finally {
+      setCalling(false);
+    }
+  }
+
+  let zeroTimer: ReturnType<typeof setTimeout> | null = null;
+
+  return (
+    <div className="miniapp-dialer">
+      {/* Number display */}
+      <div
+        className="miniapp-dialer-display"
+        onClick={async () => {
+          try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+              webApp?.HapticFeedback.selectionChanged();
+              setNumber(text.replace(/[^\d+*#]/g, ''));
+            }
+          } catch { /* clipboard not available */ }
+        }}
+      >
+        {number || (
+          <span className="miniapp-dialer-display-placeholder">
+            {t('calls.enterNumber')}
+          </span>
+        )}
+      </div>
+
+      {/* SIP / External toggle */}
+      <div className="miniapp-dialer-mode">
+        <button
+          className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
+          onClick={() => {
+            webApp?.HapticFeedback.selectionChanged();
+            setMode('sip');
+          }}
+        >
+          SIP
+        </button>
+        <button
+          className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
+          onClick={() => {
+            webApp?.HapticFeedback.selectionChanged();
+            setMode('external');
+          }}
+        >
+          External
+        </button>
+      </div>
+
+      {/* Operator info */}
+      {hasSipExtension ? (
+        <div className="miniapp-dialer-operator">
+          {t('calls.via', { ext: user!.sip_extension! })}
+        </div>
+      ) : (
+        <div className="miniapp-dialer-operator">
+          <select
+            value={selectedOperator}
+            onChange={(e) => setSelectedOperator(e.target.value)}
+          >
+            <option value="">{t('calls.selectOperator')}</option>
+            {operators.map((op) => (
+              <option key={op.extension} value={op.extension}>
+                {op.name} ({op.extension})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Number pad */}
+      <div className="miniapp-dialer-grid">
+        {DIAL_KEYS.map(({ digit, sub }) => (
+          <button
+            key={digit}
+            className="miniapp-dialer-key"
+            onClick={() => handleKeyPress(digit)}
+            onTouchStart={digit === '0' ? () => {
+              zeroTimer = setTimeout(() => {
+                handleLongPressZero();
+                zeroTimer = null;
+              }, 500);
+            } : undefined}
+            onTouchEnd={digit === '0' ? () => {
+              if (zeroTimer) {
+                clearTimeout(zeroTimer);
+                zeroTimer = null;
+                handleKeyPress('0');
+              }
+            } : undefined}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span>{digit}</span>
+              {sub && <span className="miniapp-dialer-key-sub">{sub}</span>}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Bottom row: empty, call, backspace */}
+      <div className="miniapp-dialer-bottom">
+        <div />
+        <button
+          className="miniapp-dialer-call"
+          onClick={handleCall}
+          disabled={!number.trim() || !sipExtension || calling}
+        >
+          {calling ? <Spin size="small" /> : <PhoneOutlined />}
+        </button>
+        {number ? (
+          <button className="miniapp-dialer-backspace" onClick={handleBackspace}>
+            <DeleteOutlined />
+          </button>
+        ) : (
+          <div />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// History View
+// ============================================================================
+
+function HistoryView({
+  webApp,
+  t,
+}: {
+  webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
+  t: ReturnType<typeof useTranslations>;
+}) {
   const [calls, setCalls] = useState<CallWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -92,9 +318,7 @@ export default function MiniAppCalls() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [createContactForPhone, setCreateContactForPhone] = useState<string | null>(null);
-  const { webApp } = useTelegramWebApp();
   const router = useRouter();
-  const t = useTranslations('miniapp');
 
   const load = useCallback(async (pageNum = 1) => {
     if (pageNum === 1) {
@@ -109,7 +333,7 @@ export default function MiniAppCalls() {
       if (pageNum === 1) {
         setCalls(items);
       } else {
-        setCalls(prev => [...prev, ...items]);
+        setCalls((prev) => [...prev, ...items]);
       }
       setHasMore(items.length === PAGE_SIZE);
       setPage(pageNum);
@@ -142,61 +366,49 @@ export default function MiniAppCalls() {
       webApp?.HapticFeedback.notificationOccurred('success');
       setCreateContactForPhone(null);
 
-      // Update calls client-side to show the new contact name
-      // (backend won't link them until next call from this number)
       const contactName = [firstName, lastName].filter(Boolean).join(' ');
-      setCalls(prev => prev.map(c => {
-        if ((c.phone_1 === phone || c.phone_2 === phone) && !c.contact_name) {
-          return { ...c, contact_name: contactName };
-        }
-        return c;
-      }));
+      setCalls((prev) =>
+        prev.map((c) => {
+          if ((c.phone_1 === phone || c.phone_2 === phone) && !c.contact_name) {
+            return { ...c, contact_name: contactName };
+          }
+          return c;
+        })
+      );
 
-      // Show success via native popup
       try {
         webApp?.showPopup({
-          title: '✓',
+          title: '\u2713',
           message: `${contactName} — ${t('createContact.title')}`,
           buttons: [{ type: 'ok' }],
         });
-      } catch {
-        // showPopup may not be available in older SDK
-      }
+      } catch { /* showPopup may not be available */ }
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
     }
   }
 
   if (loading) {
-    return (
-      <div className="miniapp-page-enter">
-        <div className="miniapp-page-title">{t('calls.title')}</div>
-        <SkeletonList />
-      </div>
-    );
+    return <SkeletonList />;
   }
 
   if (error) {
     return (
-      <div className="miniapp-page-enter">
-        <div className="miniapp-page-title">{t('calls.title')}</div>
-        <div className="miniapp-empty">
-          <div className="miniapp-empty-icon">!</div>
-          <div className="miniapp-empty-title">{t('error.loadFailed')}</div>
-        </div>
+      <div className="miniapp-empty">
+        <div className="miniapp-empty-icon">!</div>
+        <div className="miniapp-empty-title">{t('error.loadFailed')}</div>
       </div>
     );
   }
 
   if (calls.length === 0) {
     return (
-      <div className="miniapp-page-enter">
-        <div className="miniapp-page-title">{t('calls.title')}</div>
-        <div className="miniapp-empty">
-          <div className="miniapp-empty-icon"><PhoneOutlined /></div>
-          <div className="miniapp-empty-title">{t('calls.noCalls')}</div>
-          <div className="miniapp-empty-sub">{t('calls.emptyDescription')}</div>
+      <div className="miniapp-empty">
+        <div className="miniapp-empty-icon">
+          <PhoneOutlined />
         </div>
+        <div className="miniapp-empty-title">{t('calls.noCalls')}</div>
+        <div className="miniapp-empty-sub">{t('calls.emptyDescription')}</div>
       </div>
     );
   }
@@ -220,7 +432,12 @@ export default function MiniAppCalls() {
     groupMap.get(group)!.push(call);
   }
 
-  const groupOrder: Array<'today' | 'yesterday' | 'thisWeek' | 'earlier'> = ['today', 'yesterday', 'thisWeek', 'earlier'];
+  const groupOrder: Array<'today' | 'yesterday' | 'thisWeek' | 'earlier'> = [
+    'today',
+    'yesterday',
+    'thisWeek',
+    'earlier',
+  ];
   for (const key of groupOrder) {
     const items = groupMap.get(key);
     if (items?.length) {
@@ -229,9 +446,7 @@ export default function MiniAppCalls() {
   }
 
   return (
-    <div className="miniapp-page-enter">
-      <div className="miniapp-page-title">{t('calls.title')}</div>
-
+    <>
       {/* Inline create contact form */}
       {createContactForPhone && (
         <div className="miniapp-section" style={{ marginBottom: 8 }}>
@@ -252,12 +467,14 @@ export default function MiniAppCalls() {
               {group.calls.map((call) => {
                 const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
                 const isInbound = call.direction === 'inbound';
-                const phone = call.phone_2 || call.phone_1 || '—';
+                const phone = call.phone_2 || call.phone_1 || '\u2014';
                 const hasContact = !!call.contact_name;
                 const displayTitle = hasContact ? call.contact_name! : phone;
                 const displaySub = hasContact
                   ? phone
-                  : (isMissed ? t('calls.missed') : formatDuration(call.duration));
+                  : isMissed
+                    ? t('calls.missed')
+                    : formatDuration(call.duration);
 
                 return (
                   <div
@@ -271,20 +488,26 @@ export default function MiniAppCalls() {
                       router.push(`/miniapp/calls/${call.id}`);
                     }}
                   >
-                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
-                      <PhoneOutlined style={{ transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
+                    <div
+                      className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}
+                    >
+                      <PhoneOutlined
+                        style={{
+                          transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)',
+                        }}
+                      />
                     </div>
                     <div className="miniapp-list-item-content">
-                      <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
+                      <div
+                        className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}
+                      >
                         {displayTitle}
                       </div>
-                      <div className="miniapp-list-item-sub">
-                        {displaySub}
-                      </div>
+                      <div className="miniapp-list-item-sub">{displaySub}</div>
                     </div>
                     <div className="miniapp-list-item-right" style={{ gap: 8 }}>
                       {formatTime(call.created_at)}
-                      {!hasContact && phone !== '—' && !phonesWithContact.has(phone) && (
+                      {!hasContact && phone !== '\u2014' && !phonesWithContact.has(phone) && (
                         <button
                           className="miniapp-add-contact-btn"
                           onClick={(e) => {
@@ -311,6 +534,55 @@ export default function MiniAppCalls() {
             {loadingMore ? <Spin size="small" /> : t('loadMore')}
           </div>
         </div>
+      )}
+    </>
+  );
+}
+
+// ============================================================================
+// Main Page
+// ============================================================================
+
+export default function MiniAppCalls() {
+  const searchParams = useSearchParams();
+  const { webApp } = useTelegramWebApp();
+  const t = useTranslations('miniapp');
+
+  // Default to history unless URL says tab=dial
+  const [activeTab, setActiveTab] = useState<'history' | 'dial'>(
+    searchParams.get('tab') === 'dial' ? 'dial' : 'history'
+  );
+
+  return (
+    <div className="miniapp-page-enter">
+      <div className="miniapp-page-title">{t('calls.title')}</div>
+
+      {/* Segmented toggle */}
+      <div className="miniapp-segment">
+        <button
+          className={`miniapp-segment-btn ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => {
+            webApp?.HapticFeedback.selectionChanged();
+            setActiveTab('history');
+          }}
+        >
+          {t('calls.history')}
+        </button>
+        <button
+          className={`miniapp-segment-btn ${activeTab === 'dial' ? 'active' : ''}`}
+          onClick={() => {
+            webApp?.HapticFeedback.selectionChanged();
+            setActiveTab('dial');
+          }}
+        >
+          {t('calls.makeCall')}
+        </button>
+      </div>
+
+      {activeTab === 'history' ? (
+        <HistoryView webApp={webApp} t={t} />
+      ) : (
+        <DialerView webApp={webApp} t={t} />
       )}
     </div>
   );

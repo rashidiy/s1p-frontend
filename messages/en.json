@@ -1279,7 +1279,18 @@
       "today": "Today",
       "yesterday": "Yesterday",
       "thisWeek": "This week",
-      "earlier": "Earlier"
+      "earlier": "Earlier",
+      "makeCall": "Make Call",
+      "history": "History",
+      "sipCall": "SIP Call",
+      "externalCall": "External Call",
+      "phoneCall": "Phone Call",
+      "via": "via {ext}",
+      "enterNumber": "Enter number",
+      "callInitiated": "Call initiated",
+      "recording": "Recording",
+      "speed": "Speed",
+      "selectOperator": "Select operator"
     },
     "profile": {
       "title": "Profile",

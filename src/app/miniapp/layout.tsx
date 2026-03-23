@@ -212,7 +212,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   }, [webApp]);
 
   // Determine if we're on a detail page (hide tab bar)
-  const isDetailPage = /\/miniapp\/(contacts|leads|deals)\/[^/]+/.test(pathname);
+  const isDetailPage = /\/miniapp\/(contacts|leads|deals|calls)\/[^/]+/.test(pathname);
   const isProfilePage = pathname === '/miniapp/profile';
 
   if (authState === 'loading') {

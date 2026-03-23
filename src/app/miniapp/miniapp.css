@@ -1072,3 +1072,335 @@
 .miniapp-create-contact-input::placeholder {
   color: var(--ma-hint);
 }
+
+/* ---------- Dialer / Number pad ---------- */
+.miniapp-dialer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 0;
+  gap: 12px;
+}
+
+.miniapp-dialer-display {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--ma-text);
+  text-align: center;
+  min-height: 44px;
+  line-height: 44px;
+  letter-spacing: 1px;
+  width: 100%;
+  padding: 8px 16px;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  word-break: break-all;
+}
+
+.miniapp-dialer-display-placeholder {
+  color: var(--ma-hint);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.miniapp-dialer-mode {
+  display: flex;
+  background: var(--ma-section);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.miniapp-dialer-mode-btn {
+  padding: 4px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--ma-hint);
+}
+
+.miniapp-dialer-mode-btn.active {
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
+}
+
+.miniapp-dialer-operator {
+  font-size: 12px;
+  color: var(--ma-hint);
+  text-align: center;
+}
+
+.miniapp-dialer-operator select {
+  background: var(--ma-section);
+  color: var(--ma-text);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.miniapp-dialer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  padding: 0 8px;
+}
+
+.miniapp-dialer-key {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ma-section);
+  color: var(--ma-text);
+  font-size: 24px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, transform 0.1s;
+  user-select: none;
+}
+
+.miniapp-dialer-key:active {
+  background: var(--ma-hint);
+  transform: scale(0.92);
+}
+
+.miniapp-dialer-key-sub {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--ma-hint);
+  margin-top: -2px;
+}
+
+.miniapp-dialer-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  padding: 0 8px;
+  margin-top: 4px;
+}
+
+.miniapp-dialer-call {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: #10B981;
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, opacity 0.15s;
+}
+
+.miniapp-dialer-call:active {
+  transform: scale(0.92);
+  opacity: 0.85;
+}
+
+.miniapp-dialer-call:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.miniapp-dialer-backspace {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--ma-hint);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s;
+}
+
+.miniapp-dialer-backspace:active {
+  transform: scale(0.9);
+}
+
+/* ---------- Bottom sheet ---------- */
+.miniapp-bottomsheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  animation: ma-overlay-in 0.2s ease-out;
+}
+
+@keyframes ma-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.miniapp-bottomsheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ma-section);
+  border-radius: 14px 14px 0 0;
+  z-index: 101;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  animation: ma-sheet-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes ma-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.miniapp-bottomsheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ma-hint);
+  opacity: 0.3;
+  margin: 8px auto 4px;
+}
+
+.miniapp-bottomsheet-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  font-size: 16px;
+  color: var(--ma-text);
+}
+
+.miniapp-bottomsheet-option:active {
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.miniapp-bottomsheet-option + .miniapp-bottomsheet-option {
+  border-top: 0.5px solid var(--ma-separator);
+}
+
+.miniapp-bottomsheet-option-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--ma-bg2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--ma-accent);
+  flex-shrink: 0;
+}
+
+/* ---------- Audio player ---------- */
+.miniapp-audio-player {
+  padding: 12px 16px;
+}
+
+.miniapp-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.miniapp-audio-play {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+}
+
+.miniapp-audio-play:active {
+  transform: scale(0.9);
+}
+
+.miniapp-audio-progress {
+  flex: 1;
+  height: 4px;
+  background: var(--ma-separator);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.miniapp-audio-progress-fill {
+  height: 100%;
+  background: var(--ma-accent);
+  border-radius: 2px;
+  position: relative;
+  transition: width 0.1s linear;
+}
+
+.miniapp-audio-progress-handle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ma-accent);
+  position: absolute;
+  right: -7px;
+  top: -5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.miniapp-audio-time {
+  font-size: 12px;
+  color: var(--ma-hint);
+  flex-shrink: 0;
+  min-width: 72px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.miniapp-audio-speed {
+  padding: 2px 8px;
+  border: 1px solid var(--ma-separator);
+  border-radius: var(--ma-radius-pill);
+  background: transparent;
+  color: var(--ma-hint);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.miniapp-audio-speed:active {
+  transform: scale(0.9);
+}

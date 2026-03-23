@@ -1279,7 +1279,18 @@
       "today": "Bugun",
       "yesterday": "Kecha",
       "thisWeek": "Shu hafta",
-      "earlier": "Oldinroq"
+      "earlier": "Oldinroq",
+      "makeCall": "Qo'ng'iroq qilish",
+      "history": "Tarix",
+      "sipCall": "SIP qo'ng'iroq",
+      "externalCall": "Tashqi qo'ng'iroq",
+      "phoneCall": "Telefon",
+      "via": "{ext} orqali",
+      "enterNumber": "Raqam kiriting",
+      "callInitiated": "Qo'ng'iroq boshlandi",
+      "recording": "Yozuv",
+      "speed": "Tezlik",
+      "selectOperator": "Operatorni tanlang"
     },
     "profile": {
       "title": "Profil",
