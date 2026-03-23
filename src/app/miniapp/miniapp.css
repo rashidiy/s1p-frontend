@@ -204,9 +204,8 @@
   border-radius: var(--ma-radius);
   padding: 12px 14px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s, opacity 0.15s;
@@ -217,6 +216,12 @@
 .miniapp-stat-card:active {
   transform: scale(0.97);
   opacity: 0.85;
+}
+
+.miniapp-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .miniapp-stat-icon {
@@ -231,20 +236,17 @@
 }
 
 .miniapp-stat-value {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--ma-text);
   line-height: 1;
   letter-spacing: -0.3px;
-  flex-shrink: 0;
 }
 
 .miniapp-stat-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ma-hint);
   font-weight: 400;
-  flex: 1;
-  text-align: right;
 }
 
 /* ---------- List items ---------- */

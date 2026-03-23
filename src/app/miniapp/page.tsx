@@ -212,10 +212,12 @@ export default function MiniAppDashboard() {
               router.push(s.tap);
             }}
           >
-            <div className="miniapp-stat-icon" style={{ background: s.bg, color: s.color }}>
-              {s.icon}
+            <div className="miniapp-stat-top">
+              <div className="miniapp-stat-icon" style={{ background: s.bg, color: s.color }}>
+                {s.icon}
+              </div>
+              <div className="miniapp-stat-value">{s.value}</div>
             </div>
-            <div className="miniapp-stat-value">{s.value}</div>
             <div className="miniapp-stat-label">{s.label}</div>
           </div>
         ))}

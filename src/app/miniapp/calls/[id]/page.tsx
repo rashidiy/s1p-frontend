@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   PhoneOutlined,
-  ClockCircleOutlined,
+  MessageOutlined,
   UserOutlined,
   SwapOutlined,
+  ClockCircleOutlined,
   CalendarOutlined,
 } from '@ant-design/icons';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -18,9 +19,9 @@ function Skeleton() {
   return (
     <div>
       <div className="miniapp-detail-header">
-        <div className="miniapp-skeleton-circle" style={{ width: 72, height: 72 }} />
-        <div className="miniapp-skeleton-text" style={{ width: 140, height: 22, borderRadius: 8, marginTop: 8 }} />
-        <div className="miniapp-skeleton-text" style={{ width: 100, height: 14, borderRadius: 6 }} />
+        <div className="miniapp-skeleton-text" style={{ width: 160, height: 24, borderRadius: 8 }} />
+        <div className="miniapp-skeleton-text" style={{ width: 120, height: 14, borderRadius: 6, marginTop: 4 }} />
+        <div className="miniapp-skeleton-text" style={{ width: 80, height: 24, borderRadius: 100, marginTop: 8 }} />
       </div>
       <div className="miniapp-section">
         {[1, 2, 3, 4].map(i => <div key={i} className="miniapp-info-row"><div className="miniapp-skeleton-text" style={{ width: '30%' }} /><div className="miniapp-skeleton-text" style={{ width: '45%' }} /></div>)}
@@ -43,7 +44,6 @@ export default function CallDetailPage() {
   }, [router]);
 
   useEffect(() => {
-    // Read call data from sessionStorage (set by calls list page)
     try {
       const stored = sessionStorage.getItem(`call_${id}`);
       if (stored) {
@@ -66,28 +66,6 @@ export default function CallDetailPage() {
     }
   }, [webApp, goBack]);
 
-  // MainButton: Call back
-  const phone = call?.phone_2 || call?.phone_1 || '';
-  const handleCall = useCallback(() => {
-    if (phone) {
-      webApp?.HapticFeedback.impactOccurred('medium');
-      window.open(`tel:${phone}`, '_self');
-    }
-  }, [phone, webApp]);
-
-  useEffect(() => {
-    if (!webApp || loading) return;
-    if (phone) {
-      webApp.MainButton.setText(t('actions.call'));
-      webApp.MainButton.show();
-      webApp.MainButton.onClick(handleCall);
-      return () => {
-        webApp.MainButton.offClick(handleCall);
-        webApp.MainButton.hide();
-      };
-    }
-  }, [webApp, loading, phone, handleCall, t]);
-
   if (loading) return <Skeleton />;
 
   if (!call) {
@@ -101,41 +79,76 @@ export default function CallDetailPage() {
 
   const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
   const isInbound = call.direction === 'inbound';
+  const phone = call.phone_2 || call.phone_1 || '';
   const displayName = call.contact_name || phone || '—';
 
-  const directionLabel = isInbound
-    ? (t('calls.inbound') || 'Inbound')
-    : (t('calls.outbound') || 'Outbound');
+  const directionLabel = isInbound ? t('calls.inbound') : t('calls.outbound');
   const stateLabel = isMissed
     ? t('calls.missed')
-    : (call.state === 'ANSWER' ? (t('calls.answered') || 'Answered') : (call.state || '—'));
+    : (call.state === 'ANSWER' ? t('calls.answered') : (call.state || '—'));
+
+  // Check if contact has telegram username (we'd need it from contact data)
+  // For now, telegram deep link uses phone number
+  const hasTelegramLink = !!phone;
 
   return (
     <div className="miniapp-detail-enter">
-      {/* Header */}
+      {/* Header — name, phone, badge */}
       <div className="miniapp-detail-header">
-        <div
-          className="miniapp-detail-avatar"
-          style={{
-            background: isMissed
-              ? 'rgba(239, 68, 68, 0.15)'
-              : isInbound
-                ? 'rgba(16, 185, 129, 0.15)'
-                : 'rgba(59, 130, 246, 0.15)',
-            color: isMissed ? '#EF4444' : isInbound ? '#10B981' : '#3B82F6',
-          }}
-        >
-          <PhoneOutlined style={{ fontSize: 28, transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
-        </div>
         <div className={`miniapp-detail-name ${isMissed ? 'miniapp-text-missed' : ''}`}>
           {displayName}
         </div>
         {call.contact_name && (
           <div className="miniapp-detail-sub">{phone}</div>
         )}
+        {!call.contact_name && (
+          <div className="miniapp-detail-sub">{phone}</div>
+        )}
         <span className={`miniapp-badge ${isMissed ? 'miniapp-badge-red' : isInbound ? 'miniapp-badge-green' : 'miniapp-badge-blue'}`}>
-          {directionLabel}
+          {directionLabel} · {stateLabel}
         </span>
+      </div>
+
+      {/* 3 Action buttons */}
+      <div className="miniapp-detail-actions" style={{ justifyContent: 'center', padding: '8px 0 16px' }}>
+        {phone && (
+          <a
+            href={`tel:${phone}`}
+            className="miniapp-detail-action-btn"
+            onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}
+          >
+            <div className="miniapp-detail-action-icon">
+              <PhoneOutlined />
+            </div>
+            <span className="miniapp-detail-action-label">{t('actions.call')}</span>
+          </a>
+        )}
+        {hasTelegramLink && (
+          <a
+            href={`https://t.me/${phone.replace(/[^0-9]/g, '')}`}
+            className="miniapp-detail-action-btn"
+            onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}
+          >
+            <div className="miniapp-detail-action-icon">
+              <MessageOutlined />
+            </div>
+            <span className="miniapp-detail-action-label">{t('actions.message') || 'Message'}</span>
+          </a>
+        )}
+        {call.contact_id && (
+          <button
+            className="miniapp-detail-action-btn"
+            onClick={() => {
+              webApp?.HapticFeedback.impactOccurred('light');
+              router.push(`/miniapp/contacts/${call.contact_id}`);
+            }}
+          >
+            <div className="miniapp-detail-action-icon">
+              <UserOutlined />
+            </div>
+            <span className="miniapp-detail-action-label">{t('detail.contact')}</span>
+          </button>
+        )}
       </div>
 
       {/* Call info */}
@@ -178,14 +191,14 @@ export default function CallDetailPage() {
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">
               <UserOutlined style={{ marginRight: 6 }} />
-              {t('detail.operator') || 'Operator'}
+              {t('detail.operator')}
             </span>
             <span className="miniapp-info-value">{call.operator_name}</span>
           </div>
         )}
       </div>
 
-      {/* Contact link */}
+      {/* Contact card if linked */}
       {call.contact_name && call.contact_id && (
         <>
           <div className="miniapp-section-header">{t('detail.contact')}</div>
@@ -211,18 +224,6 @@ export default function CallDetailPage() {
             </div>
           </div>
         </>
-      )}
-
-      {/* Phone actions */}
-      {phone && (
-        <div className="miniapp-detail-actions" style={{ justifyContent: 'center', padding: '16px 0' }}>
-          <a href={`tel:${phone}`} className="miniapp-detail-action-btn" onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}>
-            <div className="miniapp-detail-action-icon">
-              <PhoneOutlined />
-            </div>
-            <span className="miniapp-detail-action-label">{t('actions.call')}</span>
-          </a>
-        </div>
       )}
     </div>
   );

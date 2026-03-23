@@ -1349,7 +1349,8 @@
       "lost": "Yo'qotildi",
       "addNote": "Eslatma qo'shish...",
       "save": "Saqlash",
-      "call": "Qo'ng'iroq qilish"
+      "call": "Qo'ng'iroq qilish",
+      "message": "Xabar"
     },
     "notifications": {
       "title": "Bildirishnomalar",
