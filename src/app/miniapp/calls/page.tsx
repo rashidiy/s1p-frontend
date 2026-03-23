@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PhoneOutlined } from '@ant-design/icons';
+import { PhoneOutlined, CloseCircleFilled } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -12,20 +12,17 @@ import type { SipuniOperator } from '@/types/api';
 
 const DIAL_KEYS = ['1','2','3','4','5','6','7','8','9','+','0','#'];
 
-/** Format raw digits like +998200083233 → +998 20 008 32 33 */
 function formatPhone(raw: string): string {
   if (!raw) return '';
-  // If starts with +998, format nicely
   if (raw.startsWith('+998') && raw.length > 4) {
     const rest = raw.slice(4);
-    // +998 XX XXX XX XX
-    let formatted = '+998';
-    if (rest.length > 0) formatted += ' ' + rest.slice(0, 2);
-    if (rest.length > 2) formatted += ' ' + rest.slice(2, 5);
-    if (rest.length > 5) formatted += ' ' + rest.slice(5, 7);
-    if (rest.length > 7) formatted += ' ' + rest.slice(7, 9);
-    if (rest.length > 9) formatted += rest.slice(9);
-    return formatted;
+    let f = '+998';
+    if (rest.length > 0) f += ' ' + rest.slice(0, 2);
+    if (rest.length > 2) f += ' ' + rest.slice(2, 5);
+    if (rest.length > 5) f += ' ' + rest.slice(5, 7);
+    if (rest.length > 7) f += ' ' + rest.slice(7, 9);
+    if (rest.length > 9) f += rest.slice(9);
+    return f;
   }
   return raw;
 }
@@ -47,6 +44,13 @@ export default function MiniAppCalls() {
   const [activeInput, setActiveInput] = useState<'to' | 'from'>('to');
   const hasSipExtension = !!user?.sip_extension;
 
+  // Prefill phone1 with user's phone when switching to external
+  useEffect(() => {
+    if (mode === 'external' && !phone1 && user?.phone) {
+      setPhone1(user.phone);
+    }
+  }, [mode, phone1, user?.phone]);
+
   useEffect(() => {
     if (!hasSipExtension) {
       apiClient.getSipuniOperators().then(setOperators).catch(() => {});
@@ -59,7 +63,6 @@ export default function MiniAppCalls() {
     webApp?.HapticFeedback.selectionChanged();
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
     setter((prev) => {
-      // Auto-prefix +998 on first digit press (not if pressing +)
       if (prev === '' && digit !== '+' && digit !== '#') {
         return '+998' + digit;
       }
@@ -77,7 +80,6 @@ export default function MiniAppCalls() {
     if (!phone2.trim() || calling) return;
     if (mode === 'sip' && !sipExtension) return;
     if (mode === 'external' && !phone1.trim()) return;
-
     setCalling(true);
     webApp?.HapticFeedback.impactOccurred('medium');
     try {
@@ -85,13 +87,7 @@ export default function MiniAppCalls() {
         ? await apiClient.callNumber({ phone: phone2, operator_id: sipExtension, reverse: false, antiaon: false })
         : await apiClient.callExternal({ phone_1: phone1, phone_2: phone2, operator_id: sipExtension || phone1 });
       webApp?.HapticFeedback.notificationOccurred('success');
-      try {
-        webApp?.showPopup({
-          title: t('calls.callInitiated'),
-          message: `ID: ${result?.call_id || '\u2014'}`,
-          buttons: [{ type: 'ok' }],
-        });
-      } catch {}
+      try { webApp?.showPopup({ title: t('calls.callInitiated'), message: `ID: ${result?.call_id || '\u2014'}`, buttons: [{ type: 'ok' }] }); } catch {}
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
       try { webApp?.showPopup({ message: t('error.loadFailed'), buttons: [{ type: 'ok' }] }); } catch {}
@@ -105,39 +101,52 @@ export default function MiniAppCalls() {
 
   return (
     <div className="miniapp-dialer">
-      {/* Number display — fixed height, no layout shift */}
+      {/* Display area — always same height for both modes */}
       <div className="miniapp-dialer-display-area">
         {mode === 'external' ? (
-          <div className="miniapp-dialer-dual">
+          <>
             <div
               className={`miniapp-dialer-ext-number ${activeInput === 'from' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('from'); }}
             >
-              {formatPhone(phone1) || <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
+              {phone1 ? (
+                <>
+                  {formatPhone(phone1)}
+                  <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                    <CloseCircleFilled />
+                  </button>
+                </>
+              ) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
             </div>
             <div
               className={`miniapp-dialer-ext-number ${activeInput === 'to' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('to'); }}
             >
-              {formatPhone(phone2) || <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
+              {phone2 ? (
+                <>
+                  {formatPhone(phone2)}
+                  <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                    <CloseCircleFilled />
+                  </button>
+                </>
+              ) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
             </div>
-          </div>
+          </>
         ) : (
-          <div
-            className="miniapp-dialer-number"
-            onClick={async () => {
-              try {
-                const text = await navigator.clipboard.readText();
-                if (text) { webApp?.HapticFeedback.selectionChanged(); setPhone2(text.replace(/[^\d+*#]/g, '')); }
-              } catch {}
-            }}
-          >
-            {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
+          <div className="miniapp-dialer-number">
+            {phone2 ? (
+              <>
+                {formatPhone(phone2)}
+                <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <CloseCircleFilled />
+                </button>
+              </>
+            ) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
           </div>
         )}
       </div>
 
-      {/* Controls row — toggle + operator, compact */}
+      {/* Controls */}
       <div className="miniapp-dialer-controls">
         <div className="miniapp-dialer-mode">
           <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
