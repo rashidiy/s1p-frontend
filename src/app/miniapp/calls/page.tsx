@@ -199,6 +199,15 @@ export default function MiniAppCalls() {
     );
   }
 
+  // Build set of phone numbers that already have a contact linked
+  const phonesWithContact = new Set<string>();
+  for (const call of calls) {
+    if (call.contact_name) {
+      if (call.phone_1) phonesWithContact.add(call.phone_1);
+      if (call.phone_2) phonesWithContact.add(call.phone_2);
+    }
+  }
+
   // Group calls by date
   const groups: { key: string; label: string; calls: CallWithDetails[] }[] = [];
   const groupMap = new Map<string, CallWithDetails[]>();
@@ -272,7 +281,7 @@ export default function MiniAppCalls() {
                     </div>
                     <div className="miniapp-list-item-right" style={{ gap: 8 }}>
                       {formatTime(call.created_at)}
-                      {!hasContact && phone !== '—' && (
+                      {!hasContact && phone !== '—' && !phonesWithContact.has(phone) && (
                         <button
                           className="miniapp-add-contact-btn"
                           onClick={(e) => {
