@@ -154,7 +154,7 @@ export default function MiniAppDashboard() {
   ];
 
   const avatarUrl = user?.avatar_url
-    ? `${API_BASE_URL}${user.avatar_url}`
+    ? (user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE_URL}${user.avatar_url}`)
     : undefined;
 
   return (

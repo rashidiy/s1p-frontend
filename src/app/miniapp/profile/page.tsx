@@ -43,7 +43,7 @@ export default function MiniAppProfile() {
 
   const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'User';
   const avatarUrl = user?.avatar_url
-    ? `${API_BASE_URL}${user.avatar_url}`
+    ? (user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE_URL}${user.avatar_url}`)
     : undefined;
   const initials = getInitials(user?.first_name, user?.last_name);
 
