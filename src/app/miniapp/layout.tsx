@@ -198,17 +198,13 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     if (webApp) {
       const isDark = webApp.colorScheme === 'dark';
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      // Match Telegram's header and bottom area to our bg
-      const bgColor = webApp.themeParams.bg_color || (isDark ? '#1C1C1E' : '#F8F9FA');
+      // Match Telegram's header to our bg
       try {
         webApp.setHeaderColor('secondary_bg_color');
-        webApp.setBackgroundColor(bgColor);
+        webApp.setBackgroundColor(webApp.themeParams.secondary_bg_color || (isDark ? '#121214' : '#F8F9FA'));
       } catch {
         // older SDK versions may not support this
       }
-      // Set html/body background to match — fixes iPhone safe area black gap
-      document.documentElement.style.background = bgColor;
-      document.body.style.background = bgColor;
     }
   }, [webApp]);
 
