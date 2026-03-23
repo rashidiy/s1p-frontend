@@ -106,42 +106,36 @@ export default function MiniAppCalls() {
         {mode === 'external' ? (
           <>
             <div
-              className={`miniapp-dialer-ext-number ${activeInput === 'from' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-from ${activeInput === 'from' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('from'); }}
             >
-              {phone1 ? (
-                <>
-                  {formatPhone(phone1)}
-                  <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                    <CloseCircleFilled />
-                  </button>
-                </>
-              ) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
+              {phone1 ? formatPhone(phone1) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
+              {phone1 && (
+                <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <CloseCircleFilled />
+                </span>
+              )}
             </div>
             <div
-              className={`miniapp-dialer-ext-number ${activeInput === 'to' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-to ${activeInput === 'to' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('to'); }}
             >
-              {phone2 ? (
-                <>
-                  {formatPhone(phone2)}
-                  <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                    <CloseCircleFilled />
-                  </button>
-                </>
-              ) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
+              {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
+              {phone2 && (
+                <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <CloseCircleFilled />
+                </span>
+              )}
             </div>
           </>
         ) : (
           <div className="miniapp-dialer-number">
-            {phone2 ? (
-              <>
-                {formatPhone(phone2)}
-                <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <CloseCircleFilled />
-                </button>
-              </>
-            ) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
+            {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
+            {phone2 && (
+              <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.preventDefault(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                <CloseCircleFilled />
+              </span>
+            )}
           </div>
         )}
       </div>
