@@ -1113,9 +1113,6 @@
   padding: 0 24px;
   gap: 0;
   flex: 1;
-  background: #000;
-  margin: -8px -12px -12px;
-  padding-bottom: 12px;
 }
 
 .miniapp-dialer-display {
@@ -1147,27 +1144,28 @@
   gap: 0;
   padding: 2px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--ma-separator);
   margin: 6px 0;
+  width: 200px;
 }
 
 .miniapp-dialer-mode-btn {
-  padding: 4px 16px;
+  flex: 1;
+  padding: 5px 0;
   border: none;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.2s;
   background: transparent;
   color: var(--ma-hint);
-  letter-spacing: 0.5px;
 }
 
 .miniapp-dialer-mode-btn.active {
-  background: var(--ma-accent);
-  color: var(--ma-btn-text);
+  background: var(--ma-section);
+  color: var(--ma-text);
 }
 
 .miniapp-dialer-operator {
@@ -1242,7 +1240,7 @@
   height: 76px;
   border-radius: 50%;
   border: none;
-  background: #30D158;
+  background: var(--ma-accent);
   color: #FFFFFF;
   font-size: 28px;
   cursor: pointer;
@@ -1259,8 +1257,7 @@
 }
 
 .miniapp-dialer-call:disabled {
-  background: rgba(48, 209, 88, 0.15);
-  color: rgba(255, 255, 255, 0.25);
+  opacity: 0.4;
   box-shadow: none;
 }
 

@@ -251,10 +251,7 @@ export default function MiniAppCalls() {
                 }
               } : undefined}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span>{digit}</span>
-                {sub && <span className="miniapp-dialer-key-sub">{sub}</span>}
-              </div>
+              {digit}
             </button>
           ))}
         </div>
