@@ -1273,6 +1273,9 @@
       "noCalls": "Hali qo'ng'iroqlar yo'q",
       "emptyDescription": "Qo'ng'iroqlar tarixi shu yerda ko'rinadi",
       "missed": "O'tkazilgan",
+      "answered": "Javob berilgan",
+      "inbound": "Kiruvchi",
+      "outbound": "Chiquvchi",
       "today": "Bugun",
       "yesterday": "Kecha",
       "thisWeek": "Shu hafta",
@@ -1312,7 +1315,8 @@
       "closed": "Yopilgan",
       "winReason": "Yutish sababi",
       "lossReason": "Yo'qotish sababi",
-      "untitled": "Nomsiz"
+      "untitled": "Nomsiz",
+      "operator": "Operator"
     },
     "error": {
       "loadFailed": "Ma'lumotlarni yuklab bo'lmadi",

@@ -1273,6 +1273,9 @@
       "noCalls": "No calls yet",
       "emptyDescription": "Your call history will appear here",
       "missed": "Missed",
+      "answered": "Answered",
+      "inbound": "Inbound",
+      "outbound": "Outbound",
       "today": "Today",
       "yesterday": "Yesterday",
       "thisWeek": "This week",
@@ -1312,7 +1315,8 @@
       "closed": "Closed",
       "winReason": "Win reason",
       "lossReason": "Loss reason",
-      "untitled": "Untitled"
+      "untitled": "Untitled",
+      "operator": "Operator"
     },
     "error": {
       "loadFailed": "Failed to load data",

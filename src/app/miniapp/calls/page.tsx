@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { PhoneOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -92,6 +93,7 @@ export default function MiniAppCalls() {
   const [page, setPage] = useState(1);
   const [createContactForPhone, setCreateContactForPhone] = useState<string | null>(null);
   const { webApp } = useTelegramWebApp();
+  const router = useRouter();
   const t = useTranslations('miniapp');
 
   const load = useCallback(async (pageNum = 1) => {
@@ -250,7 +252,7 @@ export default function MiniAppCalls() {
               {group.calls.map((call) => {
                 const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
                 const isInbound = call.direction === 'inbound';
-                const phone = call.phone_1 || call.phone_2 || '—';
+                const phone = call.phone_2 || call.phone_1 || '—';
                 const hasContact = !!call.contact_name;
                 const displayTitle = hasContact ? call.contact_name! : phone;
                 const displaySub = hasContact
@@ -262,10 +264,11 @@ export default function MiniAppCalls() {
                     key={call.id}
                     className="miniapp-list-item"
                     onClick={() => {
-                      if (phone !== '—') {
-                        webApp?.HapticFeedback.impactOccurred('light');
-                        window.open(`tel:${phone}`, '_self');
-                      }
+                      webApp?.HapticFeedback.impactOccurred('light');
+                      try {
+                        sessionStorage.setItem(`call_${call.id}`, JSON.stringify(call));
+                      } catch { /* ignore */ }
+                      router.push(`/miniapp/calls/${call.id}`);
                     }}
                   >
                     <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
