@@ -284,7 +284,21 @@ export default function MiniAppDashboard() {
               const isInbound = call.direction === 'inbound';
               const displayName = call.contact_name || phone;
               return (
-                <div key={i} className="miniapp-list-item" onClick={() => router.push('/miniapp/calls')}>
+                <div key={i} className="miniapp-list-item" onClick={() => {
+                  webApp?.HapticFeedback.impactOccurred('light');
+                  try {
+                    sessionStorage.setItem(`call_${call.id}`, JSON.stringify({
+                      id: call.id,
+                      phone_2: call.phone,
+                      direction: call.direction,
+                      state: call.state,
+                      duration: call.duration,
+                      created_at: call.started_at,
+                      contact_name: call.contact_name,
+                    }));
+                  } catch {}
+                  router.push(`/miniapp/calls/${call.id}`);
+                }}>
                   <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
                     <PhoneOutlined style={{ transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
                   </div>
