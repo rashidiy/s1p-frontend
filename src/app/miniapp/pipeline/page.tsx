@@ -204,8 +204,8 @@ export default function PipelinePage() {
                       ].filter(Boolean).join(' · ')}
                     </div>
                   </div>
-                  <span className={`miniapp-badge ${STATUS_BADGE[lead.status] || 'miniapp-badge-default'}`}>
-                    {tStatus(lead.status)}
+                  <span className={`miniapp-badge ${STATUS_BADGE[lead.status || ''] || 'miniapp-badge-default'}`}>
+                    {tStatus(lead.status || 'new')}
                   </span>
                   <div className="miniapp-list-item-chevron"><RightOutlined /></div>
                 </div>
