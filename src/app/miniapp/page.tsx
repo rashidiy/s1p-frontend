@@ -27,6 +27,7 @@ interface DashboardCall {
   id: number;
   phone?: string;
   direction?: string;
+  state?: string;
   duration?: number;
   started_at?: string;
   contact_name?: string;
@@ -139,7 +140,7 @@ export default function MiniAppDashboard() {
       color: '#2563EB',
       value: data?.active_deals ?? 0,
       label: t('dashboard.activeDeals'),
-      tap: '/miniapp/pipeline',
+      tap: '/miniapp/pipeline?tab=deals',
     },
   ];
 
@@ -267,7 +268,7 @@ export default function MiniAppDashboard() {
           <div className="miniapp-list">
             {recentCalls.slice(0, 4).map((call, i) => {
               const phone = call.phone || '—';
-              const isMissed = !call.duration;
+              const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
               const isInbound = call.direction === 'inbound';
               const displayName = call.contact_name || phone;
               return (

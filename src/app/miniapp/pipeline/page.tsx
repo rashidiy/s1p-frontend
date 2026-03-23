@@ -7,7 +7,7 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import { Spin } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -35,7 +35,9 @@ function SkeletonList() {
 }
 
 export default function PipelinePage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('leads');
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'deals' ? 'deals' : 'leads';
+  const [viewMode, setViewMode] = useState<ViewMode>(initialTab);
   const [leads, setLeads] = useState<LeadResponse[]>([]);
   const [deals, setDeals] = useState<DealResponse[]>([]);
   const [loading, setLoading] = useState(true);
