@@ -130,16 +130,36 @@ export default function MiniAppCalls() {
 
   async function handleCreateContact(firstName: string, lastName: string) {
     if (!createContactForPhone) return;
+    const phone = createContactForPhone;
     try {
       await apiClient.createContact({
         first_name: firstName,
         last_name: lastName || undefined,
-        phone: createContactForPhone,
+        phone,
       });
       webApp?.HapticFeedback.notificationOccurred('success');
       setCreateContactForPhone(null);
-      // Refresh calls to show updated contact names
-      load();
+
+      // Update calls client-side to show the new contact name
+      // (backend won't link them until next call from this number)
+      const contactName = [firstName, lastName].filter(Boolean).join(' ');
+      setCalls(prev => prev.map(c => {
+        if ((c.phone_1 === phone || c.phone_2 === phone) && !c.contact_name) {
+          return { ...c, contact_name: contactName };
+        }
+        return c;
+      }));
+
+      // Show success via native popup
+      try {
+        webApp?.showPopup({
+          title: '✓',
+          message: `${contactName} — ${t('createContact.title')}`,
+          buttons: [{ type: 'ok' }],
+        });
+      } catch {
+        // showPopup may not be available in older SDK
+      }
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
     }
