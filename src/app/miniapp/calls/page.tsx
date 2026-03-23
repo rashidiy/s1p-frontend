@@ -236,14 +236,16 @@ export default function MiniAppCalls() {
             <button
               key={digit}
               className="miniapp-dialer-key"
-              onClick={() => handleKeyPress(digit)}
-              onTouchStart={digit === '0' ? () => {
+              onClick={digit !== '0' ? () => handleKeyPress(digit) : undefined}
+              onTouchStart={digit === '0' ? (e) => {
+                e.preventDefault();
                 zeroTimer = setTimeout(() => {
                   handleLongPressZero();
                   zeroTimer = null;
                 }, 500);
               } : undefined}
-              onTouchEnd={digit === '0' ? () => {
+              onTouchEnd={digit === '0' ? (e) => {
+                e.preventDefault();
                 if (zeroTimer) {
                   clearTimeout(zeroTimer);
                   zeroTimer = null;
