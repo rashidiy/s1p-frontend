@@ -47,6 +47,7 @@ interface TelegramWebApp {
   close: () => void;
   setHeaderColor: (color: 'bg_color' | 'secondary_bg_color' | string) => void;
   setBackgroundColor: (color: string) => void;
+  setBottomBarColor: (color: string) => void;
   enableClosingConfirmation: () => void;
   disableClosingConfirmation: () => void;
   openLink: (url: string, options?: { try_instant_view?: boolean }) => void;
