@@ -110,22 +110,16 @@ export default function MiniAppCalls() {
         {mode === 'external' ? (
           <div className="miniapp-dialer-dual">
             <div
-              className={`miniapp-dialer-input-row ${activeInput === 'from' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-number ${activeInput === 'from' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('from'); }}
             >
-              <span className="miniapp-dialer-input-label">{t('calls.from')}</span>
-              <span className="miniapp-dialer-input-value">
-                {formatPhone(phone1) || <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
-              </span>
+              {formatPhone(phone1) || <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
             </div>
             <div
-              className={`miniapp-dialer-input-row ${activeInput === 'to' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-number ${activeInput === 'to' ? 'active' : ''}`}
               onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('to'); }}
             >
-              <span className="miniapp-dialer-input-label">{t('calls.to')}</span>
-              <span className="miniapp-dialer-input-value">
-                {formatPhone(phone2) || <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
-              </span>
+              {formatPhone(phone2) || <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
             </div>
           </div>
         ) : (
@@ -151,18 +145,16 @@ export default function MiniAppCalls() {
           <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
             onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>External</button>
         </div>
-        {mode === 'sip' && (
-          hasSipExtension ? (
-            <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
-          ) : (
-            <select className="miniapp-dialer-operator-select" value={selectedOperator}
-              onChange={(e) => setSelectedOperator(e.target.value)}>
-              <option value="">{t('calls.selectOperator')}</option>
-              {operators.map((op) => (
-                <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
-              ))}
-            </select>
-          )
+        {hasSipExtension ? (
+          <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
+        ) : (
+          <select className="miniapp-dialer-operator-select" value={selectedOperator}
+            onChange={(e) => setSelectedOperator(e.target.value)}>
+            <option value="">{t('calls.selectOperator')}</option>
+            {operators.map((op) => (
+              <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
+            ))}
+          </select>
         )}
       </div>
 
