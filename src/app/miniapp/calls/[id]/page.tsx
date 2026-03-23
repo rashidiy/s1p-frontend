@@ -99,7 +99,7 @@ export default function CallDetailPage() {
     );
   }
 
-  const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
+  const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
   const isInbound = call.direction === 'inbound';
   const displayName = call.contact_name || phone || '—';
 
@@ -156,13 +156,13 @@ export default function CallDetailPage() {
             {stateLabel}
           </span>
         </div>
-        {!isMissed && call.billing_sec != null && (
+        {!isMissed && call.duration != null && (
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">
               <ClockCircleOutlined style={{ marginRight: 6 }} />
               {tFields('duration') || 'Duration'}
             </span>
-            <span className="miniapp-info-value">{formatDuration(call.billing_sec)}</span>
+            <span className="miniapp-info-value">{formatDuration(call.duration)}</span>
           </div>
         )}
         <div className="miniapp-info-row">

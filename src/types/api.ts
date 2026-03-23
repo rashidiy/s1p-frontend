@@ -141,12 +141,27 @@ export type CallEventResponse = Schema<'CallEventResponse'> & {
   utm_campaign?: string | null;
 };
 // Extended call response with joined fields from call history endpoint
-export interface CallWithDetails extends CallEventResponse {
-  contact_name?: string | null;
+/** Call history response from /calls/history endpoint (different shape from CallEventResponse) */
+export interface CallWithDetails {
+  id: number;
+  phone_1?: string | null;
+  phone_2?: string | null;
+  direction?: string | null;
+  state?: string | null;
+  duration?: number | null;
+  outcome?: string | null;
+  disposition_notes?: string | null;
+  started_at?: string | null;
+  created_at: string;
   contact_id?: string | null;
-  operator_name?: string | null;
+  contact_name?: string | null;
+  lead_id?: string | null;
   lead_title?: string | null;
+  deal_id?: string | null;
   deal_title?: string | null;
+  operator_id?: string | null;
+  operator_name?: string | null;
+  billing_sec?: number | null; // alias for duration (from CallEventResponse)
 }
 
 export type CallOutcomeUpdate = Schema<'CallOutcomeUpdate'>;

@@ -250,14 +250,14 @@ export default function MiniAppCalls() {
           <div className="miniapp-section">
             <div className="miniapp-list">
               {group.calls.map((call) => {
-                const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
+                const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
                 const isInbound = call.direction === 'inbound';
                 const phone = call.phone_2 || call.phone_1 || '—';
                 const hasContact = !!call.contact_name;
                 const displayTitle = hasContact ? call.contact_name! : phone;
                 const displaySub = hasContact
                   ? phone
-                  : (isMissed ? t('calls.missed') : formatDuration(call.billing_sec));
+                  : (isMissed ? t('calls.missed') : formatDuration(call.duration));
 
                 return (
                   <div
