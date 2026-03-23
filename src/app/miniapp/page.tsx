@@ -15,12 +15,31 @@ import { useAuthStore } from '@/store/auth';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
-import type { OperatorDashboard, AdminDashboard, CallWithDetails } from '@/types/api';
+import type { OperatorDashboard, AdminDashboard } from '@/types/api';
 import { formatTime, getInitials, getAvatarColor } from './_utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 type Period = 'today' | 'this_week' | 'this_month';
+
+/** Dashboard recent_calls have different fields than CallWithDetails */
+interface DashboardCall {
+  id: number;
+  phone?: string;
+  direction?: string;
+  duration?: number;
+  started_at?: string;
+  contact_name?: string;
+}
+
+/** Dashboard missed_calls_to_return */
+interface MissedCall {
+  id: number;
+  phone?: string;
+  contact_name?: string;
+  contact_id?: string;
+  created_at?: string;
+}
 
 function SkeletonDashboard() {
   return (
@@ -125,12 +144,8 @@ export default function MiniAppDashboard() {
   ];
 
   const greeting = user?.first_name ? t('dashboard.greeting', { name: user.first_name }) : '';
-  const recentCalls = (data?.recent_calls ?? []) as unknown as CallWithDetails[];
-
-  // Filter missed calls for "Needs Attention" section
-  const missedCalls = recentCalls.filter(
-    (c) => c.state === 'NOANSWER' || c.state === 'CANCEL' || !c.billing_sec
-  ).slice(0, 3);
+  const recentCalls = (data?.recent_calls ?? []) as unknown as DashboardCall[];
+  const missedCalls = ((data as Record<string, unknown>)?.missed_calls_to_return ?? []) as unknown as MissedCall[];
 
   const periods: { key: Period; label: string }[] = [
     { key: 'today', label: t('dashboard.today') },
@@ -210,8 +225,8 @@ export default function MiniAppDashboard() {
         <div className="miniapp-section">
           <div className="miniapp-section-header">{t('needsAttention')}</div>
           <div className="miniapp-list">
-            {missedCalls.map((call, i) => {
-              const phone = call.phone_1 || call.phone_2 || '';
+            {missedCalls.slice(0, 5).map((call, i) => {
+              const phone = call.phone || '';
               const displayName = call.contact_name || phone || '—';
               return (
                 <div
@@ -236,7 +251,7 @@ export default function MiniAppDashboard() {
                     )}
                   </div>
                   <div className="miniapp-list-item-right">
-                    {formatTime(call.created_at)}
+                    {call.created_at ? formatTime(call.created_at) : ''}
                   </div>
                 </div>
               );
@@ -251,8 +266,8 @@ export default function MiniAppDashboard() {
           <div className="miniapp-section-header">{t('dashboard.recentCalls')}</div>
           <div className="miniapp-list">
             {recentCalls.slice(0, 4).map((call, i) => {
-              const phone = call.phone_1 || call.phone_2 || '—';
-              const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
+              const phone = call.phone || '—';
+              const isMissed = !call.duration;
               const isInbound = call.direction === 'inbound';
               const displayName = call.contact_name || phone;
               return (
@@ -269,7 +284,7 @@ export default function MiniAppDashboard() {
                     )}
                   </div>
                   <div className="miniapp-list-item-right">
-                    {formatTime(call.created_at)}
+                    {call.started_at ? formatTime(call.started_at) : ''}
                   </div>
                 </div>
               );
