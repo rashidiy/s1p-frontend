@@ -125,9 +125,6 @@ export default function MiniAppCalls() {
     : phone2.trim() && phone1.trim();
 
   return (
-    <div className="miniapp-page-enter">
-      <div className="miniapp-page-title">{t('calls.makeCall')}</div>
-
       <div className="miniapp-dialer">
         {/* External mode: dual display */}
         {mode === 'external' ? (
@@ -281,6 +278,5 @@ export default function MiniAppCalls() {
           )}
         </div>
       </div>
-    </div>
   );
 }
