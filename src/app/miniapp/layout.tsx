@@ -82,6 +82,18 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     || webApp?.initDataUnsafe?.start_param
     || '';
 
+  // Session-based company persistence
+  const getSessionCompany = () => {
+    try {
+      const stored = sessionStorage.getItem('miniapp_company');
+      return stored ? JSON.parse(stored) as { id: string; name: string } : null;
+    } catch { return null; }
+  };
+
+  const setSessionCompany = (id: string, name: string) => {
+    try { sessionStorage.setItem('miniapp_company', JSON.stringify({ id, name })); } catch {}
+  };
+
   // Enable closing confirmation to prevent accidental close
   useEffect(() => {
     if (webApp) {
@@ -93,13 +105,18 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     }
   }, [webApp]);
 
-  const authenticateWithCompany = useCallback(async (companyId: string) => {
+  const authenticateWithCompany = useCallback(async (companyId: string, companyName?: string) => {
     if (!isTelegram || !webApp?.initData) return;
     try {
       await apiClient.miniAppAuth(webApp.initData, companyId);
       const profile = await apiClient.getMyProfile();
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
+
+      // Save company to session so we don't ask again on navigation
+      if (companyName) {
+        setSessionCompany(companyId, companyName);
+      }
 
       // Handle deep link redirect after successful auth
       const deepLink = resolveDeepLink(searchParams);
@@ -116,8 +133,17 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const authenticate = useCallback(async () => {
     if (!sdkReady) return;
 
+    // Check if we already have a session (avoid re-asking company on every navigation)
+    const sessionCompany = getSessionCompany();
+
     if (isTelegram && webApp?.initData && companyIdParam) {
       await authenticateWithCompany(companyIdParam);
+      return;
+    }
+
+    // Use session company if available
+    if (isTelegram && webApp?.initData && sessionCompany) {
+      await authenticateWithCompany(sessionCompany.id, sessionCompany.name);
       return;
     }
 
@@ -128,7 +154,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
           setErrorMsg(t('error.noCompanies'));
           setAuthState('error');
         } else if (companiesList.length === 1) {
-          await authenticateWithCompany(companiesList[0].id);
+          await authenticateWithCompany(companiesList[0].id, companiesList[0].name);
         } else {
           setCompanies(companiesList);
           setAuthState('pick_company');
@@ -217,7 +243,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                   className="miniapp-list-item"
                   onClick={() => {
                     webApp?.HapticFeedback.impactOccurred('medium');
-                    authenticateWithCompany(c.id);
+                    authenticateWithCompany(c.id, c.name);
                     setAuthState('loading');
                   }}
                 >

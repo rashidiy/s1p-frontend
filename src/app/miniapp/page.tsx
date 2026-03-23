@@ -162,8 +162,18 @@ export default function MiniAppDashboard() {
     <div className="miniapp-page-enter">
       {/* Header bar: greeting + avatar */}
       <div className="miniapp-header-bar">
-        <div className="miniapp-page-title" style={{ padding: '8px 4px 0', marginBottom: 0 }}>
-          {greeting}
+        <div>
+          <div className="miniapp-page-title" style={{ padding: '8px 4px 0', marginBottom: 0 }}>
+            {greeting}
+          </div>
+          {(() => {
+            try {
+              const co = sessionStorage.getItem('miniapp_company');
+              const name = co ? JSON.parse(co).name : null;
+              if (name) return <div style={{ fontSize: 13, color: 'var(--ma-hint)', padding: '0 4px' }}>{name}</div>;
+            } catch {}
+            return null;
+          })()}
         </div>
         <button
           className="miniapp-avatar-btn"
