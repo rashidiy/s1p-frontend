@@ -157,7 +157,7 @@ function DialerView({ webApp, t }: {
     try {
       let result;
       if (mode === 'sip') {
-        result = await apiClient.callNumber({ phone: number, operator_id: sipExtension });
+        result = await apiClient.callNumber({ phone: number, operator_id: sipExtension, reverse: false, antiaon: false });
       } else {
         result = await apiClient.callExternal({ phone_1: sipExtension, phone_2: number, operator_id: sipExtension });
       }
