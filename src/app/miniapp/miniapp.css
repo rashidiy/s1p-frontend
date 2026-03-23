@@ -25,6 +25,10 @@
 }
 
 /* ---------- Shell layout ---------- */
+html, body {
+  background: var(--ma-bg, #121214) !important;
+}
+
 .miniapp-shell {
   display: flex;
   flex-direction: column;
