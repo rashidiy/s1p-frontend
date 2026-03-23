@@ -298,21 +298,11 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                 }}
               >
                 {tab.center ? (
-                  <>
-                    <div className="miniapp-tab-center-circle">
-                      {tab.icon}
-                    </div>
-                    <span className="miniapp-tab-label">
-                      {t(`tabs.${tab.key}`)}
-                    </span>
-                  </>
-                ) : (
-                  <>
+                  <div className="miniapp-tab-center-circle">
                     {tab.icon}
-                    <span className="miniapp-tab-label">
-                      {t(`tabs.${tab.key}`)}
-                    </span>
-                  </>
+                  </div>
+                ) : (
+                  tab.icon
                 )}
               </button>
             );
