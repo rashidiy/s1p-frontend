@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { PhoneOutlined } from '@ant-design/icons';
+import { PhoneOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
-import type { CallEventResponse } from '@/types/api';
+import type { CallWithDetails } from '@/types/api';
 import { formatDuration, formatTime, getDateGroup } from '../_utils';
 
 const PAGE_SIZE = 50;
@@ -27,13 +27,70 @@ function SkeletonList() {
   );
 }
 
+interface CreateContactFormProps {
+  phone: string;
+  onSave: (firstName: string, lastName: string) => Promise<void>;
+  onCancel: () => void;
+  t: ReturnType<typeof useTranslations>;
+}
+
+function CreateContactForm({ phone, onSave, onCancel, t }: CreateContactFormProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit() {
+    if (!firstName.trim() || saving) return;
+    setSaving(true);
+    try {
+      await onSave(firstName.trim(), lastName.trim());
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="miniapp-create-contact-form">
+      <div className="miniapp-create-contact-header">
+        <span style={{ fontWeight: 600, fontSize: 15 }}>{t('createContact.title')}</span>
+        <button className="miniapp-create-contact-close" onClick={onCancel}>
+          <CloseOutlined />
+        </button>
+      </div>
+      <div className="miniapp-create-contact-phone">{phone}</div>
+      <input
+        className="miniapp-create-contact-input"
+        placeholder={t('createContact.firstName')}
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        autoFocus
+      />
+      <input
+        className="miniapp-create-contact-input"
+        placeholder={t('createContact.lastName')}
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+      />
+      <button
+        className="miniapp-note-submit"
+        onClick={handleSubmit}
+        disabled={!firstName.trim() || saving}
+        style={{ marginTop: 8 }}
+      >
+        {saving ? '...' : t('actions.save')}
+      </button>
+    </div>
+  );
+}
+
 export default function MiniAppCalls() {
-  const [calls, setCalls] = useState<CallEventResponse[]>([]);
+  const [calls, setCalls] = useState<CallWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
+  const [createContactForPhone, setCreateContactForPhone] = useState<string | null>(null);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
 
@@ -71,6 +128,23 @@ export default function MiniAppCalls() {
     load(page + 1);
   }
 
+  async function handleCreateContact(firstName: string, lastName: string) {
+    if (!createContactForPhone) return;
+    try {
+      await apiClient.createContact({
+        first_name: firstName,
+        last_name: lastName || undefined,
+        phone: createContactForPhone,
+      });
+      webApp?.HapticFeedback.notificationOccurred('success');
+      setCreateContactForPhone(null);
+      // Refresh calls to show updated contact names
+      load();
+    } catch {
+      webApp?.HapticFeedback.notificationOccurred('error');
+    }
+  }
+
   if (loading) {
     return (
       <div className="miniapp-page-enter">
@@ -106,8 +180,8 @@ export default function MiniAppCalls() {
   }
 
   // Group calls by date
-  const groups: { key: string; label: string; calls: CallEventResponse[] }[] = [];
-  const groupMap = new Map<string, CallEventResponse[]>();
+  const groups: { key: string; label: string; calls: CallWithDetails[] }[] = [];
+  const groupMap = new Map<string, CallWithDetails[]>();
 
   for (const call of calls) {
     const group = getDateGroup(call.created_at);
@@ -127,6 +201,18 @@ export default function MiniAppCalls() {
     <div className="miniapp-page-enter">
       <div className="miniapp-page-title">{t('calls.title')}</div>
 
+      {/* Inline create contact form */}
+      {createContactForPhone && (
+        <div className="miniapp-section" style={{ marginBottom: 8 }}>
+          <CreateContactForm
+            phone={createContactForPhone}
+            onSave={handleCreateContact}
+            onCancel={() => setCreateContactForPhone(null)}
+            t={t}
+          />
+        </div>
+      )}
+
       {groups.map((group) => (
         <div key={group.key}>
           <div className="miniapp-date-group">{group.label}</div>
@@ -136,6 +222,11 @@ export default function MiniAppCalls() {
                 const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
                 const isInbound = call.direction === 'inbound';
                 const phone = call.phone_1 || call.phone_2 || '—';
+                const hasContact = !!call.contact_name;
+                const displayTitle = hasContact ? call.contact_name! : phone;
+                const displaySub = hasContact
+                  ? phone
+                  : (isMissed ? t('calls.missed') : formatDuration(call.billing_sec));
 
                 return (
                   <div
@@ -153,14 +244,26 @@ export default function MiniAppCalls() {
                     </div>
                     <div className="miniapp-list-item-content">
                       <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
-                        {phone}
+                        {displayTitle}
                       </div>
                       <div className="miniapp-list-item-sub">
-                        {isMissed ? t('calls.missed') : formatDuration(call.billing_sec)}
+                        {displaySub}
                       </div>
                     </div>
-                    <div className="miniapp-list-item-right">
+                    <div className="miniapp-list-item-right" style={{ gap: 8 }}>
                       {formatTime(call.created_at)}
+                      {!hasContact && phone !== '—' && (
+                        <button
+                          className="miniapp-add-contact-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            webApp?.HapticFeedback.impactOccurred('light');
+                            setCreateContactForPhone(phone);
+                          }}
+                        >
+                          <PlusOutlined />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

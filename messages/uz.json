@@ -1322,10 +1322,42 @@
     "tabs": {
       "home": "Bosh sahifa",
       "contacts": "Kontaktlar",
-      "leads": "Lidlar",
-      "deals": "Bitimlar",
+      "pipeline": "Voronka",
       "calls": "Qo'ng'iroqlar",
       "profile": "Profil"
+    },
+    "needsAttention": "E'tibor kerak",
+    "missedCallsToReturn": "O'tkazib yuborilgan",
+    "newLeadsAssigned": "Yangi lidlar",
+    "teamToday": "Jamoa bugun",
+    "unassigned": "Operatorsiz",
+    "pipeline": {
+      "title": "Voronka",
+      "leads": "Lidlar",
+      "deals": "Bitimlar"
+    },
+    "actions": {
+      "markContacted": "Bog'lanildi",
+      "markQualified": "Malakali",
+      "convertToDeal": "Bitim yaratish",
+      "closeDeal": "Bitimni yopish",
+      "won": "Yutildi",
+      "lost": "Yo'qotildi",
+      "addNote": "Eslatma qo'shish...",
+      "save": "Saqlash",
+      "call": "Qo'ng'iroq qilish"
+    },
+    "notifications": {
+      "title": "Bildirishnomalar",
+      "myCalls": "Mening qo'ng'iroqlarim",
+      "myLeads": "Mening lidlarim",
+      "dealChanges": "Bitim o'zgarishlari",
+      "quietHours": "Tinch soatlar"
+    },
+    "createContact": {
+      "title": "Kontakt yaratish",
+      "firstName": "Ism",
+      "lastName": "Familiya"
     }
   }
 }

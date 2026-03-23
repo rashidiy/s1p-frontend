@@ -77,7 +77,18 @@ export type AuthorizedResponse = Schema<'AuthorizedResponse'> & {
 export type SetPasswordRequest = Schema<'SetPasswordRequest'>;
 export type ForgotPasswordRequest = Schema<'ForgotPasswordRequest'>;
 export type ResetPasswordRequest = Schema<'ResetPasswordRequest'>;
-export type ProfileUpdateRequest = Schema<'ProfileUpdateRequest'>;
+export type ProfileUpdateRequest = Schema<'ProfileUpdateRequest'> & {
+  telegram_dm_prefs?: TelegramDmPrefs;
+};
+
+export interface TelegramDmPrefs {
+  my_calls?: boolean;
+  my_leads?: boolean;
+  assigned_to_me?: boolean;
+  quiet_hours_enabled?: boolean;
+  quiet_hours_start?: number;
+  quiet_hours_end?: number;
+}
 export interface InviteAdminRequest {
   first_name: string;
   last_name?: string | null;
@@ -129,6 +140,15 @@ export type CallEventResponse = Schema<'CallEventResponse'> & {
   utm_medium?: string | null;
   utm_campaign?: string | null;
 };
+// Extended call response with joined fields from call history endpoint
+export interface CallWithDetails extends CallEventResponse {
+  contact_name?: string | null;
+  contact_id?: string | null;
+  operator_name?: string | null;
+  lead_title?: string | null;
+  deal_title?: string | null;
+}
+
 export type CallOutcomeUpdate = Schema<'CallOutcomeUpdate'>;
 export type CallLinkRequest = Schema<'CallLinkRequest'>;
 export type CallNumberRequest = Schema<'CallNumberRequest'>;
@@ -142,11 +162,16 @@ export type ContactUpdateRequest = Schema<'ContactUpdateRequest'>;
 // Leads
 export type LeadCreateRequest = Schema<'LeadCreateRequest'>;
 export type LeadResponse = Schema<'LeadResponse'>;
-export type LeadUpdateRequest = Schema<'LeadUpdateRequest'>;
+export type LeadUpdateRequest = Schema<'LeadUpdateRequest'> & {
+  status?: string;
+};
 
 // Deals
 export type DealCreateRequest = Schema<'DealCreateRequest'>;
-export type DealResponse = Schema<'DealResponse'>;
+export type DealResponse = Schema<'DealResponse'> & {
+  win_reason?: string | null;
+  loss_reason?: string | null;
+};
 export type DealUpdateRequest = Schema<'DealUpdateRequest'>;
 
 // Tasks

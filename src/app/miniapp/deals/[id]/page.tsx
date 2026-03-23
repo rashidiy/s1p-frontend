@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, RightOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -30,27 +30,29 @@ export default function DealDetailPage() {
   const [deal, setDeal] = useState<DealResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tStatus = useTranslations('statuses');
 
   const goBack = useCallback(() => {
-    router.push('/miniapp/deals');
+    router.push('/miniapp/pipeline');
   }, [router]);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await apiClient.getDeal(id);
-        setDeal(data);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+  const loadDeal = useCallback(async () => {
+    try {
+      const data = await apiClient.getDeal(id);
+      setDeal(data);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    load();
   }, [id]);
+
+  useEffect(() => {
+    loadDeal();
+  }, [loadDeal]);
 
   useEffect(() => {
     if (webApp) {
@@ -62,6 +64,65 @@ export default function DealDetailPage() {
       };
     }
   }, [webApp, goBack]);
+
+  // Close Deal action handler
+  const handleCloseDeal = useCallback(async () => {
+    if (!deal || !webApp || actionLoading) return;
+
+    webApp.showPopup(
+      {
+        title: t('actions.closeDeal'),
+        message: deal.title || t('detail.untitled'),
+        buttons: [
+          { id: 'won', type: 'default', text: t('actions.won') },
+          { id: 'lost', type: 'destructive', text: t('actions.lost') },
+          { id: 'cancel', type: 'cancel' },
+        ],
+      },
+      async (buttonId: string) => {
+        if (buttonId === 'cancel') return;
+        setActionLoading(true);
+        try {
+          if (buttonId === 'won') {
+            await apiClient.markDealWon(deal.id);
+          } else if (buttonId === 'lost') {
+            await apiClient.markDealLost(deal.id);
+          }
+          webApp.HapticFeedback.notificationOccurred('success');
+          const updated = await apiClient.getDeal(id);
+          setDeal(updated);
+        } catch {
+          webApp.HapticFeedback.notificationOccurred('error');
+        } finally {
+          setActionLoading(false);
+        }
+      }
+    );
+  }, [deal, webApp, actionLoading, id, t]);
+
+  // MainButton for closing deals in negotiation stage
+  useEffect(() => {
+    if (!webApp || loading) return;
+    const stage = deal?.stage || '';
+    const isCloseable = stage === 'negotiation' || stage === 'proposal' || stage === 'qualification';
+
+    if (deal && isCloseable) {
+      webApp.MainButton.setText(t('actions.closeDeal'));
+      webApp.MainButton.show();
+      webApp.MainButton.onClick(handleCloseDeal);
+      if (actionLoading) {
+        webApp.MainButton.showProgress(true);
+      } else {
+        webApp.MainButton.hideProgress();
+      }
+      return () => {
+        webApp.MainButton.offClick(handleCloseDeal);
+        webApp.MainButton.hide();
+      };
+    } else {
+      webApp.MainButton.hide();
+    }
+  }, [webApp, loading, deal, handleCloseDeal, actionLoading, t]);
 
   if (loading) return <Skeleton />;
 
@@ -112,9 +173,21 @@ export default function DealDetailPage() {
           </div>
         )}
         {deal.contact_name && (
-          <div className="miniapp-info-row">
+          <div
+            className="miniapp-info-row"
+            style={{ cursor: deal.contact_id ? 'pointer' : 'default' }}
+            onClick={() => {
+              if (deal.contact_id) {
+                webApp?.HapticFeedback.impactOccurred('light');
+                router.push(`/miniapp/contacts/${deal.contact_id}`);
+              }
+            }}
+          >
             <span className="miniapp-info-label">{t('detail.contact')}</span>
-            <span className="miniapp-info-value">{deal.contact_name}</span>
+            <span className="miniapp-info-value" style={{ color: deal.contact_id ? 'var(--ma-link)' : undefined }}>
+              {deal.contact_name}
+              {deal.contact_id && <RightOutlined style={{ fontSize: 11, marginLeft: 4 }} />}
+            </span>
           </div>
         )}
         {deal.assigned_to_name && (

@@ -503,7 +503,7 @@ class ApiClient {
   }
 
   async getCallHistory(params: API.CallHistoryFilters) {
-    const response = await this.client.get<API.PaginatedResponse<API.CallEventResponse>>('/api/v1/company/calls/history', { params });
+    const response = await this.client.get<API.PaginatedResponse<API.CallWithDetails>>('/api/v1/company/calls/history', { params });
     return response.data;
   }
 

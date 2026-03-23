@@ -69,6 +69,29 @@ export default function ContactDetailPage() {
     }
   }, [webApp, goBack]);
 
+  // MainButton: Call if phone exists
+  const handleCall = useCallback(() => {
+    if (contact?.phone) {
+      webApp?.HapticFeedback.impactOccurred('medium');
+      window.open(`tel:${contact.phone}`, '_self');
+    }
+  }, [contact, webApp]);
+
+  useEffect(() => {
+    if (!webApp || loading) return;
+    if (contact?.phone) {
+      webApp.MainButton.setText(t('actions.call'));
+      webApp.MainButton.show();
+      webApp.MainButton.onClick(handleCall);
+      return () => {
+        webApp.MainButton.offClick(handleCall);
+        webApp.MainButton.hide();
+      };
+    } else {
+      webApp.MainButton.hide();
+    }
+  }, [webApp, loading, contact, handleCall, t]);
+
   if (loading) return <Skeleton />;
 
   if (error || !contact) {
@@ -157,7 +180,13 @@ export default function ContactDetailPage() {
         {t('detail.linkedLeads')} & {t('detail.linkedDeals')}
       </div>
       <div className="miniapp-section">
-        <div className="miniapp-list-item" onClick={() => router.push('/miniapp/leads')}>
+        <div
+          className="miniapp-list-item"
+          onClick={() => {
+            webApp?.HapticFeedback.impactOccurred('light');
+            router.push('/miniapp/pipeline');
+          }}
+        >
           <div className="miniapp-call-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
             <RiseOutlined />
           </div>
@@ -168,7 +197,13 @@ export default function ContactDetailPage() {
             {contact.total_leads || 0}
           </div>
         </div>
-        <div className="miniapp-list-item" onClick={() => router.push('/miniapp/deals')}>
+        <div
+          className="miniapp-list-item"
+          onClick={() => {
+            webApp?.HapticFeedback.impactOccurred('light');
+            router.push('/miniapp/pipeline');
+          }}
+        >
           <div className="miniapp-call-icon" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563EB' }}>
             <FundProjectionScreenOutlined />
           </div>

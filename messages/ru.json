@@ -1322,10 +1322,42 @@
     "tabs": {
       "home": "Главная",
       "contacts": "Контакты",
-      "leads": "Лиды",
-      "deals": "Сделки",
+      "pipeline": "Воронка",
       "calls": "Звонки",
       "profile": "Профиль"
+    },
+    "needsAttention": "Требует внимания",
+    "missedCallsToReturn": "Пропущенные",
+    "newLeadsAssigned": "Новые лиды",
+    "teamToday": "Команда сегодня",
+    "unassigned": "Без оператора",
+    "pipeline": {
+      "title": "Воронка",
+      "leads": "Лиды",
+      "deals": "Сделки"
+    },
+    "actions": {
+      "markContacted": "Связались",
+      "markQualified": "Квалифицирован",
+      "convertToDeal": "Создать сделку",
+      "closeDeal": "Закрыть сделку",
+      "won": "Выиграна",
+      "lost": "Проиграна",
+      "addNote": "Добавить заметку...",
+      "save": "Сохранить",
+      "call": "Позвонить"
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "myCalls": "Мои звонки",
+      "myLeads": "Мои лиды",
+      "dealChanges": "Изменения сделок",
+      "quietHours": "Тихие часы"
+    },
+    "createContact": {
+      "title": "Создать контакт",
+      "firstName": "Имя",
+      "lastName": "Фамилия"
     }
   }
 }

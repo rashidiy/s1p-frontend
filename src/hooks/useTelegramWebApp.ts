@@ -78,6 +78,11 @@ interface TelegramWebApp {
     show: () => void;
     hide: () => void;
   };
+  showPopup: (params: {
+    title?: string;
+    message: string;
+    buttons?: Array<{ id?: string; type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive'; text?: string }>;
+  }, callback?: (buttonId: string) => void) => void;
 }
 
 declare global {

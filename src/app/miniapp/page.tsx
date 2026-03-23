@@ -6,16 +6,19 @@ import {
   WarningOutlined,
   RiseOutlined,
   FundProjectionScreenOutlined,
-  ClockCircleOutlined,
   RightOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
-import type { OperatorDashboard } from '@/types/api';
-import { formatTime } from './_utils';
+import { UserRole } from '@/types/api';
+import type { OperatorDashboard, AdminDashboard, CallWithDetails } from '@/types/api';
+import { formatTime, getInitials, getAvatarColor } from './_utils';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 type Period = 'today' | 'this_week' | 'this_month';
 
@@ -23,9 +26,6 @@ function SkeletonDashboard() {
   return (
     <div>
       <div className="miniapp-skeleton-text" style={{ width: 140, height: 28, marginBottom: 16, borderRadius: 8 }} />
-      <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
-        {[1,2,3].map(i => <div key={i} className="miniapp-skeleton-text" style={{ width: 72, height: 32, borderRadius: 8 }} />)}
-      </div>
       <div className="miniapp-skeleton-stats">
         {[1,2,3,4].map(i => <div key={i} className="miniapp-skeleton-stat" />)}
       </div>
@@ -46,6 +46,7 @@ function SkeletonDashboard() {
 
 export default function MiniAppDashboard() {
   const [data, setData] = useState<OperatorDashboard | null>(null);
+  const [teamData, setTeamData] = useState<AdminDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [period, setPeriod] = useState<Period>('today');
@@ -54,11 +55,19 @@ export default function MiniAppDashboard() {
   const router = useRouter();
   const t = useTranslations('miniapp');
 
+  const isManagerOrAdmin = user?.role === UserRole.COMPANY_ADMIN ||
+    user?.role === UserRole.COMPANY_MANAGER ||
+    user?.role === ('company_owner' as UserRole);
+
   useEffect(() => {
     async function load() {
       try {
-        const dashboard = await apiClient.getMyDashboard();
+        const [dashboard, team] = await Promise.all([
+          apiClient.getMyDashboard(),
+          isManagerOrAdmin ? apiClient.getAdminDashboard().catch(() => null) : Promise.resolve(null),
+        ]);
         setData(dashboard);
+        if (team) setTeamData(team);
       } catch {
         setError(true);
       } finally {
@@ -66,7 +75,7 @@ export default function MiniAppDashboard() {
       }
     }
     load();
-  }, []);
+  }, [isManagerOrAdmin]);
 
   if (loading) return <SkeletonDashboard />;
 
@@ -103,7 +112,7 @@ export default function MiniAppDashboard() {
       color: '#10B981',
       value: data?.pending_leads ?? 0,
       label: t('dashboard.pendingLeads'),
-      tap: '/miniapp/leads',
+      tap: '/miniapp/pipeline',
     },
     {
       icon: <FundProjectionScreenOutlined />,
@@ -111,13 +120,17 @@ export default function MiniAppDashboard() {
       color: '#2563EB',
       value: data?.active_deals ?? 0,
       label: t('dashboard.activeDeals'),
-      tap: '/miniapp/deals',
+      tap: '/miniapp/pipeline',
     },
   ];
 
   const greeting = user?.first_name ? t('dashboard.greeting', { name: user.first_name }) : '';
-  const recentCalls = data?.recent_calls ?? [];
-  const recentTasks = data?.recent_tasks ?? [];
+  const recentCalls = (data?.recent_calls ?? []) as CallWithDetails[];
+
+  // Filter missed calls for "Needs Attention" section
+  const missedCalls = recentCalls.filter(
+    (c) => c.state === 'NOANSWER' || c.state === 'CANCEL' || !c.billing_sec
+  ).slice(0, 3);
 
   const periods: { key: Period; label: string }[] = [
     { key: 'today', label: t('dashboard.today') },
@@ -125,12 +138,39 @@ export default function MiniAppDashboard() {
     { key: 'this_month', label: t('dashboard.thisMonth') },
   ];
 
+  const avatarUrl = user?.avatar_url
+    ? `${API_BASE_URL}${user.avatar_url}`
+    : undefined;
+
   return (
     <div className="miniapp-page-enter">
-      {greeting && <div className="miniapp-page-title">{greeting}</div>}
+      {/* Header bar: greeting + avatar */}
+      <div className="miniapp-header-bar">
+        <div className="miniapp-page-title" style={{ padding: '8px 4px 0', marginBottom: 0 }}>
+          {greeting}
+        </div>
+        <button
+          className="miniapp-avatar-btn"
+          onClick={() => {
+            webApp?.HapticFeedback.impactOccurred('light');
+            router.push('/miniapp/profile');
+          }}
+        >
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="miniapp-avatar-img" />
+          ) : (
+            <div
+              className="miniapp-avatar-placeholder"
+              style={{ background: getAvatarColor(user?.first_name || 'U') }}
+            >
+              {getInitials(user?.first_name, user?.last_name)}
+            </div>
+          )}
+        </button>
+      </div>
 
       {/* Period selector */}
-      <div className="miniapp-period-selector">
+      <div className="miniapp-period-selector" style={{ marginTop: 12 }}>
         {periods.map((p) => (
           <button
             key={p.key}
@@ -165,15 +205,56 @@ export default function MiniAppDashboard() {
         ))}
       </div>
 
+      {/* Needs Attention section */}
+      {missedCalls.length > 0 && (
+        <div className="miniapp-section">
+          <div className="miniapp-section-header">{t('needsAttention')}</div>
+          <div className="miniapp-list">
+            {missedCalls.map((call, i) => {
+              const phone = call.phone_1 || call.phone_2 || '';
+              const displayName = call.contact_name || phone || '—';
+              return (
+                <div
+                  key={i}
+                  className="miniapp-attention-item"
+                  onClick={() => {
+                    if (phone) {
+                      webApp?.HapticFeedback.impactOccurred('medium');
+                      window.open(`tel:${phone}`, '_self');
+                    }
+                  }}
+                >
+                  <div className="miniapp-call-icon miniapp-call-icon-missed">
+                    <PhoneOutlined style={{ transform: 'rotate(135deg)' }} />
+                  </div>
+                  <div className="miniapp-list-item-content">
+                    <div className="miniapp-list-item-title miniapp-text-missed">
+                      {displayName}
+                    </div>
+                    {call.contact_name && phone && (
+                      <div className="miniapp-list-item-sub">{phone}</div>
+                    )}
+                  </div>
+                  <div className="miniapp-list-item-right">
+                    {formatTime(call.created_at)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Recent calls */}
       {recentCalls.length > 0 && (
         <div className="miniapp-section">
           <div className="miniapp-section-header">{t('dashboard.recentCalls')}</div>
           <div className="miniapp-list">
             {recentCalls.slice(0, 4).map((call, i) => {
-              const phone = (call.phone_1 as string) || (call.phone_2 as string) || '—';
+              const phone = call.phone_1 || call.phone_2 || '—';
               const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL' || !call.billing_sec;
               const isInbound = call.direction === 'inbound';
+              const displayName = call.contact_name || phone;
               return (
                 <div key={i} className="miniapp-list-item" onClick={() => router.push('/miniapp/calls')}>
                   <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
@@ -181,11 +262,14 @@ export default function MiniAppDashboard() {
                   </div>
                   <div className="miniapp-list-item-content">
                     <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
-                      {phone}
+                      {displayName}
                     </div>
+                    {call.contact_name && (
+                      <div className="miniapp-list-item-sub">{phone}</div>
+                    )}
                   </div>
                   <div className="miniapp-list-item-right">
-                    {formatTime(call.created_at as string)}
+                    {formatTime(call.created_at)}
                   </div>
                 </div>
               );
@@ -197,29 +281,46 @@ export default function MiniAppDashboard() {
         </div>
       )}
 
-      {/* Recent tasks */}
-      {recentTasks.length > 0 && (
+      {/* Team Today — manager/admin only */}
+      {isManagerOrAdmin && teamData && (
         <div className="miniapp-section">
-          <div className="miniapp-section-header">{t('dashboard.recentTasks')}</div>
+          <div className="miniapp-section-header">{t('teamToday')}</div>
           <div className="miniapp-list">
-            {recentTasks.slice(0, 4).map((task, i) => (
-              <div key={i} className="miniapp-list-item">
-                <div className="miniapp-call-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}>
-                  <ClockCircleOutlined />
+            {(teamData as Record<string, unknown>).operator_stats
+              ? ((teamData as Record<string, unknown>).operator_stats as Array<Record<string, unknown>>).slice(0, 6).map((op, i) => (
+                <div key={i} className="miniapp-team-row">
+                  <div
+                    className="miniapp-list-item-icon"
+                    style={{ background: getAvatarColor(String(op.operator_name || '')), width: 32, height: 32, fontSize: 13 }}
+                  >
+                    {getInitials(String(op.operator_name || '').split(' ')[0], String(op.operator_name || '').split(' ')[1])}
+                  </div>
+                  <div className="miniapp-list-item-content">
+                    <div className="miniapp-list-item-title">{String(op.operator_name || t('unassigned'))}</div>
+                  </div>
+                  <div className="miniapp-list-item-right">
+                    <PhoneOutlined style={{ fontSize: 12, marginRight: 4 }} />
+                    {String(op.total_calls ?? 0)}
+                  </div>
                 </div>
-                <div className="miniapp-list-item-content">
-                  <div className="miniapp-list-item-title">{task.title as string}</div>
+              ))
+              : (
+                <div className="miniapp-team-row">
+                  <UserOutlined style={{ fontSize: 16, color: 'var(--ma-hint)', marginRight: 8 }} />
+                  <div className="miniapp-list-item-content">
+                    <div className="miniapp-list-item-sub">{t('dashboard.noActivity')}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            }
           </div>
         </div>
       )}
 
-      {!recentCalls.length && !recentTasks.length && periodData?.calls?.total_calls === 0 && (
+      {!recentCalls.length && periodData?.calls?.total_calls === 0 && (
         <div className="miniapp-empty">
           <div className="miniapp-empty-icon">
-            <ClockCircleOutlined />
+            <PhoneOutlined />
           </div>
           <div className="miniapp-empty-sub">{t('dashboard.noActivity')}</div>
         </div>
@@ -227,4 +328,3 @@ export default function MiniAppDashboard() {
     </div>
   );
 }
-

@@ -6,10 +6,8 @@ import { Spin } from 'antd';
 import {
   HomeOutlined,
   ContactsOutlined,
-  RiseOutlined,
-  FundProjectionScreenOutlined,
+  FunnelPlotOutlined,
   PhoneOutlined,
-  UserOutlined,
   RightOutlined,
 } from '@ant-design/icons';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -23,10 +21,8 @@ import './miniapp.css';
 const TABS = [
   { key: 'home', path: '/miniapp', icon: <HomeOutlined /> },
   { key: 'contacts', path: '/miniapp/contacts', icon: <ContactsOutlined /> },
-  { key: 'leads', path: '/miniapp/leads', icon: <RiseOutlined /> },
-  { key: 'deals', path: '/miniapp/deals', icon: <FundProjectionScreenOutlined /> },
+  { key: 'pipeline', path: '/miniapp/pipeline', icon: <FunnelPlotOutlined /> },
   { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
-  { key: 'profile', path: '/miniapp/profile', icon: <UserOutlined /> },
 ];
 
 interface CompanyOption {
@@ -49,6 +45,28 @@ function profileToUser(profile: UserResponse) {
   };
 }
 
+/** Map deep link params to a miniapp route */
+function resolveDeepLink(searchParams: URLSearchParams): string | null {
+  const view = searchParams.get('view');
+  const id = searchParams.get('id');
+  if (!view) return null;
+
+  switch (view) {
+    case 'contact':
+      return id ? `/miniapp/contacts/${id}` : '/miniapp/contacts';
+    case 'lead':
+      return id ? `/miniapp/leads/${id}` : '/miniapp/pipeline';
+    case 'deal':
+      return id ? `/miniapp/deals/${id}` : '/miniapp/pipeline';
+    case 'calls':
+      return '/miniapp/calls';
+    case 'pipeline':
+      return '/miniapp/pipeline';
+    default:
+      return null;
+  }
+}
+
 export default function MiniAppLayout({ children }: { children: React.ReactNode }) {
   const { webApp, isReady: sdkReady, isTelegram } = useTelegramWebApp();
   const [authState, setAuthState] = useState<'loading' | 'pick_company' | 'authenticated' | 'error'>('loading');
@@ -64,6 +82,17 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     || webApp?.initDataUnsafe?.start_param
     || '';
 
+  // Enable closing confirmation to prevent accidental close
+  useEffect(() => {
+    if (webApp) {
+      try {
+        webApp.enableClosingConfirmation();
+      } catch {
+        // older SDK versions may not support this
+      }
+    }
+  }, [webApp]);
+
   const authenticateWithCompany = useCallback(async (companyId: string) => {
     if (!isTelegram || !webApp?.initData) return;
     try {
@@ -71,12 +100,18 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       const profile = await apiClient.getMyProfile();
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
+
+      // Handle deep link redirect after successful auth
+      const deepLink = resolveDeepLink(searchParams);
+      if (deepLink && deepLink !== pathname) {
+        router.replace(deepLink);
+      }
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setErrorMsg(detail || t('error.authFailed'));
       setAuthState('error');
     }
-  }, [isTelegram, webApp, setUser, t]);
+  }, [isTelegram, webApp, setUser, t, searchParams, pathname, router]);
 
   const authenticate = useCallback(async () => {
     if (!sdkReady) return;
@@ -110,6 +145,12 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       const profile = await apiClient.getMyProfile();
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
+
+      // Handle deep link redirect
+      const deepLink = resolveDeepLink(searchParams);
+      if (deepLink && deepLink !== pathname) {
+        router.replace(deepLink);
+      }
     } catch {
       const hasTg = typeof window !== 'undefined' && !!window.Telegram;
       const hasWebApp = hasTg && !!window.Telegram?.WebApp;
@@ -120,7 +161,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       );
       setAuthState('error');
     }
-  }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany, t]);
+  }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany, t, searchParams, pathname, router]);
 
   useEffect(() => {
     authenticate();
@@ -143,6 +184,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
 
   // Determine if we're on a detail page (hide tab bar)
   const isDetailPage = /\/miniapp\/(contacts|leads|deals)\/[^/]+/.test(pathname);
+  const isProfilePage = pathname === '/miniapp/profile';
 
   if (authState === 'loading') {
     return (
@@ -208,8 +250,8 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
         {children}
       </main>
 
-      {/* Bottom tab bar — hidden on detail pages */}
-      {!isDetailPage && (
+      {/* Bottom tab bar — hidden on detail pages and profile */}
+      {!isDetailPage && !isProfilePage && (
         <nav className="miniapp-tabs">
           {TABS.map((tab) => {
             const isActive = tab.path === '/miniapp'

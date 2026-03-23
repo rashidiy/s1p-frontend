@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   LogoutOutlined,
   GlobalOutlined,
   CheckOutlined,
 } from '@ant-design/icons';
+import { Switch } from 'antd';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
+import { apiClient } from '@/lib/api';
 import { useTranslations, useLocale } from 'next-intl';
 import { getInitials, getAvatarColor } from '../_utils';
+import type { TelegramDmPrefs } from '@/types/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -22,16 +26,42 @@ const LANGUAGES = [
 export default function MiniAppProfile() {
   const { user } = useAuthStore();
   const { webApp } = useTelegramWebApp();
+  const router = useRouter();
   const t = useTranslations('miniapp');
   const tRoles = useTranslations('roles');
   const currentLocale = useLocale();
   const [showLangs, setShowLangs] = useState(false);
+  const [dmPrefs, setDmPrefs] = useState<TelegramDmPrefs>({
+    my_calls: true,
+    my_leads: true,
+    assigned_to_me: true,
+    quiet_hours_enabled: false,
+    quiet_hours_start: 22,
+    quiet_hours_end: 8,
+  });
+  const [prefsLoading, setPrefsLoading] = useState(false);
 
   const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'User';
   const avatarUrl = user?.avatar_url
     ? `${API_BASE_URL}${user.avatar_url}`
     : undefined;
   const initials = getInitials(user?.first_name, user?.last_name);
+
+  // BackButton to go back to home
+  const goBack = useCallback(() => {
+    router.push('/miniapp');
+  }, [router]);
+
+  useEffect(() => {
+    if (webApp) {
+      webApp.BackButton.show();
+      webApp.BackButton.onClick(goBack);
+      return () => {
+        webApp.BackButton.offClick(goBack);
+        webApp.BackButton.hide();
+      };
+    }
+  }, [webApp, goBack]);
 
   function changeLanguage(locale: string) {
     webApp?.HapticFeedback.impactOccurred('light');
@@ -45,6 +75,22 @@ export default function MiniAppProfile() {
       return tRoles(role);
     } catch {
       return role.replace('company_', '').replace('_', ' ');
+    }
+  }
+
+  async function updatePref(key: keyof TelegramDmPrefs, value: boolean | number) {
+    const updated = { ...dmPrefs, [key]: value };
+    setDmPrefs(updated);
+    setPrefsLoading(true);
+    webApp?.HapticFeedback.selectionChanged();
+    try {
+      await apiClient.updateMyProfile({ telegram_dm_prefs: updated });
+    } catch {
+      // Revert on error
+      setDmPrefs(dmPrefs);
+      webApp?.HapticFeedback.notificationOccurred('error');
+    } finally {
+      setPrefsLoading(false);
     }
   }
 
@@ -80,6 +126,56 @@ export default function MiniAppProfile() {
             <span className="miniapp-info-label">{t('detail.phone')}</span>
             <span className="miniapp-info-value">
               <a href={`tel:${user.phone}`}>{user.phone}</a>
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Notifications section */}
+      <div className="miniapp-section-header">
+        {t('notifications.title')}
+      </div>
+      <div className="miniapp-section">
+        <div className="miniapp-toggle-row">
+          <span className="miniapp-toggle-label">{t('notifications.myCalls')}</span>
+          <Switch
+            size="small"
+            checked={dmPrefs.my_calls}
+            onChange={(checked) => updatePref('my_calls', checked)}
+            loading={prefsLoading}
+          />
+        </div>
+        <div className="miniapp-toggle-row">
+          <span className="miniapp-toggle-label">{t('notifications.myLeads')}</span>
+          <Switch
+            size="small"
+            checked={dmPrefs.my_leads}
+            onChange={(checked) => updatePref('my_leads', checked)}
+            loading={prefsLoading}
+          />
+        </div>
+        <div className="miniapp-toggle-row">
+          <span className="miniapp-toggle-label">{t('notifications.dealChanges')}</span>
+          <Switch
+            size="small"
+            checked={dmPrefs.assigned_to_me}
+            onChange={(checked) => updatePref('assigned_to_me', checked)}
+            loading={prefsLoading}
+          />
+        </div>
+        <div className="miniapp-toggle-row">
+          <span className="miniapp-toggle-label">{t('notifications.quietHours')}</span>
+          <Switch
+            size="small"
+            checked={dmPrefs.quiet_hours_enabled}
+            onChange={(checked) => updatePref('quiet_hours_enabled', checked)}
+            loading={prefsLoading}
+          />
+        </div>
+        {dmPrefs.quiet_hours_enabled && (
+          <div className="miniapp-toggle-row" style={{ paddingLeft: 32 }}>
+            <span className="miniapp-toggle-label" style={{ fontSize: 13, color: 'var(--ma-hint)' }}>
+              {dmPrefs.quiet_hours_start}:00 — {dmPrefs.quiet_hours_end}:00
             </span>
           </div>
         )}

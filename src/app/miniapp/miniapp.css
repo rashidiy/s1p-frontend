@@ -821,3 +821,246 @@
 .miniapp-text-missed {
   color: var(--ma-destructive);
 }
+
+/* ---------- Header bar (greeting + avatar) ---------- */
+.miniapp-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.miniapp-avatar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: none;
+  transition: transform 0.1s;
+}
+
+.miniapp-avatar-btn:active {
+  transform: scale(0.9);
+}
+
+.miniapp-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.miniapp-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ---------- Segmented control ---------- */
+.miniapp-segment {
+  display: flex;
+  background: var(--ma-section);
+  border-radius: var(--ma-radius-sm);
+  padding: 2px;
+  margin-bottom: 8px;
+}
+
+.miniapp-segment-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--ma-hint);
+}
+
+.miniapp-segment-btn.active {
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+/* ---------- Note input ---------- */
+.miniapp-note-input {
+  width: 100%;
+  border: none;
+  border-radius: var(--ma-radius-sm);
+  background: var(--ma-bg2);
+  color: var(--ma-text);
+  font-size: 15px;
+  padding: 10px 12px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+
+.miniapp-note-input::placeholder {
+  color: var(--ma-hint);
+}
+
+.miniapp-note-submit {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+  border: none;
+  border-radius: var(--ma-radius-sm);
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.miniapp-note-submit:active {
+  opacity: 0.8;
+}
+
+.miniapp-note-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Toggle/switch row ---------- */
+.miniapp-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.miniapp-toggle-row + .miniapp-toggle-row {
+  border-top: 0.5px solid var(--ma-separator);
+}
+
+.miniapp-toggle-label {
+  font-size: 15px;
+  color: var(--ma-text);
+}
+
+/* ---------- Attention item ---------- */
+.miniapp-attention-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  position: relative;
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.miniapp-attention-item:active {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.miniapp-attention-item + .miniapp-attention-item {
+  border-top: 0.5px solid var(--ma-separator);
+}
+
+/* ---------- Team member row ---------- */
+.miniapp-team-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.miniapp-team-row + .miniapp-team-row {
+  border-top: 0.5px solid var(--ma-separator);
+}
+
+/* ---------- Add contact button (calls page) ---------- */
+.miniapp-add-contact-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ma-accent);
+  background: transparent;
+  color: var(--ma-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.miniapp-add-contact-btn:active {
+  transform: scale(0.9);
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
+}
+
+/* ---------- Create contact form (inline) ---------- */
+.miniapp-create-contact-form {
+  padding: 16px;
+}
+
+.miniapp-create-contact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--ma-text);
+}
+
+.miniapp-create-contact-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ma-bg2);
+  color: var(--ma-hint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.miniapp-create-contact-phone {
+  font-size: 13px;
+  color: var(--ma-hint);
+  margin-bottom: 12px;
+}
+
+.miniapp-create-contact-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--ma-radius-sm);
+  background: var(--ma-bg2);
+  color: var(--ma-text);
+  font-size: 15px;
+  outline: none;
+  margin-bottom: 8px;
+  -webkit-appearance: none;
+}
+
+.miniapp-create-contact-input::placeholder {
+  color: var(--ma-hint);
+}

@@ -1322,10 +1322,42 @@
     "tabs": {
       "home": "Home",
       "contacts": "Contacts",
-      "leads": "Leads",
-      "deals": "Deals",
+      "pipeline": "Pipeline",
       "calls": "Calls",
       "profile": "Profile"
+    },
+    "needsAttention": "Needs Attention",
+    "missedCallsToReturn": "Missed calls",
+    "newLeadsAssigned": "New leads",
+    "teamToday": "Team today",
+    "unassigned": "Unassigned",
+    "pipeline": {
+      "title": "Pipeline",
+      "leads": "Leads",
+      "deals": "Deals"
+    },
+    "actions": {
+      "markContacted": "Mark Contacted",
+      "markQualified": "Mark Qualified",
+      "convertToDeal": "Convert to Deal",
+      "closeDeal": "Close Deal",
+      "won": "Won",
+      "lost": "Lost",
+      "addNote": "Add note...",
+      "save": "Save",
+      "call": "Call"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "myCalls": "My calls",
+      "myLeads": "My leads",
+      "dealChanges": "Deal changes",
+      "quietHours": "Quiet hours"
+    },
+    "createContact": {
+      "title": "Create Contact",
+      "firstName": "First name",
+      "lastName": "Last name"
     }
   }
 }
