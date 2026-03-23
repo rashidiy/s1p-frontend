@@ -111,9 +111,9 @@ export default function MiniAppCalls() {
             >
               {phone1 ? formatPhone(phone1) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
               {phone1 && (
-                <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
                   <CloseCircleFilled />
-                </span>
+                </button>
               )}
             </div>
             <div
@@ -122,9 +122,9 @@ export default function MiniAppCalls() {
             >
               {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
               {phone2 && (
-                <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
                   <CloseCircleFilled />
-                </span>
+                </button>
               )}
             </div>
           </>
@@ -132,9 +132,9 @@ export default function MiniAppCalls() {
           <div className="miniapp-dialer-number">
             {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
             {phone2 && (
-              <span className="miniapp-dialer-clear" onPointerDown={(e) => { e.preventDefault(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+              <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
                 <CloseCircleFilled />
-              </span>
+              </button>
             )}
           </div>
         )}
