@@ -165,7 +165,7 @@ function DialerView({ webApp, t }: {
       try {
         webApp?.showPopup({
           title: t('calls.callInitiated'),
-          message: `ID: ${result?.id || '—'}`,
+          message: `ID: ${result?.call_id || '—'}`,
           buttons: [{ type: 'ok' }],
         });
       } catch { /* popup may not be available */ }
