@@ -13,18 +13,10 @@ import { useTranslations } from 'next-intl';
 import type { SipuniOperator } from '@/types/api';
 
 const DIAL_KEYS = [
-  { digit: '1', sub: '' },
-  { digit: '2', sub: 'ABC' },
-  { digit: '3', sub: 'DEF' },
-  { digit: '4', sub: 'GHI' },
-  { digit: '5', sub: 'JKL' },
-  { digit: '6', sub: 'MNO' },
-  { digit: '7', sub: 'PQRS' },
-  { digit: '8', sub: 'TUV' },
-  { digit: '9', sub: 'WXYZ' },
-  { digit: '*', sub: '' },
-  { digit: '0', sub: '+' },
-  { digit: '#', sub: '' },
+  '1', '2', '3',
+  '4', '5', '6',
+  '7', '8', '9',
+  '+', '0', '#',
 ];
 
 export default function MiniAppCalls() {
@@ -72,14 +64,6 @@ export default function MiniAppCalls() {
     }
   }
 
-  function handleLongPressZero() {
-    webApp?.HapticFeedback.selectionChanged();
-    if (mode === 'external' && activeInput === 'from') {
-      setPhone1((prev) => prev + '+');
-    } else {
-      setPhone2((prev) => prev + '+');
-    }
-  }
 
   async function handleCall() {
     if (!phone2.trim() || calling) return;
@@ -115,8 +99,6 @@ export default function MiniAppCalls() {
       setCalling(false);
     }
   }
-
-  let zeroTimer: ReturnType<typeof setTimeout> | null = null;
 
   const currentNumber = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
 
@@ -232,26 +214,11 @@ export default function MiniAppCalls() {
 
         {/* Number pad */}
         <div className="miniapp-dialer-grid">
-          {DIAL_KEYS.map(({ digit, sub }) => (
+          {DIAL_KEYS.map((digit) => (
             <button
               key={digit}
               className="miniapp-dialer-key"
-              onClick={digit !== '0' ? () => handleKeyPress(digit) : undefined}
-              onTouchStart={digit === '0' ? (e) => {
-                e.preventDefault();
-                zeroTimer = setTimeout(() => {
-                  handleLongPressZero();
-                  zeroTimer = null;
-                }, 500);
-              } : undefined}
-              onTouchEnd={digit === '0' ? (e) => {
-                e.preventDefault();
-                if (zeroTimer) {
-                  clearTimeout(zeroTimer);
-                  zeroTimer = null;
-                  handleKeyPress('0');
-                }
-              } : undefined}
+              onClick={() => handleKeyPress(digit)}
             >
               {digit}
             </button>
