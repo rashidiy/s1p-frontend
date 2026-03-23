@@ -205,7 +205,10 @@
     "congestion": "Congestion",
     "unavailable": "Unavailable",
     "answered": "Answered",
-    "status": "Status"
+    "status": "Status",
+    "unqualified": "Unqualified",
+    "closed_won": "Won",
+    "closed_lost": "Lost"
   },
   "priorities": {
     "low": "Low",
@@ -1225,6 +1228,104 @@
       "contact": "Contact us",
       "address": "Tashkent, Uzbekistan",
       "copyright": "© 2026 S1P. All rights reserved."
+    }
+  },
+  "miniapp": {
+    "selectCompany": "Select company",
+    "role": "Role",
+    "loadMore": "Load more",
+    "dashboard": {
+      "greeting": "Hi, {name}",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "calls": "Calls",
+      "missed": "Missed",
+      "pendingLeads": "Pending leads",
+      "activeDeals": "Active deals",
+      "recentCalls": "Recent Calls",
+      "recentTasks": "Tasks",
+      "noActivity": "No activity today",
+      "viewAll": "View all"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "search": "Search contacts...",
+      "noContacts": "No contacts found",
+      "emptyTitle": "No contacts yet",
+      "emptyDescription": "Your contacts will appear here"
+    },
+    "leads": {
+      "title": "Leads",
+      "noLeads": "No leads yet",
+      "emptyDescription": "Your leads will appear here",
+      "all": "All",
+      "estimatedValue": "Est. value"
+    },
+    "deals": {
+      "title": "Deals",
+      "noDeals": "No deals yet",
+      "emptyDescription": "Your deals will appear here",
+      "all": "All"
+    },
+    "calls": {
+      "title": "Calls",
+      "noCalls": "No calls yet",
+      "emptyDescription": "Your call history will appear here",
+      "missed": "Missed",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "earlier": "Earlier"
+    },
+    "profile": {
+      "title": "Profile",
+      "language": "Language",
+      "company": "Company",
+      "closeApp": "Close App",
+      "role": "Role",
+      "languageChanged": "Language changed"
+    },
+    "detail": {
+      "phone": "Phone",
+      "email": "Email",
+      "linkedLeads": "Leads",
+      "linkedDeals": "Deals",
+      "recentCalls": "Recent Calls",
+      "noLinkedLeads": "No linked leads",
+      "noLinkedDeals": "No linked deals",
+      "noRecentCalls": "No recent calls",
+      "status": "Status",
+      "stage": "Stage",
+      "amount": "Amount",
+      "source": "Source",
+      "value": "Value",
+      "contact": "Contact",
+      "notes": "Notes",
+      "noNotes": "No notes yet",
+      "created": "Created",
+      "assignedTo": "Assigned to",
+      "title": "Title",
+      "currency": "Currency",
+      "probability": "Probability",
+      "closeDate": "Close date",
+      "closed": "Closed",
+      "winReason": "Win reason",
+      "lossReason": "Loss reason",
+      "untitled": "Untitled"
+    },
+    "error": {
+      "loadFailed": "Failed to load data",
+      "authFailed": "Authentication failed",
+      "noCompanies": "No companies found"
+    },
+    "tabs": {
+      "home": "Home",
+      "contacts": "Contacts",
+      "leads": "Leads",
+      "deals": "Deals",
+      "calls": "Calls",
+      "profile": "Profile"
     }
   }
 }

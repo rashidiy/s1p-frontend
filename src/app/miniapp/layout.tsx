@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Spin, Avatar } from 'antd';
+import { Spin } from 'antd';
 import {
   HomeOutlined,
   ContactsOutlined,
@@ -17,16 +17,16 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types/api';
 import type { UserResponse } from '@/types/api';
+import { useTranslations } from 'next-intl';
 import './miniapp.css';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-
 const TABS = [
-  { key: 'dashboard', path: '/miniapp', icon: <HomeOutlined /> },
+  { key: 'home', path: '/miniapp', icon: <HomeOutlined /> },
   { key: 'contacts', path: '/miniapp/contacts', icon: <ContactsOutlined /> },
   { key: 'leads', path: '/miniapp/leads', icon: <RiseOutlined /> },
   { key: 'deals', path: '/miniapp/deals', icon: <FundProjectionScreenOutlined /> },
   { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
+  { key: 'profile', path: '/miniapp/profile', icon: <UserOutlined /> },
 ];
 
 interface CompanyOption {
@@ -35,7 +35,6 @@ interface CompanyOption {
   role?: string;
 }
 
-/** Map API profile response to auth store user shape */
 function profileToUser(profile: UserResponse) {
   return {
     id: profile.id,
@@ -44,7 +43,7 @@ function profileToUser(profile: UserResponse) {
     phone: profile.phone,
     role: profile.role as UserRole,
     company_id: profile.company_id ?? undefined,
-    avatar_url: (profile as Record<string, unknown>).avatar_url as string | null ?? null,
+    avatar_url: profile.avatar_url ?? null,
     is_active: profile.is_active,
     permissions: profile.permissions,
   };
@@ -58,12 +57,9 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname() ?? '/miniapp';
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
+  const t = useTranslations('miniapp');
 
-  // company_id comes from URL params or Telegram start_param.
-  // Security note: this is client-provided but the backend validates that the
-  // authenticated telegram_user_id actually belongs to this company before
-  // issuing a JWT. Spoofing company_id results in a 401, not cross-tenant access.
   const companyIdParam = searchParams.get('company_id')
     || webApp?.initDataUnsafe?.start_param
     || '';
@@ -77,37 +73,33 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setAuthState('authenticated');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setErrorMsg(detail || 'Authentication failed');
+      setErrorMsg(detail || t('error.authFailed'));
       setAuthState('error');
     }
-  }, [isTelegram, webApp, setUser]);
+  }, [isTelegram, webApp, setUser, t]);
 
   const authenticate = useCallback(async () => {
     if (!sdkReady) return;
 
-    // In Telegram with company_id — direct auth
     if (isTelegram && webApp?.initData && companyIdParam) {
       await authenticateWithCompany(companyIdParam);
       return;
     }
 
-    // In Telegram without company_id — fetch companies list
     if (isTelegram && webApp?.initData && !companyIdParam) {
       try {
         const companiesList = await apiClient.miniAppCompanies(webApp.initData);
         if (companiesList.length === 0) {
-          setErrorMsg('No companies found for this account');
+          setErrorMsg(t('error.noCompanies'));
           setAuthState('error');
         } else if (companiesList.length === 1) {
-          // Auto-select single company
           await authenticateWithCompany(companiesList[0].id);
         } else {
-          // Show company picker
           setCompanies(companiesList);
           setAuthState('pick_company');
         }
       } catch {
-        setErrorMsg('Failed to load companies');
+        setErrorMsg(t('error.loadFailed'));
         setAuthState('error');
       }
       return;
@@ -119,7 +111,6 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
     } catch {
-      // Debug info to diagnose SDK detection issues
       const hasTg = typeof window !== 'undefined' && !!window.Telegram;
       const hasWebApp = hasTg && !!window.Telegram?.WebApp;
       const hasInitData = hasWebApp && !!window.Telegram?.WebApp?.initData;
@@ -129,23 +120,29 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       );
       setAuthState('error');
     }
-  }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany]);
+  }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany, t]);
 
   useEffect(() => {
     authenticate();
   }, [authenticate]);
 
-  // Sync theme with Telegram
+  // Sync Telegram theme — set CSS variables and header/bg colors
   useEffect(() => {
     if (webApp) {
       const isDark = webApp.colorScheme === 'dark';
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      // Match Telegram's header to our bg
+      try {
+        webApp.setHeaderColor('secondary_bg_color');
+        webApp.setBackgroundColor(webApp.themeParams.secondary_bg_color || (isDark ? '#121214' : '#F8F9FA'));
+      } catch {
+        // older SDK versions may not support this
+      }
     }
   }, [webApp]);
 
-  const avatarUrl = user?.avatar_url
-    ? `${API_BASE_URL}${user.avatar_url}`
-    : undefined;
+  // Determine if we're on a detail page (hide tab bar)
+  const isDetailPage = /\/miniapp\/(contacts|leads|deals)\/[^/]+/.test(pathname);
 
   if (authState === 'loading') {
     return (
@@ -158,7 +155,8 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   if (authState === 'error') {
     return (
       <div className="miniapp-error">
-        <p>{errorMsg}</p>
+        <div style={{ fontSize: 48, opacity: 0.3 }}>!</div>
+        <p style={{ fontWeight: 500, fontSize: 16 }}>{errorMsg}</p>
       </div>
     );
   }
@@ -167,13 +165,9 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   if (authState === 'pick_company') {
     return (
       <div className="miniapp-shell">
-          <header className="miniapp-header">
-            <div className="miniapp-header-title">S1P</div>
-          </header>
-          <main className="miniapp-content">
-            <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>
-              Select company
-            </div>
+        <main className="miniapp-content">
+          <div className="miniapp-page-title">{t('selectCompany')}</div>
+          <div className="miniapp-section">
             <div className="miniapp-list">
               {companies.map((c) => (
                 <div
@@ -185,6 +179,9 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                     setAuthState('loading');
                   }}
                 >
+                  <div className="miniapp-list-item-icon" style={{ background: '#4338CA' }}>
+                    {c.name.charAt(0).toUpperCase()}
+                  </div>
                   <div className="miniapp-list-item-content">
                     <div className="miniapp-list-item-title">{c.name}</div>
                     {c.role && (
@@ -193,40 +190,26 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                       </div>
                     )}
                   </div>
-                  <div className="miniapp-list-item-right">
+                  <div className="miniapp-list-item-chevron">
                     <RightOutlined />
                   </div>
                 </div>
               ))}
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
+      </div>
     );
   }
 
   return (
-      <div className="miniapp-shell">
-        {/* Top bar */}
-        <header className="miniapp-header">
-          <div className="miniapp-header-title">S1P</div>
-          <div
-            className="miniapp-header-avatar"
-            onClick={() => router.push('/miniapp/profile')}
-          >
-            <Avatar
-              size={32}
-              src={avatarUrl}
-              icon={!avatarUrl ? <UserOutlined /> : undefined}
-            />
-          </div>
-        </header>
+    <div className="miniapp-shell">
+      <main className="miniapp-content">
+        {children}
+      </main>
 
-        {/* Content */}
-        <main className="miniapp-content">
-          {children}
-        </main>
-
-        {/* Bottom tab bar */}
+      {/* Bottom tab bar — hidden on detail pages */}
+      {!isDetailPage && (
         <nav className="miniapp-tabs">
           {TABS.map((tab) => {
             const isActive = tab.path === '/miniapp'
@@ -237,17 +220,19 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                 key={tab.key}
                 className={`miniapp-tab ${isActive ? 'active' : ''}`}
                 onClick={() => {
-                  if (webApp) {
-                    webApp.HapticFeedback.selectionChanged();
-                  }
+                  webApp?.HapticFeedback.selectionChanged();
                   router.push(tab.path);
                 }}
               >
                 {tab.icon}
+                <span className="miniapp-tab-label">
+                  {t(`tabs.${tab.key}`)}
+                </span>
               </button>
             );
           })}
         </nav>
-      </div>
+      )}
+    </div>
   );
 }

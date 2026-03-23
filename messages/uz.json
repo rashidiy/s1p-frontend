@@ -205,7 +205,10 @@
     "congestion": "Tiqilinch",
     "unavailable": "Mavjud emas",
     "answered": "Javob berilgan",
-    "status": "Holat"
+    "status": "Holat",
+    "unqualified": "Nomuvofiq",
+    "closed_won": "Yutilgan",
+    "closed_lost": "Yo'qotilgan"
   },
   "priorities": {
     "low": "Past",
@@ -1225,6 +1228,104 @@
       "contact": "Biz bilan bog'lanish",
       "address": "Toshkent, O'zbekiston",
       "copyright": "© 2026 S1P. Barcha huquqlar himoyalangan."
+    }
+  },
+  "miniapp": {
+    "selectCompany": "Kompaniyani tanlang",
+    "role": "Rol",
+    "loadMore": "Yana yuklash",
+    "dashboard": {
+      "greeting": "Salom, {name}",
+      "today": "Bugun",
+      "thisWeek": "Shu hafta",
+      "thisMonth": "Shu oy",
+      "calls": "Qo'ng'iroqlar",
+      "missed": "O'tkazilgan",
+      "pendingLeads": "Kutilayotgan lidlar",
+      "activeDeals": "Faol bitimlar",
+      "recentCalls": "So'nggi qo'ng'iroqlar",
+      "recentTasks": "Vazifalar",
+      "noActivity": "Bugun faoliyat yo'q",
+      "viewAll": "Hammasi"
+    },
+    "contacts": {
+      "title": "Kontaktlar",
+      "search": "Kontaktlarni qidirish...",
+      "noContacts": "Kontaktlar topilmadi",
+      "emptyTitle": "Hali kontaktlar yo'q",
+      "emptyDescription": "Kontaktlaringiz shu yerda ko'rinadi"
+    },
+    "leads": {
+      "title": "Lidlar",
+      "noLeads": "Hali lidlar yo'q",
+      "emptyDescription": "Lidlaringiz shu yerda ko'rinadi",
+      "all": "Barchasi",
+      "estimatedValue": "Tax. qiymat"
+    },
+    "deals": {
+      "title": "Bitimlar",
+      "noDeals": "Hali bitimlar yo'q",
+      "emptyDescription": "Bitimlaringiz shu yerda ko'rinadi",
+      "all": "Barchasi"
+    },
+    "calls": {
+      "title": "Qo'ng'iroqlar",
+      "noCalls": "Hali qo'ng'iroqlar yo'q",
+      "emptyDescription": "Qo'ng'iroqlar tarixi shu yerda ko'rinadi",
+      "missed": "O'tkazilgan",
+      "today": "Bugun",
+      "yesterday": "Kecha",
+      "thisWeek": "Shu hafta",
+      "earlier": "Oldinroq"
+    },
+    "profile": {
+      "title": "Profil",
+      "language": "Til",
+      "company": "Kompaniya",
+      "closeApp": "Yopish",
+      "role": "Rol",
+      "languageChanged": "Til o'zgartirildi"
+    },
+    "detail": {
+      "phone": "Telefon",
+      "email": "Email",
+      "linkedLeads": "Lidlar",
+      "linkedDeals": "Bitimlar",
+      "recentCalls": "So'nggi qo'ng'iroqlar",
+      "noLinkedLeads": "Bog'langan lidlar yo'q",
+      "noLinkedDeals": "Bog'langan bitimlar yo'q",
+      "noRecentCalls": "So'nggi qo'ng'iroqlar yo'q",
+      "status": "Holat",
+      "stage": "Bosqich",
+      "amount": "Summa",
+      "source": "Manba",
+      "value": "Qiymat",
+      "contact": "Kontakt",
+      "notes": "Eslatmalar",
+      "noNotes": "Hali eslatmalar yo'q",
+      "created": "Yaratilgan",
+      "assignedTo": "Tayinlangan",
+      "title": "Nomi",
+      "currency": "Valyuta",
+      "probability": "Ehtimollik",
+      "closeDate": "Yopilish sanasi",
+      "closed": "Yopilgan",
+      "winReason": "Yutish sababi",
+      "lossReason": "Yo'qotish sababi",
+      "untitled": "Nomsiz"
+    },
+    "error": {
+      "loadFailed": "Ma'lumotlarni yuklab bo'lmadi",
+      "authFailed": "Autentifikatsiya xatosi",
+      "noCompanies": "Kompaniyalar topilmadi"
+    },
+    "tabs": {
+      "home": "Bosh sahifa",
+      "contacts": "Kontaktlar",
+      "leads": "Lidlar",
+      "deals": "Bitimlar",
+      "calls": "Qo'ng'iroqlar",
+      "profile": "Profil"
     }
   }
 }

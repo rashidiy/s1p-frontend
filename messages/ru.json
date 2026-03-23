@@ -205,7 +205,10 @@
     "congestion": "Перегрузка",
     "unavailable": "Недоступен",
     "answered": "Отвечен",
-    "status": "Статус"
+    "status": "Статус",
+    "unqualified": "Неквалифицированный",
+    "closed_won": "Выиграна",
+    "closed_lost": "Проиграна"
   },
   "priorities": {
     "low": "Низкий",
@@ -1225,6 +1228,104 @@
       "contact": "Связаться с нами",
       "address": "Ташкент, Узбекистан",
       "copyright": "© 2026 S1P. Все права защищены."
+    }
+  },
+  "miniapp": {
+    "selectCompany": "Выберите компанию",
+    "role": "Роль",
+    "loadMore": "Загрузить ещё",
+    "dashboard": {
+      "greeting": "Привет, {name}",
+      "today": "Сегодня",
+      "thisWeek": "Эта неделя",
+      "thisMonth": "Этот месяц",
+      "calls": "Звонки",
+      "missed": "Пропущено",
+      "pendingLeads": "Ожидающие лиды",
+      "activeDeals": "Активные сделки",
+      "recentCalls": "Последние звонки",
+      "recentTasks": "Задачи",
+      "noActivity": "Нет активности сегодня",
+      "viewAll": "Все"
+    },
+    "contacts": {
+      "title": "Контакты",
+      "search": "Поиск контактов...",
+      "noContacts": "Контакты не найдены",
+      "emptyTitle": "Пока нет контактов",
+      "emptyDescription": "Ваши контакты появятся здесь"
+    },
+    "leads": {
+      "title": "Лиды",
+      "noLeads": "Пока нет лидов",
+      "emptyDescription": "Ваши лиды появятся здесь",
+      "all": "Все",
+      "estimatedValue": "Ожид. стоимость"
+    },
+    "deals": {
+      "title": "Сделки",
+      "noDeals": "Пока нет сделок",
+      "emptyDescription": "Ваши сделки появятся здесь",
+      "all": "Все"
+    },
+    "calls": {
+      "title": "Звонки",
+      "noCalls": "Пока нет звонков",
+      "emptyDescription": "История звонков появится здесь",
+      "missed": "Пропущен",
+      "today": "Сегодня",
+      "yesterday": "Вчера",
+      "thisWeek": "На этой неделе",
+      "earlier": "Ранее"
+    },
+    "profile": {
+      "title": "Профиль",
+      "language": "Язык",
+      "company": "Компания",
+      "closeApp": "Закрыть",
+      "role": "Роль",
+      "languageChanged": "Язык изменён"
+    },
+    "detail": {
+      "phone": "Телефон",
+      "email": "Эл. почта",
+      "linkedLeads": "Лиды",
+      "linkedDeals": "Сделки",
+      "recentCalls": "Последние звонки",
+      "noLinkedLeads": "Нет связанных лидов",
+      "noLinkedDeals": "Нет связанных сделок",
+      "noRecentCalls": "Нет последних звонков",
+      "status": "Статус",
+      "stage": "Этап",
+      "amount": "Сумма",
+      "source": "Источник",
+      "value": "Стоимость",
+      "contact": "Контакт",
+      "notes": "Заметки",
+      "noNotes": "Пока нет заметок",
+      "created": "Создано",
+      "assignedTo": "Назначено",
+      "title": "Название",
+      "currency": "Валюта",
+      "probability": "Вероятность",
+      "closeDate": "Дата закрытия",
+      "closed": "Закрыто",
+      "winReason": "Причина выигрыша",
+      "lossReason": "Причина проигрыша",
+      "untitled": "Без названия"
+    },
+    "error": {
+      "loadFailed": "Не удалось загрузить данные",
+      "authFailed": "Ошибка авторизации",
+      "noCompanies": "Компании не найдены"
+    },
+    "tabs": {
+      "home": "Главная",
+      "contacts": "Контакты",
+      "leads": "Лиды",
+      "deals": "Сделки",
+      "calls": "Звонки",
+      "profile": "Профиль"
     }
   }
 }
