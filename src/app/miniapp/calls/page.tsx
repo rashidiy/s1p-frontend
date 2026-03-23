@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  PhoneOutlined,
-} from '@ant-design/icons';
+import { PhoneOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -12,12 +10,25 @@ import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
 import type { SipuniOperator } from '@/types/api';
 
-const DIAL_KEYS = [
-  '1', '2', '3',
-  '4', '5', '6',
-  '7', '8', '9',
-  '+', '0', '#',
-];
+const DIAL_KEYS = ['1','2','3','4','5','6','7','8','9','+','0','#'];
+
+/** Format raw digits like +998200083233 → +998 20 008 32 33 */
+function formatPhone(raw: string): string {
+  if (!raw) return '';
+  // If starts with +998, format nicely
+  if (raw.startsWith('+998') && raw.length > 4) {
+    const rest = raw.slice(4);
+    // +998 XX XXX XX XX
+    let formatted = '+998';
+    if (rest.length > 0) formatted += ' ' + rest.slice(0, 2);
+    if (rest.length > 2) formatted += ' ' + rest.slice(2, 5);
+    if (rest.length > 5) formatted += ' ' + rest.slice(5, 7);
+    if (rest.length > 7) formatted += ' ' + rest.slice(7, 9);
+    if (rest.length > 9) formatted += rest.slice(9);
+    return formatted;
+  }
+  return raw;
+}
 
 export default function MiniAppCalls() {
   const searchParams = useSearchParams();
@@ -42,28 +53,25 @@ export default function MiniAppCalls() {
     }
   }, [hasSipExtension]);
 
-  const sipExtension = hasSipExtension
-    ? user!.sip_extension!
-    : selectedOperator;
+  const sipExtension = hasSipExtension ? user!.sip_extension! : selectedOperator;
 
   function handleKeyPress(digit: string) {
     webApp?.HapticFeedback.selectionChanged();
-    if (mode === 'external' && activeInput === 'from') {
-      setPhone1((prev) => prev + digit);
-    } else {
-      setPhone2((prev) => prev + digit);
-    }
+    const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
+    setter((prev) => {
+      // Auto-prefix +998 on first digit press (not if pressing +)
+      if (prev === '' && digit !== '+' && digit !== '#') {
+        return '+998' + digit;
+      }
+      return prev + digit;
+    });
   }
 
   function handleBackspace() {
     webApp?.HapticFeedback.selectionChanged();
-    if (mode === 'external' && activeInput === 'from') {
-      setPhone1((prev) => prev.slice(0, -1));
-    } else {
-      setPhone2((prev) => prev.slice(0, -1));
-    }
+    const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
+    setter((prev) => prev.slice(0, -1));
   }
-
 
   async function handleCall() {
     if (!phone2.trim() || calling) return;
@@ -73,12 +81,9 @@ export default function MiniAppCalls() {
     setCalling(true);
     webApp?.HapticFeedback.impactOccurred('medium');
     try {
-      let result;
-      if (mode === 'sip') {
-        result = await apiClient.callNumber({ phone: phone2, operator_id: sipExtension, reverse: false, antiaon: false });
-      } else {
-        result = await apiClient.callExternal({ phone_1: phone1, phone_2: phone2, operator_id: sipExtension || phone1 });
-      }
+      const result = mode === 'sip'
+        ? await apiClient.callNumber({ phone: phone2, operator_id: sipExtension, reverse: false, antiaon: false })
+        : await apiClient.callExternal({ phone_1: phone1, phone_2: phone2, operator_id: sipExtension || phone1 });
       webApp?.HapticFeedback.notificationOccurred('success');
       try {
         webApp?.showPopup({
@@ -86,163 +91,98 @@ export default function MiniAppCalls() {
           message: `ID: ${result?.call_id || '\u2014'}`,
           buttons: [{ type: 'ok' }],
         });
-      } catch { /* popup may not be available */ }
+      } catch {}
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
-      try {
-        webApp?.showPopup({
-          message: t('error.loadFailed'),
-          buttons: [{ type: 'ok' }],
-        });
-      } catch { /* popup may not be available */ }
+      try { webApp?.showPopup({ message: t('error.loadFailed'), buttons: [{ type: 'ok' }] }); } catch {}
     } finally {
       setCalling(false);
     }
   }
 
   const currentNumber = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
-
-  const canCall = mode === 'sip'
-    ? phone2.trim() && sipExtension
-    : phone2.trim() && phone1.trim();
+  const canCall = mode === 'sip' ? phone2.trim() && sipExtension : phone2.trim() && phone1.trim();
 
   return (
-      <div className="miniapp-dialer">
-        {/* External mode: dual display */}
+    <div className="miniapp-dialer">
+      {/* Number display — fixed height, no layout shift */}
+      <div className="miniapp-dialer-display-area">
         {mode === 'external' ? (
           <div className="miniapp-dialer-dual">
             <div
-              className={`miniapp-dialer-from ${activeInput === 'from' ? 'miniapp-dialer-input-active' : ''}`}
-              onClick={() => {
-                webApp?.HapticFeedback.selectionChanged();
-                setActiveInput('from');
-              }}
+              className={`miniapp-dialer-input-row ${activeInput === 'from' ? 'active' : ''}`}
+              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('from'); }}
             >
               <span className="miniapp-dialer-input-label">{t('calls.from')}</span>
-              <span className="miniapp-dialer-from-number">
-                {phone1 || (
-                  <span className="miniapp-dialer-display-placeholder" style={{ fontSize: 16 }}>
-                    {t('calls.enterNumber')}
-                  </span>
-                )}
+              <span className="miniapp-dialer-input-value">
+                {formatPhone(phone1) || <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
               </span>
             </div>
             <div
-              className={`miniapp-dialer-to ${activeInput === 'to' ? 'miniapp-dialer-input-active' : ''}`}
-              onClick={() => {
-                webApp?.HapticFeedback.selectionChanged();
-                setActiveInput('to');
-              }}
+              className={`miniapp-dialer-input-row ${activeInput === 'to' ? 'active' : ''}`}
+              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('to'); }}
             >
               <span className="miniapp-dialer-input-label">{t('calls.to')}</span>
-              <span className="miniapp-dialer-to-number">
-                {phone2 || (
-                  <span className="miniapp-dialer-display-placeholder" style={{ fontSize: 20 }}>
-                    {t('calls.enterNumber')}
-                  </span>
-                )}
+              <span className="miniapp-dialer-input-value">
+                {formatPhone(phone2) || <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
               </span>
             </div>
           </div>
         ) : (
-          /* SIP mode: single display */
           <div
-            className="miniapp-dialer-display"
+            className="miniapp-dialer-number"
             onClick={async () => {
               try {
                 const text = await navigator.clipboard.readText();
-                if (text) {
-                  webApp?.HapticFeedback.selectionChanged();
-                  setPhone2(text.replace(/[^\d+*#]/g, ''));
-                }
-              } catch { /* clipboard not available */ }
+                if (text) { webApp?.HapticFeedback.selectionChanged(); setPhone2(text.replace(/[^\d+*#]/g, '')); }
+              } catch {}
             }}
           >
-            {phone2 || (
-              <span className="miniapp-dialer-display-placeholder">
-                {t('calls.enterNumber')}
-              </span>
-            )}
+            {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
           </div>
         )}
+      </div>
 
-        {/* SIP / External toggle */}
+      {/* Controls row — toggle + operator, compact */}
+      <div className="miniapp-dialer-controls">
         <div className="miniapp-dialer-mode">
-          <button
-            className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
-            onClick={() => {
-              webApp?.HapticFeedback.selectionChanged();
-              setMode('sip');
-              setActiveInput('to');
-            }}
-          >
-            SIP
-          </button>
-          <button
-            className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
-            onClick={() => {
-              webApp?.HapticFeedback.selectionChanged();
-              setMode('external');
-            }}
-          >
-            External
-          </button>
+          <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
+            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('sip'); setActiveInput('to'); }}>SIP</button>
+          <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
+            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>External</button>
         </div>
-
-        {/* Operator info — only in SIP mode */}
         {mode === 'sip' && (
           hasSipExtension ? (
-            <div className="miniapp-dialer-operator">
-              {t('calls.via', { ext: user!.sip_extension! })}
-            </div>
+            <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
           ) : (
-            <div className="miniapp-dialer-operator">
-              <select
-                value={selectedOperator}
-                onChange={(e) => setSelectedOperator(e.target.value)}
-              >
-                <option value="">{t('calls.selectOperator')}</option>
-                {operators.map((op) => (
-                  <option key={op.extension} value={op.extension}>
-                    {op.name} ({op.extension})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select className="miniapp-dialer-operator-select" value={selectedOperator}
+              onChange={(e) => setSelectedOperator(e.target.value)}>
+              <option value="">{t('calls.selectOperator')}</option>
+              {operators.map((op) => (
+                <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
+              ))}
+            </select>
           )
         )}
-
-        {/* Number pad */}
-        <div className="miniapp-dialer-grid">
-          {DIAL_KEYS.map((digit) => (
-            <button
-              key={digit}
-              className="miniapp-dialer-key"
-              onClick={() => handleKeyPress(digit)}
-            >
-              {digit}
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom row: empty, call, backspace */}
-        <div className="miniapp-dialer-bottom">
-          <div />
-          <button
-            className="miniapp-dialer-call"
-            onClick={handleCall}
-            disabled={!canCall || calling}
-          >
-            {calling ? <Spin size="small" /> : <PhoneOutlined />}
-          </button>
-          {currentNumber ? (
-            <button className="miniapp-dialer-backspace" onClick={handleBackspace}>
-              <span style={{ fontSize: 22, lineHeight: 1 }}>{'\u232B'}</span>
-            </button>
-          ) : (
-            <div />
-          )}
-        </div>
       </div>
+
+      {/* Number pad */}
+      <div className="miniapp-dialer-grid">
+        {DIAL_KEYS.map((d) => (
+          <button key={d} className="miniapp-dialer-key" onClick={() => handleKeyPress(d)}>{d}</button>
+        ))}
+      </div>
+
+      {/* Bottom: call + backspace */}
+      <div className="miniapp-dialer-bottom">
+        <div />
+        <button className="miniapp-dialer-call" onClick={handleCall} disabled={!canCall || calling}>
+          {calling ? <Spin size="small" /> : <PhoneOutlined />}
+        </button>
+        {currentNumber ? (
+          <button className="miniapp-dialer-backspace" onClick={handleBackspace}>{'\u232B'}</button>
+        ) : <div />}
+      </div>
+    </div>
   );
 }
