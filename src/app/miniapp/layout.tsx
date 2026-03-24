@@ -3,14 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Spin } from 'antd';
-import {
-  HomeOutlined,
-  ContactsOutlined,
-  FunnelPlotOutlined,
-  PhoneOutlined,
-  ClockCircleOutlined,
-  RightOutlined,
-} from '@ant-design/icons';
+import { Phone, Users, Home, Filter, Clock, ChevronRight } from 'lucide-react';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -20,11 +13,11 @@ import { useTranslations } from 'next-intl';
 import './miniapp.css';
 
 const TABS: Array<{ key: string; path: string; icon: React.ReactNode; center?: boolean }> = [
-  { key: 'calls', path: '/miniapp/calls', icon: <PhoneOutlined /> },
-  { key: 'contacts', path: '/miniapp/contacts', icon: <ContactsOutlined /> },
-  { key: 'home', path: '/miniapp', icon: <HomeOutlined />, center: true },
-  { key: 'pipeline', path: '/miniapp/pipeline', icon: <FunnelPlotOutlined /> },
-  { key: 'history', path: '/miniapp/history', icon: <ClockCircleOutlined /> },
+  { key: 'calls', path: '/miniapp/calls', icon: <Phone size={24} /> },
+  { key: 'contacts', path: '/miniapp/contacts', icon: <Users size={24} /> },
+  { key: 'home', path: '/miniapp', icon: <Home size={24} />, center: true },
+  { key: 'pipeline', path: '/miniapp/pipeline', icon: <Filter size={24} /> },
+  { key: 'history', path: '/miniapp/history', icon: <Clock size={24} /> },
 ];
 
 interface CompanyOption {
@@ -264,7 +257,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                     )}
                   </div>
                   <div className="miniapp-list-item-chevron">
-                    <RightOutlined />
+                    <ChevronRight size={16} />
                   </div>
                 </div>
               ))}

@@ -2,13 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  PhoneOutlined,
-  MailOutlined,
-  MessageOutlined,
-  RiseOutlined,
-  FundProjectionScreenOutlined,
-} from '@ant-design/icons';
+import { Phone, Mail, MessageCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -119,7 +113,7 @@ export default function ContactDetailPage() {
           {contact.phone && (
             <button className="miniapp-detail-action-btn" onClick={handleCallPress}>
               <div className="miniapp-detail-action-icon">
-                <PhoneOutlined />
+                <Phone size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('actions.call')}</span>
             </button>
@@ -127,7 +121,7 @@ export default function ContactDetailPage() {
           {contact.phone && (
             <button className="miniapp-detail-action-btn" onClick={handleMessage}>
               <div className="miniapp-detail-action-icon">
-                <MessageOutlined />
+                <MessageCircle size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('actions.message')}</span>
             </button>
@@ -135,7 +129,7 @@ export default function ContactDetailPage() {
           {contact.email && (
             <a href={`mailto:${contact.email}`} className="miniapp-detail-action-btn" onClick={() => webApp?.HapticFeedback.impactOccurred('medium')}>
               <div className="miniapp-detail-action-icon">
-                <MailOutlined />
+                <Mail size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('detail.email')}</span>
             </a>
@@ -192,7 +186,7 @@ export default function ContactDetailPage() {
           }}
         >
           <div className="miniapp-call-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
-            <RiseOutlined />
+            <TrendingUp size={16} />
           </div>
           <div className="miniapp-list-item-content">
             <div className="miniapp-list-item-title">{t('detail.linkedLeads')}</div>
@@ -209,7 +203,7 @@ export default function ContactDetailPage() {
           }}
         >
           <div className="miniapp-call-icon" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563EB' }}>
-            <FundProjectionScreenOutlined />
+            <BarChart3 size={16} />
           </div>
           <div className="miniapp-list-item-content">
             <div className="miniapp-list-item-title">{t('detail.linkedDeals')}</div>
@@ -220,7 +214,7 @@ export default function ContactDetailPage() {
         </div>
         <div className="miniapp-list-item">
           <div className="miniapp-call-icon" style={{ background: 'rgba(67, 56, 202, 0.1)', color: '#4338CA' }}>
-            <PhoneOutlined />
+            <Phone size={20} />
           </div>
           <div className="miniapp-list-item-content">
             <div className="miniapp-list-item-title">{t('detail.recentCalls')}</div>

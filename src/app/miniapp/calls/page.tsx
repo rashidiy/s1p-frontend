@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PhoneOutlined, CloseCircleFilled } from '@ant-design/icons';
+import { Phone, XCircle } from 'lucide-react';
 import { Spin } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -42,14 +42,20 @@ export default function MiniAppCalls() {
   const [operators, setOperators] = useState<SipuniOperator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string>('');
   const [activeInput, setActiveInput] = useState<'to' | 'from'>('to');
+  const [fromCleared, setFromCleared] = useState(false);
   const hasSipExtension = !!user?.sip_extension;
 
-  // Prefill phone1 with user's phone when switching to external
+  // Prefill phone1 with user's phone when switching to external (skip if user cleared it)
   useEffect(() => {
-    if (mode === 'external' && !phone1 && user?.phone) {
+    if (mode === 'external' && !phone1 && !fromCleared && user?.phone) {
       setPhone1(user.phone);
     }
-  }, [mode, phone1, user?.phone]);
+  }, [mode, phone1, fromCleared, user?.phone]);
+
+  // Reset cleared flag when switching back to SIP
+  useEffect(() => {
+    if (mode === 'sip') setFromCleared(false);
+  }, [mode]);
 
   useEffect(() => {
     if (!hasSipExtension) {
@@ -114,8 +120,8 @@ export default function MiniAppCalls() {
             >
               {phone1 ? formatPhone(phone1) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
               {phone1 && (
-                <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <CloseCircleFilled />
+                <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <XCircle size={14} />
                 </button>
               )}
             </div>
@@ -129,7 +135,7 @@ export default function MiniAppCalls() {
               {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
               {phone2 && (
                 <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <CloseCircleFilled />
+                  <XCircle size={14} />
                 </button>
               )}
             </div>
@@ -139,7 +145,7 @@ export default function MiniAppCalls() {
             {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
             {phone2 && (
               <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                <CloseCircleFilled />
+                <XCircle size={14} />
               </button>
             )}
           </div>
@@ -178,7 +184,7 @@ export default function MiniAppCalls() {
       <div className="miniapp-dialer-bottom">
         <div />
         <button className="miniapp-dialer-call" onClick={handleCall} disabled={!canCall || calling}>
-          {calling ? <Spin size="small" /> : <PhoneOutlined />}
+          {calling ? <Spin size="small" /> : <Phone size={24} />}
         </button>
         {currentNumber ? (
           <button className="miniapp-dialer-backspace" onClick={handleBackspace}>{'\u232B'}</button>

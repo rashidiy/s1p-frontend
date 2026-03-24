@@ -2,16 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  PhoneOutlined,
-  MessageOutlined,
-  UserOutlined,
-  SwapOutlined,
-  ClockCircleOutlined,
-  CalendarOutlined,
-  CaretRightOutlined,
-  PauseOutlined,
-} from '@ant-design/icons';
+import { Phone, MessageCircle, User, ArrowLeftRight, Clock, Calendar, Play, Pause } from 'lucide-react';
 import { Spin } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -167,7 +158,7 @@ function AudioPlayer({
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
       <div className="miniapp-audio-controls">
         <button className="miniapp-audio-play" onClick={togglePlay}>
-          {playing ? <PauseOutlined /> : <CaretRightOutlined />}
+          {playing ? <Pause size={18} /> : <Play size={18} />}
         </button>
         <div
           className="miniapp-audio-progress"
@@ -300,12 +291,7 @@ export default function CallDetailPage() {
               color: isMissed ? '#EF4444' : isInbound ? '#10B981' : '#3B82F6',
             }}
           >
-            <PhoneOutlined
-              style={{
-                fontSize: 28,
-                transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)',
-              }}
-            />
+            <Phone size={28} style={{ transform: isInbound ? 'rotate(135deg)' : 'none' }} />
           </div>
         )}
         <div className={`miniapp-detail-name ${isMissed ? 'miniapp-text-missed' : ''}`}>
@@ -323,7 +309,7 @@ export default function CallDetailPage() {
           {phone && (
             <button className="miniapp-detail-action-btn" onClick={handlePhoneSheet}>
               <div className="miniapp-detail-action-icon">
-                <PhoneOutlined />
+                <Phone size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('actions.call')}</span>
             </button>
@@ -331,7 +317,7 @@ export default function CallDetailPage() {
           {phone && (
             <button className="miniapp-detail-action-btn" onClick={handleMessage}>
               <div className="miniapp-detail-action-icon">
-                <MessageOutlined />
+                <MessageCircle size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('actions.message')}</span>
             </button>
@@ -339,7 +325,7 @@ export default function CallDetailPage() {
           {hasContact && (
             <button className="miniapp-detail-action-btn" onClick={handleContactNav}>
               <div className="miniapp-detail-action-icon">
-                <UserOutlined />
+                <User size={20} />
               </div>
               <span className="miniapp-detail-action-label">{t('detail.contact')}</span>
             </button>
@@ -351,14 +337,14 @@ export default function CallDetailPage() {
       <div className="miniapp-section">
         <div className="miniapp-info-row">
           <span className="miniapp-info-label">
-            <SwapOutlined style={{ marginRight: 6 }} />
+            <ArrowLeftRight size={15} style={{ marginRight: 6 }} />
             {tFields('direction') || 'Direction'}
           </span>
           <span className="miniapp-info-value">{directionLabel}</span>
         </div>
         <div className="miniapp-info-row">
           <span className="miniapp-info-label">
-            <PhoneOutlined style={{ marginRight: 6 }} />
+            <Phone size={15} style={{ marginRight: 6 }} />
             {t('detail.status')}
           </span>
           <span className={`miniapp-info-value ${isMissed ? 'miniapp-text-missed' : ''}`}>
@@ -368,7 +354,7 @@ export default function CallDetailPage() {
         {!isMissed && call.duration != null && (
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">
-              <ClockCircleOutlined style={{ marginRight: 6 }} />
+              <Clock size={15} style={{ marginRight: 6 }} />
               {tFields('duration') || 'Duration'}
             </span>
             <span className="miniapp-info-value">{formatDuration(call.duration)}</span>
@@ -376,7 +362,7 @@ export default function CallDetailPage() {
         )}
         <div className="miniapp-info-row">
           <span className="miniapp-info-label">
-            <CalendarOutlined style={{ marginRight: 6 }} />
+            <Calendar size={15} style={{ marginRight: 6 }} />
             {t('detail.created')}
           </span>
           <span className="miniapp-info-value">
@@ -386,7 +372,7 @@ export default function CallDetailPage() {
         {call.operator_name && (
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">
-              <UserOutlined style={{ marginRight: 6 }} />
+              <User size={15} style={{ marginRight: 6 }} />
               {t('detail.operator')}
             </span>
             <span className="miniapp-info-value">{call.operator_name}</span>

@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  PhoneOutlined,
-  WarningOutlined,
-  RiseOutlined,
-  FundProjectionScreenOutlined,
-  RightOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { Phone, AlertTriangle, TrendingUp, BarChart3, ChevronRight, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -111,7 +104,7 @@ export default function MiniAppDashboard() {
   const periodData = data?.[period];
   const stats = [
     {
-      icon: <PhoneOutlined />,
+      icon: <Phone size={18} />,
       bg: 'rgba(67, 56, 202, 0.1)',
       color: '#4338CA',
       value: periodData?.calls?.total_calls ?? 0,
@@ -119,7 +112,7 @@ export default function MiniAppDashboard() {
       tap: '/miniapp/history',
     },
     {
-      icon: <WarningOutlined />,
+      icon: <AlertTriangle size={18} />,
       bg: 'rgba(239, 68, 68, 0.1)',
       color: '#EF4444',
       value: periodData?.calls?.missed_calls ?? 0,
@@ -127,7 +120,7 @@ export default function MiniAppDashboard() {
       tap: '/miniapp/history',
     },
     {
-      icon: <RiseOutlined />,
+      icon: <TrendingUp size={18} />,
       bg: 'rgba(16, 185, 129, 0.1)',
       color: '#10B981',
       value: data?.pending_leads ?? 0,
@@ -135,7 +128,7 @@ export default function MiniAppDashboard() {
       tap: '/miniapp/pipeline',
     },
     {
-      icon: <FundProjectionScreenOutlined />,
+      icon: <BarChart3 size={18} />,
       bg: 'rgba(59, 130, 246, 0.1)',
       color: '#2563EB',
       value: data?.active_deals ?? 0,
@@ -253,7 +246,7 @@ export default function MiniAppDashboard() {
                   }}
                 >
                   <div className="miniapp-call-icon miniapp-call-icon-missed">
-                    <PhoneOutlined style={{ transform: 'rotate(135deg)' }} />
+                    <Phone size={16} />
                   </div>
                   <div className="miniapp-list-item-content">
                     <div className="miniapp-list-item-title miniapp-text-missed">
@@ -300,7 +293,7 @@ export default function MiniAppDashboard() {
                   router.push(`/miniapp/calls/${call.id}`);
                 }}>
                   <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
-                    <PhoneOutlined style={{ transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
+                    {isInbound ? <Phone size={16} /> : <Phone size={16} />}
                   </div>
                   <div className="miniapp-list-item-content">
                     <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
@@ -318,7 +311,7 @@ export default function MiniAppDashboard() {
             })}
           </div>
           <div className="miniapp-section-footer" onClick={() => router.push('/miniapp/history')}>
-            {t('dashboard.viewAll')} <RightOutlined style={{ fontSize: 11, marginLeft: 4 }} />
+            {t('dashboard.viewAll')} <ChevronRight size={14} style={{ marginLeft: 4 }} />
           </div>
         </div>
       )}
@@ -341,14 +334,14 @@ export default function MiniAppDashboard() {
                     <div className="miniapp-list-item-title">{String(op.operator_name || t('unassigned'))}</div>
                   </div>
                   <div className="miniapp-list-item-right">
-                    <PhoneOutlined style={{ fontSize: 12, marginRight: 4 }} />
+                    <Phone size={12} style={{ marginRight: 4 }} />
                     {String(op.total_calls ?? 0)}
                   </div>
                 </div>
               ))
               : (
                 <div className="miniapp-team-row">
-                  <UserOutlined style={{ fontSize: 16, color: 'var(--ma-hint)', marginRight: 8 }} />
+                  <User size={16} style={{ color: 'var(--ma-hint)', marginRight: 8 }} />
                   <div className="miniapp-list-item-content">
                     <div className="miniapp-list-item-sub">{t('dashboard.noActivity')}</div>
                   </div>
@@ -362,7 +355,7 @@ export default function MiniAppDashboard() {
       {!recentCalls.length && periodData?.calls?.total_calls === 0 && (
         <div className="miniapp-empty">
           <div className="miniapp-empty-icon">
-            <PhoneOutlined />
+            <Phone size={24} />
           </div>
           <div className="miniapp-empty-sub">{t('dashboard.noActivity')}</div>
         </div>

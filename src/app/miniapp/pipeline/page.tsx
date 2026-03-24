@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import {
-  RiseOutlined,
-  FundProjectionScreenOutlined,
-  RightOutlined,
-} from '@ant-design/icons';
+import { TrendingUp, BarChart3, ChevronRight } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -181,7 +177,7 @@ export default function PipelinePage() {
       ) : viewMode === 'leads' ? (
         leads.length === 0 ? (
           <div className="miniapp-empty">
-            <div className="miniapp-empty-icon"><RiseOutlined /></div>
+            <div className="miniapp-empty-icon"><TrendingUp size={24} /></div>
             <div className="miniapp-empty-title">{t('leads.noLeads')}</div>
             <div className="miniapp-empty-sub">{t('leads.emptyDescription')}</div>
           </div>
@@ -209,7 +205,7 @@ export default function PipelinePage() {
                   <span className={`miniapp-badge ${STATUS_BADGE[lead.status || ''] || 'miniapp-badge-default'}`}>
                     {tStatus(lead.status || 'new')}
                   </span>
-                  <div className="miniapp-list-item-chevron"><RightOutlined /></div>
+                  <div className="miniapp-list-item-chevron"><ChevronRight size={16} /></div>
                 </div>
               ))}
             </div>
@@ -223,7 +219,7 @@ export default function PipelinePage() {
       ) : (
         deals.length === 0 ? (
           <div className="miniapp-empty">
-            <div className="miniapp-empty-icon"><FundProjectionScreenOutlined /></div>
+            <div className="miniapp-empty-icon"><BarChart3 size={24} /></div>
             <div className="miniapp-empty-title">{t('deals.noDeals')}</div>
             <div className="miniapp-empty-sub">{t('deals.emptyDescription')}</div>
           </div>
@@ -250,7 +246,7 @@ export default function PipelinePage() {
                     <span className={`miniapp-badge ${badgeMap[stage] || 'miniapp-badge-default'}`}>
                       {tStatus(stage)}
                     </span>
-                    <div className="miniapp-list-item-chevron"><RightOutlined /></div>
+                    <div className="miniapp-list-item-chevron"><ChevronRight size={16} /></div>
                   </div>
                 );
               })}

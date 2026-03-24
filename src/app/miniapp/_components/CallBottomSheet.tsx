@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  PhoneFilled,
-  CustomerServiceOutlined,
-  SwapOutlined,
-} from '@ant-design/icons';
+import { Phone, Headphones, ArrowLeftRight } from 'lucide-react';
 import { BottomSheet, BottomSheetOption } from './BottomSheet';
 import type { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import type { useTranslations } from 'next-intl';
@@ -29,7 +25,7 @@ export function CallBottomSheet({
   return (
     <BottomSheet open={open} onClose={onClose}>
       <BottomSheetOption
-        icon={<PhoneFilled />}
+        icon={<Phone size={20} />}
         label={t('calls.phoneCall')}
         onClick={() => {
           onClose();
@@ -42,7 +38,7 @@ export function CallBottomSheet({
         }}
       />
       <BottomSheetOption
-        icon={<CustomerServiceOutlined />}
+        icon={<Headphones size={20} />}
         label={t('calls.sipCall')}
         onClick={() => {
           onClose();
@@ -51,7 +47,7 @@ export function CallBottomSheet({
         }}
       />
       <BottomSheetOption
-        icon={<SwapOutlined />}
+        icon={<ArrowLeftRight size={20} />}
         label={t('calls.externalCall')}
         onClick={() => {
           onClose();

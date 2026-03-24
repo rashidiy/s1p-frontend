@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import {
-  PhoneOutlined,
-  PlusOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
+import { Phone, Plus, X } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -59,7 +55,7 @@ function CreateContactForm({ phone, onSave, onCancel, t }: CreateContactFormProp
       <div className="miniapp-create-contact-header">
         <span style={{ fontWeight: 600, fontSize: 15 }}>{t('createContact.title')}</span>
         <button className="miniapp-create-contact-close" onClick={onCancel}>
-          <CloseOutlined />
+          <X size={14} />
         </button>
       </div>
       <div className="miniapp-create-contact-phone">{phone}</div>
@@ -214,7 +210,7 @@ export default function MiniAppHistory() {
       ) : calls.length === 0 ? (
         <div className="miniapp-empty">
           <div className="miniapp-empty-icon">
-            <PhoneOutlined />
+            <Phone size={24} />
           </div>
           <div className="miniapp-empty-title">{t('calls.noCalls')}</div>
           <div className="miniapp-empty-sub">{t('calls.emptyDescription')}</div>
@@ -265,11 +261,7 @@ export default function MiniAppHistory() {
                         <div
                           className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}
                         >
-                          <PhoneOutlined
-                            style={{
-                              transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)',
-                            }}
-                          />
+                          <Phone size={16} style={{ transform: isInbound ? 'rotate(135deg)' : 'none' }} />
                         </div>
                         <div className="miniapp-list-item-content">
                           <div
@@ -290,7 +282,7 @@ export default function MiniAppHistory() {
                                 setCreateContactForPhone(phone);
                               }}
                             >
-                              <PlusOutlined />
+                              <Plus size={14} />
                             </button>
                           )}
                         </div>

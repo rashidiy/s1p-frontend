@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import {
-  LogoutOutlined,
-  GlobalOutlined,
-  CheckOutlined,
-} from '@ant-design/icons';
+import { LogOut, Globe, Check } from 'lucide-react';
 import { Switch } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
@@ -194,7 +190,7 @@ export default function MiniAppProfile() {
               setShowLangs(true);
             }}
           >
-            <GlobalOutlined style={{ fontSize: 18, color: 'var(--ma-accent)' }} />
+            <Globe size={18} style={{ color: 'var(--ma-accent)' }} />
             <div className="miniapp-list-item-content">
               <div className="miniapp-list-item-title">
                 {LANGUAGES.find(l => l.code === currentLocale)?.label || currentLocale}
@@ -220,7 +216,7 @@ export default function MiniAppProfile() {
               <span style={{ fontSize: 20 }}>{lang.flag}</span>
               <span className="miniapp-lang-label">{lang.label}</span>
               {lang.code === currentLocale && (
-                <CheckOutlined className="miniapp-lang-check" />
+                <Check size={16} className="miniapp-lang-check" />
               )}
             </div>
           ))
@@ -237,7 +233,7 @@ export default function MiniAppProfile() {
               webApp.close();
             }}
           >
-            <LogoutOutlined style={{ fontSize: 18, color: 'var(--ma-destructive)' }} />
+            <LogOut size={18} style={{ color: 'var(--ma-destructive)' }} />
             <div className="miniapp-list-item-content">
               <div className="miniapp-list-item-title" style={{ color: 'var(--ma-destructive)' }}>
                 {t('profile.closeApp')}

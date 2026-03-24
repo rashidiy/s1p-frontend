@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { UserOutlined, RightOutlined } from '@ant-design/icons';
+import { User, ChevronRight } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -186,7 +186,7 @@ export default function DealDetailPage() {
             <span className="miniapp-info-label">{t('detail.contact')}</span>
             <span className="miniapp-info-value" style={{ color: deal.contact_id ? 'var(--ma-link)' : undefined }}>
               {deal.contact_name}
-              {deal.contact_id && <RightOutlined style={{ fontSize: 11, marginLeft: 4 }} />}
+              {deal.contact_id && <ChevronRight size={14} style={{ marginLeft: 4 }} />}
             </span>
           </div>
         )}
@@ -194,7 +194,7 @@ export default function DealDetailPage() {
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">{t('detail.assignedTo')}</span>
             <span className="miniapp-info-value">
-              <UserOutlined style={{ marginRight: 4, fontSize: 12 }} />
+              <User size={12} style={{ marginRight: 4 }} />
               {deal.assigned_to_name}
             </span>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { SearchOutlined, UserOutlined, RightOutlined } from '@ant-design/icons';
+import { Search, User, ChevronRight } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -97,7 +97,7 @@ export default function MiniAppContacts() {
       <div className="miniapp-page-title">{t('contacts.title')}</div>
 
       <div className="miniapp-search" style={{ position: 'relative' }}>
-        <SearchOutlined className="miniapp-search-icon" />
+        <Search size={15} className="miniapp-search-icon" />
         <input
           placeholder={t('contacts.search')}
           value={search}
@@ -114,7 +114,7 @@ export default function MiniAppContacts() {
         </div>
       ) : contacts.length === 0 ? (
         <div className="miniapp-empty">
-          <div className="miniapp-empty-icon"><UserOutlined /></div>
+          <div className="miniapp-empty-icon"><User size={24} /></div>
           <div className="miniapp-empty-title">
             {search ? t('contacts.noContacts') : t('contacts.emptyTitle')}
           </div>
@@ -148,7 +148,7 @@ export default function MiniAppContacts() {
                     )}
                   </div>
                   <div className="miniapp-list-item-chevron">
-                    <RightOutlined />
+                    <ChevronRight size={16} />
                   </div>
                 </div>
               );
