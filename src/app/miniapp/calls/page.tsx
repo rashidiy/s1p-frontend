@@ -266,9 +266,10 @@ export default function MiniAppCalls() {
                   <button className="miniapp-dialer-num-action" onClick={(e) => { e.stopPropagation(); openSearch('from'); }}><Search size={16} /></button>
                 </>
               ) : (
-                <span className="miniapp-dialer-num-placeholder" onClick={(e) => { e.stopPropagation(); openSearch('from'); }}>
-                  {t('calls.enterNumber')} <Search size={14} />
-                </span>
+                <>
+                  <span className="miniapp-dialer-num-placeholder">{t('calls.enterNumber')}</span>
+                  <button className="miniapp-dialer-num-action" onClick={(e) => { e.stopPropagation(); openSearch('from'); }}><Search size={14} /></button>
+                </>
               )}
             </div>
           </div>
@@ -283,9 +284,10 @@ export default function MiniAppCalls() {
                 <button className="miniapp-dialer-num-action" onClick={(e) => { e.stopPropagation(); openSearch('to'); }}><Search size={16} /></button>
               </>
             ) : (
-              <span className="miniapp-dialer-num-placeholder" onClick={(e) => { e.stopPropagation(); openSearch('to'); }}>
-                {t('calls.enterNumber')} <Search size={14} />
-              </span>
+              <>
+                <span className="miniapp-dialer-num-placeholder">{t('calls.enterNumber')}</span>
+                <button className="miniapp-dialer-num-action" onClick={(e) => { e.stopPropagation(); openSearch('to'); }}><Search size={14} /></button>
+              </>
             )}
           </div>
         </div>

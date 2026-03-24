@@ -1320,20 +1320,17 @@
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
   font-size: 26px;
   font-weight: 200;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: var(--ma-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .miniapp-dialer-num-placeholder {
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 300;
   color: var(--ma-hint);
   opacity: 0.5;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
 }
 
 .miniapp-dialer-num-action {
