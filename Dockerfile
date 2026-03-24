@@ -19,6 +19,11 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
 
+# Accept build-time env vars (NEXT_PUBLIC_* are baked into the bundle)
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_OWNER_SUBDOMAIN
+ARG NEXT_PUBLIC_BASE_DOMAIN
+
 # Build the application
 RUN npm run build
 
