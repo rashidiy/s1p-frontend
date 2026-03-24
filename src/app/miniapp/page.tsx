@@ -312,17 +312,7 @@ export default function MiniAppDashboard() {
                     </div>
                     <div className="miniapp-list-item-content">
                       <div className="miniapp-list-item-title miniapp-text-missed">
-                        {displayName}
-                        {count > 1 && (
-                          <span style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: '#EF4444',
-                            marginLeft: 6,
-                          }}>
-                            ({'\u00D7'}{count})
-                          </span>
-                        )}
+                        {displayName}{count > 1 ? ` (${count})` : ''}
                       </div>
                       {call.contact_name && phone && (
                         <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
@@ -374,17 +364,7 @@ export default function MiniAppDashboard() {
                     </div>
                     <div className="miniapp-list-item-content">
                       <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
-                        {displayName}
-                        {group.count > 1 && (
-                          <span style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: 'var(--ma-hint)',
-                            marginLeft: 6,
-                          }}>
-                            {'\u00D7'}{group.count}
-                          </span>
-                        )}
+                        {displayName}{group.count > 1 ? ` (${group.count})` : ''}
                       </div>
                       {call.contact_name && (
                         <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>

@@ -275,25 +275,12 @@ export default function MiniAppHistory() {
                             <div
                               className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}
                             >
-                              {displayTitle}
+                              {displayTitle}{cGroup.count > 1 ? ` (${cGroup.count})` : ''}
                             </div>
                             <div className="miniapp-list-item-sub">{displaySub}</div>
                           </div>
                           <div className="miniapp-list-item-right" style={{ gap: 8 }}>
                             {formatTime(call.created_at)}
-                            {cGroup.count > 1 && (
-                              <span style={{
-                                fontSize: 12,
-                                fontWeight: 600,
-                                background: 'var(--ma-bg2)',
-                                color: 'var(--ma-hint)',
-                                borderRadius: 'var(--ma-radius-pill)',
-                                padding: '2px 8px',
-                                marginLeft: 6,
-                              }}>
-                                {'\u00D7'}{cGroup.count}
-                              </span>
-                            )}
                             {!hasContact && phone !== '\u2014' && !phonesWithContact.has(phone) && (
                               <button
                                 className="miniapp-add-contact-btn"
