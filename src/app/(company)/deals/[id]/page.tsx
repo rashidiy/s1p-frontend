@@ -234,7 +234,7 @@ export default function DealDetailPage() {
   );
 
   const stageColor = DEAL_STAGE_COLORS[deal.stage?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
-  const isClosedDeal = deal.stage === 'won' || deal.stage === 'lost';
+  const isClosedDeal = deal.stage === 'closed_won' || deal.stage === 'closed_lost';
 
   return (
     <div className="space-y-6">
