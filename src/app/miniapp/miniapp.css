@@ -1512,8 +1512,8 @@
   margin: 0 auto;
   border-radius: 50%;
   border: none;
-  background: #34C759;
-  color: #FFFFFF;
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
   font-size: 26px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -1521,12 +1521,12 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 4px 14px rgba(52, 199, 89, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .miniapp-dialer-call:active {
   transform: scale(0.9);
-  box-shadow: 0 2px 6px rgba(52, 199, 89, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .miniapp-dialer-call:disabled {

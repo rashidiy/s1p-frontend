@@ -147,7 +147,9 @@ export default function MiniAppCalls() {
   }
 
   const currentNumber = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
-  const canCall = mode === 'sip' ? phone2.trim() && sipExtension : phone2.trim() && phone1.trim();
+  const canCall = mode === 'sip'
+    ? phone2.trim() && sipExtension
+    : phone2.trim() && phone1.trim() && sipExtension;
   const operatorName = hasSipExtension
     ? `${user!.first_name || t('calls.operator')} · ${user!.sip_extension}`
     : selectedOperator
