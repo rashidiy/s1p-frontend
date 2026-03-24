@@ -228,13 +228,6 @@ export default function PipelinePage() {
         currency: 'UZS',
       });
       webApp?.HapticFeedback.notificationOccurred('success');
-      try {
-        webApp?.showPopup({
-          title: '\u2713',
-          message: t('pipeline.leadCreated'),
-          buttons: [{ type: 'ok' }],
-        });
-      } catch { /* showPopup may not be available */ }
       router.replace(`/miniapp/leads/${created.id}`);
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');

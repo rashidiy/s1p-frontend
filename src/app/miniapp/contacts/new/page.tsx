@@ -48,13 +48,6 @@ export default function NewContactPage() {
         email: email.trim() || undefined,
       });
       webApp?.HapticFeedback.notificationOccurred('success');
-      try {
-        webApp?.showPopup({
-          title: '\u2713',
-          message: t('contacts.contactCreated'),
-          buttons: [{ type: 'ok' }],
-        });
-      } catch { /* showPopup may not be available */ }
       router.replace(`/miniapp/contacts/${created.id}`);
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');

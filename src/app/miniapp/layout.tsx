@@ -288,10 +288,6 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     }
   }, [webApp]);
 
-  // Determine if we're on a detail page (hide tab bar)
-  const isDetailPage = /\/miniapp\/(contacts|leads|deals|calls|history)\/[^/]+/.test(pathname);
-  const isProfilePage = pathname === '/miniapp/profile';
-
   if (authState === 'loading') {
     return (
       <div className="miniapp-loading">
@@ -358,34 +354,32 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
         </MiniAppErrorBoundary>
       </main>
 
-      {/* Bottom tab bar — hidden on detail pages and profile */}
-      {!isDetailPage && !isProfilePage && (
-        <nav className="miniapp-tabs">
-          {TABS.map((tab) => {
-            const isActive = tab.path === '/miniapp'
-              ? pathname === '/miniapp'
-              : pathname.startsWith(tab.path);
-            return (
-              <button
-                key={tab.key}
-                className={`miniapp-tab ${isActive ? 'active' : ''} ${tab.center ? 'miniapp-tab-center' : ''}`}
-                onClick={() => {
-                  webApp?.HapticFeedback.selectionChanged();
-                  router.push(tab.path);
-                }}
-              >
-                {tab.center ? (
-                  <div className="miniapp-tab-center-circle">
-                    {tab.icon}
-                  </div>
-                ) : (
-                  tab.icon
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      )}
+      {/* Bottom tab bar — always visible for navigation safety */}
+      <nav className="miniapp-tabs">
+        {TABS.map((tab) => {
+          const isActive = tab.path === '/miniapp'
+            ? pathname === '/miniapp'
+            : pathname.startsWith(tab.path);
+          return (
+            <button
+              key={tab.key}
+              className={`miniapp-tab ${isActive ? 'active' : ''} ${tab.center ? 'miniapp-tab-center' : ''}`}
+              onClick={() => {
+                webApp?.HapticFeedback.selectionChanged();
+                router.push(tab.path);
+              }}
+            >
+              {tab.center ? (
+                <div className="miniapp-tab-center-circle">
+                  {tab.icon}
+                </div>
+              ) : (
+                tab.icon
+              )}
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
