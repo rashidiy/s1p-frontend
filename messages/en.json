@@ -783,7 +783,12 @@
     "roleManager": "Manager",
     "roleAdmin": "Admin",
     "copyMessage": "Copy Message",
-    "copyTokenOnly": "Copy Token Only"
+    "copyTokenOnly": "Copy Token Only",
+    "inviteMsgTitle": "You've been invited to S1P CRM!",
+    "inviteMsgRole": "Role:",
+    "inviteMsgCode": "Invitation code:",
+    "inviteMsgRegister": "To register, follow this link:",
+    "inviteMsgExpires": "Valid until:"
   },
   "settings": {
     "title": "Settings",

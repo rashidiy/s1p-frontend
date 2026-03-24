@@ -91,15 +91,15 @@ export default function InviteTelegramPage() {
     const regUrl = subdomain ? getSubdomainUrl(subdomain, '/register') : `${window.location.origin}/register`;
 
     return [
-      `Вас пригласили в S1P CRM!`,
+      t('inviteMsgTitle'),
       '',
-      `Роль: ${roleName}`,
-      `Код приглашения: ${tokenResult.invite_token}`,
+      `${t('inviteMsgRole')} ${roleName}`,
+      `${t('inviteMsgCode')} ${tokenResult.invite_token}`,
       '',
-      `Для регистрации перейдите по ссылке:`,
+      t('inviteMsgRegister'),
       regUrl,
       '',
-      `Действует до: ${expiresFormatted}`,
+      `${t('inviteMsgExpires')} ${expiresFormatted}`,
     ].join('\n');
   };
 

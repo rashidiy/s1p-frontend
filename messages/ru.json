@@ -783,7 +783,12 @@
     "roleManager": "Менеджер",
     "roleAdmin": "Администратор",
     "copyMessage": "Копировать сообщение",
-    "copyTokenOnly": "Копировать только токен"
+    "copyTokenOnly": "Копировать только токен",
+    "inviteMsgTitle": "Вас пригласили в S1P CRM!",
+    "inviteMsgRole": "Роль:",
+    "inviteMsgCode": "Код приглашения:",
+    "inviteMsgRegister": "Для регистрации перейдите по ссылке:",
+    "inviteMsgExpires": "Действует до:"
   },
   "settings": {
     "title": "Настройки",

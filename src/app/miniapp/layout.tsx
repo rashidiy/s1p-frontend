@@ -64,9 +64,9 @@ function startappToDeepLink(action: string, data: string): string | null {
     case 'new_lead':
       return `/miniapp/pipeline?new_lead=1&phone=${encodeURIComponent(data)}`;
     case 'lead_detail':
-      return `/miniapp/pipeline`;
+      return `/miniapp/leads/${data}`;
     case 'deal_detail':
-      return `/miniapp/pipeline`;
+      return `/miniapp/deals/${data}`;
     case 'recording':
       return `/miniapp/calls/${data}`;
     default:
@@ -214,10 +214,11 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       const hasTg = typeof window !== 'undefined' && !!window.Telegram;
       const hasWebApp = hasTg && !!window.Telegram?.WebApp;
       const hasInitData = hasWebApp && !!window.Telegram?.WebApp?.initData;
-      setErrorMsg(
-        `sdk: ${sdkReady}, tg: ${hasTg}, wa: ${hasWebApp}, init: ${hasInitData}, ` +
+      console.error(
+        `Auth failed — sdk: ${sdkReady}, tg: ${hasTg}, wa: ${hasWebApp}, init: ${hasInitData}, ` +
         `hook: ${isTelegram}, param: ${companyIdParam || 'none'}`
       );
+      setErrorMsg(t('error.authFailed'));
       setAuthState('error');
     }
   }, [sdkReady, isTelegram, webApp, companyIdParam, setUser, authenticateWithCompany, t, searchParams, pathname, router]);

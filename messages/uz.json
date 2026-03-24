@@ -783,7 +783,12 @@
     "roleManager": "Menejer",
     "roleAdmin": "Administrator",
     "copyMessage": "Xabarni nusxalash",
-    "copyTokenOnly": "Faqat tokenni nusxalash"
+    "copyTokenOnly": "Faqat tokenni nusxalash",
+    "inviteMsgTitle": "Sizni S1P CRM ga taklif qilishdi!",
+    "inviteMsgRole": "Rol:",
+    "inviteMsgCode": "Taklif kodi:",
+    "inviteMsgRegister": "Ro'yxatdan o'tish uchun havolaga o'ting:",
+    "inviteMsgExpires": "Amal qilish muddati:"
   },
   "settings": {
     "title": "Sozlamalar",
