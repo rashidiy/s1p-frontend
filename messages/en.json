@@ -1236,6 +1236,9 @@
     "loadMore": "Load more",
     "dashboard": {
       "greeting": "Hi, {name}",
+      "goodMorning": "Good morning, {name}",
+      "goodAfternoon": "Good afternoon, {name}",
+      "goodEvening": "Good evening, {name}",
       "today": "Today",
       "thisWeek": "This week",
       "thisMonth": "This month",

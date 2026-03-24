@@ -1236,6 +1236,9 @@
     "loadMore": "Yana yuklash",
     "dashboard": {
       "greeting": "Salom, {name}",
+      "goodMorning": "Xayrli tong, {name}",
+      "goodAfternoon": "Xayrli kun, {name}",
+      "goodEvening": "Xayrli kech, {name}",
       "today": "Bugun",
       "thisWeek": "Shu hafta",
       "thisMonth": "Shu oy",

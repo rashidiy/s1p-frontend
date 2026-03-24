@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Phone, AlertTriangle, TrendingUp, BarChart3, ChevronRight, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -12,6 +12,39 @@ import type { OperatorDashboard, AdminDashboard } from '@/types/api';
 import { formatTime, getInitials, getAvatarColor } from './_utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
+/** Animated number counter — counts up from 0 to target */
+function AnimatedNumber({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0);
+  const ref = useRef<number>();
+
+  useEffect(() => {
+    if (value === 0) { setDisplay(0); return; }
+    const duration = 600;
+    const start = performance.now();
+    const from = 0;
+    function tick(now: number) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(from + (value - from) * eased));
+      if (progress < 1) ref.current = requestAnimationFrame(tick);
+    }
+    ref.current = requestAnimationFrame(tick);
+    return () => { if (ref.current) cancelAnimationFrame(ref.current); };
+  }, [value]);
+
+  return <>{display}</>;
+}
+
+/** Time-based greeting key */
+function getGreetingKey(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'dashboard.goodMorning';
+  if (h < 18) return 'dashboard.goodAfternoon';
+  return 'dashboard.goodEvening';
+}
 
 type Period = 'today' | 'this_week' | 'this_month';
 
@@ -137,7 +170,10 @@ export default function MiniAppDashboard() {
     },
   ];
 
-  const greeting = user?.first_name ? t('dashboard.greeting', { name: user.first_name }) : '';
+  const greetingKey = getGreetingKey();
+  const greeting = user?.first_name
+    ? (t.has(greetingKey) ? t(greetingKey, { name: user.first_name }) : t('dashboard.greeting', { name: user.first_name }))
+    : '';
   const recentCalls = (data?.recent_calls ?? []) as unknown as DashboardCall[];
   const missedCalls = ((data as Record<string, unknown>)?.missed_calls_to_return ?? []) as unknown as MissedCall[];
 
@@ -219,7 +255,7 @@ export default function MiniAppDashboard() {
               <div className="miniapp-stat-icon" style={{ background: s.bg, color: s.color }}>
                 {s.icon}
               </div>
-              <div className="miniapp-stat-value">{s.value}</div>
+              <div className="miniapp-stat-value"><AnimatedNumber value={s.value} /></div>
             </div>
             <div className="miniapp-stat-label">{s.label}</div>
           </div>

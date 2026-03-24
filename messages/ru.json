@@ -1236,6 +1236,9 @@
     "loadMore": "Загрузить ещё",
     "dashboard": {
       "greeting": "Привет, {name}",
+      "goodMorning": "Доброе утро, {name}",
+      "goodAfternoon": "Добрый день, {name}",
+      "goodEvening": "Добрый вечер, {name}",
       "today": "Сегодня",
       "thisWeek": "Эта неделя",
       "thisMonth": "Этот месяц",
