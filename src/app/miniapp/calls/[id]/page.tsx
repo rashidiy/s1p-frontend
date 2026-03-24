@@ -146,32 +146,41 @@ function CallRow({
       ? t('calls.answered')
       : (call.state || '\u2014');
 
+  const stateClass = isMissed
+    ? 'miniapp-call-detail-row-state-missed'
+    : isAnswered
+      ? 'miniapp-call-detail-row-state-answered'
+      : '';
+
   const dur = isAnswered && call.duration ? formatDuration(call.duration) : null;
 
   return (
     <div className="miniapp-call-detail-row">
-      <div className="miniapp-call-detail-row-icon" style={{ color: iconColor }}>
-        <IconComponent size={18} />
-      </div>
-      <div className="miniapp-call-detail-row-info">
-        <div className="miniapp-call-detail-row-top">
-          <span className="miniapp-call-detail-row-date">
-            {formatDate(call.created_at)} {formatTime(call.created_at)}
-          </span>
-          <span className={`miniapp-call-detail-row-state ${isMissed ? 'miniapp-text-missed' : ''}`}>
-            {stateLabel}
-          </span>
+      <div className="miniapp-call-detail-row-header">
+        <div className="miniapp-call-detail-row-icon" style={{ color: iconColor }}>
+          <IconComponent size={16} />
         </div>
-        {(dur || call.operator_name) && (
+        <div className="miniapp-call-detail-row-info">
+          <div className="miniapp-call-detail-row-top">
+            <span className="miniapp-call-detail-row-date">
+              {formatDate(call.created_at)} {formatTime(call.created_at)}
+            </span>
+            <span className={`miniapp-call-detail-row-state ${stateClass}`}>
+              {stateLabel}
+            </span>
+          </div>
           <div className="miniapp-call-detail-row-bottom">
             {dur && <span><Clock size={12} style={{ marginRight: 3, verticalAlign: -1 }} />{dur}</span>}
-            {call.operator_name && <span style={{ marginLeft: dur ? 12 : 0 }}>{call.operator_name}</span>}
+            {call.operator_name && <span>{call.operator_name}</span>}
+            {!dur && !call.operator_name && isMissed && (
+              <span style={{ color: '#EF4444' }}>{t('calls.missed')}</span>
+            )}
           </div>
-        )}
-        {call.has_recording && (
-          <AudioPlayer callId={call.id} webApp={webApp} />
-        )}
+        </div>
       </div>
+      {call.has_recording && (
+        <AudioPlayer callId={call.id} webApp={webApp} />
+      )}
     </div>
   );
 }
