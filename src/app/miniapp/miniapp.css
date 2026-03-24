@@ -1283,13 +1283,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Middle gap — fields float here, centered vertically */
+/* Middle gap — fields at the bottom of this zone, space pushes above */
 .miniapp-dialer-middle {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 0 24px;
+  justify-content: flex-end;
+  padding: 0 24px 12px;
   min-height: 0;
 }
 
