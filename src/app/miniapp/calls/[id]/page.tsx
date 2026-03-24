@@ -210,8 +210,9 @@ export default function CallDetailPage() {
     } catch { /* ignore */ }
 
     // Always fetch from API to get full data (has_recording, etc.)
+    // Merge with existing sessionStorage data to preserve contact_name, duration, etc.
     apiClient.getCall(id).then((data) => {
-      setCall(data);
+      setCall((prev) => prev ? { ...prev, ...data } : data);
     }).catch(() => {
       // If no sessionStorage data either, show error
       setCall((prev) => prev ?? null);
