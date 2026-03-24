@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { CallWithDetails } from '@/types/api';
-import { formatDuration, formatTime, formatPhone, getDateGroup } from '../_utils';
+import { formatDuration, formatTime, formatPhone, getDateGroup, groupConsecutive } from '../_utils';
 
 const PAGE_SIZE = 50;
 
@@ -229,70 +229,92 @@ export default function MiniAppHistory() {
             </div>
           )}
 
-          {groups.map((group) => (
-            <div key={group.key}>
-              <div className="miniapp-date-group">{group.label}</div>
-              <div className="miniapp-section">
-                <div className="miniapp-list">
-                  {group.calls.map((call) => {
-                    const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
-                    const isInbound = call.direction === 'inbound';
-                    const phone = isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
-                    const hasContact = !!call.contact_name;
-                    const displayTitle = hasContact ? call.contact_name! : formatPhone(phone);
-                    const displaySub = hasContact
-                      ? formatPhone(phone)
-                      : isMissed
-                        ? t('calls.missed')
-                        : formatDuration(call.duration);
+          {groups.map((group) => {
+            // Apply consecutive grouping by phone within each date group
+            const consecutiveGroups = groupConsecutive(group.calls, (call) => {
+              const isInbound = call.direction === 'inbound';
+              return isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
+            });
 
-                    return (
-                      <div
-                        key={call.id}
-                        className="miniapp-list-item"
-                        onClick={() => {
-                          webApp?.HapticFeedback.impactOccurred('light');
-                          try {
-                            sessionStorage.setItem(`call_${call.id}`, JSON.stringify(call));
-                          } catch { /* ignore */ }
-                          router.push(`/miniapp/calls/${call.id}`);
-                        }}
-                      >
+            return (
+              <div key={group.key}>
+                <div className="miniapp-date-group">{group.label}</div>
+                <div className="miniapp-section">
+                  <div className="miniapp-list">
+                    {consecutiveGroups.map((cGroup, gi) => {
+                      const call = cGroup.items[0]; // first = most recent in the group
+                      const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
+                      const isInbound = call.direction === 'inbound';
+                      const phone = isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
+                      const hasContact = !!call.contact_name;
+                      const displayTitle = hasContact ? call.contact_name! : formatPhone(phone);
+                      const displaySub = hasContact
+                        ? formatPhone(phone)
+                        : isMissed
+                          ? t('calls.missed')
+                          : formatDuration(call.duration);
+
+                      return (
                         <div
-                          className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}
+                          key={`${call.id}-${gi}`}
+                          className="miniapp-list-item"
+                          onClick={() => {
+                            webApp?.HapticFeedback.impactOccurred('light');
+                            try {
+                              sessionStorage.setItem(`call_${call.id}`, JSON.stringify(call));
+                            } catch { /* ignore */ }
+                            router.push(`/miniapp/calls/${call.id}`);
+                          }}
                         >
-                          <Phone size={16} style={{ transform: isInbound ? 'rotate(135deg)' : 'none' }} />
-                        </div>
-                        <div className="miniapp-list-item-content">
                           <div
-                            className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}
+                            className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}
                           >
-                            {displayTitle}
+                            <Phone size={16} style={{ transform: isInbound ? 'rotate(135deg)' : 'none' }} />
                           </div>
-                          <div className="miniapp-list-item-sub">{displaySub}</div>
-                        </div>
-                        <div className="miniapp-list-item-right" style={{ gap: 8 }}>
-                          {formatTime(call.created_at)}
-                          {!hasContact && phone !== '\u2014' && !phonesWithContact.has(phone) && (
-                            <button
-                              className="miniapp-add-contact-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                webApp?.HapticFeedback.impactOccurred('light');
-                                setCreateContactForPhone(phone);
-                              }}
+                          <div className="miniapp-list-item-content">
+                            <div
+                              className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}
                             >
-                              <Plus size={14} />
-                            </button>
-                          )}
+                              {displayTitle}
+                            </div>
+                            <div className="miniapp-list-item-sub">{displaySub}</div>
+                          </div>
+                          <div className="miniapp-list-item-right" style={{ gap: 8 }}>
+                            {formatTime(call.created_at)}
+                            {cGroup.count > 1 && (
+                              <span style={{
+                                fontSize: 12,
+                                fontWeight: 600,
+                                background: 'var(--ma-bg2)',
+                                color: 'var(--ma-hint)',
+                                borderRadius: 'var(--ma-radius-pill)',
+                                padding: '2px 8px',
+                                marginLeft: 6,
+                              }}>
+                                {'\u00D7'}{cGroup.count}
+                              </span>
+                            )}
+                            {!hasContact && phone !== '\u2014' && !phonesWithContact.has(phone) && (
+                              <button
+                                className="miniapp-add-contact-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  webApp?.HapticFeedback.impactOccurred('light');
+                                  setCreateContactForPhone(phone);
+                                }}
+                              >
+                                <Plus size={14} />
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {hasMore && (
             <div className="miniapp-section" style={{ marginTop: 0 }}>

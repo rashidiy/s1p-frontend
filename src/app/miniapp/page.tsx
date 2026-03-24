@@ -9,7 +9,7 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
-import { formatTime, formatPhone, getInitials, getAvatarColor } from './_utils';
+import { formatTime, formatPhone, getInitials, getAvatarColor, groupConsecutive } from './_utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -263,102 +263,146 @@ export default function MiniAppDashboard() {
       </div>
 
       {/* Needs Attention section */}
-      {missedCalls.length > 0 && (
-        <div className="miniapp-section miniapp-attention-section">
-          <div className="miniapp-section-header">{t('needsAttention')}</div>
-          <div className="miniapp-list">
-            {missedCalls.slice(0, 5).map((call, i) => {
-              const phone = call.phone || '';
-              const displayName = call.contact_name || formatPhone(phone) || '—';
-              return (
-                <div
-                  key={i}
-                  className="miniapp-attention-item"
-                  onClick={() => {
-                    webApp?.HapticFeedback.impactOccurred('medium');
+      {missedCalls.length > 0 && (() => {
+        // Deduplicate by phone: group all missed calls by phone, keep latest, add count
+        const phoneMap = new Map<string, { call: MissedCall; count: number }>();
+        for (const call of missedCalls) {
+          const phone = call.phone || '';
+          const existing = phoneMap.get(phone);
+          if (existing) {
+            existing.count++;
+            // Keep the latest call (compare created_at)
+            if (call.created_at && existing.call.created_at && call.created_at > existing.call.created_at) {
+              existing.call = call;
+            }
+          } else {
+            phoneMap.set(phone, { call, count: 1 });
+          }
+        }
+        const dedupedMissed = Array.from(phoneMap.values());
+
+        return (
+          <div className="miniapp-section miniapp-attention-section">
+            <div className="miniapp-section-header">{t('needsAttention')}</div>
+            <div className="miniapp-list">
+              {dedupedMissed.slice(0, 5).map(({ call, count }, i) => {
+                const phone = call.phone || '';
+                const displayName = call.contact_name || formatPhone(phone) || '—';
+                return (
+                  <div
+                    key={i}
+                    className="miniapp-attention-item"
+                    onClick={() => {
+                      webApp?.HapticFeedback.impactOccurred('medium');
+                      try {
+                        sessionStorage.setItem(`call_${call.id}`, JSON.stringify({
+                          id: call.id,
+                          phone_1: call.phone,
+                          direction: 'inbound',
+                          state: 'NOANSWER',
+                          created_at: call.created_at,
+                          contact_name: call.contact_name,
+                        }));
+                      } catch {}
+                      router.push(`/miniapp/calls/${call.id}`);
+                    }}
+                  >
+                    <div className="miniapp-call-icon miniapp-call-icon-missed">
+                      <Phone size={16} />
+                    </div>
+                    <div className="miniapp-list-item-content">
+                      <div className="miniapp-list-item-title miniapp-text-missed">
+                        {displayName}
+                        {count > 1 && (
+                          <span style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#EF4444',
+                            marginLeft: 6,
+                          }}>
+                            ({'\u00D7'}{count})
+                          </span>
+                        )}
+                      </div>
+                      {call.contact_name && phone && (
+                        <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
+                      )}
+                    </div>
+                    <div className="miniapp-list-item-right">
+                      {call.created_at ? formatTime(call.created_at) : ''}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Recent calls */}
+      {recentCalls.length > 0 && (() => {
+        const recentGroups = groupConsecutive(recentCalls, (call) => call.phone || '—');
+
+        return (
+          <div className="miniapp-section">
+            <div className="miniapp-section-header">{t('dashboard.recentCalls')}</div>
+            <div className="miniapp-list">
+              {recentGroups.slice(0, 4).map((group, i) => {
+                const call = group.items[0]; // first = most recent
+                const phone = call.phone || '—';
+                const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
+                const isInbound = call.direction === 'inbound';
+                const displayName = call.contact_name || formatPhone(phone);
+                return (
+                  <div key={i} className="miniapp-list-item" onClick={() => {
+                    webApp?.HapticFeedback.impactOccurred('light');
                     try {
                       sessionStorage.setItem(`call_${call.id}`, JSON.stringify({
                         id: call.id,
-                        phone_1: call.phone,
-                        direction: 'inbound',
-                        state: 'NOANSWER',
-                        created_at: call.created_at,
+                        phone_2: call.phone,
+                        direction: call.direction,
+                        state: call.state,
+                        duration: call.duration,
+                        created_at: call.started_at,
                         contact_name: call.contact_name,
                       }));
                     } catch {}
                     router.push(`/miniapp/calls/${call.id}`);
-                  }}
-                >
-                  <div className="miniapp-call-icon miniapp-call-icon-missed">
-                    <Phone size={16} />
-                  </div>
-                  <div className="miniapp-list-item-content">
-                    <div className="miniapp-list-item-title miniapp-text-missed">
-                      {displayName}
+                  }}>
+                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
+                      {isInbound ? <Phone size={16} /> : <Phone size={16} />}
                     </div>
-                    {call.contact_name && phone && (
-                      <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
-                    )}
-                  </div>
-                  <div className="miniapp-list-item-right">
-                    {call.created_at ? formatTime(call.created_at) : ''}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Recent calls */}
-      {recentCalls.length > 0 && (
-        <div className="miniapp-section">
-          <div className="miniapp-section-header">{t('dashboard.recentCalls')}</div>
-          <div className="miniapp-list">
-            {recentCalls.slice(0, 4).map((call, i) => {
-              const phone = call.phone || '—';
-              const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
-              const isInbound = call.direction === 'inbound';
-              const displayName = call.contact_name || formatPhone(phone);
-              return (
-                <div key={i} className="miniapp-list-item" onClick={() => {
-                  webApp?.HapticFeedback.impactOccurred('light');
-                  try {
-                    sessionStorage.setItem(`call_${call.id}`, JSON.stringify({
-                      id: call.id,
-                      phone_2: call.phone,
-                      direction: call.direction,
-                      state: call.state,
-                      duration: call.duration,
-                      created_at: call.started_at,
-                      contact_name: call.contact_name,
-                    }));
-                  } catch {}
-                  router.push(`/miniapp/calls/${call.id}`);
-                }}>
-                  <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
-                    {isInbound ? <Phone size={16} /> : <Phone size={16} />}
-                  </div>
-                  <div className="miniapp-list-item-content">
-                    <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
-                      {displayName}
+                    <div className="miniapp-list-item-content">
+                      <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
+                        {displayName}
+                        {group.count > 1 && (
+                          <span style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: 'var(--ma-hint)',
+                            marginLeft: 6,
+                          }}>
+                            {'\u00D7'}{group.count}
+                          </span>
+                        )}
+                      </div>
+                      {call.contact_name && (
+                        <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
+                      )}
                     </div>
-                    {call.contact_name && (
-                      <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
-                    )}
+                    <div className="miniapp-list-item-right">
+                      {call.started_at ? formatTime(call.started_at) : ''}
+                    </div>
                   </div>
-                  <div className="miniapp-list-item-right">
-                    {call.started_at ? formatTime(call.started_at) : ''}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className="miniapp-section-footer" onClick={() => router.push('/miniapp/history')}>
+              {t('dashboard.viewAll')} <ChevronRight size={14} style={{ marginLeft: 4 }} />
+            </div>
           </div>
-          <div className="miniapp-section-footer" onClick={() => router.push('/miniapp/history')}>
-            {t('dashboard.viewAll')} <ChevronRight size={14} style={{ marginLeft: 4 }} />
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Team Today — manager/admin only */}
       {isManagerOrAdmin && teamData && (

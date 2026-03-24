@@ -124,3 +124,19 @@ export const STAGE_BADGE: Record<string, string> = {
 };
 
 export const ALL_STAGES = ['prospecting', 'qualification', 'proposal', 'negotiation', 'closed_won', 'closed_lost'];
+
+/** Group consecutive items by a key function (like Python's itertools.groupby) */
+export function groupConsecutive<T>(items: T[], keyFn: (item: T) => string): Array<{ key: string; items: T[]; count: number }> {
+  const groups: Array<{ key: string; items: T[]; count: number }> = [];
+  for (const item of items) {
+    const k = keyFn(item);
+    const last = groups[groups.length - 1];
+    if (last && last.key === k) {
+      last.items.push(item);
+      last.count++;
+    } else {
+      groups.push({ key: k, items: [item], count: 1 });
+    }
+  }
+  return groups;
+}
