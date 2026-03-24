@@ -1261,7 +1261,14 @@
       "search": "Kontaktlarni qidirish...",
       "noContacts": "Kontaktlar topilmadi",
       "emptyTitle": "Hali kontaktlar yo'q",
-      "emptyDescription": "Kontaktlaringiz shu yerda ko'rinadi"
+      "emptyDescription": "Kontaktlaringiz shu yerda ko'rinadi",
+      "newContact": "Yangi kontakt",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "phone": "Telefon",
+      "email": "Email",
+      "saveContact": "Kontaktni saqlash",
+      "contactCreated": "Kontakt yaratildi"
     },
     "leads": {
       "title": "Lidlar",
@@ -1313,7 +1320,9 @@
       "company": "Kompaniya",
       "closeApp": "Yopish",
       "role": "Rol",
-      "languageChanged": "Til o'zgartirildi"
+      "languageChanged": "Til o'zgartirildi",
+      "quietHoursStart": "Dan",
+      "quietHoursEnd": "Gacha"
     },
     "detail": {
       "phone": "Telefon",
@@ -1347,7 +1356,9 @@
     "error": {
       "loadFailed": "Ma'lumotlarni yuklab bo'lmadi",
       "authFailed": "Autentifikatsiya xatosi",
-      "noCompanies": "Kompaniyalar topilmadi"
+      "noCompanies": "Kompaniyalar topilmadi",
+      "somethingWentWrong": "Xatolik yuz berdi",
+      "reload": "Qayta yuklash"
     },
     "tabs": {
       "home": "Bosh sahifa",
@@ -1365,7 +1376,14 @@
     "pipeline": {
       "title": "Voronka",
       "leads": "Lidlar",
-      "deals": "Bitimlar"
+      "deals": "Bitimlar",
+      "newLead": "Yangi lid",
+      "leadTitle": "Nomi",
+      "source": "Manba",
+      "estimatedValue": "Taxminiy qiymat",
+      "createLead": "Lid yaratish",
+      "leadCreated": "Lid yaratildi",
+      "leadFrom": "{phone} dan lid"
     },
     "actions": {
       "markContacted": "Bog'lanildi",

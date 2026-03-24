@@ -31,9 +31,11 @@ export function formatDateTime(date: string | Date, locale?: string): string {
   }).format(new Date(date))
 }
 
-export function formatCurrency(amount: number, currency = 'USD'): string {
+export function formatCurrency(amount: number, currency = 'UZS'): string {
   if (!Number.isFinite(amount)) return '—';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+  // Use space-separated thousands for readability; append currency code
+  const formatted = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(amount);
+  return `${formatted} ${currency}`;
 }
 
 export function formatNumber(n: number): string {

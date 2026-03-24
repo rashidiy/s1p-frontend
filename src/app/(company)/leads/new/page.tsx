@@ -24,7 +24,7 @@ export default function NewLeadPage() {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [contactId, setContactId] = useState<string | null>(null);
   const [assignedTo, setAssignedTo] = useState<string | null>(null);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('UZS');
 
   useEffect(() => {
     loadUsers();
@@ -133,7 +133,7 @@ export default function NewLeadPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('currency')}</label>
-                <Select value={currency} onChange={setCurrency} style={{ width: "100%" }} options={[{ value: "USD", label: "USD" }, { value: "EUR", label: "EUR" }, { value: "UZS", label: "UZS" }]} size="large" />
+                <Select value={currency} onChange={setCurrency} style={{ width: "100%" }} options={[{ value: "UZS", label: "UZS" }, { value: "USD", label: "USD" }]} size="large" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">{tFields('assignedTo')}</label>

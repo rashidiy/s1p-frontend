@@ -1261,7 +1261,14 @@
       "search": "Поиск контактов...",
       "noContacts": "Контакты не найдены",
       "emptyTitle": "Пока нет контактов",
-      "emptyDescription": "Ваши контакты появятся здесь"
+      "emptyDescription": "Ваши контакты появятся здесь",
+      "newContact": "Новый контакт",
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "phone": "Телефон",
+      "email": "Эл. почта",
+      "saveContact": "Сохранить контакт",
+      "contactCreated": "Контакт создан"
     },
     "leads": {
       "title": "Лиды",
@@ -1313,7 +1320,9 @@
       "company": "Компания",
       "closeApp": "Закрыть",
       "role": "Роль",
-      "languageChanged": "Язык изменён"
+      "languageChanged": "Язык изменён",
+      "quietHoursStart": "С",
+      "quietHoursEnd": "До"
     },
     "detail": {
       "phone": "Телефон",
@@ -1347,7 +1356,9 @@
     "error": {
       "loadFailed": "Не удалось загрузить данные",
       "authFailed": "Ошибка авторизации",
-      "noCompanies": "Компании не найдены"
+      "noCompanies": "Компании не найдены",
+      "somethingWentWrong": "Что-то пошло не так",
+      "reload": "Обновить"
     },
     "tabs": {
       "home": "Главная",
@@ -1365,7 +1376,14 @@
     "pipeline": {
       "title": "Воронка",
       "leads": "Лиды",
-      "deals": "Сделки"
+      "deals": "Сделки",
+      "newLead": "Новый лид",
+      "leadTitle": "Название",
+      "source": "Источник",
+      "estimatedValue": "Ожидаемая стоимость",
+      "createLead": "Создать лид",
+      "leadCreated": "Лид создан",
+      "leadFrom": "Лид от {phone}"
     },
     "actions": {
       "markContacted": "Связались",

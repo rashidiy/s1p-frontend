@@ -252,8 +252,7 @@ export default function LeadDetailPage() {
                   {lead.estimated_value && (
                     <div className="flex items-center gap-2">
                       <DollarOutlined style={{ color: '#16a34a' }} />
-                      <span className="text-lg font-semibold">{formatCurrency(lead.estimated_value)}</span>
-                      {lead.currency && <span className="text-gray-500">{lead.currency}</span>}
+                      <span className="text-lg font-semibold">{formatCurrency(lead.estimated_value, lead.currency || 'UZS')}</span>
                     </div>
                   )}
                   {lead.contact_name && (

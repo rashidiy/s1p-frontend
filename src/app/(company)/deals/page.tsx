@@ -165,7 +165,7 @@ export default function DealsPage() {
                   },
                   {
                     title: t('amount'), dataIndex: 'amount', key: 'amount', width: 130,
-                    render: (v: number) => <span className="font-bold text-green-600">{formatCurrency(v ?? 0)}</span>,
+                    render: (v: number, record: DealResponse) => <span className="font-bold text-green-600">{formatCurrency(v ?? 0, record.currency || 'UZS')}</span>,
                   },
                   {
                     title: t('probability'), dataIndex: 'probability', key: 'probability', width: 80, responsive: ['lg'],

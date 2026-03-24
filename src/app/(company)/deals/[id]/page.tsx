@@ -340,9 +340,8 @@ export default function DealDetailPage() {
                   <div className="flex items-center gap-2">
                     <DollarOutlined style={{ fontSize: 20, color: '#16a34a' }} />
                     <span className="text-2xl font-bold text-green-600">
-                      {formatCurrency(deal.amount)}
+                      {formatCurrency(deal.amount, deal.currency || 'UZS')}
                     </span>
-                    {deal.currency && <span className="text-gray-500">{deal.currency}</span>}
                   </div>
                   {deal.probability != null && (
                     <div className="flex items-center gap-2">
@@ -350,7 +349,7 @@ export default function DealDetailPage() {
                       <span className="font-medium">{deal.probability}%</span>
                       {deal.weighted_value != null && (
                         <span className="text-sm text-gray-500">
-                          ({formatCurrency(deal.weighted_value)})
+                          ({formatCurrency(deal.weighted_value, deal.currency || 'UZS')})
                         </span>
                       )}
                     </div>
@@ -441,7 +440,7 @@ export default function DealDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('amount')}</span>
-                <span className="font-medium">{formatCurrency(deal.amount)}</span>
+                <span className="font-medium">{formatCurrency(deal.amount, deal.currency || 'UZS')}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{tFields('created')}</span>

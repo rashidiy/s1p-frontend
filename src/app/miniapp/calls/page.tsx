@@ -105,6 +105,8 @@ export default function MiniAppCalls() {
   function handleKeyPress(digit: string) {
     // No haptic on keypad — causes lag in Telegram WebView at rapid press speeds
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
+    const currentVal = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
+    if (currentVal.replace(/\D/g, '').length >= 15) return;
     setter((prev) => prev === '' && digit !== '+' && digit !== '#' ? '+998' + digit : prev + digit);
   }
 

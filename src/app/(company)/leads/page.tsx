@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Button, Tag, Select, Table, Segmented, message } from 'antd';
+import { Input, Pagination, Button, Tag, Select, Table, Segmented, Modal, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   PlusOutlined,
@@ -9,6 +9,7 @@ import {
   DollarOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -18,6 +19,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { LEAD_STATUS_KEYS } from '@/lib/constants';
+import { formatCurrency } from '@/lib/utils';
 
 type ViewMode = 'cards' | 'table';
 
@@ -107,6 +109,26 @@ export default function LeadsPage() {
     }
   };
 
+  const handleDelete = (e: React.MouseEvent, leadId: string) => {
+    e.stopPropagation();
+    Modal.confirm({
+      title: tCommon('areYouSure'),
+      content: t('confirmDeleteLead'),
+      okText: tActions('delete'),
+      cancelText: tActions('cancel'),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await apiClient.deleteLead(leadId);
+          message.success(t('leadDeleted'));
+          loadLeads();
+        } catch {
+          message.error(tErrors('failedToDeleteLead'));
+        }
+      },
+    });
+  };
+
   const statusOptions = [
     { label: tStatuses('new'), value: 'new' },
     { label: tStatuses('contacted'), value: 'contacted' },
@@ -137,9 +159,20 @@ export default function LeadsPage() {
       title: tFields('status'),
       dataIndex: 'status',
       key: 'status',
-      width: 120,
-      render: (value: string | null) =>
-        value ? <Tag color={statusColors[value.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[value.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[value.toLowerCase()]) : value}</Tag> : <span className="text-gray-300">-</span>,
+      width: 150,
+      render: (value: string | null, record: LeadResponse) =>
+        value && hasPermissionString('leads.write') ? (
+          <Select
+            value={value}
+            onChange={(newStatus) => handleStatusChange(record.id, newStatus)}
+            options={statusOptions}
+            size="small"
+            variant="borderless"
+            className="min-w-[120px]"
+            popupMatchSelectWidth={false}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : value ? <Tag color={statusColors[value.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[value.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[value.toLowerCase()]) : value}</Tag> : <span className="text-gray-300">-</span>,
     },
     {
       title: tFields('estimatedValue'),
@@ -148,8 +181,8 @@ export default function LeadsPage() {
       responsive: ['lg'],
       width: 130,
       align: 'right',
-      render: (value: number | null) =>
-        value ? <span className="font-semibold text-green-600">${value.toLocaleString()}</span> : <span className="text-gray-300">-</span>,
+      render: (value: number | null, record: LeadResponse) =>
+        value ? <span className="font-semibold text-green-600">{formatCurrency(value, record.currency || 'UZS')}</span> : <span className="text-gray-300">-</span>,
     },
     {
       title: tFields('assignedTo'),
@@ -169,7 +202,7 @@ export default function LeadsPage() {
     {
       title: '',
       key: 'actions',
-      width: 160,
+      width: 200,
       render: (_, record) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <Link href={`/leads/${record.id}`}>
@@ -177,6 +210,9 @@ export default function LeadsPage() {
           </Link>
           {record.status !== 'converted' && hasPermissionString('leads.write') && hasPermissionString('deals.write') && (
             <Button size="small" type="primary" onClick={(e) => handleConvert(e, record.id)}>{tActions('convert')}</Button>
+          )}
+          {hasPermissionString('leads.delete') && (
+            <Button size="small" danger icon={<DeleteOutlined />} onClick={(e) => handleDelete(e, record.id)} />
           )}
         </div>
       ),
@@ -299,13 +335,14 @@ export default function LeadsPage() {
                   ))}
                 </div>
                 <div className="space-y-2">
-                  {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}
+                  {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">{formatCurrency(lead.estimated_value, lead.currency || 'UZS')}</span></div>}
                   {lead.pipeline_stage && <p className="text-sm text-gray-600">{tFields('stage')}: <span className="font-medium">{lead.pipeline_stage}</span></p>}
                   {lead.assigned_to_name && <p className="text-sm text-gray-600">{tFields('assigned')}: <span className="font-medium">{lead.assigned_to_name}</span></p>}
                   {lead.source && <Tag className="!mt-1">{lead.source}</Tag>}
                   <div className="flex gap-2 pt-2">
                     <Link href={`/leads/${lead.id}`} className="flex-1"><Button block>{tActions('view')}</Button></Link>
                     {lead.status !== 'converted' && hasPermissionString('leads.write') && hasPermissionString('deals.write') && <Button type="primary" onClick={(e) => handleConvert(e, lead.id)}>{tActions('convert')}</Button>}
+                    {hasPermissionString('leads.delete') && <Button danger icon={<DeleteOutlined />} onClick={(e) => handleDelete(e, lead.id)} />}
                   </div>
                 </div>
               </div>

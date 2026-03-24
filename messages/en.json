@@ -1261,7 +1261,14 @@
       "search": "Search contacts...",
       "noContacts": "No contacts found",
       "emptyTitle": "No contacts yet",
-      "emptyDescription": "Your contacts will appear here"
+      "emptyDescription": "Your contacts will appear here",
+      "newContact": "New Contact",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "saveContact": "Save Contact",
+      "contactCreated": "Contact created"
     },
     "leads": {
       "title": "Leads",
@@ -1313,7 +1320,9 @@
       "company": "Company",
       "closeApp": "Close App",
       "role": "Role",
-      "languageChanged": "Language changed"
+      "languageChanged": "Language changed",
+      "quietHoursStart": "From",
+      "quietHoursEnd": "To"
     },
     "detail": {
       "phone": "Phone",
@@ -1347,7 +1356,9 @@
     "error": {
       "loadFailed": "Failed to load data",
       "authFailed": "Authentication failed",
-      "noCompanies": "No companies found"
+      "noCompanies": "No companies found",
+      "somethingWentWrong": "Something went wrong",
+      "reload": "Reload"
     },
     "tabs": {
       "home": "Home",
@@ -1365,7 +1376,14 @@
     "pipeline": {
       "title": "Pipeline",
       "leads": "Leads",
-      "deals": "Deals"
+      "deals": "Deals",
+      "newLead": "New Lead",
+      "leadTitle": "Title",
+      "source": "Source",
+      "estimatedValue": "Estimated value",
+      "createLead": "Create Lead",
+      "leadCreated": "Lead created",
+      "leadFrom": "Lead from {phone}"
     },
     "actions": {
       "markContacted": "Mark Contacted",

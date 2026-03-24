@@ -1,18 +1,20 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { TrendingUp, BarChart3, ChevronRight } from 'lucide-react';
+import { TrendingUp, BarChart3, ChevronRight, X } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { LeadResponse, DealResponse } from '@/types/api';
-import { formatAmount, STATUS_BADGE, ALL_STATUSES, STAGE_BADGE, ALL_STAGES } from '../_utils';
+import { formatAmount, formatPhone, STATUS_BADGE, ALL_STATUSES, STAGE_BADGE, ALL_STAGES } from '../_utils';
 
 const PAGE_SIZE = 30;
 
 type ViewMode = 'leads' | 'deals';
+
+const SOURCE_OPTIONS = ['phone', 'website', 'referral', 'other'];
 
 function SkeletonList() {
   return (
@@ -30,9 +32,99 @@ function SkeletonList() {
   );
 }
 
+interface NewLeadFormProps {
+  phone: string;
+  onSave: (data: { title: string; source?: string; estimated_value?: number }) => Promise<void>;
+  onCancel: () => void;
+  t: ReturnType<typeof useTranslations>;
+}
+
+function NewLeadForm({ phone, onSave, onCancel, t }: NewLeadFormProps) {
+  const defaultTitle = t('pipeline.leadFrom', { phone: formatPhone(phone) });
+  const [title, setTitle] = useState(defaultTitle);
+  const [source, setSource] = useState('phone');
+  const [estimatedValue, setEstimatedValue] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit() {
+    if (!title.trim() || saving) return;
+    setSaving(true);
+    try {
+      await onSave({
+        title: title.trim(),
+        source: source || undefined,
+        estimated_value: estimatedValue ? parseFloat(estimatedValue) : undefined,
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="miniapp-create-contact-form">
+      <div className="miniapp-create-contact-header">
+        <span style={{ fontWeight: 600, fontSize: 15 }}>{t('pipeline.newLead')}</span>
+        <button className="miniapp-create-contact-close" onClick={onCancel}>
+          <X size={14} />
+        </button>
+      </div>
+      <div className="miniapp-create-contact-phone">{formatPhone(phone)}</div>
+
+      <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, display: 'block' }}>
+        {t('pipeline.leadTitle')} *
+      </label>
+      <input
+        className="miniapp-create-contact-input"
+        placeholder={t('pipeline.leadTitle')}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        autoFocus
+      />
+
+      <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, marginTop: 12, display: 'block' }}>
+        {t('pipeline.source')}
+      </label>
+      <select
+        className="miniapp-create-contact-input"
+        value={source}
+        onChange={(e) => setSource(e.target.value)}
+        style={{ appearance: 'auto' }}
+      >
+        <option value="">—</option>
+        {SOURCE_OPTIONS.map((s) => (
+          <option key={s} value={s}>{s}</option>
+        ))}
+      </select>
+
+      <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, marginTop: 12, display: 'block' }}>
+        {t('pipeline.estimatedValue')}
+      </label>
+      <input
+        className="miniapp-create-contact-input"
+        placeholder={t('pipeline.estimatedValue')}
+        value={estimatedValue}
+        onChange={(e) => setEstimatedValue(e.target.value)}
+        type="number"
+        inputMode="numeric"
+      />
+
+      <button
+        className="miniapp-note-submit"
+        onClick={handleSubmit}
+        disabled={!title.trim() || saving}
+        style={{ marginTop: 12 }}
+      >
+        {saving ? '...' : t('pipeline.createLead')}
+      </button>
+    </div>
+  );
+}
+
 export default function PipelinePage() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'deals' ? 'deals' : 'leads';
+  const newLeadParam = searchParams.get('new_lead') === '1';
+  const phoneParam = searchParams.get('phone') || '';
   const [viewMode, setViewMode] = useState<ViewMode>(initialTab);
   const [leads, setLeads] = useState<LeadResponse[]>([]);
   const [deals, setDeals] = useState<DealResponse[]>([]);
@@ -42,6 +134,7 @@ export default function PipelinePage() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<string>('');
+  const [showNewLeadForm, setShowNewLeadForm] = useState(newLeadParam);
   const { webApp } = useTelegramWebApp();
   const router = useRouter();
   const t = useTranslations('miniapp');
@@ -120,12 +213,78 @@ export default function PipelinePage() {
     setViewMode(mode);
   }
 
+  function dismissNewLeadForm() {
+    setShowNewLeadForm(false);
+    // Remove query params from URL without navigation
+    router.replace('/miniapp/pipeline', { scroll: false });
+  }
+
+  async function handleCreateLead(data: { title: string; source?: string; estimated_value?: number }) {
+    try {
+      const created = await apiClient.createLead({
+        title: data.title,
+        source: data.source || null,
+        estimated_value: data.estimated_value || null,
+        currency: 'UZS',
+      });
+      webApp?.HapticFeedback.notificationOccurred('success');
+      try {
+        webApp?.showPopup({
+          title: '\u2713',
+          message: t('pipeline.leadCreated'),
+          buttons: [{ type: 'ok' }],
+        });
+      } catch { /* showPopup may not be available */ }
+      router.replace(`/miniapp/leads/${created.id}`);
+    } catch {
+      webApp?.HapticFeedback.notificationOccurred('error');
+      try {
+        webApp?.showPopup({ message: t('error.loadFailed') });
+      } catch { /* showPopup may not be available */ }
+    }
+  }
+
+  // MainButton for "Create Lead" when form is open
+  const handleMainButtonCreateLead = useCallback(() => {
+    // The form handles its own submit via the inline button
+    // MainButton is a secondary way to trigger — find and click the form submit
+    const submitBtn = document.querySelector('.miniapp-create-contact-form .miniapp-note-submit') as HTMLButtonElement | null;
+    if (submitBtn && !submitBtn.disabled) submitBtn.click();
+  }, []);
+
+  useEffect(() => {
+    if (!webApp) return;
+    if (showNewLeadForm) {
+      webApp.MainButton.setText(t('pipeline.createLead'));
+      webApp.MainButton.show();
+      webApp.MainButton.onClick(handleMainButtonCreateLead);
+      return () => {
+        webApp.MainButton.offClick(handleMainButtonCreateLead);
+        webApp.MainButton.hide();
+      };
+    } else {
+      webApp.MainButton.hide();
+    }
+  }, [webApp, showNewLeadForm, handleMainButtonCreateLead, t]);
+
   const filterOptions = viewMode === 'leads' ? ALL_STATUSES : ALL_STAGES;
   const badgeMap = viewMode === 'leads' ? STATUS_BADGE : STAGE_BADGE;
 
   return (
     <div className="miniapp-page-enter">
       <div className="miniapp-page-title">{t('pipeline.title')}</div>
+
+      {/* New lead creation form */}
+      {showNewLeadForm && phoneParam && (
+        <div className="miniapp-section" style={{ marginBottom: 8 }}>
+          <NewLeadForm
+            phone={phoneParam}
+            onSave={handleCreateLead}
+            onCancel={dismissNewLeadForm}
+            t={t}
+          />
+        </div>
+      )}
 
       {/* Segmented control */}
       <div className="miniapp-segment">

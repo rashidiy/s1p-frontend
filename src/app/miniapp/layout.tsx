@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Spin } from 'antd';
 import { Phone, Users, Home, Filter, Clock, ChevronRight } from 'lucide-react';
@@ -11,6 +11,48 @@ import { UserRole } from '@/types/api';
 import type { UserResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
 import './miniapp.css';
+
+class MiniAppErrorBoundary extends React.Component<
+  { children: React.ReactNode; errorTitle: string; reloadLabel: string },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; errorTitle: string; reloadLabel: string }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('MiniApp error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="miniapp-error">
+          <div style={{ fontSize: 48, opacity: 0.3 }}>!</div>
+          <p style={{ fontWeight: 500, fontSize: 16 }}>{this.props.errorTitle}</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: 12,
+              padding: '8px 24px',
+              background: 'var(--ma-accent)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            {this.props.reloadLabel}
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const TABS: Array<{ key: string; path: string; icon: React.ReactNode; center?: boolean }> = [
   { key: 'calls', path: '/miniapp/calls', icon: <Phone size={24} /> },
@@ -105,6 +147,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const searchParams = useSearchParams();
   const { setUser } = useAuthStore();
   const t = useTranslations('miniapp');
+  const tRoles = useTranslations('roles');
 
   // Parse startapp param — could be raw company_id or base64-encoded signed payload
   const rawStartParam = searchParams.get('company_id')
@@ -291,7 +334,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
                     <div className="miniapp-list-item-title">{c.name}</div>
                     {c.role && (
                       <div className="miniapp-list-item-sub">
-                        {c.role.replace('company_', '')}
+                        {(() => { try { return tRoles(c.role); } catch { return c.role.replace('company_', ''); } })()}
                       </div>
                     )}
                   </div>
@@ -310,7 +353,9 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   return (
     <div className="miniapp-shell">
       <main className="miniapp-content">
-        {children}
+        <MiniAppErrorBoundary errorTitle={t('error.somethingWentWrong')} reloadLabel={t('error.reload')}>
+          {children}
+        </MiniAppErrorBoundary>
       </main>
 
       {/* Bottom tab bar — hidden on detail pages and profile */}

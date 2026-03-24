@@ -1,19 +1,22 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Spin, message } from 'antd';
-import { DollarOutlined, RiseOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Button, Spin, message } from 'antd';
+import { DollarOutlined, RiseOutlined, UserOutlined, CalendarOutlined, TrophyOutlined } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { apiClient } from '@/lib/api';
 import type { DealResponse } from '@/types/api';
 import { useTranslations } from 'next-intl';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { DEAL_STAGES, DEAL_STAGE_BOARD_COLORS, DEAL_STAGE_KEYS } from '@/lib/constants';
+import { useAuthStore } from '@/store/auth';
 
 export default function DealsPipelineView() {
   const t = useTranslations('deals');
+  const tActions = useTranslations('actions');
   const tStatuses = useTranslations('statuses');
   const tErrors = useTranslations('errors');
+  const { hasPermissionString } = useAuthStore();
 
   const [deals, setDeals] = useState<DealResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +76,18 @@ export default function DealsPipelineView() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stable refs
   }, []);
+
+  const handleWin = useCallback(async (e: React.MouseEvent, dealId: string) => {
+    e.stopPropagation();
+    try {
+      await apiClient.markDealWon(dealId);
+      message.success(t('dealMarkedWon'));
+      loadDeals();
+    } catch {
+      message.error(tErrors('failedToMarkDealAsWon'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable refs
+  }, [loadDeals]);
 
   if (loading) {
     return (
@@ -137,7 +152,7 @@ export default function DealsPipelineView() {
 
                             <div className="flex items-center gap-1 text-green-600 font-bold text-base mb-2">
                               <DollarOutlined className="text-xs" />
-                              {formatCurrency(deal.amount ?? 0)}
+                              {formatCurrency(deal.amount ?? 0, deal.currency || 'UZS')}
                             </div>
 
                             {deal.contact_name && (
@@ -161,6 +176,14 @@ export default function DealsPipelineView() {
                                 </span>
                               )}
                             </div>
+
+                            {!closed && hasPermissionString('deals.write') && (
+                              <div className="flex gap-1 mt-2 pt-2 border-t border-gray-100">
+                                <Button size="small" type="primary" className="flex-1 !text-xs bg-green-600 hover:bg-green-700" icon={<TrophyOutlined />} onClick={(e) => handleWin(e, deal.id)}>
+                                  {tActions('win')}
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </Draggable>

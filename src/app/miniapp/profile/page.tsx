@@ -169,10 +169,50 @@ export default function MiniAppProfile() {
           />
         </div>
         {dmPrefs.quiet_hours_enabled && (
-          <div className="miniapp-toggle-row" style={{ paddingLeft: 32 }}>
-            <span className="miniapp-toggle-label" style={{ fontSize: 13, color: 'var(--ma-hint)' }}>
-              {dmPrefs.quiet_hours_start}:00 — {dmPrefs.quiet_hours_end}:00
+          <div className="miniapp-toggle-row" style={{ paddingLeft: 32, gap: 8 }}>
+            <span className="miniapp-toggle-label" style={{ fontSize: 13, color: 'var(--ma-hint)', flex: 'none' }}>
+              {t('profile.quietHoursStart')}
             </span>
+            <select
+              value={dmPrefs.quiet_hours_start}
+              onChange={(e) => updatePref('quiet_hours_start', Number(e.target.value))}
+              disabled={prefsLoading}
+              style={{
+                background: 'var(--ma-bg)',
+                color: 'var(--ma-text)',
+                border: '1px solid var(--ma-separator)',
+                borderRadius: 8,
+                padding: '4px 8px',
+                fontSize: 13,
+                outline: 'none',
+              }}
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+              ))}
+            </select>
+            <span style={{ fontSize: 13, color: 'var(--ma-hint)' }}>—</span>
+            <span className="miniapp-toggle-label" style={{ fontSize: 13, color: 'var(--ma-hint)', flex: 'none' }}>
+              {t('profile.quietHoursEnd')}
+            </span>
+            <select
+              value={dmPrefs.quiet_hours_end}
+              onChange={(e) => updatePref('quiet_hours_end', Number(e.target.value))}
+              disabled={prefsLoading}
+              style={{
+                background: 'var(--ma-bg)',
+                color: 'var(--ma-text)',
+                border: '1px solid var(--ma-separator)',
+                borderRadius: 8,
+                padding: '4px 8px',
+                fontSize: 13,
+                outline: 'none',
+              }}
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+              ))}
+            </select>
           </div>
         )}
       </div>
