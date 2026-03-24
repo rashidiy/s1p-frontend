@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Phone, XCircle, Delete, Search, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Phone, XCircle, Delete, Search, ChevronDown, ArrowLeft, Check } from 'lucide-react';
 import { Spin } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -44,7 +44,7 @@ export default function MiniAppCalls() {
   const [selectedOperator, setSelectedOperator] = useState<string>('');
   const [activeInput, setActiveInput] = useState<'to' | 'from'>('to');
   const [fromCleared, setFromCleared] = useState(false);
-  const [showOperatorSheet, setShowOperatorSheet] = useState(false);
+  const [showOperatorDropdown, setShowOperatorDropdown] = useState(false);
   const hasSipExtension = !!user?.sip_extension;
 
   // Contact search
@@ -61,9 +61,7 @@ export default function MiniAppCalls() {
     }
   }, [mode, phone1, fromCleared, user?.phone]);
 
-  useEffect(() => {
-    if (mode === 'sip') setFromCleared(false);
-  }, [mode]);
+  useEffect(() => { if (mode === 'sip') setFromCleared(false); }, [mode]);
 
   useEffect(() => {
     if (!hasSipExtension) {
@@ -79,11 +77,8 @@ export default function MiniAppCalls() {
     try {
       const res = await apiClient.getContacts({ page: 1, page_size: 8, search: q });
       setSearchResults(res.items || []);
-    } catch {
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
+    } catch { setSearchResults([]); }
+    finally { setSearching(false); }
   }, []);
 
   function handleSearchInput(value: string) {
@@ -91,8 +86,7 @@ export default function MiniAppCalls() {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (/^[+\d\s()-]+$/.test(value) && value.replace(/\D/g, '').length >= 3) {
       const clean = value.replace(/[^\d+]/g, '');
-      if (searchMode === 'from') setPhone1(clean);
-      else setPhone2(clean);
+      if (searchMode === 'from') setPhone1(clean); else setPhone2(clean);
     }
     searchTimeout.current = setTimeout(() => doSearch(value), 300);
   }
@@ -105,16 +99,10 @@ export default function MiniAppCalls() {
     webApp?.HapticFeedback.impactOccurred('light');
   }
 
-  function closeSearch() {
-    setSearchMode(null);
-    setSearchQuery('');
-    setSearchResults([]);
-  }
+  function closeSearch() { setSearchMode(null); setSearchQuery(''); setSearchResults([]); }
 
   function openSearch(field: 'to' | 'from') {
-    setSearchMode(field);
-    setSearchQuery('');
-    setSearchResults([]);
+    setSearchMode(field); setSearchQuery(''); setSearchResults([]);
     webApp?.HapticFeedback.selectionChanged();
     setTimeout(() => searchInputRef.current?.focus(), 100);
   }
@@ -122,10 +110,7 @@ export default function MiniAppCalls() {
   function handleKeyPress(digit: string) {
     webApp?.HapticFeedback.selectionChanged();
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
-    setter((prev) => {
-      if (prev === '' && digit !== '+' && digit !== '#') return '+998' + digit;
-      return prev + digit;
-    });
+    setter((prev) => prev === '' && digit !== '+' && digit !== '#' ? '+998' + digit : prev + digit);
   }
 
   function handleBackspace() {
@@ -149,9 +134,7 @@ export default function MiniAppCalls() {
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
       try { webApp?.showPopup({ message: t('error.loadFailed'), buttons: [{ type: 'ok' }] }); } catch {}
-    } finally {
-      setCalling(false);
-    }
+    } finally { setCalling(false); }
   }
 
   const currentNumber = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
@@ -162,32 +145,23 @@ export default function MiniAppCalls() {
       ? `${operators.find(o => o.extension === selectedOperator)?.name || ''} · ${selectedOperator}`
       : t('calls.selectOperator');
 
-  // ── Contact search overlay ──
+  // ── Search overlay ──
   if (searchMode) {
     return (
       <div className="miniapp-dialer">
         <div className="miniapp-dialer-search">
           <div className="miniapp-dialer-search-bar">
-            <button className="miniapp-dialer-search-back" onClick={closeSearch}>
-              <ArrowLeft size={20} />
-            </button>
-            <input
-              ref={searchInputRef}
-              className="miniapp-dialer-search-input"
-              placeholder={t('calls.searchContact')}
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              autoFocus
-            />
+            <button className="miniapp-dialer-search-back" onClick={closeSearch}><ArrowLeft size={20} /></button>
+            <input ref={searchInputRef} className="miniapp-dialer-search-input"
+              placeholder={t('calls.searchContact')} value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)} autoFocus />
             {searchQuery && (
               <button className="miniapp-dialer-search-cancel" onClick={() => { setSearchQuery(''); setSearchResults([]); }}>
                 <XCircle size={18} />
               </button>
             )}
           </div>
-
           {searching && <div style={{ padding: 16, textAlign: 'center' }}><Spin size="small" /></div>}
-
           {searchResults.length > 0 && (
             <div className="miniapp-dialer-search-results">
               {searchResults.map((c) => {
@@ -206,15 +180,12 @@ export default function MiniAppCalls() {
               })}
             </div>
           )}
-
           {searchQuery && !searching && searchResults.length === 0 && searchQuery.replace(/\D/g, '').length >= 3 && (
             <div className="miniapp-dialer-search-results">
               <div className="miniapp-dialer-search-item" onClick={() => {
                 const clean = searchQuery.replace(/[^\d+]/g, '');
-                if (searchMode === 'from') setPhone1(clean);
-                else setPhone2(clean);
-                closeSearch();
-                webApp?.HapticFeedback.impactOccurred('light');
+                if (searchMode === 'from') setPhone1(clean); else setPhone2(clean);
+                closeSearch(); webApp?.HapticFeedback.impactOccurred('light');
               }}>
                 <div className="miniapp-dialer-search-avatar" style={{ background: 'var(--ma-separator)', color: 'var(--ma-hint)' }}>
                   <Phone size={16} />
@@ -234,19 +205,38 @@ export default function MiniAppCalls() {
   // ── Main dialer ──
   return (
     <div className="miniapp-dialer">
-      {/* Top: operator + toggle + fields — pushed to bottom of flex space */}
-      <div className="miniapp-dialer-top">
-        {/* Operator — whole row tappable */}
-        {!hasSipExtension ? (
-          <div className="miniapp-dialer-operator-bar" onClick={() => { webApp?.HapticFeedback.selectionChanged(); setShowOperatorSheet(true); }}>
-            <span className="miniapp-dialer-operator-label">{operatorName}</span>
-            <ChevronDown size={14} style={{ opacity: 0.5 }} />
-          </div>
-        ) : (
-          <div className="miniapp-dialer-operator-bar">
-            <span className="miniapp-dialer-operator-label">{operatorName}</span>
-          </div>
-        )}
+      {/* === TOP HEADER: operator + toggle (stays at top) === */}
+      <div className="miniapp-dialer-header">
+        {/* Operator — tappable opens dropdown DOWN */}
+        <div className="miniapp-dialer-operator-wrap">
+          {!hasSipExtension ? (
+            <div className="miniapp-dialer-operator-bar"
+              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setShowOperatorDropdown(!showOperatorDropdown); }}>
+              <span className="miniapp-dialer-operator-label">{operatorName}</span>
+              <ChevronDown size={14} style={{ opacity: 0.5 }} />
+            </div>
+          ) : (
+            <div className="miniapp-dialer-operator-bar">
+              <span className="miniapp-dialer-operator-label">{operatorName}</span>
+            </div>
+          )}
+          {/* Dropdown — appears BELOW the label */}
+          {showOperatorDropdown && (
+            <>
+              <div className="miniapp-dialer-dropdown-backdrop" onClick={() => setShowOperatorDropdown(false)} />
+              <div className="miniapp-dialer-dropdown">
+                {operators.map((op) => (
+                  <div key={op.extension} className="miniapp-dialer-dropdown-item"
+                    onClick={() => { setSelectedOperator(op.extension); setShowOperatorDropdown(false); webApp?.HapticFeedback.impactOccurred('light'); }}>
+                    <span className="miniapp-dialer-dropdown-name">{op.name}</span>
+                    <span className="miniapp-dialer-dropdown-ext">{op.extension}</span>
+                    {selectedOperator === op.extension && <Check size={16} style={{ color: 'var(--ma-accent)' }} />}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Toggle */}
         <div className="miniapp-dialer-mode">
@@ -259,19 +249,18 @@ export default function MiniAppCalls() {
             {t('calls.externalMode')}
           </button>
         </div>
+      </div>
 
-        {/* Phone fields */}
+      {/* === MIDDLE GAP: fields float here === */}
+      <div className="miniapp-dialer-middle">
         <div className="miniapp-dialer-fields">
           {mode === 'external' && (
-            <div
-              className={`miniapp-dialer-field ${activeInput === 'from' ? 'active' : ''}`}
+            <div className={`miniapp-dialer-field ${activeInput === 'from' ? 'active' : ''}`}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
                 if (!phone1) { openSearch('from'); return; }
-                webApp?.HapticFeedback.selectionChanged();
-                setActiveInput('from');
-              }}
-            >
+                webApp?.HapticFeedback.selectionChanged(); setActiveInput('from');
+              }}>
               <span className="miniapp-dialer-field-label">{t('calls.from')}</span>
               {phone1 ? (
                 <>
@@ -285,15 +274,12 @@ export default function MiniAppCalls() {
               )}
             </div>
           )}
-          <div
-            className={`miniapp-dialer-field ${activeInput === 'to' || mode === 'sip' ? 'active' : ''}`}
+          <div className={`miniapp-dialer-field ${activeInput === 'to' || mode === 'sip' ? 'active' : ''}`}
             onClick={(e) => {
               if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
               if (!phone2) { openSearch('to'); return; }
-              webApp?.HapticFeedback.selectionChanged();
-              setActiveInput('to');
-            }}
-          >
+              webApp?.HapticFeedback.selectionChanged(); setActiveInput('to');
+            }}>
             {mode === 'external' && <span className="miniapp-dialer-field-label">{t('calls.to')}</span>}
             {phone2 ? (
               <>
@@ -309,7 +295,7 @@ export default function MiniAppCalls() {
         </div>
       </div>
 
-      {/* Fixed bottom: pad + call */}
+      {/* === BOTTOM: pad + call (never moves) === */}
       <div className="miniapp-dialer-fixed">
         <div className="miniapp-dialer-grid">
           {DIAL_KEYS.map((d) => (
@@ -326,33 +312,6 @@ export default function MiniAppCalls() {
           ) : <div />}
         </div>
       </div>
-
-      {/* Operator bottom sheet */}
-      {showOperatorSheet && (
-        <>
-          <div className="miniapp-bottomsheet-overlay" onClick={() => setShowOperatorSheet(false)} />
-          <div className="miniapp-bottomsheet">
-            <div className="miniapp-bottomsheet-handle" />
-            {operators.map((op) => (
-              <div
-                key={op.extension}
-                className="miniapp-bottomsheet-option"
-                onClick={() => {
-                  setSelectedOperator(op.extension);
-                  setShowOperatorSheet(false);
-                  webApp?.HapticFeedback.impactOccurred('light');
-                }}
-              >
-                <div className="miniapp-bottomsheet-option-icon">
-                  <Phone size={18} />
-                </div>
-                <span style={{ flex: 1 }}>{op.name}</span>
-                <span style={{ color: 'var(--ma-hint)', fontSize: 13 }}>{op.extension}</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 }
