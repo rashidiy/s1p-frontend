@@ -331,7 +331,10 @@ export default function MiniAppDashboard() {
 
       {/* Recent calls */}
       {recentCalls.length > 0 && (() => {
-        const recentGroups = groupConsecutive(recentCalls, (call) => call.phone || '—');
+        const recentGroups = groupConsecutive(recentCalls, (call) => {
+          const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
+          return `${call.phone || '—'}:${isMissed ? 'missed' : 'answered'}`;
+        });
 
         return (
           <div className="miniapp-section">

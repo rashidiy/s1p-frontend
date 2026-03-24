@@ -233,7 +233,9 @@ export default function MiniAppHistory() {
             // Apply consecutive grouping by phone within each date group
             const consecutiveGroups = groupConsecutive(group.calls, (call) => {
               const isInbound = call.direction === 'inbound';
-              return isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
+              const phone = isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
+              const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
+              return `${phone}:${isMissed ? 'missed' : 'answered'}`;
             });
 
             return (
