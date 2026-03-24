@@ -237,29 +237,6 @@ export default function PipelinePage() {
     }
   }
 
-  // MainButton for "Create Lead" when form is open
-  const handleMainButtonCreateLead = useCallback(() => {
-    // The form handles its own submit via the inline button
-    // MainButton is a secondary way to trigger — find and click the form submit
-    const submitBtn = document.querySelector('.miniapp-create-contact-form .miniapp-note-submit') as HTMLButtonElement | null;
-    if (submitBtn && !submitBtn.disabled) submitBtn.click();
-  }, []);
-
-  useEffect(() => {
-    if (!webApp) return;
-    if (showNewLeadForm) {
-      webApp.MainButton.setText(t('pipeline.createLead'));
-      webApp.MainButton.show();
-      webApp.MainButton.onClick(handleMainButtonCreateLead);
-      return () => {
-        webApp.MainButton.offClick(handleMainButtonCreateLead);
-        webApp.MainButton.hide();
-      };
-    } else {
-      webApp.MainButton.hide();
-    }
-  }, [webApp, showNewLeadForm, handleMainButtonCreateLead, t]);
-
   const filterOptions = viewMode === 'leads' ? ALL_STATUSES : ALL_STAGES;
   const badgeMap = viewMode === 'leads' ? STATUS_BADGE : STAGE_BADGE;
 

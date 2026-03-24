@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Spin } from 'antd';
 import { Phone, Users, Home, Filter, Clock, ChevronRight } from 'lucide-react';
@@ -149,9 +149,14 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const t = useTranslations('miniapp');
   const tRoles = useTranslations('roles');
 
-  // Track whether deep link redirect has been handled — startapp param persists
-  // for the entire Telegram SDK session, so we must only redirect ONCE
-  const deepLinkHandledRef = useRef(false);
+  // Check if deep link was already handled — persists across Mini App restarts
+  // because startapp param is baked into the Telegram SDK session
+  const isDeepLinkHandled = () => {
+    try { return sessionStorage.getItem('miniapp_deeplink_handled') === '1'; } catch { return false; }
+  };
+  const markDeepLinkHandled = () => {
+    try { sessionStorage.setItem('miniapp_deeplink_handled', '1'); } catch {}
+  };
 
   // Parse startapp param — could be raw company_id or base64-encoded signed payload
   const rawStartParam = searchParams.get('company_id')
@@ -197,11 +202,11 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       }
 
       // Handle deep link redirect after successful auth (once only)
-      if (!deepLinkHandledRef.current) {
+      if (!isDeepLinkHandled()) {
         const deepLink = resolveDeepLink(searchParams)
           || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
         if (deepLink && deepLink !== pathname) {
-          deepLinkHandledRef.current = true;
+          markDeepLinkHandled();
           router.replace(deepLink);
         }
       }
@@ -255,11 +260,11 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setAuthState('authenticated');
 
       // Handle deep link redirect (once only)
-      if (!deepLinkHandledRef.current) {
+      if (!isDeepLinkHandled()) {
         const deepLink = resolveDeepLink(searchParams)
           || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
         if (deepLink && deepLink !== pathname) {
-          deepLinkHandledRef.current = true;
+          markDeepLinkHandled();
           router.replace(deepLink);
         }
       }

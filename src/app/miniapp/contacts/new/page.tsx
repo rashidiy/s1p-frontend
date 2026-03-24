@@ -36,7 +36,7 @@ export default function NewContactPage() {
     }
   }, [webApp, goBack]);
 
-  const handleSave = useCallback(async () => {
+  const handleSave = async () => {
     if (!firstName.trim() || !phone.trim() || saving) return;
 
     setSaving(true);
@@ -57,31 +57,14 @@ export default function NewContactPage() {
     } finally {
       setSaving(false);
     }
-  }, [firstName, lastName, phone, email, saving, webApp, t, router]);
+  };
 
-  // Telegram MainButton
-  useEffect(() => {
-    if (!webApp) return;
-    webApp.MainButton.setText(t('contacts.saveContact'));
-    webApp.MainButton.show();
-    webApp.MainButton.onClick(handleSave);
-    if (saving) {
-      webApp.MainButton.showProgress(true);
-    } else {
-      webApp.MainButton.hideProgress();
-    }
-    return () => {
-      webApp.MainButton.offClick(handleSave);
-      webApp.MainButton.hide();
-    };
-  }, [webApp, handleSave, saving, t]);
+  const canSave = firstName.trim() && phone.trim() && !saving;
 
   return (
     <div className="miniapp-detail-enter">
-      {/* Header */}
       <div className="miniapp-page-title">{t('contacts.newContact')}</div>
 
-      {/* Form */}
       <div className="miniapp-section" style={{ padding: '16px' }}>
         <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, display: 'block' }}>
           {t('contacts.firstName')} *
@@ -108,7 +91,7 @@ export default function NewContactPage() {
           {t('contacts.phone')} *
         </label>
         {phoneParam ? (
-          <div className="miniapp-create-contact-phone" style={{ fontSize: 16, marginBottom: 0, padding: '10px 12px', background: 'var(--ma-bg2)', borderRadius: 'var(--ma-radius-sm)' }}>
+          <div style={{ fontSize: 16, padding: '10px 12px', background: 'var(--ma-bg2)', borderRadius: 'var(--ma-radius-sm)' }}>
             {formatPhone(phoneParam)}
           </div>
         ) : (
@@ -131,6 +114,26 @@ export default function NewContactPage() {
           onChange={(e) => setEmail(e.target.value)}
           type="email"
         />
+
+        <button
+          onClick={handleSave}
+          disabled={!canSave}
+          style={{
+            width: '100%',
+            marginTop: 20,
+            padding: '14px',
+            borderRadius: 'var(--ma-radius-sm)',
+            border: 'none',
+            background: canSave ? 'var(--ma-btn)' : 'var(--ma-separator)',
+            color: canSave ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: canSave ? 'pointer' : 'default',
+            opacity: saving ? 0.7 : 1,
+          }}
+        >
+          {saving ? '...' : t('contacts.saveContact')}
+        </button>
       </div>
     </div>
   );
