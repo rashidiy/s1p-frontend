@@ -187,7 +187,7 @@ describe('Deal Detail Page', () => {
   });
 
   it('hides win/lose buttons for closed deals', async () => {
-    const wonDeal = { ...mockDeal, stage: 'won' };
+    const wonDeal = { ...mockDeal, stage: 'closed_won' };
     mockGetDeal.mockResolvedValue(wonDeal);
     mockGetEntityNotes.mockResolvedValue([]);
 

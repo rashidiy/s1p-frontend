@@ -20,13 +20,23 @@ export const LEAD_STATUS_COLORS: Record<string, string> = {
   lost: 'bg-red-100 text-red-800',
 };
 
+/** All deal stages in pipeline order -- single source of truth matching backend DealStageEnum */
+export const DEAL_STAGES = [
+  'prospecting', 'qualification', 'proposal', 'negotiation', 'closed_won', 'closed_lost',
+] as const;
+
+/** Active (draggable) pipeline stages -- excludes terminal stages */
+export const DEAL_PIPELINE_STAGES = [
+  'prospecting', 'qualification', 'proposal', 'negotiation',
+] as const;
+
 export const DEAL_STAGE_KEYS: Record<string, string> = {
   prospecting: 'prospecting',
   qualification: 'qualification',
   proposal: 'proposal',
   negotiation: 'negotiation',
-  closed_won: 'won',
-  closed_lost: 'lost',
+  closed_won: 'closed_won',
+  closed_lost: 'closed_lost',
 };
 
 export const DEAL_STAGE_COLORS: Record<string, string> = {
@@ -37,6 +47,32 @@ export const DEAL_STAGE_COLORS: Record<string, string> = {
   closed_won: 'bg-green-100 text-green-800',
   closed_lost: 'bg-red-100 text-red-800',
 };
+
+/** Ant Design Tag colors for deal stages (used in table and card views) */
+export const DEAL_STAGE_TAG_COLORS: Record<string, string> = {
+  prospecting: 'blue',
+  qualification: 'gold',
+  proposal: 'orange',
+  negotiation: 'purple',
+  closed_won: 'green',
+  closed_lost: 'red',
+};
+
+/** Pipeline board hex colors (used in kanban column headers) */
+export const DEAL_STAGE_BOARD_COLORS: Record<string, string> = {
+  prospecting: '#3B82F6',
+  qualification: '#F59E0B',
+  proposal: '#F97316',
+  negotiation: '#8B5CF6',
+  closed_won: '#16A34A',
+  closed_lost: '#EF4444',
+};
+
+/** Deal stage filter options (value = backend enum, key = i18n key under statuses.*) */
+export const DEAL_STAGE_OPTIONS = DEAL_STAGES.map((s) => ({
+  value: s,
+  key: DEAL_STAGE_KEYS[s],
+}));
 
 export const TASK_STATUS_KEYS: Record<string, string> = {
   pending: 'pending',

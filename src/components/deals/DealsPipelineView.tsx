@@ -6,18 +6,9 @@ import { DollarOutlined, RiseOutlined, UserOutlined, CalendarOutlined } from '@a
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { apiClient } from '@/lib/api';
 import type { DealResponse } from '@/types/api';
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { formatCurrency, formatDate } from '@/lib/utils';
-
-const PIPELINE_STAGES = ['prospecting', 'qualification', 'proposal', 'negotiation'] as const;
-
-const STAGE_COLORS: Record<string, string> = {
-  prospecting: '#3B82F6',
-  qualification: '#F59E0B',
-  proposal: '#F97316',
-  negotiation: '#8B5CF6',
-};
+import { DEAL_STAGES, DEAL_STAGE_BOARD_COLORS, DEAL_STAGE_KEYS } from '@/lib/constants';
 
 export default function DealsPipelineView() {
   const t = useTranslations('deals');
@@ -44,7 +35,7 @@ export default function DealsPipelineView() {
 
   const dealsByStage = useMemo(() => {
     const grouped: Record<string, DealResponse[]> = {};
-    for (const stage of PIPELINE_STAGES) {
+    for (const stage of DEAL_STAGES) {
       grouped[stage] = [];
     }
     for (const deal of deals) {
@@ -73,12 +64,11 @@ export default function DealsPipelineView() {
     try {
       await apiClient.updateDeal(dealId, { stage: newStage } as never);
       message.success(t('dealMoved'));
-    } catch (error) {
+    } catch {
       // Revert on failure
       setDeals(prev => prev.map(d =>
         d.id === dealId ? { ...d, stage: oldStage } : d
       ));
-      console.error('Failed to move deal:', error);
       message.error(tErrors('failedToUpdateDeal'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stable refs
@@ -92,20 +82,23 @@ export default function DealsPipelineView() {
     );
   }
 
+  const isClosedStage = (stage: string) => stage === 'closed_won' || stage === 'closed_lost';
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="pipeline-board">
-        {PIPELINE_STAGES.map((stage) => {
-          const color = STAGE_COLORS[stage];
+        {DEAL_STAGES.map((stage) => {
+          const color = DEAL_STAGE_BOARD_COLORS[stage];
           const stageDeals = dealsByStage[stage] || [];
           const total = stageDeals.reduce((sum, d) => sum + (d.amount || 0), 0);
+          const closed = isClosedStage(stage);
 
           return (
             <div key={stage} className="pipeline-column">
               <div className="pipeline-column-header" style={{ borderTopColor: color }}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-gray-800 text-sm">
-                    {tStatuses(stage)}
+                    {tStatuses(DEAL_STAGE_KEYS[stage])}
                   </span>
                   <span
                     className="pipeline-count-badge"
@@ -119,7 +112,7 @@ export default function DealsPipelineView() {
                 </span>
               </div>
 
-              <Droppable droppableId={stage}>
+              <Droppable droppableId={stage} isDropDisabled={closed}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -128,7 +121,7 @@ export default function DealsPipelineView() {
                     style={{ minHeight: 100 }}
                   >
                     {stageDeals.map((deal, index) => (
-                      <Draggable key={deal.id} draggableId={deal.id} index={index}>
+                      <Draggable key={deal.id} draggableId={deal.id} index={index} isDragDisabled={closed}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
@@ -136,7 +129,7 @@ export default function DealsPipelineView() {
                             {...provided.dragHandleProps}
                             className={`pipeline-deal-card glass-card ${snapshot.isDragging ? 'pipeline-deal-dragging' : ''}`}
                             onClick={() => { window.location.href = `/deals/${deal.id}`; }}
-                            style={{ ...provided.draggableProps.style, cursor: 'grab' }}
+                            style={{ ...provided.draggableProps.style, cursor: closed ? 'pointer' : 'grab' }}
                           >
                             <h4 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
                               {deal.title}

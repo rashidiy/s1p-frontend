@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Input, Pagination, Button, Tag, Select, Segmented, Table, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, DollarOutlined, RiseOutlined, UserOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons';
+import { PlusOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -13,10 +13,7 @@ import DealsPipelineView from '@/components/deals/DealsPipelineView';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { formatCurrency, formatDate } from '@/lib/utils';
-
-const stageColors: Record<string, string> = {
-  prospecting: 'blue', qualification: 'gold', proposal: 'orange', negotiation: 'purple', won: 'green', lost: 'red',
-};
+import { DEAL_STAGE_OPTIONS, DEAL_STAGE_TAG_COLORS, DEAL_STAGE_KEYS } from '@/lib/constants';
 
 type ViewMode = 'pipeline' | 'list';
 
@@ -128,7 +125,7 @@ export default function DealsPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Input.Search placeholder={t('searchDeals')} value={searchInput} onChange={(e) => { const v = e.target.value; setSearchInput(v); if (!v) { setSearch(''); setPage(1); } }} allowClear size="large" className="w-full md:max-w-lg" />
             <Select value={stage || undefined} onChange={(v) => { setStage(v || ''); setPage(1); }} placeholder={t('allStages')} allowClear className="w-full sm:w-[180px]" size="large"
-              options={[{ label: tStatuses('prospecting'), value: 'prospecting' }, { label: tStatuses('qualification'), value: 'qualification' }, { label: tStatuses('proposal'), value: 'proposal' }, { label: tStatuses('negotiation'), value: 'negotiation' }, { label: tStatuses('won'), value: 'won' }, { label: tStatuses('lost'), value: 'lost' }]}
+              options={DEAL_STAGE_OPTIONS.map((opt) => ({ label: tStatuses(opt.key), value: opt.value }))}
             />
           </div>
 
@@ -156,11 +153,15 @@ export default function DealsPage() {
                   },
                   {
                     title: t('contact'), dataIndex: 'contact_name', key: 'contact', responsive: ['md'],
-                    render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+                    render: (v: string | null) => v || <span className="text-gray-300">{'\u2014'}</span>,
                   },
                   {
                     title: t('stage'), dataIndex: 'stage', key: 'stage', width: 130,
-                    render: (v: string) => v ? <Tag color={stageColors[v.toLowerCase()] || 'default'}>{tStatuses(v.toLowerCase())}</Tag> : '—',
+                    render: (v: string) => {
+                      if (!v) return '\u2014';
+                      const key = v.toLowerCase();
+                      return <Tag color={DEAL_STAGE_TAG_COLORS[key] || 'default'}>{DEAL_STAGE_KEYS[key] ? tStatuses(DEAL_STAGE_KEYS[key]) : v}</Tag>;
+                    },
                   },
                   {
                     title: t('amount'), dataIndex: 'amount', key: 'amount', width: 130,
@@ -168,22 +169,22 @@ export default function DealsPage() {
                   },
                   {
                     title: t('probability'), dataIndex: 'probability', key: 'probability', width: 80, responsive: ['lg'],
-                    render: (v: number | null) => v != null ? `${v}%` : '—',
+                    render: (v: number | null) => v != null ? `${v}%` : '\u2014',
                   },
                   {
                     title: t('closeDate'), dataIndex: 'expected_close_date', key: 'close', width: 120, responsive: ['lg'],
-                    render: (v: string | null) => v ? formatDate(v) : '—',
+                    render: (v: string | null) => v ? formatDate(v) : '\u2014',
                   },
                   {
                     title: t('assignedTo'), dataIndex: 'assigned_to_name', key: 'assigned', responsive: ['xl'],
-                    render: (v: string | null) => v || <span className="text-gray-300">—</span>,
+                    render: (v: string | null) => v || <span className="text-gray-300">{'\u2014'}</span>,
                   },
                   {
                     title: '', key: 'actions', width: 140,
                     render: (_, deal) => (
                       <div className="flex gap-2">
                         <Link href={`/deals/${deal.id}`}><Button size="small">{tActions('view')}</Button></Link>
-                        {deal.stage !== 'won' && deal.stage !== 'lost' && hasPermissionString('deals.write') && (
+                        {deal.stage !== 'closed_won' && deal.stage !== 'closed_lost' && hasPermissionString('deals.write') && (
                           <Button size="small" type="primary" onClick={async (e) => { e.stopPropagation(); try { await apiClient.markDealWon(deal.id); loadDeals(); } catch { message.error(tErrors('failedToMarkDealAsWon')); } }}>{tActions('win')}</Button>
                         )}
                       </div>
