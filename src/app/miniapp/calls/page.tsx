@@ -107,48 +107,26 @@ export default function MiniAppCalls() {
     setTimeout(() => searchInputRef.current?.focus(), 100);
   }
 
-  // Fast keypress handling — accumulate in ref, flush via rAF to avoid render bottleneck
-  const pendingDigits = useRef<string[]>([]);
-  const pendingBackspaces = useRef(0);
-  const rafId = useRef<number>();
-
-  function flushInput() {
-    const isFrom = mode === 'external' && activeInput === 'from';
-    const setter = isFrom ? setPhone1 : setPhone2;
-    const digits = pendingDigits.current.splice(0);
-    const backspaces = pendingBackspaces.current;
-    pendingBackspaces.current = 0;
-    if (digits.length > 0 || backspaces > 0) {
-      setter((prev) => {
-        let val = prev;
-        if (backspaces > 0) val = val.slice(0, -backspaces);
-        for (const d of digits) {
-          val = val === '' && d !== '+' && d !== '#' ? '+998' + d : val + d;
-        }
-        return val;
-      });
+  // Throttle haptic to avoid blocking the main thread on rapid presses
+  const lastHaptic = useRef(0);
+  function hapticLight() {
+    const now = Date.now();
+    if (now - lastHaptic.current > 80) {
+      lastHaptic.current = now;
+      try { webApp?.HapticFeedback.selectionChanged(); } catch {}
     }
-    rafId.current = undefined;
-  }
-
-  function scheduleFlush() {
-    if (!rafId.current) rafId.current = requestAnimationFrame(flushInput);
   }
 
   function handleKeyPress(digit: string) {
-    webApp?.HapticFeedback.selectionChanged();
-    pendingDigits.current.push(digit);
-    scheduleFlush();
+    hapticLight();
+    const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
+    setter((prev) => prev === '' && digit !== '+' && digit !== '#' ? '+998' + digit : prev + digit);
   }
 
   function handleBackspace() {
-    webApp?.HapticFeedback.selectionChanged();
-    if (pendingDigits.current.length > 0) {
-      pendingDigits.current.pop(); // cancel last pending digit first
-    } else {
-      pendingBackspaces.current++;
-    }
-    scheduleFlush();
+    hapticLight();
+    const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
+    setter((prev) => prev.slice(0, -1));
   }
 
   async function handleCall() {
