@@ -287,6 +287,14 @@ export default function CallsPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatPhone = (phone?: string | null) => {
+    if (!phone) return null;
+    // +998XXYYYXXYY → +998 XX YYY XX XX
+    const match = phone.match(/^\+998(\d{2})(\d{3})(\d{2})(\d{2})$/);
+    if (match) return `+998 ${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
+    return phone;
+  };
+
   const getDirectionIcon = (dir?: string | null, state?: string | null) => {
     if (dir === 'inbound') {
       const isMissed = state === 'NOANSWER' || state === 'BUSY' || state === 'CANCEL';
@@ -386,7 +394,7 @@ export default function CallsPage() {
                   <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction, call.state)}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm sm:text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
+                      <span className="font-medium text-sm sm:text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPhone(call.phone_1) || tCommon('unknown')} &rarr; {formatPhone(call.phone_2) || tCommon('unknown')}</span>
                       {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction}</Tag>}
                       {call.state && <Tag color={call.state === 'ANSWER' ? 'green' : (call.state === 'NOANSWER' || call.state === 'BUSY' || call.state === 'CANCEL') ? 'red' : undefined}>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>}
                     </div>
