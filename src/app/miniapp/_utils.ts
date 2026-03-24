@@ -1,15 +1,15 @@
-/** Avatar color palette — visually distinct, works on both light/dark backgrounds */
+/** Avatar gradient palette — richer than flat colors, works on both light/dark backgrounds */
 const AVATAR_COLORS = [
-  '#4338CA', // indigo
-  '#0891B2', // cyan
-  '#059669', // emerald
-  '#D97706', // amber
-  '#DC2626', // red
-  '#7C3AED', // violet
-  '#2563EB', // blue
-  '#C026D3', // fuchsia
-  '#0D9488', // teal
-  '#EA580C', // orange
+  'linear-gradient(135deg, #667eea, #764ba2)', // indigo→purple
+  'linear-gradient(135deg, #0891B2, #06b6d4)',  // cyan
+  'linear-gradient(135deg, #059669, #34d399)',  // emerald
+  'linear-gradient(135deg, #D97706, #fbbf24)',  // amber
+  'linear-gradient(135deg, #DC2626, #f87171)',  // red
+  'linear-gradient(135deg, #7C3AED, #a78bfa)',  // violet
+  'linear-gradient(135deg, #2563EB, #60a5fa)',  // blue
+  'linear-gradient(135deg, #C026D3, #e879f9)',  // fuchsia
+  'linear-gradient(135deg, #0D9488, #2dd4bf)',  // teal
+  'linear-gradient(135deg, #EA580C, #fb923c)',  // orange
 ];
 
 /** Generate initials from name parts or phone */

@@ -228,7 +228,7 @@ export default function MiniAppDashboard() {
 
       {/* Needs Attention section */}
       {missedCalls.length > 0 && (
-        <div className="miniapp-section">
+        <div className="miniapp-section miniapp-attention-section">
           <div className="miniapp-section-header">{t('needsAttention')}</div>
           <div className="miniapp-list">
             {missedCalls.slice(0, 5).map((call, i) => {
