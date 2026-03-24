@@ -41,6 +41,39 @@ function profileToUser(profile: UserResponse) {
 }
 
 /** Map deep link params to a miniapp route */
+function decodeStartapp(param: string): { action: string; data: string; company_id: string } | null {
+  try {
+    const padded = param + '='.repeat((4 - (param.length % 4)) % 4);
+    const raw = atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
+    const parts = raw.split(':');
+    if (parts.length !== 4) return null;
+    return { action: parts[0], data: parts[1], company_id: parts[2] };
+  } catch {
+    return null;
+  }
+}
+
+function startappToDeepLink(action: string, data: string): string | null {
+  switch (action) {
+    case 'call':
+      return `/miniapp/calls?dial=${encodeURIComponent(data)}`;
+    case 'call_detail':
+      return `/miniapp/calls/${data}`;
+    case 'new_contact':
+      return `/miniapp/contacts/new?phone=${encodeURIComponent(data)}`;
+    case 'new_lead':
+      return `/miniapp/pipeline?new_lead=1&phone=${encodeURIComponent(data)}`;
+    case 'lead_detail':
+      return `/miniapp/pipeline`;
+    case 'deal_detail':
+      return `/miniapp/pipeline`;
+    case 'recording':
+      return `/miniapp/calls/${data}`;
+    default:
+      return null;
+  }
+}
+
 function resolveDeepLink(searchParams: URLSearchParams): string | null {
   const view = searchParams.get('view');
   const id = searchParams.get('id');
@@ -73,9 +106,12 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const { setUser } = useAuthStore();
   const t = useTranslations('miniapp');
 
-  const companyIdParam = searchParams.get('company_id')
+  // Parse startapp param — could be raw company_id or base64-encoded signed payload
+  const rawStartParam = searchParams.get('company_id')
     || webApp?.initDataUnsafe?.start_param
     || '';
+  const startappData = rawStartParam ? decodeStartapp(rawStartParam) : null;
+  const companyIdParam = startappData?.company_id || rawStartParam;
 
   // Session-based company persistence
   const getSessionCompany = () => {
@@ -114,7 +150,8 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       }
 
       // Handle deep link redirect after successful auth
-      const deepLink = resolveDeepLink(searchParams);
+      const deepLink = resolveDeepLink(searchParams)
+        || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
       if (deepLink && deepLink !== pathname) {
         router.replace(deepLink);
       }
@@ -123,7 +160,7 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setErrorMsg(detail || t('error.authFailed'));
       setAuthState('error');
     }
-  }, [isTelegram, webApp, setUser, t, searchParams, pathname, router]);
+  }, [isTelegram, webApp, setUser, t, searchParams, pathname, router, startappData]);
 
   const authenticate = useCallback(async () => {
     if (!sdkReady) return;
@@ -168,7 +205,8 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setAuthState('authenticated');
 
       // Handle deep link redirect
-      const deepLink = resolveDeepLink(searchParams);
+      const deepLink = resolveDeepLink(searchParams)
+        || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
       if (deepLink && deepLink !== pathname) {
         router.replace(deepLink);
       }
