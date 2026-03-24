@@ -19,7 +19,7 @@ export default function MiniAppCalls() {
   const t = useTranslations('miniapp');
   const { user } = useAuthStore();
 
-  const [phone2, setPhone2] = useState(searchParams.get('number') || '');
+  const [phone2, setPhone2] = useState(searchParams.get('dial') || searchParams.get('number') || '');
   const [phone1, setPhone1] = useState('');
   const [mode, setMode] = useState<'sip' | 'external'>(
     (searchParams.get('mode') as 'sip' | 'external') || 'sip'
