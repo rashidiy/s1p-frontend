@@ -1174,30 +1174,27 @@
   min-height: 0;
 }
 
-/* Operator bar — just a label with optional change button */
+/* Operator bar — whole row tappable */
 .miniapp-dialer-operator-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
+  padding: 6px 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 8px;
+  align-self: center;
+}
+
+.miniapp-dialer-operator-bar:active {
+  background: rgba(128, 128, 128, 0.06);
 }
 
 .miniapp-dialer-operator-label {
   font-size: 13px;
   color: var(--ma-hint);
   letter-spacing: 0.2px;
-}
-
-.miniapp-dialer-operator-change {
-  background: none;
-  border: none;
-  color: var(--ma-hint);
-  padding: 4px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  display: flex;
-  align-items: center;
-  opacity: 0.6;
 }
 
 /* Mode toggle */
@@ -1213,10 +1210,10 @@
 
 .miniapp-dialer-mode-btn {
   flex: 1;
-  padding: 6px 0;
+  padding: 4px 0;
   border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 7px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -1236,6 +1233,9 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-width: 320px;
+  width: 100%;
+  align-self: center;
 }
 
 .miniapp-dialer-field {
@@ -1248,12 +1248,11 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
-  min-height: 44px;
+  min-height: 42px;
 }
 
 .miniapp-dialer-field.active {
-  background: var(--ma-section);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: rgba(128, 128, 128, 0.1);
 }
 
 .miniapp-dialer-field-label {
@@ -1304,14 +1303,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 12px;
   background: var(--ma-section);
   margin-bottom: 8px;
 }
 
-.miniapp-dialer-search-icon {
-  color: var(--ma-hint);
+.miniapp-dialer-search-back {
+  background: none;
+  border: none;
+  color: var(--ma-text);
+  padding: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
