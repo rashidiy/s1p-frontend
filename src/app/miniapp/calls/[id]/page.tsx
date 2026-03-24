@@ -235,7 +235,7 @@ export default function CallDetailPage() {
 
   const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
   const isInbound = call.direction === 'inbound';
-  const phone = call.phone_2 || call.phone_1 || '';
+  const phone = isInbound ? (call.phone_1 || call.phone_2 || '') : (call.phone_2 || call.phone_1 || '');
   const displayName = call.contact_name || phone || '\u2014';
   const hasContact = !!call.contact_name && !!call.contact_id;
 

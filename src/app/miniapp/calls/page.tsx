@@ -118,13 +118,12 @@ export default function MiniAppCalls() {
   }
 
   function handleKeyPress(digit: string) {
-    hapticLight();
+    // No haptic on keypad — causes lag in Telegram WebView at rapid press speeds
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
     setter((prev) => prev === '' && digit !== '+' && digit !== '#' ? '+998' + digit : prev + digit);
   }
 
   function handleBackspace() {
-    hapticLight();
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
     setter((prev) => prev.slice(0, -1));
   }
@@ -307,9 +306,9 @@ export default function MiniAppCalls() {
 
       {/* === BOTTOM: pad + call (never moves) === */}
       <div className="miniapp-dialer-fixed">
-        <div className="miniapp-dialer-grid" onClick={(e) => {
+        <div className="miniapp-dialer-grid" onPointerDown={(e) => {
           const key = (e.target as HTMLElement).closest('[data-key]')?.getAttribute('data-key');
-          if (key) handleKeyPress(key);
+          if (key) { e.preventDefault(); handleKeyPress(key); }
         }}>
           <button className="miniapp-dialer-key" data-key="1">1</button>
           <button className="miniapp-dialer-key" data-key="2">2</button>
