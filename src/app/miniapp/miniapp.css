@@ -1497,15 +1497,14 @@
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.08s, background 0.08s;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* No transition — instant feedback for rapid pressing */
 }
 
 .miniapp-dialer-key:active {
-  transform: scale(0.9);
-  background: rgba(128, 128, 128, 0.2);
+  background: rgba(128, 128, 128, 0.22);
 }
 
 /* Bottom row */

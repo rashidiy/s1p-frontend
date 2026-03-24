@@ -107,11 +107,11 @@ export default function MiniAppCalls() {
     setTimeout(() => searchInputRef.current?.focus(), 100);
   }
 
-  // Throttle haptic to avoid blocking the main thread on rapid presses
+  // Throttle haptic — Telegram SDK call is synchronous and blocks main thread
   const lastHaptic = useRef(0);
   function hapticLight() {
     const now = Date.now();
-    if (now - lastHaptic.current > 80) {
+    if (now - lastHaptic.current > 100) {
       lastHaptic.current = now;
       try { webApp?.HapticFeedback.selectionChanged(); } catch {}
     }
@@ -307,10 +307,22 @@ export default function MiniAppCalls() {
 
       {/* === BOTTOM: pad + call (never moves) === */}
       <div className="miniapp-dialer-fixed">
-        <div className="miniapp-dialer-grid">
-          {DIAL_KEYS.map((d) => (
-            <button key={d} className="miniapp-dialer-key" onClick={() => handleKeyPress(d)}>{d}</button>
-          ))}
+        <div className="miniapp-dialer-grid" onClick={(e) => {
+          const key = (e.target as HTMLElement).closest('[data-key]')?.getAttribute('data-key');
+          if (key) handleKeyPress(key);
+        }}>
+          <button className="miniapp-dialer-key" data-key="1">1</button>
+          <button className="miniapp-dialer-key" data-key="2">2</button>
+          <button className="miniapp-dialer-key" data-key="3">3</button>
+          <button className="miniapp-dialer-key" data-key="4">4</button>
+          <button className="miniapp-dialer-key" data-key="5">5</button>
+          <button className="miniapp-dialer-key" data-key="6">6</button>
+          <button className="miniapp-dialer-key" data-key="7">7</button>
+          <button className="miniapp-dialer-key" data-key="8">8</button>
+          <button className="miniapp-dialer-key" data-key="9">9</button>
+          <button className="miniapp-dialer-key" data-key="+">+</button>
+          <button className="miniapp-dialer-key" data-key="0">0</button>
+          <button className="miniapp-dialer-key" data-key="#">#</button>
         </div>
         <div className="miniapp-dialer-bottom">
           <div />
