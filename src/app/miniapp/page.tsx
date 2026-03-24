@@ -275,10 +275,18 @@ export default function MiniAppDashboard() {
                   key={i}
                   className="miniapp-attention-item"
                   onClick={() => {
-                    if (phone) {
-                      webApp?.HapticFeedback.impactOccurred('medium');
-                      window.open(`tel:${phone}`, '_self');
-                    }
+                    webApp?.HapticFeedback.impactOccurred('medium');
+                    try {
+                      sessionStorage.setItem(`call_${call.id}`, JSON.stringify({
+                        id: call.id,
+                        phone_1: call.phone,
+                        direction: 'inbound',
+                        state: 'NOANSWER',
+                        created_at: call.created_at,
+                        contact_name: call.contact_name,
+                      }));
+                    } catch {}
+                    router.push(`/miniapp/calls/${call.id}`);
                   }}
                 >
                   <div className="miniapp-call-icon miniapp-call-icon-missed">
