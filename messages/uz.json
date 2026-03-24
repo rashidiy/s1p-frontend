@@ -1295,7 +1295,12 @@
       "speed": "Tezlik",
       "selectOperator": "Operatorni tanlang",
       "from": "Dan",
-      "to": "Kimga"
+      "to": "Kimga",
+      "sipMode": "SIP",
+      "externalMode": "Tashqi",
+      "operator": "Operator",
+      "searchContact": "Kontaktni qidiring yoki raqam kiriting",
+      "changeOperator": "O'zgartirish"
     },
     "profile": {
       "title": "Profil",

@@ -1295,7 +1295,12 @@
       "speed": "Скорость",
       "selectOperator": "Выберите оператора",
       "from": "От",
-      "to": "Кому"
+      "to": "Кому",
+      "sipMode": "SIP",
+      "externalMode": "Внешний",
+      "operator": "Оператор",
+      "searchContact": "Поиск контакта или вставьте номер",
+      "changeOperator": "Изменить"
     },
     "profile": {
       "title": "Профиль",

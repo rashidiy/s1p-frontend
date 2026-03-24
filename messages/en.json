@@ -1295,7 +1295,12 @@
       "speed": "Speed",
       "selectOperator": "Select operator",
       "from": "From",
-      "to": "To"
+      "to": "To",
+      "sipMode": "SIP",
+      "externalMode": "External",
+      "operator": "Operator",
+      "searchContact": "Search contact or paste number",
+      "changeOperator": "Change"
     },
     "profile": {
       "title": "Profile",

@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Phone, XCircle, Delete } from 'lucide-react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { Phone, XCircle, Delete, Search, ChevronDown } from 'lucide-react';
 import { Spin } from 'antd';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
-import type { SipuniOperator } from '@/types/api';
+import type { SipuniOperator, ContactResponse } from '@/types/api';
+import { getInitials, getAvatarColor } from '../_utils';
 
 const DIAL_KEYS = ['1','2','3','4','5','6','7','8','9','+','0','#'];
 
@@ -29,6 +30,7 @@ function formatPhone(raw: string): string {
 
 export default function MiniAppCalls() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const { user } = useAuthStore();
@@ -44,6 +46,14 @@ export default function MiniAppCalls() {
   const [activeInput, setActiveInput] = useState<'to' | 'from'>('to');
   const [fromCleared, setFromCleared] = useState(false);
   const hasSipExtension = !!user?.sip_extension;
+
+  // Contact search state
+  const [searchMode, setSearchMode] = useState<'to' | 'from' | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<ContactResponse[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (mode === 'external' && !phone1 && !fromCleared && user?.phone) {
@@ -62,6 +72,54 @@ export default function MiniAppCalls() {
   }, [hasSipExtension]);
 
   const sipExtension = hasSipExtension ? user!.sip_extension! : selectedOperator;
+
+  // Contact search
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) { setSearchResults([]); return; }
+    setSearching(true);
+    try {
+      const res = await apiClient.getContacts({ page: 1, page_size: 8, search: q });
+      setSearchResults(res.items || []);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  function handleSearchInput(value: string) {
+    setSearchQuery(value);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    // If it looks like a phone number, set it directly
+    if (/^[+\d\s()-]+$/.test(value) && value.replace(/\D/g, '').length >= 3) {
+      const clean = value.replace(/[^\d+]/g, '');
+      if (searchMode === 'from') setPhone1(clean);
+      else setPhone2(clean);
+    }
+    searchTimeout.current = setTimeout(() => doSearch(value), 300);
+  }
+
+  function selectContact(contact: ContactResponse) {
+    const phone = contact.phone || '';
+    if (searchMode === 'from') {
+      setPhone1(phone);
+      setFromCleared(false);
+    } else {
+      setPhone2(phone);
+    }
+    setSearchMode(null);
+    setSearchQuery('');
+    setSearchResults([]);
+    webApp?.HapticFeedback.impactOccurred('light');
+  }
+
+  function openSearch(field: 'to' | 'from') {
+    setSearchMode(field);
+    setSearchQuery('');
+    setSearchResults([]);
+    webApp?.HapticFeedback.selectionChanged();
+    setTimeout(() => searchInputRef.current?.focus(), 100);
+  }
 
   function handleKeyPress(digit: string) {
     webApp?.HapticFeedback.selectionChanged();
@@ -100,95 +158,164 @@ export default function MiniAppCalls() {
 
   const currentNumber = mode === 'external' && activeInput === 'from' ? phone1 : phone2;
   const canCall = mode === 'sip' ? phone2.trim() && sipExtension : phone2.trim() && phone1.trim();
+  const operatorLabel = hasSipExtension
+    ? `${user!.first_name || t('calls.operator')} · ${user!.sip_extension}`
+    : selectedOperator
+      ? `${operators.find(o => o.extension === selectedOperator)?.name || ''} · ${selectedOperator}`
+      : t('calls.operator');
+
+  // Contact search overlay
+  if (searchMode) {
+    return (
+      <div className="miniapp-dialer">
+        <div className="miniapp-dialer-search">
+          <div className="miniapp-dialer-search-bar">
+            <Search size={16} className="miniapp-dialer-search-icon" />
+            <input
+              ref={searchInputRef}
+              className="miniapp-dialer-search-input"
+              placeholder={t('calls.searchContact')}
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              autoFocus
+            />
+            <button className="miniapp-dialer-search-cancel" onClick={() => { setSearchMode(null); setSearchQuery(''); setSearchResults([]); }}>
+              <XCircle size={18} />
+            </button>
+          </div>
+
+          {searching && <div style={{ padding: 16, textAlign: 'center' }}><Spin size="small" /></div>}
+
+          {searchResults.length > 0 && (
+            <div className="miniapp-dialer-search-results">
+              {searchResults.map((c) => {
+                const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.phone || '—';
+                return (
+                  <div key={c.id} className="miniapp-dialer-search-item" onClick={() => selectContact(c)}>
+                    <div className="miniapp-dialer-search-avatar" style={{ background: getAvatarColor(name) }}>
+                      {getInitials(c.first_name, c.last_name, c.phone)}
+                    </div>
+                    <div className="miniapp-dialer-search-info">
+                      <div className="miniapp-dialer-search-name">{name}</div>
+                      {c.phone && <div className="miniapp-dialer-search-phone">{c.phone}</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {searchQuery && !searching && searchResults.length === 0 && searchQuery.replace(/\D/g, '').length >= 3 && (
+            <div className="miniapp-dialer-search-results">
+              <div className="miniapp-dialer-search-item" onClick={() => {
+                const clean = searchQuery.replace(/[^\d+]/g, '');
+                if (searchMode === 'from') setPhone1(clean);
+                else setPhone2(clean);
+                setSearchMode(null);
+                setSearchQuery('');
+                webApp?.HapticFeedback.impactOccurred('light');
+              }}>
+                <div className="miniapp-dialer-search-avatar" style={{ background: 'var(--ma-separator)' }}>
+                  <Phone size={16} />
+                </div>
+                <div className="miniapp-dialer-search-info">
+                  <div className="miniapp-dialer-search-name">{formatPhone(searchQuery.replace(/[^\d+]/g, ''))}</div>
+                  <div className="miniapp-dialer-search-phone">{t('calls.enterNumber')}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="miniapp-dialer">
-      {/* Top: display area — takes all remaining space, pushes everything else to bottom */}
-      <div className="miniapp-dialer-display">
-        {mode === 'external' ? (
-          <div className="miniapp-dialer-ext">
-            <div
-              className={`miniapp-dialer-ext-field ${activeInput === 'from' ? 'active' : ''}`}
-              onClick={(e) => {
-                if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
-                webApp?.HapticFeedback.selectionChanged(); setActiveInput('from');
-              }}
-            >
-              <span className="miniapp-dialer-ext-label">{t('calls.from')}</span>
-              <span className="miniapp-dialer-ext-value">
-                {phone1 ? formatPhone(phone1) : '\u2014'}
-              </span>
-              {phone1 && (
-                <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <XCircle size={16} />
-                </button>
-              )}
-            </div>
-            <div
-              className={`miniapp-dialer-ext-field ${activeInput === 'to' ? 'active' : ''}`}
-              onClick={(e) => {
-                if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
-                webApp?.HapticFeedback.selectionChanged(); setActiveInput('to');
-              }}
-            >
-              <span className="miniapp-dialer-ext-label">{t('calls.to')}</span>
-              <span className="miniapp-dialer-ext-value">
-                {phone2 ? formatPhone(phone2) : '\u2014'}
-              </span>
-              {phone2 && (
-                <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <XCircle size={16} />
-                </button>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="miniapp-dialer-number">
-            {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
-            {phone2 && (
-              <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                <XCircle size={16} />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Fixed bottom block: controls → pad → call row */}
-      <div className="miniapp-dialer-fixed">
-        {/* Mode + operator */}
-        <div className="miniapp-dialer-controls">
-          <div className="miniapp-dialer-mode">
-            <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
-              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('sip'); setActiveInput('to'); }}>
-              {t('calls.sipMode')}
+      {/* Top section: operator + toggle + fields */}
+      <div className="miniapp-dialer-top">
+        {/* Operator label */}
+        <div className="miniapp-dialer-operator-bar">
+          <span className="miniapp-dialer-operator-label">{operatorLabel}</span>
+          {!hasSipExtension && (
+            <button className="miniapp-dialer-operator-change" onClick={() => {
+              webApp?.HapticFeedback.selectionChanged();
+              // Cycle through operators
+              const idx = operators.findIndex(o => o.extension === selectedOperator);
+              const next = operators[(idx + 1) % operators.length];
+              if (next) setSelectedOperator(next.extension);
+            }}>
+              <ChevronDown size={14} />
             </button>
-            <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
-              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>
-              {t('calls.externalMode')}
-            </button>
-          </div>
-          {hasSipExtension ? (
-            <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
-          ) : (
-            <select className="miniapp-dialer-operator-select" value={selectedOperator}
-              onChange={(e) => setSelectedOperator(e.target.value)}>
-              <option value="">{t('calls.selectOperator')}</option>
-              {operators.map((op) => (
-                <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
-              ))}
-            </select>
           )}
         </div>
 
-        {/* Number pad */}
+        {/* Mode toggle */}
+        <div className="miniapp-dialer-mode">
+          <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
+            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('sip'); setActiveInput('to'); }}>
+            {t('calls.sipMode')}
+          </button>
+          <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
+            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>
+            {t('calls.externalMode')}
+          </button>
+        </div>
+
+        {/* Phone fields */}
+        <div className="miniapp-dialer-fields">
+          {mode === 'external' && (
+            <div
+              className={`miniapp-dialer-field ${activeInput === 'from' ? 'active' : ''}`}
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
+                webApp?.HapticFeedback.selectionChanged();
+                setActiveInput('from');
+              }}
+            >
+              <span className="miniapp-dialer-field-label">{t('calls.from')}</span>
+              {phone1 ? (
+                <>
+                  <span className="miniapp-dialer-field-value">{formatPhone(phone1)}</span>
+                  <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
+                    <XCircle size={16} />
+                  </button>
+                </>
+              ) : (
+                <span className="miniapp-dialer-field-placeholder" onClick={() => openSearch('from')}>{t('calls.searchContact')}</span>
+              )}
+            </div>
+          )}
+          <div
+            className={`miniapp-dialer-field ${activeInput === 'to' || mode === 'sip' ? 'active' : ''}`}
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
+              webApp?.HapticFeedback.selectionChanged();
+              setActiveInput('to');
+            }}
+          >
+            <span className="miniapp-dialer-field-label">{mode === 'external' ? t('calls.to') : ''}</span>
+            {phone2 ? (
+              <>
+                <span className="miniapp-dialer-field-value">{formatPhone(phone2)}</span>
+                <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <XCircle size={16} />
+                </button>
+              </>
+            ) : (
+              <span className="miniapp-dialer-field-placeholder" onClick={() => openSearch(mode === 'external' ? 'to' : 'to')}>{t('calls.searchContact')}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Fixed bottom: pad + call */}
+      <div className="miniapp-dialer-fixed">
         <div className="miniapp-dialer-grid">
           {DIAL_KEYS.map((d) => (
             <button key={d} className="miniapp-dialer-key" onClick={() => handleKeyPress(d)}>{d}</button>
           ))}
         </div>
-
-        {/* Call + backspace */}
         <div className="miniapp-dialer-bottom">
           <div />
           <button className="miniapp-dialer-call" onClick={handleCall} disabled={!canCall || calling}>
