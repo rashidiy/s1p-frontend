@@ -89,6 +89,32 @@ export default function LeadsPage() {
     }
   };
 
+  const handleStatusChange = async (leadId: string, newStatus: string) => {
+    try {
+      await apiClient.updateLead(leadId, { status: newStatus });
+      setData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          items: prev.items.map((item) =>
+            item.id === leadId ? { ...item, status: newStatus } : item,
+          ),
+        };
+      });
+      message.success(t('leadUpdated'));
+    } catch {
+      message.error(tErrors('failedToUpdateLead'));
+    }
+  };
+
+  const statusOptions = [
+    { label: tStatuses('new'), value: 'new' },
+    { label: tStatuses('contacted'), value: 'contacted' },
+    { label: tStatuses('qualified'), value: 'qualified' },
+    { label: tStatuses('converted'), value: 'converted' },
+    { label: tStatuses('lost'), value: 'lost' },
+  ];
+
   const columns: ColumnsType<LeadResponse> = [
     {
       title: tFields('title'),
@@ -202,7 +228,7 @@ export default function LeadsPage() {
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
         <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => { const v = e.target.value; setSearchInput(v); if (!v) { setSearch(''); setPage(1); } }} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
-          options={[{ label: tStatuses('new'), value: 'new' }, { label: tStatuses('contacted'), value: 'contacted' }, { label: tStatuses('qualified'), value: 'qualified' }, { label: tStatuses('converted'), value: 'converted' }, { label: tStatuses('lost'), value: 'lost' }]}
+          options={statusOptions}
         />
         <Segmented
           value={viewMode}
@@ -257,7 +283,20 @@ export default function LeadsPage() {
                     <h3 className="font-semibold text-gray-900">{lead.title}</h3>
                     {lead.contact_name && <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><UserOutlined className="text-xs" /> {lead.contact_name}</p>}
                   </div>
-                  {lead.status && <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[lead.status.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[lead.status.toLowerCase()]) : lead.status}</Tag>}
+                  {lead.status && (hasPermissionString('leads.write') ? (
+                    <Select
+                      value={lead.status}
+                      onChange={(value) => handleStatusChange(lead.id, value)}
+                      options={statusOptions}
+                      size="small"
+                      variant="borderless"
+                      className="min-w-[110px]"
+                      popupMatchSelectWidth={false}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <Tag color={statusColors[lead.status.toLowerCase()] || 'default'}>{LEAD_STATUS_KEYS[lead.status.toLowerCase()] ? tStatuses(LEAD_STATUS_KEYS[lead.status.toLowerCase()]) : lead.status}</Tag>
+                  ))}
                 </div>
                 <div className="space-y-2">
                   {lead.estimated_value && <div className="flex items-center text-sm gap-1"><DollarOutlined className="text-green-600" /><span className="font-semibold text-green-600">${lead.estimated_value.toLocaleString()}</span></div>}
