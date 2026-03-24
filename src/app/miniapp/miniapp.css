@@ -1294,57 +1294,61 @@
   min-height: 0;
 }
 
-/* Phone fields */
+/* Phone fields — plain text rows, no card background */
 .miniapp-dialer-fields {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-width: 300px;
+  gap: 2px;
   width: 100%;
   align-self: center;
 }
 
-.miniapp-dialer-field {
+.miniapp-dialer-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(128, 128, 128, 0.06);
+  gap: 8px;
+  padding: 8px 8px;
+  min-height: 40px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
-  min-height: 42px;
-}
-
-.miniapp-dialer-field.active {
-  background: rgba(128, 128, 128, 0.1);
 }
 
 .miniapp-dialer-field-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--ma-hint);
-  min-width: 32px;
+  min-width: 36px;
 }
 
-.miniapp-dialer-field-value {
+.miniapp-dialer-field-number {
   flex: 1;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  color: var(--ma-text);
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--ma-hint);
+  opacity: 0.5;
 }
 
-.miniapp-dialer-field-placeholder {
-  flex: 1;
-  font-size: 14px;
-  color: var(--ma-hint);
-  opacity: 0.6;
+.miniapp-dialer-field-number.active {
+  color: var(--ma-text);
+  opacity: 1;
 }
 
 .miniapp-dialer-clear {
+  background: none;
+  border: none;
+  color: var(--ma-hint);
+  padding: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0.35;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.miniapp-dialer-contact-btn {
   background: none;
   border: none;
   color: var(--ma-hint);
@@ -1355,6 +1359,10 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+.miniapp-dialer-contact-btn:active {
+  opacity: 0.8;
 }
 
 /* Contact search overlay */
@@ -1480,19 +1488,19 @@
 /* Number pad */
 .miniapp-dialer-grid {
   display: grid;
-  grid-template-columns: repeat(3, 72px);
-  gap: 10px 20px;
+  grid-template-columns: repeat(3, 78px);
+  gap: 12px 22px;
   justify-content: center;
 }
 
 .miniapp-dialer-key {
-  width: 72px;
-  height: 72px;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
   border: none;
   background: rgba(128, 128, 128, 0.08);
   color: var(--ma-text);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 300;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
   cursor: pointer;
@@ -1510,16 +1518,16 @@
 /* Bottom row */
 .miniapp-dialer-bottom {
   display: grid;
-  grid-template-columns: 72px 72px 72px;
-  gap: 20px;
+  grid-template-columns: 78px 78px 78px;
+  gap: 22px;
   justify-content: center;
   align-items: center;
-  padding: 10px 0 8px;
+  padding: 12px 0 8px;
 }
 
 .miniapp-dialer-call {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   margin: 0 auto;
   border-radius: 50%;
   border: none;

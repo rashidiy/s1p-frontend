@@ -260,46 +260,38 @@ export default function MiniAppCalls() {
         </div>
       </div>
 
-      {/* === MIDDLE GAP: fields float here === */}
+      {/* === MIDDLE GAP: number display + contact icon === */}
       <div className="miniapp-dialer-middle">
         <div className="miniapp-dialer-fields">
           {mode === 'external' && (
-            <div className={`miniapp-dialer-field ${activeInput === 'from' ? 'active' : ''}`}
-              onClick={(e) => {
-                if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
-                if (!phone1) { openSearch('from'); return; }
-                webApp?.HapticFeedback.selectionChanged(); setActiveInput('from');
-              }}>
+            <div className="miniapp-dialer-row" onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('from'); }}>
               <span className="miniapp-dialer-field-label">{t('calls.from')}</span>
-              {phone1 ? (
-                <>
-                  <span className="miniapp-dialer-field-value">{formatPhone(phone1)}</span>
-                  <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
-                    <XCircle size={16} />
-                  </button>
-                </>
-              ) : (
-                <span className="miniapp-dialer-field-placeholder">{t('calls.searchContact')}</span>
+              <span className={`miniapp-dialer-field-number ${activeInput === 'from' ? 'active' : ''}`}>
+                {phone1 ? formatPhone(phone1) : '\u2014'}
+              </span>
+              {phone1 && (
+                <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
+                  <XCircle size={14} />
+                </button>
               )}
+              <button className="miniapp-dialer-contact-btn" onClick={(e) => { e.stopPropagation(); openSearch('from'); }}>
+                <Search size={16} />
+              </button>
             </div>
           )}
-          <div className={`miniapp-dialer-field ${activeInput === 'to' || mode === 'sip' ? 'active' : ''}`}
-            onClick={(e) => {
-              if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
-              if (!phone2) { openSearch('to'); return; }
-              webApp?.HapticFeedback.selectionChanged(); setActiveInput('to');
-            }}>
+          <div className="miniapp-dialer-row" onClick={() => { webApp?.HapticFeedback.selectionChanged(); setActiveInput('to'); }}>
             {mode === 'external' && <span className="miniapp-dialer-field-label">{t('calls.to')}</span>}
-            {phone2 ? (
-              <>
-                <span className="miniapp-dialer-field-value">{formatPhone(phone2)}</span>
-                <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <XCircle size={16} />
-                </button>
-              </>
-            ) : (
-              <span className="miniapp-dialer-field-placeholder">{t('calls.searchContact')}</span>
+            <span className={`miniapp-dialer-field-number ${activeInput === 'to' || mode === 'sip' ? 'active' : ''}`}>
+              {phone2 ? formatPhone(phone2) : (mode === 'sip' ? t('calls.enterNumber') : '\u2014')}
+            </span>
+            {phone2 && (
+              <button className="miniapp-dialer-clear" onClick={(e) => { e.stopPropagation(); setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
+                <XCircle size={14} />
+              </button>
             )}
+            <button className="miniapp-dialer-contact-btn" onClick={(e) => { e.stopPropagation(); openSearch('to'); }}>
+              <Search size={16} />
+            </button>
           </div>
         </div>
       </div>
