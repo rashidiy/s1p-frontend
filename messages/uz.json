@@ -1303,6 +1303,7 @@
       "via": "{ext} orqali",
       "enterNumber": "Raqam kiriting",
       "callInitiated": "Qo'ng'iroq boshlandi",
+      "callInfo": "Ma'lumot",
       "recording": "Yozuv",
       "speed": "Tezlik",
       "selectOperator": "Operatorni tanlang",

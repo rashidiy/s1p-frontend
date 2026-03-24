@@ -263,7 +263,13 @@ export default function MiniAppHistory() {
                           onClick={() => {
                             webApp?.HapticFeedback.impactOccurred('light');
                             try {
+                              // Store all calls in this group for detail page
                               sessionStorage.setItem(`call_${call.id}`, JSON.stringify(call));
+                              if (cGroup.count > 1) {
+                                sessionStorage.setItem(`call_group_${call.id}`, JSON.stringify(cGroup.items));
+                              } else {
+                                sessionStorage.removeItem(`call_group_${call.id}`);
+                              }
                             } catch { /* ignore */ }
                             router.push(`/miniapp/calls/${call.id}`);
                           }}

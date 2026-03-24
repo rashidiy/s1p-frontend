@@ -1303,6 +1303,7 @@
       "via": "через {ext}",
       "enterNumber": "Введите номер",
       "callInitiated": "Звонок инициирован",
+      "callInfo": "Информация",
       "recording": "Запись",
       "speed": "Скорость",
       "selectOperator": "Выберите оператора",

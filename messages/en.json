@@ -1303,6 +1303,7 @@
       "via": "via {ext}",
       "enterNumber": "Enter number",
       "callInitiated": "Call initiated",
+      "callInfo": "Call Info",
       "recording": "Recording",
       "speed": "Speed",
       "selectOperator": "Select operator",

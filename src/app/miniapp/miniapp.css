@@ -623,6 +623,52 @@
   white-space: nowrap;
 }
 
+/* Call detail rows (iPhone-style grouped call list) */
+.miniapp-call-detail-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+}
+.miniapp-call-detail-row + .miniapp-call-detail-row {
+  border-top: 0.5px solid var(--ma-separator);
+}
+.miniapp-call-detail-row-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.miniapp-call-detail-row-info {
+  flex: 1;
+  min-width: 0;
+}
+.miniapp-call-detail-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.miniapp-call-detail-row-date {
+  font-size: 15px;
+  color: var(--ma-text);
+  font-weight: 500;
+}
+.miniapp-call-detail-row-state {
+  font-size: 13px;
+  color: var(--ma-hint);
+  flex-shrink: 0;
+}
+.miniapp-call-detail-row-bottom {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--ma-hint);
+}
+
 .miniapp-info-value a {
   color: var(--ma-link);
   text-decoration: none;

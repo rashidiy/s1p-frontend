@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Phone, MessageCircle, User, ArrowLeftRight, Clock, Calendar, Play, Pause } from 'lucide-react';
+import { Phone, MessageCircle, User, Clock, Play, Pause, PhoneIncoming, PhoneOutgoing, PhoneMissed } from 'lucide-react';
 import { Spin } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -11,38 +11,16 @@ import type { CallWithDetails } from '@/types/api';
 import { formatDuration, formatDate, formatTime, formatPhone, getAvatarColor, getInitials } from '../../_utils';
 import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
-function Skeleton() {
-  return (
-    <div>
-      <div className="miniapp-detail-header">
-        <div className="miniapp-skeleton-circle" style={{ width: 72, height: 72 }} />
-        <div className="miniapp-skeleton-text" style={{ width: 160, height: 24, borderRadius: 8, marginTop: 8 }} />
-        <div className="miniapp-skeleton-text" style={{ width: 120, height: 14, borderRadius: 6 }} />
-      </div>
-      <div className="miniapp-section">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="miniapp-info-row">
-            <div className="miniapp-skeleton-text" style={{ width: '30%' }} />
-            <div className="miniapp-skeleton-text" style={{ width: '45%' }} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ============================================================================
-// Audio Player
+// Audio Player (compact — fits inside each call row)
 // ============================================================================
 
 function AudioPlayer({
   callId,
   webApp,
-  t,
 }: {
   callId: number;
   webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
-  t: ReturnType<typeof useTranslations>;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
@@ -57,48 +35,28 @@ function AudioPlayer({
     let cancelled = false;
     apiClient
       .getCallRecording(String(callId))
-      .then((url) => {
-        if (!cancelled) setAudioUrl(url);
-      })
-      .catch(() => {
-        if (!cancelled) setLoadError(true);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .then((url) => { if (!cancelled) setAudioUrl(url); })
+      .catch(() => { if (!cancelled) setLoadError(true); });
+    return () => { cancelled = true; };
   }, [callId]);
 
-  // Cleanup blob URL
   useEffect(() => {
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-    };
+    return () => { if (audioUrl) URL.revokeObjectURL(audioUrl); };
   }, [audioUrl]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    function onTimeUpdate() {
-      setCurrentTime(audio!.currentTime);
-    }
-    function onLoadedMetadata() {
-      setDuration(audio!.duration);
-    }
-    function onEnded() {
-      setPlaying(false);
-    }
-
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('ended', onEnded);
-
+    const onTime = () => setCurrentTime(audio.currentTime);
+    const onMeta = () => setDuration(audio.duration);
+    const onEnd = () => setPlaying(false);
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onMeta);
+    audio.addEventListener('ended', onEnd);
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('timeupdate', onTime);
+      audio.removeEventListener('loadedmetadata', onMeta);
+      audio.removeEventListener('ended', onEnd);
     };
   }, [audioUrl]);
 
@@ -106,13 +64,8 @@ function AudioPlayer({
     const audio = audioRef.current;
     if (!audio) return;
     webApp?.HapticFeedback.selectionChanged();
-    if (playing) {
-      audio.pause();
-      setPlaying(false);
-    } else {
-      audio.play();
-      setPlaying(true);
-    }
+    if (playing) { audio.pause(); setPlaying(false); }
+    else { audio.play(); setPlaying(true); }
   }
 
   function cycleSpeed() {
@@ -128,7 +81,6 @@ function AudioPlayer({
     const bar = progressRef.current;
     const audio = audioRef.current;
     if (!bar || !audio || !duration) return;
-
     const rect = bar.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
@@ -136,20 +88,14 @@ function AudioPlayer({
     setCurrentTime(audio.currentTime);
   }
 
-  function formatAudioTime(sec: number): string {
+  function fmt(sec: number): string {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
   if (loadError) return null;
-  if (!audioUrl) {
-    return (
-      <div className="miniapp-audio-player" style={{ textAlign: 'center' }}>
-        <Spin size="small" />
-      </div>
-    );
-  }
+  if (!audioUrl) return <div style={{ padding: '8px 0', textAlign: 'center' }}><Spin size="small" /></div>;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -160,22 +106,73 @@ function AudioPlayer({
         <button className="miniapp-audio-play" onClick={togglePlay}>
           {playing ? <Pause size={18} /> : <Play size={18} />}
         </button>
-        <div
-          className="miniapp-audio-progress"
-          ref={progressRef}
-          onClick={handleSeek}
-          onTouchMove={handleSeek}
-        >
+        <div className="miniapp-audio-progress" ref={progressRef} onClick={handleSeek} onTouchMove={handleSeek}>
           <div className="miniapp-audio-progress-fill" style={{ width: `${progress}%` }}>
             <div className="miniapp-audio-progress-handle" />
           </div>
         </div>
-        <span className="miniapp-audio-time">
-          {formatAudioTime(currentTime)} / {formatAudioTime(duration)}
-        </span>
-        <button className="miniapp-audio-speed" onClick={cycleSpeed}>
-          {speed}x
-        </button>
+        <span className="miniapp-audio-time">{fmt(currentTime)} / {fmt(duration)}</span>
+        <button className="miniapp-audio-speed" onClick={cycleSpeed}>{speed}x</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Single Call Row (iPhone-style — icon, time, duration, recording)
+// ============================================================================
+
+function CallRow({
+  call,
+  webApp,
+  t,
+  tFields,
+}: {
+  call: CallWithDetails;
+  webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
+  t: ReturnType<typeof useTranslations>;
+  tFields: ReturnType<typeof useTranslations>;
+}) {
+  const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
+  const isInbound = call.direction === 'inbound';
+  const isAnswered = call.state === 'ANSWER';
+
+  const IconComponent = isMissed ? PhoneMissed : isInbound ? PhoneIncoming : PhoneOutgoing;
+  const iconColor = isMissed ? '#EF4444' : isInbound ? '#10B981' : '#3B82F6';
+
+  const stateLabel = isMissed
+    ? t('calls.missed')
+    : isAnswered
+      ? t('calls.answered')
+      : call.state === 'RINGING'
+        ? 'RINGING'
+        : (call.state || '\u2014');
+
+  const dur = isAnswered && call.duration ? formatDuration(call.duration) : null;
+
+  return (
+    <div className="miniapp-call-detail-row">
+      <div className="miniapp-call-detail-row-icon" style={{ color: iconColor }}>
+        <IconComponent size={18} />
+      </div>
+      <div className="miniapp-call-detail-row-info">
+        <div className="miniapp-call-detail-row-top">
+          <span className="miniapp-call-detail-row-date">
+            {formatDate(call.created_at)} {formatTime(call.created_at)}
+          </span>
+          <span className={`miniapp-call-detail-row-state ${isMissed ? 'miniapp-text-missed' : ''}`}>
+            {stateLabel}
+          </span>
+        </div>
+        {(dur || call.operator_name) && (
+          <div className="miniapp-call-detail-row-bottom">
+            {dur && <span><Clock size={12} style={{ marginRight: 3, verticalAlign: -1 }} />{dur}</span>}
+            {call.operator_name && <span style={{ marginLeft: dur ? 12 : 0 }}>{call.operator_name}</span>}
+          </div>
+        )}
+        {call.has_recording && (
+          <AudioPlayer callId={call.id} webApp={webApp} />
+        )}
       </div>
     </div>
   );
@@ -189,6 +186,7 @@ export default function CallDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [call, setCall] = useState<CallWithDetails | null>(null);
+  const [groupCalls, setGroupCalls] = useState<CallWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCallSheet, setShowCallSheet] = useState(false);
   const { webApp } = useTelegramWebApp();
@@ -207,18 +205,38 @@ export default function CallDetailPage() {
         setCall(JSON.parse(stored));
         setLoading(false);
       }
+      // Load grouped calls if available
+      const groupStored = sessionStorage.getItem(`call_group_${id}`);
+      if (groupStored) {
+        const items = JSON.parse(groupStored) as CallWithDetails[];
+        setGroupCalls(items);
+      }
     } catch { /* ignore */ }
 
-    // Always fetch from API to get full data (has_recording, etc.)
-    // Merge with existing sessionStorage data to preserve contact_name, duration, etc.
+    // Fetch primary call from API for full data
     apiClient.getCall(id).then((data) => {
       setCall((prev) => prev ? { ...prev, ...data } : data);
     }).catch(() => {
-      // If no sessionStorage data either, show error
       setCall((prev) => prev ?? null);
     }).finally(() => {
       setLoading(false);
     });
+
+    // Fetch full data for each grouped call (to get has_recording etc.)
+    try {
+      const groupStored = sessionStorage.getItem(`call_group_${id}`);
+      if (groupStored) {
+        const items = JSON.parse(groupStored) as CallWithDetails[];
+        // Fetch each call's full data in parallel
+        Promise.all(
+          items.map((item) =>
+            apiClient.getCall(String(item.id))
+              .then((full) => ({ ...item, ...full }))
+              .catch(() => item)
+          )
+        ).then(setGroupCalls);
+      }
+    } catch { /* ignore */ }
   }, [id]);
 
   useEffect(() => {
@@ -232,7 +250,17 @@ export default function CallDetailPage() {
     }
   }, [webApp, goBack]);
 
-  if (loading) return <Skeleton />;
+  if (loading) {
+    return (
+      <div>
+        <div className="miniapp-detail-header">
+          <div className="miniapp-skeleton-circle" style={{ width: 72, height: 72 }} />
+          <div className="miniapp-skeleton-text" style={{ width: 160, height: 24, borderRadius: 8, marginTop: 8 }} />
+          <div className="miniapp-skeleton-text" style={{ width: 120, height: 14, borderRadius: 6 }} />
+        </div>
+      </div>
+    );
+  }
 
   if (!call) {
     return (
@@ -246,15 +274,11 @@ export default function CallDetailPage() {
   const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
   const isInbound = call.direction === 'inbound';
   const phone = isInbound ? (call.phone_1 || call.phone_2 || '') : (call.phone_2 || call.phone_1 || '');
-  const displayName = call.contact_name || phone || '\u2014';
+  const displayName = call.contact_name || formatPhone(phone) || '\u2014';
   const hasContact = !!call.contact_name && !!call.contact_id;
 
-  const directionLabel = isInbound ? t('calls.inbound') : t('calls.outbound');
-  const stateLabel = isMissed
-    ? t('calls.missed')
-    : call.state === 'ANSWER'
-      ? t('calls.answered')
-      : (call.state || '\u2014');
+  // Use grouped calls if available, otherwise just the single call
+  const allCalls = groupCalls.length > 0 ? groupCalls : [call];
 
   function handlePhoneSheet() {
     webApp?.HapticFeedback.impactOccurred('medium');
@@ -308,13 +332,8 @@ export default function CallDetailPage() {
           {displayName}
         </div>
         <div className="miniapp-detail-sub">{formatPhone(phone)}</div>
-        <span
-          className={`miniapp-badge ${isMissed ? 'miniapp-badge-red' : isInbound ? 'miniapp-badge-green' : 'miniapp-badge-blue'}`}
-        >
-          {directionLabel} · {stateLabel}
-        </span>
 
-        {/* Action buttons — 3 icons in a row */}
+        {/* Action buttons */}
         <div className="miniapp-detail-actions">
           {phone && (
             <button className="miniapp-detail-action-btn" onClick={handlePhoneSheet}>
@@ -343,60 +362,18 @@ export default function CallDetailPage() {
         </div>
       </div>
 
-      {/* Call info */}
+      {/* Call list — each call in the group */}
       <div className="miniapp-section">
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">
-            <ArrowLeftRight size={15} style={{ marginRight: 6 }} />
-            {tFields('direction') || 'Direction'}
-          </span>
-          <span className="miniapp-info-value">{directionLabel}</span>
+        <div className="miniapp-section-header">
+          {allCalls.length > 1
+            ? `${t('calls.history')} (${allCalls.length})`
+            : t('calls.callInfo')
+          }
         </div>
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">
-            <Phone size={15} style={{ marginRight: 6 }} />
-            {t('detail.status')}
-          </span>
-          <span className={`miniapp-info-value ${isMissed ? 'miniapp-text-missed' : ''}`}>
-            {stateLabel}
-          </span>
-        </div>
-        {!isMissed && call.duration != null && (
-          <div className="miniapp-info-row">
-            <span className="miniapp-info-label">
-              <Clock size={15} style={{ marginRight: 6 }} />
-              {tFields('duration') || 'Duration'}
-            </span>
-            <span className="miniapp-info-value">{formatDuration(call.duration)}</span>
-          </div>
-        )}
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">
-            <Calendar size={15} style={{ marginRight: 6 }} />
-            {t('detail.created')}
-          </span>
-          <span className="miniapp-info-value">
-            {formatDate(call.created_at)} {formatTime(call.created_at)}
-          </span>
-        </div>
-        {call.operator_name && (
-          <div className="miniapp-info-row">
-            <span className="miniapp-info-label">
-              <User size={15} style={{ marginRight: 6 }} />
-              {t('detail.operator')}
-            </span>
-            <span className="miniapp-info-value">{call.operator_name}</span>
-          </div>
-        )}
+        {allCalls.map((c) => (
+          <CallRow key={c.id} call={c} webApp={webApp} t={t} tFields={tFields} />
+        ))}
       </div>
-
-      {/* Recording section */}
-      {call.has_recording && (
-        <div className="miniapp-section" style={{ marginTop: 8 }}>
-          <div className="miniapp-section-header">{t('calls.recording')}</div>
-          <AudioPlayer callId={call.id} webApp={webApp} t={t} />
-        </div>
-      )}
 
       {/* Bottom sheet for call options */}
       <CallBottomSheet
