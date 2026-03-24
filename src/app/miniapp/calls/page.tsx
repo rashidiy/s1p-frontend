@@ -45,14 +45,12 @@ export default function MiniAppCalls() {
   const [fromCleared, setFromCleared] = useState(false);
   const hasSipExtension = !!user?.sip_extension;
 
-  // Prefill phone1 with user's phone when switching to external (skip if user cleared it)
   useEffect(() => {
     if (mode === 'external' && !phone1 && !fromCleared && user?.phone) {
       setPhone1(user.phone);
     }
   }, [mode, phone1, fromCleared, user?.phone]);
 
-  // Reset cleared flag when switching back to SIP
   useEffect(() => {
     if (mode === 'sip') setFromCleared(false);
   }, [mode]);
@@ -69,9 +67,7 @@ export default function MiniAppCalls() {
     webApp?.HapticFeedback.selectionChanged();
     const setter = mode === 'external' && activeInput === 'from' ? setPhone1 : setPhone2;
     setter((prev) => {
-      if (prev === '' && digit !== '+' && digit !== '#') {
-        return '+998' + digit;
-      }
+      if (prev === '' && digit !== '+' && digit !== '#') return '+998' + digit;
       return prev + digit;
     });
   }
@@ -107,88 +103,101 @@ export default function MiniAppCalls() {
 
   return (
     <div className="miniapp-dialer">
-      {/* Display area — always same height for both modes */}
-      <div className="miniapp-dialer-display-area">
+      {/* Top: display area — takes all remaining space, pushes everything else to bottom */}
+      <div className="miniapp-dialer-display">
         {mode === 'external' ? (
-          <>
+          <div className="miniapp-dialer-ext">
             <div
-              className={`miniapp-dialer-ext-from ${activeInput === 'from' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-field ${activeInput === 'from' ? 'active' : ''}`}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
                 webApp?.HapticFeedback.selectionChanged(); setActiveInput('from');
               }}
             >
-              {phone1 ? formatPhone(phone1) : <span className="miniapp-dialer-hint">{t('calls.from')}</span>}
+              <span className="miniapp-dialer-ext-label">{t('calls.from')}</span>
+              <span className="miniapp-dialer-ext-value">
+                {phone1 ? formatPhone(phone1) : '\u2014'}
+              </span>
               {phone1 && (
                 <button className="miniapp-dialer-clear" onClick={() => { setPhone1(''); setFromCleared(true); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <XCircle size={14} />
+                  <XCircle size={16} />
                 </button>
               )}
             </div>
             <div
-              className={`miniapp-dialer-ext-to ${activeInput === 'to' ? 'active' : ''}`}
+              className={`miniapp-dialer-ext-field ${activeInput === 'to' ? 'active' : ''}`}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('.miniapp-dialer-clear')) return;
                 webApp?.HapticFeedback.selectionChanged(); setActiveInput('to');
               }}
             >
-              {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.to')}</span>}
+              <span className="miniapp-dialer-ext-label">{t('calls.to')}</span>
+              <span className="miniapp-dialer-ext-value">
+                {phone2 ? formatPhone(phone2) : '\u2014'}
+              </span>
               {phone2 && (
                 <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                  <XCircle size={14} />
+                  <XCircle size={16} />
                 </button>
               )}
             </div>
-          </>
+          </div>
         ) : (
           <div className="miniapp-dialer-number">
             {phone2 ? formatPhone(phone2) : <span className="miniapp-dialer-hint">{t('calls.enterNumber')}</span>}
             {phone2 && (
               <button className="miniapp-dialer-clear" onClick={() => { setPhone2(''); webApp?.HapticFeedback.selectionChanged(); }}>
-                <XCircle size={14} />
+                <XCircle size={16} />
               </button>
             )}
           </div>
         )}
       </div>
 
-      {/* Controls */}
-      <div className="miniapp-dialer-controls">
-        <div className="miniapp-dialer-mode">
-          <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
-            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('sip'); setActiveInput('to'); }}>SIP</button>
-          <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
-            onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>External</button>
+      {/* Fixed bottom block: controls → pad → call row */}
+      <div className="miniapp-dialer-fixed">
+        {/* Mode + operator */}
+        <div className="miniapp-dialer-controls">
+          <div className="miniapp-dialer-mode">
+            <button className={`miniapp-dialer-mode-btn ${mode === 'sip' ? 'active' : ''}`}
+              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('sip'); setActiveInput('to'); }}>
+              {t('calls.sipMode')}
+            </button>
+            <button className={`miniapp-dialer-mode-btn ${mode === 'external' ? 'active' : ''}`}
+              onClick={() => { webApp?.HapticFeedback.selectionChanged(); setMode('external'); }}>
+              {t('calls.externalMode')}
+            </button>
+          </div>
+          {hasSipExtension ? (
+            <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
+          ) : (
+            <select className="miniapp-dialer-operator-select" value={selectedOperator}
+              onChange={(e) => setSelectedOperator(e.target.value)}>
+              <option value="">{t('calls.selectOperator')}</option>
+              {operators.map((op) => (
+                <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
+              ))}
+            </select>
+          )}
         </div>
-        {hasSipExtension ? (
-          <div className="miniapp-dialer-operator">{t('calls.via', { ext: user!.sip_extension! })}</div>
-        ) : (
-          <select className="miniapp-dialer-operator-select" value={selectedOperator}
-            onChange={(e) => setSelectedOperator(e.target.value)}>
-            <option value="">{t('calls.selectOperator')}</option>
-            {operators.map((op) => (
-              <option key={op.extension} value={op.extension}>{op.name} ({op.extension})</option>
-            ))}
-          </select>
-        )}
-      </div>
 
-      {/* Number pad */}
-      <div className="miniapp-dialer-grid">
-        {DIAL_KEYS.map((d) => (
-          <button key={d} className="miniapp-dialer-key" onClick={() => handleKeyPress(d)}>{d}</button>
-        ))}
-      </div>
+        {/* Number pad */}
+        <div className="miniapp-dialer-grid">
+          {DIAL_KEYS.map((d) => (
+            <button key={d} className="miniapp-dialer-key" onClick={() => handleKeyPress(d)}>{d}</button>
+          ))}
+        </div>
 
-      {/* Bottom: call + backspace */}
-      <div className="miniapp-dialer-bottom">
-        <div />
-        <button className="miniapp-dialer-call" onClick={handleCall} disabled={!canCall || calling}>
-          {calling ? <Spin size="small" /> : <Phone size={24} />}
-        </button>
-        {currentNumber ? (
-          <button className="miniapp-dialer-backspace" onClick={handleBackspace}><Delete size={22} /></button>
-        ) : <div />}
+        {/* Call + backspace */}
+        <div className="miniapp-dialer-bottom">
+          <div />
+          <button className="miniapp-dialer-call" onClick={handleCall} disabled={!canCall || calling}>
+            {calling ? <Spin size="small" /> : <Phone size={24} />}
+          </button>
+          {currentNumber ? (
+            <button className="miniapp-dialer-backspace" onClick={handleBackspace}><Delete size={22} /></button>
+          ) : <div />}
+        </div>
       </div>
     </div>
   );
