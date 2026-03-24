@@ -386,9 +386,9 @@ export default function CallsPage() {
                   <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction, call.state)}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm sm:text-base">{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
+                      <span className="font-medium text-sm sm:text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
                       {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction}</Tag>}
-                      {call.state && <Tag>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>}
+                      {call.state && <Tag color={call.state === 'ANSWER' ? 'green' : (call.state === 'NOANSWER' || call.state === 'BUSY' || call.state === 'CANCEL') ? 'red' : undefined}>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-500 mt-1 flex-wrap">
                       <span>{new Date(call.created_at).toLocaleString()}</span>
