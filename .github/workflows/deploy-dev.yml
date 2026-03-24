@@ -8,10 +8,6 @@ concurrency:
   group: deploy-dev-frontend
   cancel-in-progress: true
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -33,32 +29,21 @@ jobs:
         continue-on-error: true
         run: npm test
 
-  build-and-push:
-    needs: check
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           target: runner
-          push: true
-          tags: ghcr.io/${{ github.repository }}:dev
+          load: true
+          tags: s1p-frontend:dev
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -66,11 +51,18 @@ jobs:
             NEXT_PUBLIC_OWNER_SUBDOMAIN=owner
             NEXT_PUBLIC_BASE_DOMAIN=s1p.uz
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
+      - name: Save and transfer image
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H s1p.uz >> ~/.ssh/known_hosts 2>/dev/null
+          docker save s1p-frontend:dev | gzip | ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@s1p.uz "gunzip | docker load"
+          rm ~/.ssh/deploy_key
+
+      - name: Deploy
         uses: appleboy/ssh-action@v1
         with:
           host: s1p.uz
