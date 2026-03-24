@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { CallWithDetails } from '@/types/api';
-import { formatDuration, formatTime, getDateGroup } from '../_utils';
+import { formatDuration, formatTime, formatPhone, getDateGroup } from '../_utils';
 
 const PAGE_SIZE = 50;
 
@@ -58,7 +58,7 @@ function CreateContactForm({ phone, onSave, onCancel, t }: CreateContactFormProp
           <X size={14} />
         </button>
       </div>
-      <div className="miniapp-create-contact-phone">{phone}</div>
+      <div className="miniapp-create-contact-phone">{formatPhone(phone)}</div>
       <input
         className="miniapp-create-contact-input"
         placeholder={t('createContact.firstName')}
@@ -239,9 +239,9 @@ export default function MiniAppHistory() {
                     const isInbound = call.direction === 'inbound';
                     const phone = isInbound ? (call.phone_1 || call.phone_2 || '\u2014') : (call.phone_2 || call.phone_1 || '\u2014');
                     const hasContact = !!call.contact_name;
-                    const displayTitle = hasContact ? call.contact_name! : phone;
+                    const displayTitle = hasContact ? call.contact_name! : formatPhone(phone);
                     const displaySub = hasContact
-                      ? phone
+                      ? formatPhone(phone)
                       : isMissed
                         ? t('calls.missed')
                         : formatDuration(call.duration);

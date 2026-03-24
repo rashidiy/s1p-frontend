@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { ContactResponse } from '@/types/api';
-import { getInitials, getAvatarColor } from '../_utils';
+import { formatPhone, getInitials, getAvatarColor } from '../_utils';
 
 const PAGE_SIZE = 30;
 
@@ -144,7 +144,7 @@ export default function MiniAppContacts() {
                   <div className="miniapp-list-item-content">
                     <div className="miniapp-list-item-title">{name}</div>
                     {c.phone && (
-                      <div className="miniapp-list-item-sub">{c.phone}</div>
+                      <div className="miniapp-list-item-sub">{formatPhone(c.phone)}</div>
                     )}
                   </div>
                   <div className="miniapp-list-item-chevron">

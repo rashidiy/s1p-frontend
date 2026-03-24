@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { ContactResponse } from '@/types/api';
-import { getInitials, getAvatarColor, formatDate } from '../../_utils';
+import { formatPhone, getInitials, getAvatarColor, formatDate } from '../../_utils';
 import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 function Skeleton() {
@@ -143,7 +143,7 @@ export default function ContactDetailPage() {
           <div className="miniapp-info-row">
             <span className="miniapp-info-label">{t('detail.phone')}</span>
             <span className="miniapp-info-value">
-              <a href={`tel:${contact.phone}`}>{contact.phone}</a>
+              <a href={`tel:${contact.phone}`}>{formatPhone(contact.phone)}</a>
             </span>
           </div>
         )}

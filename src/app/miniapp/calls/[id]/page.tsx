@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { CallWithDetails } from '@/types/api';
-import { formatDuration, formatDate, formatTime, getAvatarColor, getInitials } from '../../_utils';
+import { formatDuration, formatDate, formatTime, formatPhone, getAvatarColor, getInitials } from '../../_utils';
 import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 function Skeleton() {
@@ -200,15 +200,24 @@ export default function CallDetailPage() {
   }, [router]);
 
   useEffect(() => {
+    // Load from sessionStorage first for instant display
     try {
       const stored = sessionStorage.getItem(`call_${id}`);
       if (stored) {
         setCall(JSON.parse(stored));
+        setLoading(false);
       }
-    } catch {
-      // ignore
-    }
-    setLoading(false);
+    } catch { /* ignore */ }
+
+    // Always fetch from API to get full data (has_recording, etc.)
+    apiClient.getCall(id).then((data) => {
+      setCall(data);
+    }).catch(() => {
+      // If no sessionStorage data either, show error
+      setCall((prev) => prev ?? null);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, [id]);
 
   useEffect(() => {
@@ -297,7 +306,7 @@ export default function CallDetailPage() {
         <div className={`miniapp-detail-name ${isMissed ? 'miniapp-text-missed' : ''}`}>
           {displayName}
         </div>
-        <div className="miniapp-detail-sub">{phone}</div>
+        <div className="miniapp-detail-sub">{formatPhone(phone)}</div>
         <span
           className={`miniapp-badge ${isMissed ? 'miniapp-badge-red' : isInbound ? 'miniapp-badge-green' : 'miniapp-badge-blue'}`}
         >

@@ -9,24 +9,9 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useAuthStore } from '@/store/auth';
 import { useTranslations } from 'next-intl';
 import type { SipuniOperator, ContactResponse } from '@/types/api';
-import { getInitials, getAvatarColor } from '../_utils';
+import { formatPhone, getInitials, getAvatarColor } from '../_utils';
 
 const DIAL_KEYS = ['1','2','3','4','5','6','7','8','9','+','0','#'];
-
-function formatPhone(raw: string): string {
-  if (!raw) return '';
-  if (raw.startsWith('+998') && raw.length > 4) {
-    const rest = raw.slice(4);
-    let f = '+998';
-    if (rest.length > 0) f += ' ' + rest.slice(0, 2);
-    if (rest.length > 2) f += ' ' + rest.slice(2, 5);
-    if (rest.length > 5) f += ' ' + rest.slice(5, 7);
-    if (rest.length > 7) f += ' ' + rest.slice(7, 9);
-    if (rest.length > 9) f += rest.slice(9);
-    return f;
-  }
-  return raw;
-}
 
 export default function MiniAppCalls() {
   const searchParams = useSearchParams();
@@ -184,7 +169,7 @@ export default function MiniAppCalls() {
                     </div>
                     <div className="miniapp-dialer-search-info">
                       <div className="miniapp-dialer-search-name">{name}</div>
-                      {c.phone && <div className="miniapp-dialer-search-phone">{c.phone}</div>}
+                      {c.phone && <div className="miniapp-dialer-search-phone">{formatPhone(c.phone)}</div>}
                     </div>
                   </div>
                 );

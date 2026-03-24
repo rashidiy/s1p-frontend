@@ -9,7 +9,7 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import { UserRole } from '@/types/api';
 import type { OperatorDashboard, AdminDashboard } from '@/types/api';
-import { formatTime, getInitials, getAvatarColor } from './_utils';
+import { formatTime, formatPhone, getInitials, getAvatarColor } from './_utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -269,7 +269,7 @@ export default function MiniAppDashboard() {
           <div className="miniapp-list">
             {missedCalls.slice(0, 5).map((call, i) => {
               const phone = call.phone || '';
-              const displayName = call.contact_name || phone || '—';
+              const displayName = call.contact_name || formatPhone(phone) || '—';
               return (
                 <div
                   key={i}
@@ -297,7 +297,7 @@ export default function MiniAppDashboard() {
                       {displayName}
                     </div>
                     {call.contact_name && phone && (
-                      <div className="miniapp-list-item-sub">{phone}</div>
+                      <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
                     )}
                   </div>
                   <div className="miniapp-list-item-right">
@@ -319,7 +319,7 @@ export default function MiniAppDashboard() {
               const phone = call.phone || '—';
               const isMissed = call.state === 'NOANSWER' || call.state === 'CANCEL';
               const isInbound = call.direction === 'inbound';
-              const displayName = call.contact_name || phone;
+              const displayName = call.contact_name || formatPhone(phone);
               return (
                 <div key={i} className="miniapp-list-item" onClick={() => {
                   webApp?.HapticFeedback.impactOccurred('light');
@@ -344,7 +344,7 @@ export default function MiniAppDashboard() {
                       {displayName}
                     </div>
                     {call.contact_name && (
-                      <div className="miniapp-list-item-sub">{phone}</div>
+                      <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
                     )}
                   </div>
                   <div className="miniapp-list-item-right">

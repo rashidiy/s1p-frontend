@@ -1,3 +1,14 @@
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
+
+/** Format phone number internationally: +998 xx xxx xx xx, +1 xxx xxx xxxx, etc. */
+export function formatPhone(raw: string | null | undefined): string {
+  if (!raw) return '';
+  const input = raw.startsWith('+') ? raw : `+${raw}`;
+  const phone = parsePhoneNumberFromString(input);
+  if (phone) return phone.formatInternational();
+  return raw;
+}
+
 /** Avatar gradient palette — richer than flat colors, works on both light/dark backgrounds */
 const AVATAR_COLORS = [
   'linear-gradient(135deg, #667eea, #764ba2)', // indigo→purple
