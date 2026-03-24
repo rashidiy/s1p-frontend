@@ -1155,45 +1155,46 @@
   color: var(--ma-hint);
 }
 
-/* ---------- Dialer / Number pad (iPhone Phone app style) ---------- */
+/* ---------- Dialer / Number pad ---------- */
 .miniapp-dialer {
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
   justify-content: flex-end;
-  padding: 0 16px 8px;
+  padding: 0 20px 8px;
 }
 
-/* Fixed-height display area — same height in both modes */
+/* Display area — flexes to fill top space */
 .miniapp-dialer-display-area {
   width: 100%;
-  height: 90px;
+  flex: 1;
+  min-height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
+  justify-content: flex-end;
+  padding-bottom: 8px;
 }
 
 .miniapp-dialer-number {
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 200;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: var(--ma-text);
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 90px;
+  min-height: 48px;
 }
 
 .miniapp-dialer-hint {
   color: var(--ma-hint);
   font-weight: 300;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: 0.5px;
 }
 
@@ -1201,8 +1202,7 @@
   background: none;
   border: none;
   color: var(--ma-hint);
-  font-size: 14px;
-  padding: 4px;
+  padding: 8px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   opacity: 0.5;
@@ -1211,49 +1211,42 @@
   flex-shrink: 0;
 }
 
-/* External mode — from is smaller, to is bigger */
-.miniapp-dialer-ext-from {
+/* External mode — from/to fields */
+.miniapp-dialer-ext-from,
+.miniapp-dialer-ext-to {
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 18px;
-  font-weight: 300;
-  letter-spacing: 1.5px;
   color: var(--ma-text);
   text-align: center;
-  padding: 4px 0;
+  padding: 6px 16px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  opacity: 0.4;
-  transition: opacity 0.15s;
+  opacity: 0.3;
+  transition: opacity 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 2px solid transparent;
+  border-radius: 2px;
+}
+
+.miniapp-dialer-ext-from {
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 1px;
   gap: 6px;
 }
 
-.miniapp-dialer-ext-from.active {
-  opacity: 1;
-}
-
 .miniapp-dialer-ext-to {
-  font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 200;
-  letter-spacing: 2px;
-  color: var(--ma-text);
-  text-align: center;
-  padding: 4px 0;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  opacity: 0.4;
-  transition: opacity 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  letter-spacing: 1.5px;
   gap: 8px;
 }
 
+.miniapp-dialer-ext-from.active,
 .miniapp-dialer-ext-to.active {
   opacity: 1;
+  border-bottom-color: var(--ma-accent);
 }
 
 /* Controls row — toggle + operator */
@@ -1261,26 +1254,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 16px;
-  width: 160px;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 200px;
 }
 
 .miniapp-dialer-mode {
   display: flex;
   gap: 0;
-  padding: 2px;
-  border-radius: 8px;
+  padding: 3px;
+  border-radius: 10px;
   background: var(--ma-separator);
   width: 100%;
 }
 
 .miniapp-dialer-mode-btn {
   flex: 1;
-  padding: 4px 0;
+  padding: 6px 0;
   border: none;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -1292,110 +1285,128 @@
 .miniapp-dialer-mode-btn.active {
   background: var(--ma-section);
   color: var(--ma-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .miniapp-dialer-operator {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ma-hint);
   text-align: center;
+  letter-spacing: 0.3px;
 }
 
 .miniapp-dialer-operator-select {
-  background: transparent;
+  background: var(--ma-section);
   border: 1px solid var(--ma-separator);
-  border-radius: 6px;
-  color: var(--ma-hint);
-  font-size: 11px;
-  padding: 3px 8px;
+  border-radius: 10px;
+  color: var(--ma-text);
+  font-size: 13px;
+  padding: 6px 12px;
   outline: none;
   -webkit-appearance: none;
   font-family: inherit;
-  width: 160px;
+  width: 100%;
   text-align: center;
 }
 
 /* Number pad */
 .miniapp-dialer-grid {
   display: grid;
-  grid-template-columns: repeat(3, 80px);
-  gap: 10px 18px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 16px;
   justify-content: center;
+  width: 100%;
+  max-width: 300px;
 }
 
 .miniapp-dialer-key {
-  width: 80px;
-  height: 80px;
+  aspect-ratio: 1;
+  max-width: 76px;
+  width: 100%;
+  margin: 0 auto;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-  font-size: 34px;
+  background: var(--ma-section);
+  color: var(--ma-text);
+  font-size: 30px;
   font-weight: 300;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.12s ease;
+  transition: transform 0.1s, background 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .miniapp-dialer-key:active {
-  background: rgba(255, 255, 255, 0.22);
+  transform: scale(0.92);
+  background: var(--ma-accent);
+  color: var(--ma-btn-text);
 }
 
 /* Bottom row */
 .miniapp-dialer-bottom {
   display: grid;
-  grid-template-columns: 80px 80px 80px;
-  gap: 18px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
   justify-content: center;
   align-items: center;
-  padding: 10px 0 8px;
+  padding: 12px 0 8px;
+  width: 100%;
+  max-width: 300px;
 }
 
 .miniapp-dialer-call {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
   border-radius: 50%;
   border: none;
-  background: var(--ma-accent);
+  background: #34C759;
   color: #FFFFFF;
-  font-size: 30px;
+  font-size: 26px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.15s;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 4px 14px rgba(52, 199, 89, 0.35);
 }
 
 .miniapp-dialer-call:active {
-  opacity: 0.8;
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(52, 199, 89, 0.2);
 }
 
 .miniapp-dialer-call:disabled {
-  opacity: 0.35;
+  background: var(--ma-separator);
+  color: var(--ma-hint);
+  box-shadow: none;
 }
 
 .miniapp-dialer-backspace {
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
   border-radius: 50%;
   border: none;
   background: transparent;
   color: var(--ma-text);
-  opacity: 0.45;
-  font-size: 24px;
+  opacity: 0.5;
+  font-size: 22px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.1s;
 }
 
 .miniapp-dialer-backspace:active {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 /* ---------- Bottom sheet ---------- */
@@ -1615,26 +1626,12 @@
 
 /* ---------- Dialer light theme overrides ---------- */
 [data-theme='light'] .miniapp-dialer-key {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme='light'] .miniapp-dialer-key:active {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-[data-theme='light'] .miniapp-dialer-key-sub {
-  color: rgba(0, 0, 0, 0.45);
-}
-
-[data-theme='light'] .miniapp-dialer-mode {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme='light'] .miniapp-dialer-input-active {
   background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme='light'] .miniapp-dialer-call:disabled {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.06);
   color: rgba(0, 0, 0, 0.25);
+  box-shadow: none;
 }

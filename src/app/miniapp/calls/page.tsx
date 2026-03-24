@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Phone, XCircle } from 'lucide-react';
+import { Phone, XCircle, Delete } from 'lucide-react';
 import { Spin } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -187,7 +187,7 @@ export default function MiniAppCalls() {
           {calling ? <Spin size="small" /> : <Phone size={24} />}
         </button>
         {currentNumber ? (
-          <button className="miniapp-dialer-backspace" onClick={handleBackspace}>{'\u232B'}</button>
+          <button className="miniapp-dialer-backspace" onClick={handleBackspace}><Delete size={22} /></button>
         ) : <div />}
       </div>
     </div>
