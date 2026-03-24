@@ -144,9 +144,7 @@ function CallRow({
     ? t('calls.missed')
     : isAnswered
       ? t('calls.answered')
-      : call.state === 'RINGING'
-        ? 'RINGING'
-        : (call.state || '\u2014');
+      : (call.state || '\u2014');
 
   const dur = isAnswered && call.duration ? formatDuration(call.duration) : null;
 
