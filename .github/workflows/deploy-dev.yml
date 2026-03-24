@@ -29,43 +29,14 @@ jobs:
         continue-on-error: true
         run: npm test
 
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          target: runner
-          load: true
-          tags: s1p-frontend:dev
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            NEXT_PUBLIC_API_BASE_URL=https://api.s1p.uz
-            NEXT_PUBLIC_OWNER_SUBDOMAIN=owner
-            NEXT_PUBLIC_BASE_DOMAIN=s1p.uz
-
-      - name: Save and transfer image
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H s1p.uz >> ~/.ssh/known_hosts 2>/dev/null
-          docker save s1p-frontend:dev | gzip | ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@s1p.uz "gunzip | docker load"
-          rm ~/.ssh/deploy_key
-
-      - name: Deploy
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: s1p.uz
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 5m
           script: /root/projects/deploy.sh frontend
