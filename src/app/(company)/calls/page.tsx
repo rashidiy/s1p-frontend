@@ -287,8 +287,11 @@ export default function CallsPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getDirectionIcon = (dir?: string | null) => {
-    if (dir === 'inbound') return <PhoneIncoming style={{ color: '#10b981' }} />;
+  const getDirectionIcon = (dir?: string | null, state?: string | null) => {
+    if (dir === 'inbound') {
+      const isMissed = state === 'NOANSWER' || state === 'BUSY' || state === 'CANCEL';
+      return <PhoneIncoming style={{ color: isMissed ? '#ef4444' : '#10b981' }} />;
+    }
     if (dir === 'outbound') return <PhoneOutgoing style={{ color: '#3b82f6' }} />;
     return <PhoneOutlined />;
   };
@@ -380,7 +383,7 @@ export default function CallsPage() {
             {data.items.map((call) => (
               <div key={call.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/calls/${call.id}`)}>
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
-                  <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction)}</span>
+                  <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction, call.state)}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm sm:text-base">{call.phone_1 || tCommon('unknown')} &rarr; {call.phone_2 || tCommon('unknown')}</span>
