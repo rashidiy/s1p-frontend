@@ -1299,7 +1299,7 @@
       "sipMode": "SIP",
       "externalMode": "Tashqi",
       "operator": "Operator",
-      "searchContact": "Kontaktni qidiring yoki raqam kiriting",
+      "searchContact": "Raqam yoki kontakt",
       "changeOperator": "O'zgartirish"
     },
     "profile": {

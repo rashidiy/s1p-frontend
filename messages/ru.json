@@ -1299,7 +1299,7 @@
       "sipMode": "SIP",
       "externalMode": "Внешний",
       "operator": "Оператор",
-      "searchContact": "Поиск контакта или вставьте номер",
+      "searchContact": "Номер или контакт",
       "changeOperator": "Изменить"
     },
     "profile": {
