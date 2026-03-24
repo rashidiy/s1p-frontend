@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Phone, Mail, MessageCircle, TrendingUp, BarChart3 } from 'lucide-react';
+import { Phone, Mail, MessageCircle, TrendingUp, BarChart3, Headphones, ArrowLeftRight } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { ContactResponse } from '@/types/api';
 import { formatPhone, getInitials, getAvatarColor, formatDate } from '../../_utils';
-import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 function Skeleton() {
   return (
@@ -31,7 +30,8 @@ export default function ContactDetailPage() {
   const [contact, setContact] = useState<ContactResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [showCallSheet, setShowCallSheet] = useState(false);
+  const [showCallMenu, setShowCallMenu] = useState(false);
+  const callMenuRef = useRef<HTMLDivElement>(null);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tFields = useTranslations('fields');
@@ -66,6 +66,18 @@ export default function ContactDetailPage() {
     }
   }, [webApp, goBack]);
 
+  // Close dropdown on outside tap
+  useEffect(() => {
+    if (!showCallMenu) return;
+    function handleTap(e: MouseEvent) {
+      if (callMenuRef.current && !callMenuRef.current.contains(e.target as Node)) {
+        setShowCallMenu(false);
+      }
+    }
+    document.addEventListener('pointerdown', handleTap);
+    return () => document.removeEventListener('pointerdown', handleTap);
+  }, [showCallMenu]);
+
   if (loading) return <Skeleton />;
 
   if (error || !contact) {
@@ -82,7 +94,7 @@ export default function ContactDetailPage() {
 
   function handleCallPress() {
     webApp?.HapticFeedback.impactOccurred('medium');
-    setShowCallSheet(true);
+    setShowCallMenu(prev => !prev);
   }
 
   function handleMessage() {
@@ -111,12 +123,77 @@ export default function ContactDetailPage() {
         {/* Quick action buttons */}
         <div className="miniapp-detail-actions">
           {contact.phone && (
-            <button className="miniapp-detail-action-btn" onClick={handleCallPress}>
-              <div className="miniapp-detail-action-icon">
-                <Phone size={20} />
-              </div>
-              <span className="miniapp-detail-action-label">{t('actions.call')}</span>
-            </button>
+            <div style={{ position: 'relative' }} ref={callMenuRef}>
+              <button className="miniapp-detail-action-btn" onClick={handleCallPress}>
+                <div className="miniapp-detail-action-icon">
+                  <Phone size={20} />
+                </div>
+                <span className="miniapp-detail-action-label">{t('actions.call')}</span>
+              </button>
+
+              {/* Dropdown menu — goes DOWN from button */}
+              {showCallMenu && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  marginTop: 6,
+                  background: 'var(--ma-section)',
+                  borderRadius: 'var(--ma-radius-sm)',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                  overflow: 'hidden',
+                  zIndex: 100,
+                  minWidth: 180,
+                  border: '0.5px solid var(--ma-separator)',
+                }}>
+                  <button
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+                      padding: '14px 16px', border: 'none', background: 'none',
+                      color: 'var(--ma-text)', fontSize: 15, cursor: 'pointer',
+                      borderBottom: '0.5px solid var(--ma-separator)',
+                    }}
+                    onClick={() => {
+                      setShowCallMenu(false);
+                      webApp?.HapticFeedback.impactOccurred('medium');
+                      try { webApp?.openLink(`tel:${contact.phone}`); } catch { window.location.href = `tel:${contact.phone}`; }
+                    }}
+                  >
+                    <Phone size={18} /> {t('calls.phoneCall')}
+                  </button>
+                  <button
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+                      padding: '14px 16px', border: 'none', background: 'none',
+                      color: 'var(--ma-text)', fontSize: 15, cursor: 'pointer',
+                      borderBottom: '0.5px solid var(--ma-separator)',
+                    }}
+                    onClick={() => {
+                      setShowCallMenu(false);
+                      webApp?.HapticFeedback.impactOccurred('medium');
+                      router.push(`/miniapp/calls?number=${encodeURIComponent(contact.phone!)}&mode=sip`);
+                    }}
+                  >
+                    <Headphones size={18} /> {t('calls.sipCall')}
+                  </button>
+                  <button
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+                      padding: '14px 16px', border: 'none', background: 'none',
+                      color: 'var(--ma-text)', fontSize: 15, cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setShowCallMenu(false);
+                      webApp?.HapticFeedback.impactOccurred('medium');
+                      router.push(`/miniapp/calls?number=${encodeURIComponent(contact.phone!)}&mode=external`);
+                    }}
+                  >
+                    <ArrowLeftRight size={18} /> {t('calls.externalCall')}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
           {contact.phone && (
             <button className="miniapp-detail-action-btn" onClick={handleMessage}>
@@ -224,18 +301,6 @@ export default function ContactDetailPage() {
           </div>
         </div>
       </div>
-
-      {/* Call bottom sheet */}
-      {contact.phone && (
-        <CallBottomSheet
-          phone={contact.phone}
-          open={showCallSheet}
-          onClose={() => setShowCallSheet(false)}
-          webApp={webApp}
-          router={router}
-          t={t}
-        />
-      )}
     </div>
   );
 }

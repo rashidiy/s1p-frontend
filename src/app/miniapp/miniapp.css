@@ -78,6 +78,7 @@
 
 .miniapp-tab {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex: 1;
@@ -85,7 +86,7 @@
   background: none;
   color: var(--ma-hint);
   font-size: 24px;
-  padding: 14px 0;
+  padding: 12px 0 16px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.2s, transform 0.1s;
@@ -100,15 +101,15 @@
   color: var(--ma-accent);
 }
 
-/* Active pill indicator */
+/* Active dot indicator — sits below the icon */
 .miniapp-tab.active::after {
   content: '';
   position: absolute;
-  bottom: max(6px, env(safe-area-inset-bottom));
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--ma-accent);
 }
