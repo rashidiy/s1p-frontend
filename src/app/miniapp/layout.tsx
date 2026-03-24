@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Spin } from 'antd';
 import { Phone, Users, Home, Filter, Clock, ChevronRight } from 'lucide-react';
@@ -149,6 +149,10 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
   const t = useTranslations('miniapp');
   const tRoles = useTranslations('roles');
 
+  // Track whether deep link redirect has been handled — startapp param persists
+  // for the entire Telegram SDK session, so we must only redirect ONCE
+  const deepLinkHandledRef = useRef(false);
+
   // Parse startapp param — could be raw company_id or base64-encoded signed payload
   const rawStartParam = searchParams.get('company_id')
     || webApp?.initDataUnsafe?.start_param
@@ -192,11 +196,14 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
         setSessionCompany(companyId, companyName);
       }
 
-      // Handle deep link redirect after successful auth
-      const deepLink = resolveDeepLink(searchParams)
-        || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
-      if (deepLink && deepLink !== pathname) {
-        router.replace(deepLink);
+      // Handle deep link redirect after successful auth (once only)
+      if (!deepLinkHandledRef.current) {
+        const deepLink = resolveDeepLink(searchParams)
+          || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
+        if (deepLink && deepLink !== pathname) {
+          deepLinkHandledRef.current = true;
+          router.replace(deepLink);
+        }
       }
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
@@ -247,11 +254,14 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
       setUser(profileToUser(profile), 'company_user');
       setAuthState('authenticated');
 
-      // Handle deep link redirect
-      const deepLink = resolveDeepLink(searchParams)
-        || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
-      if (deepLink && deepLink !== pathname) {
-        router.replace(deepLink);
+      // Handle deep link redirect (once only)
+      if (!deepLinkHandledRef.current) {
+        const deepLink = resolveDeepLink(searchParams)
+          || (startappData ? startappToDeepLink(startappData.action, startappData.data) : null);
+        if (deepLink && deepLink !== pathname) {
+          deepLinkHandledRef.current = true;
+          router.replace(deepLink);
+        }
       }
     } catch {
       const hasTg = typeof window !== 'undefined' && !!window.Telegram;
