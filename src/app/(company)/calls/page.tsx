@@ -55,6 +55,7 @@ export default function CallsPage() {
   const [outcome, setOutcome] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const { user, isOperator } = useAuthStore();
   const [myCalls, setMyCalls] = useState(() => user?.role === 'company_operator');
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
@@ -77,7 +78,6 @@ export default function CallsPage() {
   const [playingCallId, setPlayingCallId] = useState<string | null>(null);
   const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { user, isOperator } = useAuthStore();
 
   useEffect(() => {
     if (!searchInput) return;
