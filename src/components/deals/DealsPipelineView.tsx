@@ -11,7 +11,11 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { DEAL_STAGES, DEAL_STAGE_BOARD_COLORS, DEAL_STAGE_KEYS } from '@/lib/constants';
 import { useAuthStore } from '@/store/auth';
 
-export default function DealsPipelineView() {
+interface DealsPipelineViewProps {
+  myDeals?: boolean;
+}
+
+export default function DealsPipelineView({ myDeals }: DealsPipelineViewProps) {
   const t = useTranslations('deals');
   const tActions = useTranslations('actions');
   const tStatuses = useTranslations('statuses');
@@ -23,7 +27,7 @@ export default function DealsPipelineView() {
 
   const loadDeals = useCallback(async () => {
     try {
-      const result = await apiClient.getDeals({ page: 1, page_size: 100 });
+      const result = await apiClient.getDeals({ page: 1, page_size: 100, my_deals: myDeals || undefined });
       setDeals(result.items);
     } catch (error) {
       console.error('Failed to load pipeline:', error);
@@ -32,7 +36,7 @@ export default function DealsPipelineView() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stable ref
-  }, []);
+  }, [myDeals]);
 
   useEffect(() => { loadDeals(); }, [loadDeals]);
 

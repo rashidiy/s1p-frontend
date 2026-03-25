@@ -36,7 +36,7 @@ export default function ContactsPage() {
   const tCommon = useTranslations('common');
   const tFields = useTranslations('fields');
   const router = useRouter();
-  const { hasPermissionString } = useAuthStore();
+  const { user, hasPermissionString } = useAuthStore();
 
   const [data, setData] = useState<PaginatedResponse<ContactResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +44,7 @@ export default function ContactsPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [myContacts, setMyContacts] = useState(() => user?.role === 'company_operator');
 
   useEffect(() => {
     setViewMode(getInitialViewMode());
@@ -63,10 +64,8 @@ export default function ContactsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  useEffect(() => {
-    loadContacts();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  }, [page, search]);
+  useEffect(() => { loadContacts(); }, [page, search, myContacts]);
 
   const loadContacts = async () => {
     try {
@@ -74,6 +73,7 @@ export default function ContactsPage() {
         page,
         page_size: 20,
         search: search || undefined,
+        my_contacts: myContacts || undefined,
       });
       setData(result);
     } catch (error) {
@@ -202,6 +202,14 @@ export default function ContactsPage() {
           allowClear
           size="large"
           className="w-full md:max-w-lg"
+        />
+        <Segmented
+          value={myContacts ? 'my' : 'all'}
+          onChange={(v) => { setMyContacts(v === 'my'); setPage(1); }}
+          options={[
+            { label: t('myContacts'), value: 'my' },
+            { label: t('allContacts'), value: 'all' },
+          ]}
         />
         <Segmented
           value={viewMode}

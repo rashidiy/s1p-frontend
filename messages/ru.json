@@ -542,7 +542,9 @@
     "writeNote": "Написать заметку...",
     "activityLead": "Лид: {title} ({status})",
     "activityDeal": "Сделка: {title} ({amount})",
-    "activityCall": "Звонок ({direction})"
+    "activityCall": "Звонок ({direction})",
+    "myContacts": "Мои контакты",
+    "allContacts": "Все контакты"
   },
   "leads": {
     "title": "Лиды",
@@ -571,7 +573,9 @@
     "leadDeleted": "Лид успешно удален",
     "leadConverted": "Лид успешно конвертирован",
     "noteAdded": "Заметка успешно добавлена",
-    "writeNote": "Написать заметку..."
+    "writeNote": "Написать заметку...",
+    "myLeads": "Мои лиды",
+    "allLeads": "Все лиды"
   },
   "deals": {
     "title": "Сделки",
@@ -613,7 +617,9 @@
     "noDealsInStage": "Нет сделок на этом этапе",
     "failedToLoadPipeline": "Не удалось загрузить воронку",
     "pipelineHelp": "Воронка без перетаскивания: нажмите на сделку для просмотра, используйте редактирование для смены этапа",
-    "dealMoved": "Сделка перемещена"
+    "dealMoved": "Сделка перемещена",
+    "myDeals": "Мои сделки",
+    "allDeals": "Все сделки"
   },
   "tasks": {
     "title": "Задачи",
@@ -635,7 +641,9 @@
     "taskCreated": "Задача успешно создана",
     "taskUpdated": "Задача успешно обновлена",
     "taskDeleted": "Задача успешно удалена",
-    "allStatuses": "Все статусы"
+    "allStatuses": "Все статусы",
+    "myTasks": "Мои задачи",
+    "allTasks": "Все задачи"
   },
   "calls": {
     "title": "История звонков",
@@ -701,7 +709,9 @@
     "recentNumbers": "Последние номера",
     "callSuccess": "Звонок инициирован! ID: {callId}",
     "invalidPhone": "Номер должен начинаться с + и содержать только цифры",
-    "phoneHint": "Введите номер в международном формате, напр. +998901234567"
+    "phoneHint": "Введите номер в международном формате, напр. +998901234567",
+    "myCallsToggle": "Мои звонки",
+    "allCallsToggle": "Все звонки"
   },
   "analytics": {
     "title": "Аналитика",

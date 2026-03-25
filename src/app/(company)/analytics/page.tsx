@@ -37,9 +37,9 @@ export default function AnalyticsPage() {
   });
   const [chartsLoading, setChartsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const { isAdmin, isManager } = useAuthStore();
+  const { hasPermissionString } = useAuthStore();
 
-  const canViewTeamData = isAdmin() || isManager();
+  const canViewTeamData = hasPermissionString('stats.read');
 
   const tooltipStyle = {
     borderRadius: '12px',

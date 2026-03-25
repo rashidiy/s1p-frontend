@@ -542,7 +542,9 @@
     "writeNote": "Write a note...",
     "activityLead": "Lead: {title} ({status})",
     "activityDeal": "Deal: {title} ({amount})",
-    "activityCall": "Call ({direction})"
+    "activityCall": "Call ({direction})",
+    "myContacts": "My Contacts",
+    "allContacts": "All Contacts"
   },
   "leads": {
     "title": "Leads",
@@ -571,7 +573,9 @@
     "leadDeleted": "Lead deleted successfully",
     "leadConverted": "Lead converted successfully",
     "noteAdded": "Note added successfully",
-    "writeNote": "Write a note..."
+    "writeNote": "Write a note...",
+    "myLeads": "My Leads",
+    "allLeads": "All Leads"
   },
   "deals": {
     "title": "Deals",
@@ -613,7 +617,9 @@
     "noDealsInStage": "No deals in this stage",
     "failedToLoadPipeline": "Failed to load pipeline",
     "pipelineHelp": "Drag-free pipeline: click a deal to view details, use edit to change stage",
-    "dealMoved": "Deal moved successfully"
+    "dealMoved": "Deal moved successfully",
+    "myDeals": "My Deals",
+    "allDeals": "All Deals"
   },
   "tasks": {
     "title": "Tasks",
@@ -635,7 +641,9 @@
     "taskCreated": "Task created successfully",
     "taskUpdated": "Task updated successfully",
     "taskDeleted": "Task deleted successfully",
-    "allStatuses": "All Statuses"
+    "allStatuses": "All Statuses",
+    "myTasks": "My Tasks",
+    "allTasks": "All Tasks"
   },
   "calls": {
     "title": "Call History",
@@ -701,7 +709,9 @@
     "recentNumbers": "Recent Numbers",
     "callSuccess": "Call initiated! ID: {callId}",
     "invalidPhone": "Phone must start with + followed by digits",
-    "phoneHint": "Enter phone in international format, e.g. +998901234567"
+    "phoneHint": "Enter phone in international format, e.g. +998901234567",
+    "myCallsToggle": "My Calls",
+    "allCallsToggle": "All Calls"
   },
   "analytics": {
     "title": "Analytics",

@@ -56,10 +56,7 @@ const baseCompanyNavigation: NavItem[] = [
   { nameKey: 'deals', href: '/deals', icon: <FundProjectionScreenOutlined />, permission: 'deals.read' },
   { nameKey: 'tasks', href: '/tasks', icon: <CheckSquareOutlined />, permission: 'tasks.read' },
   { nameKey: 'calls', href: '/calls', icon: <PhoneOutlined />, permission: 'calls.read' },
-];
-
-const managerNavigation: NavItem[] = [
-  { nameKey: 'analytics', href: '/analytics', icon: <BarChartOutlined /> },
+  { nameKey: 'analytics', href: '/analytics', icon: <BarChartOutlined />, permission: 'stats.read' },
 ];
 
 const adminNavigation: NavItem[] = [
@@ -81,7 +78,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname() ?? '/';
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { user, isOwner, isAdmin, isManager, hasPermissionString, logout } = useAuthStore();
+  const { user, isOwner, isAdmin, hasPermissionString, logout } = useAuthStore();
   const { mode, setMode } = useThemeStore();
   const locale = useLocale() as Locale;
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -100,10 +97,6 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
     let nav = baseCompanyNavigation.filter(
       (item) => !item.permission || hasPermissionString(item.permission)
     );
-
-    if (isManager() || isAdmin()) {
-      nav = [...nav, ...managerNavigation];
-    }
 
     if (isAdmin()) {
       nav = [...nav, ...adminNavigation];
