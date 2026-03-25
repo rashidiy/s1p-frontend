@@ -12,15 +12,8 @@ import { formatDuration, formatDate, formatTime, formatPhone, getAvatarColor, ge
 import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 // ============================================================================
-// Audio Player — Telegram voice message style with waveform bars
+// Audio Player — lazy-load on play, clean progress bar (no fake waveform)
 // ============================================================================
-
-function generateWaveformBars(callId: number, count: number = 45): number[] {
-  return Array.from({ length: count }, (_, i) => {
-    const seed = callId * 31 + i * 17;
-    return 20 + (((seed * 2654435761) >>> 0) % 80); // 20-100% height
-  });
-}
 
 function AudioPlayer({
   callId,
@@ -30,51 +23,67 @@ function AudioPlayer({
   webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const waveformRef = useRef<HTMLDivElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
-  const [loadError, setLoadError] = useState(false);
 
-  const bars = useRef(generateWaveformBars(callId)).current;
-
-  useEffect(() => {
-    let cancelled = false;
-    apiClient
-      .getCallRecording(String(callId))
-      .then((url) => { if (!cancelled) setAudioUrl(url); })
-      .catch(() => { if (!cancelled) setLoadError(true); });
-    return () => { cancelled = true; };
-  }, [callId]);
-
+  // Cleanup blob URL on unmount
   useEffect(() => {
     return () => { if (audioUrl) URL.revokeObjectURL(audioUrl); };
   }, [audioUrl]);
 
+  // Wire up audio events when URL is available
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const onTime = () => setCurrentTime(audio.currentTime);
-    const onMeta = () => setDuration(audio.duration);
+    const onMeta = () => { setDuration(audio.duration); setState('ready'); };
     const onEnd = () => setPlaying(false);
+    const onCanPlay = () => {
+      setState('ready');
+      // Auto-play once loaded (user already pressed play)
+      audio.play().then(() => setPlaying(true)).catch(() => {});
+    };
+    const onError = () => setState('error');
     audio.addEventListener('timeupdate', onTime);
     audio.addEventListener('loadedmetadata', onMeta);
+    audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('ended', onEnd);
+    audio.addEventListener('error', onError);
     return () => {
       audio.removeEventListener('timeupdate', onTime);
       audio.removeEventListener('loadedmetadata', onMeta);
+      audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('ended', onEnd);
+      audio.removeEventListener('error', onError);
     };
   }, [audioUrl]);
 
+  // Lazy load: fetch recording only when user taps play
+  async function loadAndPlay() {
+    if (state === 'loading') return;
+    setState('loading');
+    webApp?.HapticFeedback.selectionChanged();
+    try {
+      const url = await apiClient.getCallRecording(String(callId));
+      setAudioUrl(url);
+      // Audio will auto-play via canplay event
+    } catch {
+      setState('error');
+      webApp?.HapticFeedback.notificationOccurred('error');
+    }
+  }
+
   function togglePlay() {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || state !== 'ready') return;
     webApp?.HapticFeedback.selectionChanged();
     if (playing) { audio.pause(); setPlaying(false); }
-    else { audio.play(); setPlaying(true); }
+    else { audio.play().then(() => setPlaying(true)).catch(() => {}); }
   }
 
   function cycleSpeed() {
@@ -87,7 +96,7 @@ function AudioPlayer({
   }
 
   function handleSeek(e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
-    const bar = waveformRef.current;
+    const bar = progressRef.current;
     const audio = audioRef.current;
     if (!bar || !audio || !duration) return;
     const rect = bar.getBoundingClientRect();
@@ -103,81 +112,100 @@ function AudioPlayer({
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
-  if (loadError) return null;
-  if (!audioUrl) return <div style={{ padding: '8px 0', textAlign: 'center' }}><Spin size="small" /></div>;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const isLoading = state === 'loading';
+  const isReady = state === 'ready';
 
-  const progress = duration > 0 ? currentTime / duration : 0;
+  // Error state — recording unavailable
+  if (state === 'error') {
+    return (
+      <div style={{ padding: '10px 16px', fontSize: 13, color: 'var(--ma-hint)', textAlign: 'center' }}>
+        {"Recording unavailable" /* TODO: i18n */}
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '14px 16px' }}>
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* Play/Pause — filled circle with pulse while playing */}
+    <div style={{ padding: '12px 16px' }}>
+      {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" />}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Play/Pause button */}
         <button
-          onClick={togglePlay}
+          onClick={isReady ? togglePlay : loadAndPlay}
+          disabled={isLoading}
           style={{
-            width: 44, height: 44, borderRadius: '50%', border: 'none',
-            background: 'var(--ma-accent)', color: 'var(--ma-btn-text)',
+            width: 40, height: 40, borderRadius: '50%', border: 'none',
+            background: isLoading ? 'var(--ma-separator)' : 'var(--ma-accent)',
+            color: 'var(--ma-btn-text)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', WebkitTapHighlightColor: 'transparent', flexShrink: 0,
-            transition: 'transform 0.1s',
-            animation: playing ? 'waveform-pulse 2s ease-in-out infinite' : 'none',
+            cursor: isLoading ? 'default' : 'pointer',
+            WebkitTapHighlightColor: 'transparent', flexShrink: 0,
           }}
         >
-          {playing ? <Pause size={20} /> : <Play size={20} style={{ marginLeft: 2 }} />}
+          {isLoading ? (
+            <Spin size="small" />
+          ) : playing ? (
+            <Pause size={18} />
+          ) : (
+            <Play size={18} style={{ marginLeft: 2 }} />
+          )}
         </button>
 
-        {/* Waveform bars + time */}
+        {/* Progress bar + time */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
-            ref={waveformRef}
-            onClick={handleSeek}
-            onTouchMove={handleSeek}
-            style={{ display: 'flex', alignItems: 'center', gap: 2, height: 32, cursor: 'pointer', touchAction: 'none' }}
+            ref={progressRef}
+            onClick={isReady ? handleSeek : undefined}
+            onTouchMove={isReady ? handleSeek : undefined}
+            style={{
+              height: 6, borderRadius: 3, cursor: isReady ? 'pointer' : 'default',
+              background: 'var(--ma-separator)', position: 'relative', touchAction: 'none',
+            }}
           >
-            {bars.map((height, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 3, height: `${height}%`, borderRadius: 1.5, flexShrink: 0,
-                  background: (i / bars.length) < progress ? 'var(--ma-accent)' : 'var(--ma-separator)',
-                  transition: 'background 0.15s ease',
-                }}
-              />
-            ))}
+            <div style={{
+              height: '100%', borderRadius: 3,
+              background: 'var(--ma-accent)',
+              width: `${progress}%`,
+              transition: playing ? 'width 0.2s linear' : 'none',
+              position: 'relative',
+            }}>
+              {/* Seek handle — only show when ready */}
+              {isReady && progress > 0 && (
+                <div style={{
+                  width: 14, height: 14, borderRadius: '50%',
+                  background: 'var(--ma-accent)',
+                  position: 'absolute', right: -7, top: -4,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                }} />
+              )}
+            </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-            <span style={{ fontSize: 12, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
-              {fmt(currentTime)}
+            <span style={{ fontSize: 11, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
+              {isReady ? fmt(currentTime) : '0:00'}
             </span>
-            <span style={{ fontSize: 12, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
-              {fmt(duration)}
+            <span style={{ fontSize: 11, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
+              {isReady ? fmt(duration) : (state === 'idle' ? '' : '...')}
             </span>
           </div>
         </div>
 
-        {/* Speed pill */}
-        <button
-          onClick={cycleSpeed}
-          style={{
-            padding: '3px 10px', border: '1px solid var(--ma-separator)', borderRadius: 100,
-            background: speed !== 1 ? 'var(--ma-accent)' : 'transparent',
-            color: speed !== 1 ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
-            fontSize: 12, fontWeight: 600, cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent', flexShrink: 0, transition: 'all 0.15s',
-          }}
-        >
-          {speed}x
-        </button>
+        {/* Speed pill — only show when playing/ready */}
+        {isReady && (
+          <button
+            onClick={cycleSpeed}
+            style={{
+              padding: '3px 8px', border: '1px solid var(--ma-separator)', borderRadius: 100,
+              background: speed !== 1 ? 'var(--ma-accent)' : 'transparent',
+              color: speed !== 1 ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
+              fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent', flexShrink: 0,
+            }}
+          >
+            {speed}x
+          </button>
+        )}
       </div>
-
-      <style>{`
-        @keyframes waveform-pulse {
-          0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ma-accent) 40%, transparent); }
-          70% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--ma-accent) 0%, transparent); }
-          100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ma-accent) 0%, transparent); }
-        }
-      `}</style>
     </div>
   );
 }
