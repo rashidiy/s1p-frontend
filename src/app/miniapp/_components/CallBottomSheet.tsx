@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Phone, Headphones, ArrowLeftRight } from 'lucide-react';
 import { BottomSheet, BottomSheetOption } from './BottomSheet';
 import type { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -14,6 +15,18 @@ interface CallBottomSheetProps {
   t: ReturnType<typeof useTranslations>;
 }
 
+function ColoredIcon({ children, bg, color }: { children: ReactNode; bg: string; color: string }) {
+  return (
+    <div style={{
+      width: 42, height: 42, borderRadius: '50%', background: bg,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color, flexShrink: 0,
+    }}>
+      {children}
+    </div>
+  );
+}
+
 export function CallBottomSheet({
   phone,
   open,
@@ -25,33 +38,29 @@ export function CallBottomSheet({
   return (
     <BottomSheet open={open} onClose={onClose}>
       <BottomSheetOption
-        icon={<Phone size={20} />}
+        icon={<ColoredIcon bg="rgba(16, 185, 129, 0.12)" color="#10B981"><Phone size={20} /></ColoredIcon>}
         label={t('calls.phoneCall')}
         onClick={() => {
-          onClose();
           webApp?.HapticFeedback.impactOccurred('medium');
-          try {
-            webApp?.openLink(`tel:${phone}`);
-          } catch {
-            window.location.href = `tel:${phone}`;
-          }
+          onClose();
+          try { webApp?.openLink(`tel:${phone}`); } catch { window.location.href = `tel:${phone}`; }
         }}
       />
       <BottomSheetOption
-        icon={<Headphones size={20} />}
+        icon={<ColoredIcon bg="rgba(59, 130, 246, 0.12)" color="#3B82F6"><Headphones size={20} /></ColoredIcon>}
         label={t('calls.sipCall')}
         onClick={() => {
-          onClose();
           webApp?.HapticFeedback.impactOccurred('medium');
+          onClose();
           router.push(`/miniapp/calls?number=${encodeURIComponent(phone)}&mode=sip`);
         }}
       />
       <BottomSheetOption
-        icon={<ArrowLeftRight size={20} />}
+        icon={<ColoredIcon bg="rgba(139, 92, 246, 0.12)" color="#8B5CF6"><ArrowLeftRight size={20} /></ColoredIcon>}
         label={t('calls.externalCall')}
         onClick={() => {
-          onClose();
           webApp?.HapticFeedback.impactOccurred('medium');
+          onClose();
           router.push(`/miniapp/calls?number=${encodeURIComponent(phone)}&mode=external`);
         }}
       />

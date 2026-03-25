@@ -453,7 +453,7 @@ export default function MiniAppDashboard() {
                         <div className="miniapp-list-item-content" style={{ minWidth: 0 }}>
                           <div className="miniapp-list-item-title">{String(op.operator_name || t('unassigned'))}</div>
                           {/* Mini progress bar */}
-                          <div style={{ height: 4, borderRadius: 2, background: 'var(--ma-border)', marginTop: 4, overflow: 'hidden' }}>
+                          <div style={{ height: 4, borderRadius: 2, background: 'var(--ma-separator)', marginTop: 4, overflow: 'hidden' }}>
                             <div style={{
                               height: '100%',
                               width: `${pct}%`,

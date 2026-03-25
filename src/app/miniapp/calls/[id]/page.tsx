@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Phone, MessageCircle, User, Clock, Play, Pause, PhoneIncoming, PhoneOutgoing, PhoneMissed } from 'lucide-react';
+import { Phone, MessageCircle, User, Clock, Play, Pause, PhoneIncoming, PhoneOutgoing, PhoneMissed, UserPlus, TrendingUp } from 'lucide-react';
 import { Spin } from 'antd';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
@@ -12,8 +12,15 @@ import { formatDuration, formatDate, formatTime, formatPhone, getAvatarColor, ge
 import { CallBottomSheet } from '../../_components/CallBottomSheet';
 
 // ============================================================================
-// Audio Player (compact — fits inside each call row)
+// Audio Player — Telegram voice message style with waveform bars
 // ============================================================================
+
+function generateWaveformBars(callId: number, count: number = 45): number[] {
+  return Array.from({ length: count }, (_, i) => {
+    const seed = callId * 31 + i * 17;
+    return 20 + (((seed * 2654435761) >>> 0) % 80); // 20-100% height
+  });
+}
 
 function AudioPlayer({
   callId,
@@ -23,13 +30,15 @@ function AudioPlayer({
   webApp: ReturnType<typeof useTelegramWebApp>['webApp'];
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressRef = useRef<HTMLDivElement | null>(null);
+  const waveformRef = useRef<HTMLDivElement | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [loadError, setLoadError] = useState(false);
+
+  const bars = useRef(generateWaveformBars(callId)).current;
 
   useEffect(() => {
     let cancelled = false;
@@ -78,7 +87,7 @@ function AudioPlayer({
   }
 
   function handleSeek(e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
-    const bar = progressRef.current;
+    const bar = waveformRef.current;
     const audio = audioRef.current;
     if (!bar || !audio || !duration) return;
     const rect = bar.getBoundingClientRect();
@@ -97,23 +106,78 @@ function AudioPlayer({
   if (loadError) return null;
   if (!audioUrl) return <div style={{ padding: '8px 0', textAlign: 'center' }}><Spin size="small" /></div>;
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? currentTime / duration : 0;
 
   return (
-    <div className="miniapp-audio-player">
+    <div style={{ padding: '14px 16px' }}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
-      <div className="miniapp-audio-controls">
-        <button className="miniapp-audio-play" onClick={togglePlay}>
-          {playing ? <Pause size={18} /> : <Play size={18} />}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Play/Pause — filled circle with pulse while playing */}
+        <button
+          onClick={togglePlay}
+          style={{
+            width: 44, height: 44, borderRadius: '50%', border: 'none',
+            background: 'var(--ma-accent)', color: 'var(--ma-btn-text)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', WebkitTapHighlightColor: 'transparent', flexShrink: 0,
+            transition: 'transform 0.1s',
+            animation: playing ? 'waveform-pulse 2s ease-in-out infinite' : 'none',
+          }}
+        >
+          {playing ? <Pause size={20} /> : <Play size={20} style={{ marginLeft: 2 }} />}
         </button>
-        <div className="miniapp-audio-progress" ref={progressRef} onClick={handleSeek} onTouchMove={handleSeek}>
-          <div className="miniapp-audio-progress-fill" style={{ width: `${progress}%` }}>
-            <div className="miniapp-audio-progress-handle" />
+
+        {/* Waveform bars + time */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            ref={waveformRef}
+            onClick={handleSeek}
+            onTouchMove={handleSeek}
+            style={{ display: 'flex', alignItems: 'center', gap: 2, height: 32, cursor: 'pointer', touchAction: 'none' }}
+          >
+            {bars.map((height, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 3, height: `${height}%`, borderRadius: 1.5, flexShrink: 0,
+                  background: (i / bars.length) < progress ? 'var(--ma-accent)' : 'var(--ma-separator)',
+                  transition: 'background 0.15s ease',
+                }}
+              />
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            <span style={{ fontSize: 12, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
+              {fmt(currentTime)}
+            </span>
+            <span style={{ fontSize: 12, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
+              {fmt(duration)}
+            </span>
           </div>
         </div>
-        <span className="miniapp-audio-time">{fmt(currentTime)} / {fmt(duration)}</span>
-        <button className="miniapp-audio-speed" onClick={cycleSpeed}>{speed}x</button>
+
+        {/* Speed pill */}
+        <button
+          onClick={cycleSpeed}
+          style={{
+            padding: '3px 10px', border: '1px solid var(--ma-separator)', borderRadius: 100,
+            background: speed !== 1 ? 'var(--ma-accent)' : 'transparent',
+            color: speed !== 1 ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
+            fontSize: 12, fontWeight: 600, cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent', flexShrink: 0, transition: 'all 0.15s',
+          }}
+        >
+          {speed}x
+        </button>
       </div>
+
+      <style>{`
+        @keyframes waveform-pulse {
+          0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ma-accent) 40%, transparent); }
+          70% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--ma-accent) 0%, transparent); }
+          100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ma-accent) 0%, transparent); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -309,10 +373,17 @@ export default function CallDetailPage() {
     router.push(`/miniapp/contacts/${call!.contact_id}`);
   }
 
+  // Subtle gradient tint based on call type
+  const headerGradient = isMissed
+    ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, transparent 100%)'
+    : isInbound
+      ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, transparent 100%)'
+      : 'linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%)';
+
   return (
     <div className="miniapp-detail-enter">
       {/* Header with avatar */}
-      <div className="miniapp-detail-header">
+      <div className="miniapp-detail-header" style={{ background: headerGradient }}>
         {hasContact ? (
           <div
             className="miniapp-detail-avatar"
@@ -368,6 +439,44 @@ export default function CallDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Unknown caller — quick create actions */}
+      {!hasContact && phone && (
+        <div className="miniapp-section" style={{ marginBottom: 8 }}>
+          <div style={{ padding: '14px 16px', display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => {
+                webApp?.HapticFeedback.impactOccurred('medium');
+                router.push(`/miniapp/contacts/new?phone=${encodeURIComponent(phone)}`);
+              }}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 0', border: '1.5px solid var(--ma-accent)', borderRadius: 10,
+                background: 'transparent', color: 'var(--ma-accent)', fontSize: 14, fontWeight: 500,
+                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <UserPlus size={16} />
+              {"Contact" /* TODO: i18n */}
+            </button>
+            <button
+              onClick={() => {
+                webApp?.HapticFeedback.impactOccurred('medium');
+                router.push(`/miniapp/pipeline?new_lead=1&phone=${encodeURIComponent(phone)}`);
+              }}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 0', border: '1.5px solid var(--ma-accent)', borderRadius: 10,
+                background: 'transparent', color: 'var(--ma-accent)', fontSize: 14, fontWeight: 500,
+                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <TrendingUp size={16} />
+              {"Lead" /* TODO: i18n */}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Call list — each call in the group */}
       <div className="miniapp-section">
