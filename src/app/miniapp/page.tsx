@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Phone, AlertTriangle, TrendingUp, BarChart3, ChevronRight, User } from 'lucide-react';
+import { Phone, AlertTriangle, TrendingUp, BarChart3, ChevronRight, User, Plus, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -246,6 +246,7 @@ export default function MiniAppDashboard() {
           <div
             key={i}
             className="miniapp-stat-card"
+            style={{ borderLeft: `3px solid ${s.color}`, position: 'relative' }}
             onClick={() => {
               webApp?.HapticFeedback.impactOccurred('light');
               router.push(s.tap);
@@ -255,9 +256,12 @@ export default function MiniAppDashboard() {
               <div className="miniapp-stat-icon" style={{ background: s.bg, color: s.color }}>
                 {s.icon}
               </div>
-              <div className="miniapp-stat-value"><AnimatedNumber value={s.value} /></div>
+              <div className="miniapp-stat-value" style={{ fontSize: 32, fontWeight: 700 }}><AnimatedNumber value={s.value} /></div>
             </div>
-            <div className="miniapp-stat-label">{s.label}</div>
+            <div className="miniapp-stat-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {s.label}
+              <ChevronRight size={12} style={{ color: 'var(--ma-hint)', opacity: 0.6 }} />
+            </div>
           </div>
         ))}
       </div>
@@ -288,6 +292,17 @@ export default function MiniAppDashboard() {
               {dedupedMissed.slice(0, 5).map(({ call, count }, i) => {
                 const phone = call.phone || '';
                 const displayName = call.contact_name || formatPhone(phone) || '—';
+                const quickActionStyle: React.CSSProperties = {
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 36,
+                  height: 28,
+                  borderRadius: 14,
+                  border: 'none',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                };
                 return (
                   <div
                     key={i}
@@ -318,8 +333,36 @@ export default function MiniAppDashboard() {
                         <div className="miniapp-list-item-sub">{formatPhone(phone)}</div>
                       )}
                     </div>
-                    <div className="miniapp-list-item-right">
-                      {call.created_at ? formatTime(call.created_at) : ''}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
+                      {/* Call Back button */}
+                      <button
+                        style={{ ...quickActionStyle, background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          webApp?.HapticFeedback.impactOccurred('medium');
+                          router.push(`/miniapp/calls?dial=${encodeURIComponent(phone)}&mode=sip`);
+                        }}
+                        aria-label="Call back" /* TODO: i18n */
+                      >
+                        <Phone size={14} />
+                      </button>
+                      {/* Add contact button — only if no contact_name */}
+                      {!call.contact_name && phone && (
+                        <button
+                          style={{ ...quickActionStyle, background: 'rgba(59, 130, 246, 0.15)', color: '#2563EB' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            webApp?.HapticFeedback.impactOccurred('light');
+                            router.push(`/miniapp/contacts/new?phone=${encodeURIComponent(phone)}`);
+                          }}
+                          aria-label="Add contact" /* TODO: i18n */
+                        >
+                          <Plus size={14} />
+                        </button>
+                      )}
+                      <span style={{ fontSize: 12, color: 'var(--ma-hint)', whiteSpace: 'nowrap', minWidth: 40, textAlign: 'right' }}>
+                        {call.created_at ? formatTime(call.created_at) : ''}
+                      </span>
                     </div>
                   </div>
                 );
@@ -362,8 +405,8 @@ export default function MiniAppDashboard() {
                     } catch {}
                     router.push(`/miniapp/calls/${call.id}`);
                   }}>
-                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
-                      {isInbound ? <Phone size={16} /> : <Phone size={16} />}
+                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`} style={{ position: 'relative' }}>
+                      <Phone size={16} style={{ transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
                     </div>
                     <div className="miniapp-list-item-content">
                       <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
@@ -393,23 +436,41 @@ export default function MiniAppDashboard() {
           <div className="miniapp-section-header">{t('teamToday')}</div>
           <div className="miniapp-list">
             {(teamData as Record<string, unknown>).operator_stats
-              ? ((teamData as Record<string, unknown>).operator_stats as Array<Record<string, unknown>>).slice(0, 6).map((op, i) => (
-                <div key={i} className="miniapp-team-row">
-                  <div
-                    className="miniapp-list-item-icon"
-                    style={{ background: getAvatarColor(String(op.operator_name || '')), width: 32, height: 32, fontSize: 13 }}
-                  >
-                    {getInitials(String(op.operator_name || '').split(' ')[0], String(op.operator_name || '').split(' ')[1])}
-                  </div>
-                  <div className="miniapp-list-item-content">
-                    <div className="miniapp-list-item-title">{String(op.operator_name || t('unassigned'))}</div>
-                  </div>
-                  <div className="miniapp-list-item-right">
-                    <Phone size={12} style={{ marginRight: 4 }} />
-                    {String(op.total_calls ?? 0)}
-                  </div>
-                </div>
-              ))
+              ? (() => {
+                  const operators = ((teamData as Record<string, unknown>).operator_stats as Array<Record<string, unknown>>).slice(0, 6);
+                  const maxCalls = Math.max(...operators.map(op => Number(op.total_calls ?? 0)), 1);
+                  return operators.map((op, i) => {
+                    const calls = Number(op.total_calls ?? 0);
+                    const pct = Math.round((calls / maxCalls) * 100);
+                    return (
+                      <div key={i} className="miniapp-team-row">
+                        <div
+                          className="miniapp-list-item-icon"
+                          style={{ background: getAvatarColor(String(op.operator_name || '')), width: 32, height: 32, fontSize: 13 }}
+                        >
+                          {getInitials(String(op.operator_name || '').split(' ')[0], String(op.operator_name || '').split(' ')[1])}
+                        </div>
+                        <div className="miniapp-list-item-content" style={{ minWidth: 0 }}>
+                          <div className="miniapp-list-item-title">{String(op.operator_name || t('unassigned'))}</div>
+                          {/* Mini progress bar */}
+                          <div style={{ height: 4, borderRadius: 2, background: 'var(--ma-border)', marginTop: 4, overflow: 'hidden' }}>
+                            <div style={{
+                              height: '100%',
+                              width: `${pct}%`,
+                              borderRadius: 2,
+                              background: 'var(--ma-accent)',
+                              transition: 'width 0.6s ease-out',
+                            }} />
+                          </div>
+                        </div>
+                        <div className="miniapp-list-item-right">
+                          <Phone size={12} style={{ marginRight: 4 }} />
+                          {String(calls)}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()
               : (
                 <div className="miniapp-team-row">
                   <User size={16} style={{ color: 'var(--ma-hint)', marginRight: 8 }} />
@@ -423,12 +484,17 @@ export default function MiniAppDashboard() {
         </div>
       )}
 
-      {!recentCalls.length && periodData?.calls?.total_calls === 0 && (
+      {!recentCalls.length && missedCalls.length === 0 && (
         <div className="miniapp-empty">
-          <div className="miniapp-empty-icon">
-            <Phone size={24} />
+          <div className="miniapp-empty-icon" style={{ color: '#10B981' }}>
+            <CheckCircle size={32} />
           </div>
-          <div className="miniapp-empty-sub">{t('dashboard.noActivity')}</div>
+          <div className="miniapp-empty-title" style={{ fontSize: 16, fontWeight: 600, marginTop: 8 }}>
+            {"All caught up!"  /* TODO: i18n */}
+          </div>
+          <div className="miniapp-empty-sub" style={{ marginTop: 4 }}>
+            {"No missed calls or pending items" /* TODO: i18n */}
+          </div>
         </div>
       )}
     </div>
