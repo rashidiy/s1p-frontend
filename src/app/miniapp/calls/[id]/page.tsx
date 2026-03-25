@@ -126,17 +126,17 @@ function AudioPlayer({
   }
 
   return (
-    <div style={{ padding: '12px 16px' }}>
+    <div style={{ paddingTop: 8 }}>
       {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" />}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {/* Play/Pause button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Play/Pause — compact circle */}
         <button
           onClick={isReady ? togglePlay : loadAndPlay}
           disabled={isLoading}
           style={{
-            width: 40, height: 40, borderRadius: '50%', border: 'none',
-            background: isLoading ? 'var(--ma-separator)' : 'var(--ma-accent)',
-            color: 'var(--ma-btn-text)',
+            width: 32, height: 32, borderRadius: '50%', border: 'none',
+            background: isLoading ? 'var(--ma-separator)' : 'rgba(128,128,128,0.15)',
+            color: 'var(--ma-text)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: isLoading ? 'default' : 'pointer',
             WebkitTapHighlightColor: 'transparent', flexShrink: 0,
@@ -145,60 +145,43 @@ function AudioPlayer({
           {isLoading ? (
             <Spin size="small" />
           ) : playing ? (
-            <Pause size={18} />
+            <Pause size={14} />
           ) : (
-            <Play size={18} style={{ marginLeft: 2 }} />
+            <Play size={14} style={{ marginLeft: 1 }} />
           )}
         </button>
 
-        {/* Progress bar + time */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            ref={progressRef}
-            onClick={isReady ? handleSeek : undefined}
-            onTouchMove={isReady ? handleSeek : undefined}
-            style={{
-              height: 6, borderRadius: 3, cursor: isReady ? 'pointer' : 'default',
-              background: 'var(--ma-separator)', position: 'relative', touchAction: 'none',
-            }}
-          >
-            <div style={{
-              height: '100%', borderRadius: 3,
-              background: 'var(--ma-accent)',
-              width: `${progress}%`,
-              transition: playing ? 'width 0.2s linear' : 'none',
-              position: 'relative',
-            }}>
-              {/* Seek handle — only show when ready */}
-              {isReady && progress > 0 && (
-                <div style={{
-                  width: 14, height: 14, borderRadius: '50%',
-                  background: 'var(--ma-accent)',
-                  position: 'absolute', right: -7, top: -4,
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                }} />
-              )}
-            </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-            <span style={{ fontSize: 11, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
-              {isReady ? fmt(currentTime) : '0:00'}
-            </span>
-            <span style={{ fontSize: 11, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums' }}>
-              {isReady ? fmt(duration) : (state === 'idle' ? '' : '...')}
-            </span>
-          </div>
+        {/* Progress bar */}
+        <div
+          ref={progressRef}
+          onClick={isReady ? handleSeek : undefined}
+          onTouchMove={isReady ? handleSeek : undefined}
+          style={{
+            flex: 1, height: 4, borderRadius: 2, cursor: isReady ? 'pointer' : 'default',
+            background: 'var(--ma-separator)', touchAction: 'none',
+          }}
+        >
+          <div style={{
+            height: '100%', borderRadius: 2,
+            background: 'var(--ma-hint)',
+            width: `${progress}%`,
+            transition: playing ? 'width 0.2s linear' : 'none',
+          }} />
         </div>
 
-        {/* Speed pill — only show when playing/ready */}
-        {isReady && (
+        {/* Time */}
+        <span style={{ fontSize: 11, color: 'var(--ma-hint)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, minWidth: 32 }}>
+          {isReady ? fmt(currentTime) : '0:00'}
+        </span>
+
+        {/* Speed pill — only when not 1x */}
+        {isReady && speed !== 1 && (
           <button
             onClick={cycleSpeed}
             style={{
-              padding: '3px 8px', border: '1px solid var(--ma-separator)', borderRadius: 100,
-              background: speed !== 1 ? 'var(--ma-accent)' : 'transparent',
-              color: speed !== 1 ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
-              fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              padding: '1px 6px', border: '1px solid var(--ma-separator)', borderRadius: 100,
+              background: 'transparent', color: 'var(--ma-hint)',
+              fontSize: 10, fontWeight: 600, cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent', flexShrink: 0,
             }}
           >
@@ -245,32 +228,32 @@ function CallRow({
       : '';
 
   const dur = isAnswered && call.duration ? formatDuration(call.duration) : null;
+  const showRecording = isAnswered && call.has_recording;
 
   return (
-    <div className="miniapp-call-detail-row">
-      <div className="miniapp-call-detail-row-header">
-        <div className="miniapp-call-detail-row-icon" style={{ color: iconColor }}>
+    <div style={{ padding: '10px 16px', borderBottom: '0.5px solid var(--ma-separator)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ color: iconColor, flexShrink: 0 }}>
           <IconComponent size={16} />
         </div>
-        <div className="miniapp-call-detail-row-info">
-          <div className="miniapp-call-detail-row-top">
-            <span className="miniapp-call-detail-row-date">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 14, color: 'var(--ma-text)' }}>
               {formatDate(call.created_at)} {formatTime(call.created_at)}
             </span>
-            <span className={`miniapp-call-detail-row-state ${stateClass}`}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: isMissed ? '#EF4444' : '#10B981' }}>
               {stateLabel}
             </span>
           </div>
-          <div className="miniapp-call-detail-row-bottom">
-            {dur && <span><Clock size={12} style={{ marginRight: 3, verticalAlign: -1 }} />{dur}</span>}
-            {call.operator_name && <span>{call.operator_name}</span>}
-            {!dur && !call.operator_name && isMissed && (
-              <span style={{ color: '#EF4444' }}>{t('calls.missed')}</span>
-            )}
-          </div>
+          {(dur || call.operator_name) && (
+            <div style={{ fontSize: 12, color: 'var(--ma-hint)', marginTop: 2, display: 'flex', gap: 8 }}>
+              {dur && <span>{dur}</span>}
+              {call.operator_name && <span>{call.operator_name}</span>}
+            </div>
+          )}
         </div>
       </div>
-      {call.has_recording && (
+      {showRecording && (
         <AudioPlayer callId={call.id} webApp={webApp} />
       )}
     </div>
@@ -401,17 +384,10 @@ export default function CallDetailPage() {
     router.push(`/miniapp/contacts/${call!.contact_id}`);
   }
 
-  // Subtle gradient tint based on call type
-  const headerGradient = isMissed
-    ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, transparent 100%)'
-    : isInbound
-      ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, transparent 100%)'
-      : 'linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%)';
-
   return (
     <div className="miniapp-detail-enter">
       {/* Header with avatar */}
-      <div className="miniapp-detail-header" style={{ background: headerGradient }}>
+      <div className="miniapp-detail-header">
         {hasContact ? (
           <div
             className="miniapp-detail-avatar"
@@ -470,39 +446,37 @@ export default function CallDetailPage() {
 
       {/* Unknown caller — quick create actions */}
       {!hasContact && phone && (
-        <div className="miniapp-section" style={{ marginBottom: 8 }}>
-          <div style={{ padding: '14px 16px', display: 'flex', gap: 10 }}>
-            <button
-              onClick={() => {
-                webApp?.HapticFeedback.impactOccurred('medium');
-                router.push(`/miniapp/contacts/new?phone=${encodeURIComponent(phone)}`);
-              }}
-              style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '10px 0', border: '1.5px solid var(--ma-accent)', borderRadius: 10,
-                background: 'transparent', color: 'var(--ma-accent)', fontSize: 14, fontWeight: 500,
-                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <UserPlus size={16} />
-              {"Contact" /* TODO: i18n */}
-            </button>
-            <button
-              onClick={() => {
-                webApp?.HapticFeedback.impactOccurred('medium');
-                router.push(`/miniapp/pipeline?new_lead=1&phone=${encodeURIComponent(phone)}`);
-              }}
-              style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '10px 0', border: '1.5px solid var(--ma-accent)', borderRadius: 10,
-                background: 'transparent', color: 'var(--ma-accent)', fontSize: 14, fontWeight: 500,
-                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <TrendingUp size={16} />
-              {"Lead" /* TODO: i18n */}
-            </button>
-          </div>
+        <div style={{ padding: '0 16px 8px', display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => {
+              webApp?.HapticFeedback.impactOccurred('medium');
+              router.push(`/miniapp/contacts/new?phone=${encodeURIComponent(phone)}`);
+            }}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '8px 0', border: '1px solid var(--ma-separator)', borderRadius: 8,
+              background: 'transparent', color: 'var(--ma-text)', fontSize: 13, fontWeight: 500,
+              cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <UserPlus size={14} />
+            {"Contact" /* TODO: i18n */}
+          </button>
+          <button
+            onClick={() => {
+              webApp?.HapticFeedback.impactOccurred('medium');
+              router.push(`/miniapp/pipeline?new_lead=1&phone=${encodeURIComponent(phone)}`);
+            }}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '8px 0', border: '1px solid var(--ma-separator)', borderRadius: 8,
+              background: 'transparent', color: 'var(--ma-text)', fontSize: 13, fontWeight: 500,
+              cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <TrendingUp size={14} />
+            {"Lead" /* TODO: i18n */}
+          </button>
         </div>
       )}
 

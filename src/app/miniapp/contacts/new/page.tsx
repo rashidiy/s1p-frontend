@@ -19,16 +19,6 @@ const labelTopStyle: React.CSSProperties = {
   marginTop: 12,
 };
 
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 600,
-  color: 'var(--ma-text)',
-  marginTop: 20,
-  marginBottom: 8,
-  paddingBottom: 6,
-  borderBottom: '0.5px solid var(--ma-separator)',
-};
-
 export default function NewContactPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,8 +30,6 @@ export default function NewContactPage() {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState(phoneParam);
   const [email, setEmail] = useState('');
-  const [position, setPosition] = useState('');
-  const [companyName, setCompanyName] = useState('');
   const [saving, setSaving] = useState(false);
 
   const canSave = firstName.trim() && phone.trim() && !saving;
@@ -74,8 +62,6 @@ export default function NewContactPage() {
         last_name: lastName.trim() || undefined,
         phone: phone.trim(),
         email: email.trim() || undefined,
-        position: position.trim() || undefined,
-        company_name: companyName.trim() || undefined,
       });
       webApp?.HapticFeedback.notificationOccurred('success');
       try {
@@ -129,11 +115,6 @@ export default function NewContactPage() {
       <div className="miniapp-page-title">{t('contacts.newContact')}</div>
 
       <div className="miniapp-section" style={{ padding: '16px' }}>
-        {/* Personal Info */}
-        <div style={sectionTitleStyle}>
-          {'Personal Info' /* TODO: i18n */}
-        </div>
-
         <label style={labelStyle}>
           {t('contacts.firstName')} *
         </label>
@@ -155,16 +136,11 @@ export default function NewContactPage() {
           onChange={(e) => setLastName(e.target.value)}
         />
 
-        {/* Contact Info */}
-        <div style={sectionTitleStyle}>
-          {'Contact Info' /* TODO: i18n */}
-        </div>
-
-        <label style={labelStyle}>
+        <label style={labelTopStyle}>
           {t('contacts.phone')} *
         </label>
         {phoneParam ? (
-          <div style={{ fontSize: 16, padding: '10px 12px', background: 'var(--ma-bg2)', borderRadius: 'var(--ma-radius-sm)' }}>
+          <div style={{ fontSize: 16, padding: '10px 12px', background: 'var(--ma-bg2)', borderRadius: 'var(--ma-radius-sm)', marginBottom: 8 }}>
             {formatPhone(phoneParam)}
           </div>
         ) : (
@@ -186,31 +162,6 @@ export default function NewContactPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
-        />
-
-        {/* Work Info */}
-        <div style={sectionTitleStyle}>
-          {'Work Info' /* TODO: i18n */}
-        </div>
-
-        <label style={labelStyle}>
-          {'Position' /* TODO: i18n */}
-        </label>
-        <input
-          className="miniapp-create-contact-input"
-          placeholder={'Position' /* TODO: i18n */}
-          value={position}
-          onChange={(e) => setPosition(e.target.value)}
-        />
-
-        <label style={labelTopStyle}>
-          {'Company' /* TODO: i18n */}
-        </label>
-        <input
-          className="miniapp-create-contact-input"
-          placeholder={'Company' /* TODO: i18n */}
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
         />
       </div>
     </div>

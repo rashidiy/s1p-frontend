@@ -37,8 +37,9 @@ const sectionHeaderStyle: React.CSSProperties = {
   fontWeight: 700,
   textTransform: 'uppercase',
   color: 'var(--ma-hint)',
-  background: 'var(--ma-bg)',
+  background: 'var(--ma-section)',
   letterSpacing: '0.5px',
+  borderBottom: '0.5px solid var(--ma-separator)',
 };
 
 export default function MiniAppContacts() {

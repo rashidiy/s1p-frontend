@@ -415,54 +415,24 @@ export default function ContactDetailPage() {
         </div>
 
         {/* Email */}
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">{t('detail.email')}</span>
-          {editing ? (
-            <input
-              style={editInputStyle}
-              value={editData.email || ''}
-              onChange={(e) => updateField('email', e.target.value)}
-              placeholder={t('detail.email')}
-              type="email"
-            />
-          ) : contact.email ? (
-            <span className="miniapp-info-value">
-              <a href={`mailto:${contact.email}`}>{contact.email}</a>
-            </span>
-          ) : (
-            <span className="miniapp-info-value">{'\u2014'}</span>
-          )}
-        </div>
-
-        {/* Position */}
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">{tFields('position')}</span>
-          {editing ? (
-            <input
-              style={editInputStyle}
-              value={editData.position || ''}
-              onChange={(e) => updateField('position', e.target.value)}
-              placeholder={tFields('position')}
-            />
-          ) : (
-            <span className="miniapp-info-value">{contact.position || '\u2014'}</span>
-          )}
-        </div>
-
-        {/* Company Name */}
-        <div className="miniapp-info-row">
-          <span className="miniapp-info-label">{'Company' /* TODO: i18n */}</span>
-          {editing ? (
-            <input
-              style={editInputStyle}
-              value={editData.company_name || ''}
-              onChange={(e) => updateField('company_name', e.target.value)}
-              placeholder={'Company' /* TODO: i18n */}
-            />
-          ) : (
-            <span className="miniapp-info-value">{contact.company_name || '\u2014'}</span>
-          )}
-        </div>
+        {(editing || contact.email) && (
+          <div className="miniapp-info-row">
+            <span className="miniapp-info-label">{t('detail.email')}</span>
+            {editing ? (
+              <input
+                style={editInputStyle}
+                value={editData.email || ''}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder={t('detail.email')}
+                type="email"
+              />
+            ) : (
+              <span className="miniapp-info-value">
+                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Source — view only */}
         {!editing && contact.source && (

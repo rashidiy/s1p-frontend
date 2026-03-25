@@ -246,7 +246,7 @@ export default function MiniAppDashboard() {
           <div
             key={i}
             className="miniapp-stat-card"
-            style={{ borderLeft: `3px solid ${s.color}`, position: 'relative' }}
+            style={{ position: 'relative' }}
             onClick={() => {
               webApp?.HapticFeedback.impactOccurred('light');
               router.push(s.tap);
@@ -402,11 +402,17 @@ export default function MiniAppDashboard() {
                         created_at: call.started_at,
                         contact_name: call.contact_name,
                       }));
+                      // Store group data so detail page shows all calls
+                      if (group.count > 1) {
+                        sessionStorage.setItem(`call_group_${call.id}`, JSON.stringify(group.items));
+                      } else {
+                        sessionStorage.removeItem(`call_group_${call.id}`);
+                      }
                     } catch {}
                     router.push(`/miniapp/calls/${call.id}`);
                   }}>
-                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`} style={{ position: 'relative' }}>
-                      <Phone size={16} style={{ transform: isInbound ? 'rotate(135deg)' : 'rotate(-45deg)' }} />
+                    <div className={`miniapp-call-icon ${isMissed ? 'miniapp-call-icon-missed' : isInbound ? 'miniapp-call-icon-inbound' : 'miniapp-call-icon-outbound'}`}>
+                      <Phone size={16} />
                     </div>
                     <div className="miniapp-list-item-content">
                       <div className={`miniapp-list-item-title ${isMissed ? 'miniapp-text-missed' : ''}`}>
