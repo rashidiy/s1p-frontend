@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Search, User, ChevronRight } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,19 @@ function SkeletonList() {
   );
 }
 
+const sectionHeaderStyle: React.CSSProperties = {
+  position: 'sticky',
+  top: 0,
+  zIndex: 10,
+  padding: '6px 16px',
+  fontSize: 13,
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  color: 'var(--ma-hint)',
+  background: 'var(--ma-bg)',
+  letterSpacing: '0.5px',
+};
+
 export default function MiniAppContacts() {
   const [contacts, setContacts] = useState<ContactResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +49,7 @@ export default function MiniAppContacts() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const { webApp } = useTelegramWebApp();
   const router = useRouter();
   const t = useTranslations('miniapp');
@@ -62,6 +76,15 @@ export default function MiniAppContacts() {
       }
       setHasMore(items.length === PAGE_SIZE);
       setPage(pageNum);
+      // Track total count if API provides it
+      if (res.total !== undefined) {
+        setTotalCount(res.total);
+      } else {
+        // Estimate from loaded items
+        if (pageNum === 1) {
+          setTotalCount(items.length + (items.length === PAGE_SIZE ? 1 : 0));
+        }
+      }
     } catch {
       setError(true);
     } finally {
@@ -92,6 +115,73 @@ export default function MiniAppContacts() {
     load(search, page + 1);
   }
 
+  // Group contacts by first letter for alphabetical sections
+  const groupedContacts = useMemo(() => {
+    if (search) return null; // Don't group when searching
+
+    const groups: { letter: string; items: ContactResponse[] }[] = [];
+    const letterMap = new Map<string, ContactResponse[]>();
+
+    for (const c of contacts) {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.phone || '';
+      const firstChar = name.charAt(0).toUpperCase();
+      const letter = /[A-ZА-ЯЁ]/.test(firstChar) ? firstChar : '#';
+      if (!letterMap.has(letter)) {
+        letterMap.set(letter, []);
+      }
+      letterMap.get(letter)!.push(c);
+    }
+
+    // Sort letters: A-Z first, then Cyrillic, then #
+    const sortedLetters = Array.from(letterMap.keys()).sort((a, b) => {
+      if (a === '#') return 1;
+      if (b === '#') return -1;
+      return a.localeCompare(b);
+    });
+
+    for (const letter of sortedLetters) {
+      groups.push({ letter, items: letterMap.get(letter)! });
+    }
+
+    return groups;
+  }, [contacts, search]);
+
+  // Count display
+  const displayCount = totalCount !== null
+    ? totalCount
+    : contacts.length;
+
+  function renderContactItem(c: ContactResponse) {
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.phone || '\u2014';
+    const initials = getInitials(c.first_name, c.last_name, c.phone);
+    return (
+      <div
+        key={c.id}
+        className="miniapp-list-item"
+        onClick={() => {
+          webApp?.HapticFeedback.impactOccurred('light');
+          router.push(`/miniapp/contacts/${c.id}`);
+        }}
+      >
+        <div
+          className="miniapp-list-item-icon"
+          style={{ background: getAvatarColor(name) }}
+        >
+          {initials}
+        </div>
+        <div className="miniapp-list-item-content">
+          <div className="miniapp-list-item-title">{name}</div>
+          {c.phone && (
+            <div className="miniapp-list-item-sub">{formatPhone(c.phone)}</div>
+          )}
+        </div>
+        <div className="miniapp-list-item-chevron">
+          <ChevronRight size={16} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="miniapp-page-enter">
       <div className="miniapp-page-title">{t('contacts.title')}</div>
@@ -104,6 +194,17 @@ export default function MiniAppContacts() {
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
+
+      {/* Contact count */}
+      {!loading && !error && contacts.length > 0 && (
+        <div style={{
+          fontSize: 13,
+          color: 'var(--ma-hint)',
+          padding: '4px 16px 0',
+        }}>
+          {displayCount}{hasMore && totalCount === null ? '+' : ''} {'contacts' /* TODO: i18n */}
+        </div>
+      )}
 
       {loading ? (
         <SkeletonList />
@@ -120,39 +221,30 @@ export default function MiniAppContacts() {
           </div>
           {!search && <div className="miniapp-empty-sub">{t('contacts.emptyDescription')}</div>}
         </div>
+      ) : groupedContacts ? (
+        /* Alphabetical sections — only when not searching */
+        <div className="miniapp-section" style={{ padding: 0 }}>
+          <div className="miniapp-list">
+            {groupedContacts.map(group => (
+              <div key={group.letter}>
+                <div style={sectionHeaderStyle}>
+                  {group.letter}
+                </div>
+                {group.items.map(c => renderContactItem(c))}
+              </div>
+            ))}
+          </div>
+          {hasMore && (
+            <div className="miniapp-section-footer" onClick={handleLoadMore}>
+              {loadingMore ? <Spin size="small" /> : t('loadMore')}
+            </div>
+          )}
+        </div>
       ) : (
+        /* Flat list — when searching */
         <div className="miniapp-section">
           <div className="miniapp-list">
-            {contacts.map((c) => {
-              const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.phone || '—';
-              const initials = getInitials(c.first_name, c.last_name, c.phone);
-              return (
-                <div
-                  key={c.id}
-                  className="miniapp-list-item"
-                  onClick={() => {
-                    webApp?.HapticFeedback.impactOccurred('light');
-                    router.push(`/miniapp/contacts/${c.id}`);
-                  }}
-                >
-                  <div
-                    className="miniapp-list-item-icon"
-                    style={{ background: getAvatarColor(name) }}
-                  >
-                    {initials}
-                  </div>
-                  <div className="miniapp-list-item-content">
-                    <div className="miniapp-list-item-title">{name}</div>
-                    {c.phone && (
-                      <div className="miniapp-list-item-sub">{formatPhone(c.phone)}</div>
-                    )}
-                  </div>
-                  <div className="miniapp-list-item-chevron">
-                    <ChevronRight size={16} />
-                  </div>
-                </div>
-              );
-            })}
+            {contacts.map(c => renderContactItem(c))}
           </div>
           {hasMore && (
             <div className="miniapp-section-footer" onClick={handleLoadMore}>
