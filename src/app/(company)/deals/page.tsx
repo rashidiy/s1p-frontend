@@ -29,7 +29,7 @@ export default function DealsPage() {
   const tStatuses = useTranslations('statuses');
   const tCommon = useTranslations('common');
 
-  const { hasPermissionString } = useAuthStore();
+  const { user, hasPermissionString } = useAuthStore();
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialView);
   const [data, setData] = useState<PaginatedResponse<DealResponse> | null>(null);
@@ -38,6 +38,7 @@ export default function DealsPage() {
   const [search, setSearch] = useState('');
   const [stage, setStage] = useState<string>('');
   const [page, setPage] = useState(1);
+  const [myDeals, setMyDeals] = useState(() => user?.role === 'company_operator');
 
   const handleViewChange = (value: string | number) => {
     const v = value as ViewMode;
@@ -55,12 +56,12 @@ export default function DealsPage() {
   }, [searchInput]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  useEffect(() => { if (viewMode === 'list') loadDeals(); else setLoading(false); }, [page, search, stage, viewMode]);
+  useEffect(() => { if (viewMode === 'list') loadDeals(); else setLoading(false); }, [page, search, stage, viewMode, myDeals]);
 
   const loadDeals = async () => {
     setLoading(true);
     try {
-      const result = await apiClient.getDeals({ page, page_size: 20, search: search || undefined, stage: stage || undefined });
+      const result = await apiClient.getDeals({ page, page_size: 20, search: search || undefined, stage: stage || undefined, my_deals: myDeals || undefined });
       setData(result);
     } catch { message.error(tErrors('failedToLoadDeals')); }
     finally { setLoading(false); }
@@ -107,6 +108,14 @@ export default function DealsPage() {
             <Link href="/deals/new"><Button type="primary" icon={<PlusOutlined />}>{t('addDeal')}</Button></Link>
           )}
           <Segmented
+            value={myDeals ? 'my' : 'all'}
+            onChange={(v) => { setMyDeals(v === 'my'); setPage(1); }}
+            options={[
+              { label: t('myDeals'), value: 'my' },
+              { label: t('allDeals'), value: 'all' },
+            ]}
+          />
+          <Segmented
             value={viewMode}
             onChange={handleViewChange}
             options={[
@@ -119,7 +128,7 @@ export default function DealsPage() {
       <p className="page-subtitle">{t('subtitle')}</p>
 
       {viewMode === 'pipeline' ? (
-        <DealsPipelineView />
+        <DealsPipelineView myDeals={myDeals} />
       ) : (
         <>
           <div className="flex flex-col sm:flex-row gap-3">

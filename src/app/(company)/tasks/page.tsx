@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Pagination, Button, Tag, Checkbox, Select, message } from 'antd';
+import { Input, Pagination, Button, Tag, Checkbox, Select, Segmented, message } from 'antd';
 import { PlusOutlined, CalendarOutlined, UserOutlined, ExclamationCircleOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -21,7 +21,7 @@ export default function TasksPage() {
   const tCommon = useTranslations('common');
   const tPriorities = useTranslations('priorities');
 
-  const { hasPermissionString } = useAuthStore();
+  const { user, hasPermissionString } = useAuthStore();
   const [data, setData] = useState<PaginatedResponse<TaskResponse> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -29,6 +29,7 @@ export default function TasksPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<string>('');
   const [page, setPage] = useState(1);
+  const [myTasks, setMyTasks] = useState(() => user?.role === 'company_operator');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,12 +40,12 @@ export default function TasksPage() {
   }, [searchInput]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  useEffect(() => { loadTasks(); }, [page, search, status]);
+  useEffect(() => { loadTasks(); }, [page, search, status, myTasks]);
 
   const loadTasks = async () => {
     setError(false);
     try {
-      const result = await apiClient.getTasks({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
+      const result = await apiClient.getTasks({ page, page_size: 20, search: search || undefined, status_filter: status || undefined, my_tasks: myTasks || undefined });
       setData(result);
     } catch { setError(true); message.error(tErrors('failedToLoadTasks')); }
     finally { setLoading(false); }
@@ -106,10 +107,18 @@ export default function TasksPage() {
       </div>
       <p className="page-subtitle">{t('subtitle')}</p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
         <Input.Search placeholder={t('searchTasks')} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
           options={[{ label: tStatuses('pending'), value: 'pending' }, { label: tStatuses('inProgress'), value: 'in_progress' }, { label: tStatuses('completed'), value: 'completed' }]}
+        />
+        <Segmented
+          value={myTasks ? 'my' : 'all'}
+          onChange={(v) => { setMyTasks(v === 'my'); setPage(1); }}
+          options={[
+            { label: t('myTasks'), value: 'my' },
+            { label: t('allTasks'), value: 'all' },
+          ]}
         />
       </div>
 

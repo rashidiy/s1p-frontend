@@ -42,7 +42,7 @@ export default function LeadsPage() {
   const tStatuses = useTranslations('statuses');
   const tFields = useTranslations('fields');
   const router = useRouter();
-  const { hasPermissionString } = useAuthStore();
+  const { user, hasPermissionString } = useAuthStore();
 
   const [data, setData] = useState<PaginatedResponse<LeadResponse> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +51,7 @@ export default function LeadsPage() {
   const [status, setStatus] = useState<string>('');
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [myLeads, setMyLeads] = useState(() => user?.role === 'company_operator');
 
   useEffect(() => {
     setViewMode(getInitialViewMode());
@@ -71,11 +72,11 @@ export default function LeadsPage() {
   }, [searchInput]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  useEffect(() => { loadLeads(); }, [page, search, status]);
+  useEffect(() => { loadLeads(); }, [page, search, status, myLeads]);
 
   const loadLeads = async () => {
     try {
-      const result = await apiClient.getLeads({ page, page_size: 20, search: search || undefined, status_filter: status || undefined });
+      const result = await apiClient.getLeads({ page, page_size: 20, search: search || undefined, status_filter: status || undefined, my_leads: myLeads || undefined });
       setData(result);
     } catch { message.error(tErrors('failedToLoadLeads')); }
     finally { setLoading(false); }
@@ -265,6 +266,14 @@ export default function LeadsPage() {
         <Input.Search placeholder={t('searchLeads')} value={searchInput} onChange={(e) => { const v = e.target.value; setSearchInput(v); if (!v) { setSearch(''); setPage(1); } }} allowClear size="large" className="w-full md:max-w-lg" />
         <Select value={status || undefined} onChange={(v) => { setStatus(v || ''); setPage(1); }} placeholder={tCommon('allStatuses')} allowClear className="w-full sm:w-[180px]" size="large"
           options={statusOptions}
+        />
+        <Segmented
+          value={myLeads ? 'my' : 'all'}
+          onChange={(v) => { setMyLeads(v === 'my'); setPage(1); }}
+          options={[
+            { label: t('myLeads'), value: 'my' },
+            { label: t('allLeads'), value: 'all' },
+          ]}
         />
         <Segmented
           value={viewMode}

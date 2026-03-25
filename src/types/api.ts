@@ -286,6 +286,7 @@ export interface ContactFilters extends PaginationParams, SearchParams {
   has_email?: boolean;
   has_phone?: boolean;
   created_by?: string;
+  my_contacts?: boolean;
 }
 
 export interface LeadFilters extends PaginationParams, SearchParams {

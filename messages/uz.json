@@ -542,7 +542,9 @@
     "writeNote": "Eslatma yozing...",
     "activityLead": "Lid: {title} ({status})",
     "activityDeal": "Bitim: {title} ({amount})",
-    "activityCall": "Qo'ng'iroq ({direction})"
+    "activityCall": "Qo'ng'iroq ({direction})",
+    "myContacts": "Mening kontaktlarim",
+    "allContacts": "Barcha kontaktlar"
   },
   "leads": {
     "title": "Lidlar",
@@ -571,7 +573,9 @@
     "leadDeleted": "Lid muvaffaqiyatli o'chirildi",
     "leadConverted": "Lid muvaffaqiyatli konvertatsiya qilindi",
     "noteAdded": "Eslatma muvaffaqiyatli qo'shildi",
-    "writeNote": "Eslatma yozing..."
+    "writeNote": "Eslatma yozing...",
+    "myLeads": "Mening lidlarim",
+    "allLeads": "Barcha lidlar"
   },
   "deals": {
     "title": "Bitimlar",
@@ -613,7 +617,9 @@
     "noDealsInStage": "Bu bosqichda bitimlar yo'q",
     "failedToLoadPipeline": "Quvurni yuklashda xatolik",
     "pipelineHelp": "Sudrab bo'lmaydigan quvur: tafsilotlarni ko'rish uchun bitimni bosing, bosqichni o'zgartirish uchun tahrirlashdan foydalaning",
-    "dealMoved": "Bitim koʻchirildi"
+    "dealMoved": "Bitim koʻchirildi",
+    "myDeals": "Mening bitimlarim",
+    "allDeals": "Barcha bitimlar"
   },
   "tasks": {
     "title": "Vazifalar",
@@ -635,7 +641,9 @@
     "taskCreated": "Vazifa muvaffaqiyatli yaratildi",
     "taskUpdated": "Vazifa muvaffaqiyatli yangilandi",
     "taskDeleted": "Vazifa muvaffaqiyatli o'chirildi",
-    "allStatuses": "Barcha holatlar"
+    "allStatuses": "Barcha holatlar",
+    "myTasks": "Mening vazifalarim",
+    "allTasks": "Barcha vazifalar"
   },
   "calls": {
     "title": "Qo'ng'iroqlar tarixi",
@@ -701,7 +709,9 @@
     "recentNumbers": "So'nggi raqamlar",
     "callSuccess": "Qo'ng'iroq boshlandi! ID: {callId}",
     "invalidPhone": "Telefon + belgisi bilan boshlanishi va faqat raqamlardan iborat bo'lishi kerak",
-    "phoneHint": "Telefon raqamini xalqaro formatda kiriting, masalan +998901234567"
+    "phoneHint": "Telefon raqamini xalqaro formatda kiriting, masalan +998901234567",
+    "myCallsToggle": "Mening qo'ng'iroqlarim",
+    "allCallsToggle": "Barcha qo'ng'iroqlar"
   },
   "analytics": {
     "title": "Tahlillar",

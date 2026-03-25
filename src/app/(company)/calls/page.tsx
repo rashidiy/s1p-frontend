@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, message, Segmented, Switch } from 'antd';
+import { DatePicker, Input, Button, Tag, Select, Pagination, Modal, message, Segmented, Switch } from 'antd';
 import dayjs from 'dayjs';
 import { PhoneOutlined, LoadingOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
@@ -55,7 +55,7 @@ export default function CallsPage() {
   const [outcome, setOutcome] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [myCalls, setMyCalls] = useState(false);
+  const [myCalls, setMyCalls] = useState(() => user?.role === 'company_operator');
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [callModalVisible, setCallModalVisible] = useState(false);
@@ -376,7 +376,14 @@ export default function CallsPage() {
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">{t('filter')}</label>
-            <Checkbox checked={myCalls} onChange={(e) => { setMyCalls(e.target.checked); setPage(1); }} className="mt-1">{t('myCalls')}</Checkbox>
+            <Segmented
+              value={myCalls ? 'my' : 'all'}
+              onChange={(v) => { setMyCalls(v === 'my'); setPage(1); }}
+              options={[
+                { label: t('myCallsToggle'), value: 'my' },
+                { label: t('allCallsToggle'), value: 'all' },
+              ]}
+            />
           </div>
         </div>
       </div>
