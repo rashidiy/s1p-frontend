@@ -1,11 +1,33 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import { formatPhone } from '../../_utils';
+
+const labelStyle: React.CSSProperties = {
+  fontSize: 13,
+  color: 'var(--ma-hint)',
+  marginBottom: 4,
+  display: 'block',
+};
+
+const labelTopStyle: React.CSSProperties = {
+  ...labelStyle,
+  marginTop: 12,
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600,
+  color: 'var(--ma-text)',
+  marginTop: 20,
+  marginBottom: 8,
+  paddingBottom: 6,
+  borderBottom: '0.5px solid var(--ma-separator)',
+};
 
 export default function NewContactPage() {
   const router = useRouter();
@@ -18,7 +40,11 @@ export default function NewContactPage() {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState(phoneParam);
   const [email, setEmail] = useState('');
+  const [position, setPosition] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const canSave = firstName.trim() && phone.trim() && !saving;
 
   const goBack = useCallback(() => {
     router.push('/miniapp/contacts');
@@ -36,7 +62,9 @@ export default function NewContactPage() {
     }
   }, [webApp, goBack]);
 
-  const handleSave = async () => {
+  // Save handler ref for stable MainButton callback
+  const handleSaveRef = useRef<() => void>();
+  handleSaveRef.current = async () => {
     if (!firstName.trim() || !phone.trim() || saving) return;
 
     setSaving(true);
@@ -46,8 +74,13 @@ export default function NewContactPage() {
         last_name: lastName.trim() || undefined,
         phone: phone.trim(),
         email: email.trim() || undefined,
+        position: position.trim() || undefined,
+        company_name: companyName.trim() || undefined,
       });
       webApp?.HapticFeedback.notificationOccurred('success');
+      try {
+        webApp?.showPopup({ message: 'Contact created' /* TODO: i18n */ });
+      } catch { /* showPopup may not be available */ }
       router.replace(`/miniapp/contacts/${created.id}`);
     } catch {
       webApp?.HapticFeedback.notificationOccurred('error');
@@ -59,14 +92,49 @@ export default function NewContactPage() {
     }
   };
 
-  const canSave = firstName.trim() && phone.trim() && !saving;
+  // Telegram MainButton for Save
+  useEffect(() => {
+    if (!webApp) return;
+
+    const onSave = () => handleSaveRef.current?.();
+
+    webApp.MainButton.setText(t('contacts.saveContact'));
+    webApp.MainButton.show();
+    webApp.MainButton.onClick(onSave);
+
+    return () => {
+      webApp.MainButton.offClick(onSave);
+      webApp.MainButton.hide();
+    };
+  }, [webApp, t]);
+
+  // Update MainButton enabled/disabled state and loading
+  useEffect(() => {
+    if (!webApp) return;
+    if (saving) {
+      webApp.MainButton.showProgress(false);
+    } else {
+      webApp.MainButton.hideProgress();
+    }
+    // Visually indicate if form is valid
+    if (canSave) {
+      webApp.MainButton.enable();
+    } else {
+      webApp.MainButton.disable();
+    }
+  }, [webApp, canSave, saving]);
 
   return (
     <div className="miniapp-detail-enter">
       <div className="miniapp-page-title">{t('contacts.newContact')}</div>
 
       <div className="miniapp-section" style={{ padding: '16px' }}>
-        <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, display: 'block' }}>
+        {/* Personal Info */}
+        <div style={sectionTitleStyle}>
+          {'Personal Info' /* TODO: i18n */}
+        </div>
+
+        <label style={labelStyle}>
           {t('contacts.firstName')} *
         </label>
         <input
@@ -77,7 +145,7 @@ export default function NewContactPage() {
           autoFocus
         />
 
-        <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, marginTop: 12, display: 'block' }}>
+        <label style={labelTopStyle}>
           {t('contacts.lastName')}
         </label>
         <input
@@ -87,7 +155,12 @@ export default function NewContactPage() {
           onChange={(e) => setLastName(e.target.value)}
         />
 
-        <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, marginTop: 12, display: 'block' }}>
+        {/* Contact Info */}
+        <div style={sectionTitleStyle}>
+          {'Contact Info' /* TODO: i18n */}
+        </div>
+
+        <label style={labelStyle}>
           {t('contacts.phone')} *
         </label>
         {phoneParam ? (
@@ -104,7 +177,7 @@ export default function NewContactPage() {
           />
         )}
 
-        <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, marginTop: 12, display: 'block' }}>
+        <label style={labelTopStyle}>
           {t('contacts.email')}
         </label>
         <input
@@ -115,25 +188,30 @@ export default function NewContactPage() {
           type="email"
         />
 
-        <button
-          onClick={handleSave}
-          disabled={!canSave}
-          style={{
-            width: '100%',
-            marginTop: 20,
-            padding: '14px',
-            borderRadius: 'var(--ma-radius-sm)',
-            border: 'none',
-            background: canSave ? 'var(--ma-btn)' : 'var(--ma-separator)',
-            color: canSave ? 'var(--ma-btn-text)' : 'var(--ma-hint)',
-            fontSize: 16,
-            fontWeight: 600,
-            cursor: canSave ? 'pointer' : 'default',
-            opacity: saving ? 0.7 : 1,
-          }}
-        >
-          {saving ? '...' : t('contacts.saveContact')}
-        </button>
+        {/* Work Info */}
+        <div style={sectionTitleStyle}>
+          {'Work Info' /* TODO: i18n */}
+        </div>
+
+        <label style={labelStyle}>
+          {'Position' /* TODO: i18n */}
+        </label>
+        <input
+          className="miniapp-create-contact-input"
+          placeholder={'Position' /* TODO: i18n */}
+          value={position}
+          onChange={(e) => setPosition(e.target.value)}
+        />
+
+        <label style={labelTopStyle}>
+          {'Company' /* TODO: i18n */}
+        </label>
+        <input
+          className="miniapp-create-contact-input"
+          placeholder={'Company' /* TODO: i18n */}
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+        />
       </div>
     </div>
   );
