@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { User, ChevronRight } from 'lucide-react';
+import { User, ChevronRight, ChevronDown, X as XIcon, Check } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -24,6 +24,93 @@ function Skeleton() {
   );
 }
 
+const LEAD_STEPS = ['new', 'contacted', 'qualified', 'converted'];
+
+const LEAD_NEXT_STATUSES: Record<string, string[]> = {
+  new: ['contacted', 'unqualified', 'lost'],
+  contacted: ['qualified', 'unqualified', 'lost'],
+  qualified: ['convert', 'lost'],
+};
+
+function LeadProgressSteps({ status }: { status: string }) {
+  const isTerminal = status === 'lost' || status === 'unqualified';
+  const currentIndex = LEAD_STEPS.indexOf(status);
+
+  if (isTerminal) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', gap: 6 }}>
+        <div style={{
+          width: 16, height: 16, borderRadius: '50%', background: '#ef4444',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <XIcon size={10} color="#fff" />
+        </div>
+        <span style={{ fontSize: 12, color: '#ef4444', fontWeight: 600 }}>
+          {status === 'lost' ? 'Lost' : 'Unqualified'} {/* TODO: i18n */}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', gap: 0 }}>
+      {LEAD_STEPS.map((step, i) => {
+        const isCompleted = currentIndex >= 0 && i < currentIndex;
+        const isCurrent = i === currentIndex;
+        const isFuture = currentIndex >= 0 ? i > currentIndex : true;
+
+        return (
+          <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Dot */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 20 }}>
+              {isCompleted ? (
+                <div style={{
+                  width: 12, height: 12, borderRadius: '50%',
+                  background: 'var(--ma-accent, #2563eb)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Check size={8} color="#fff" />
+                </div>
+              ) : isCurrent ? (
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  border: '2px solid var(--ma-accent, #2563eb)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: 'var(--ma-accent, #2563eb)',
+                  }} />
+                </div>
+              ) : (
+                <div style={{
+                  width: 12, height: 12, borderRadius: '50%',
+                  border: '2px solid var(--ma-hint, #999)',
+                }} />
+              )}
+              <span style={{
+                fontSize: 9, marginTop: 3,
+                color: isFuture ? 'var(--ma-hint, #999)' : 'var(--ma-accent, #2563eb)',
+                fontWeight: isCurrent ? 600 : 400,
+                textTransform: 'capitalize',
+              }}>
+                {step}
+              </span>
+            </div>
+            {/* Connector line */}
+            {i < LEAD_STEPS.length - 1 && (
+              <div style={{
+                width: 28, height: 2, marginBottom: 14,
+                background: isCompleted ? 'var(--ma-accent, #2563eb)' : 'var(--ma-hint, #ddd)',
+              }} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LeadDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -33,6 +120,7 @@ export default function LeadDetailPage() {
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tStatus = useTranslations('statuses');
@@ -150,6 +238,26 @@ export default function LeadDetailPage() {
     }
   }
 
+  async function handleStatusChange(nextStatus: string) {
+    if (!lead || actionLoading) return;
+    setStatusDropdownOpen(false);
+    setActionLoading(true);
+    try {
+      if (nextStatus === 'convert') {
+        await apiClient.convertLead(lead.id, true);
+      } else {
+        await apiClient.updateLead(lead.id, { status: nextStatus });
+      }
+      webApp?.HapticFeedback.notificationOccurred('success');
+      const updated = await apiClient.getLead(id);
+      setLead(updated);
+    } catch {
+      webApp?.HapticFeedback.notificationOccurred('error');
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   if (loading) return <Skeleton />;
 
   if (error || !lead) {
@@ -167,9 +275,60 @@ export default function LeadDetailPage() {
     <div className="miniapp-detail-enter">
       {/* Header */}
       <div className="miniapp-detail-header">
-        <span className={`miniapp-badge miniapp-detail-badge ${STATUS_BADGE[status] || 'miniapp-badge-default'}`}>
-          {tStatus(status)}
-        </span>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <span
+            className={`miniapp-badge miniapp-detail-badge ${STATUS_BADGE[status] || 'miniapp-badge-default'}`}
+            style={{ cursor: LEAD_NEXT_STATUSES[status] ? 'pointer' : 'default', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            onClick={() => {
+              if (LEAD_NEXT_STATUSES[status]) {
+                webApp?.HapticFeedback.selectionChanged();
+                setStatusDropdownOpen(!statusDropdownOpen);
+              }
+            }}
+          >
+            {tStatus(status)}
+            {LEAD_NEXT_STATUSES[status] && <ChevronDown size={12} />}
+          </span>
+          {/* Status change dropdown */}
+          {statusDropdownOpen && LEAD_NEXT_STATUSES[status] && (
+            <>
+              <div
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                onClick={() => setStatusDropdownOpen(false)}
+              />
+              <div style={{
+                position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
+                marginTop: 4, background: 'var(--ma-card-bg, #fff)', borderRadius: 10,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 100,
+                minWidth: 160, overflow: 'hidden',
+              }}>
+                {LEAD_NEXT_STATUSES[status].map((ns) => {
+                  const label = ns === 'convert' ? (t('actions.convertToDeal')) : tStatus(ns);
+                  const badgeClass = ns === 'convert' ? 'miniapp-badge-purple' : (STATUS_BADGE[ns] || 'miniapp-badge-default');
+                  return (
+                    <div
+                      key={ns}
+                      style={{
+                        padding: '10px 14px', cursor: 'pointer', fontSize: 14,
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        borderBottom: '1px solid var(--ma-border, #eee)',
+                      }}
+                      onClick={() => handleStatusChange(ns)}
+                    >
+                      <span className={`miniapp-badge ${badgeClass}`} style={{ fontSize: 11, padding: '2px 8px' }}>
+                        {label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Progress steps */}
+        <LeadProgressSteps status={status} />
+
         <div className="miniapp-detail-name">{lead.title || t('detail.untitled')}</div>
         {lead.estimated_value ? (
           <div className="miniapp-detail-sub">

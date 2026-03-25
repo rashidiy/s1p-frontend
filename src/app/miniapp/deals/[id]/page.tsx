@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { User, ChevronRight } from 'lucide-react';
+import { User, ChevronRight, Check, X as XIcon } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
@@ -24,6 +24,97 @@ function Skeleton() {
   );
 }
 
+const DEAL_STEPS = ['prospecting', 'qualification', 'proposal', 'negotiation', 'closed_won'];
+
+function DealProgressSteps({ stage }: { stage: string }) {
+  const isWon = stage === 'closed_won';
+  const isLost = stage === 'closed_lost';
+  const currentIndex = DEAL_STEPS.indexOf(stage);
+
+  if (isLost) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', gap: 6 }}>
+        <div style={{
+          width: 16, height: 16, borderRadius: '50%', background: '#ef4444',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <XIcon size={10} color="#fff" />
+        </div>
+        <span style={{ fontSize: 12, color: '#ef4444', fontWeight: 600 }}>
+          Closed Lost {/* TODO: i18n */}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', gap: 0 }}>
+      {DEAL_STEPS.map((step, i) => {
+        const isCompleted = currentIndex >= 0 && i < currentIndex;
+        const isCurrent = i === currentIndex;
+        const isFuture = currentIndex >= 0 ? i > currentIndex : true;
+        const isLastStep = i === DEAL_STEPS.length - 1;
+
+        return (
+          <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Dot */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 20 }}>
+              {isLastStep && isWon ? (
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  background: '#22c55e',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Check size={10} color="#fff" />
+                </div>
+              ) : isCompleted ? (
+                <div style={{
+                  width: 12, height: 12, borderRadius: '50%',
+                  background: 'var(--ma-accent, #2563eb)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Check size={8} color="#fff" />
+                </div>
+              ) : isCurrent ? (
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  border: '2px solid var(--ma-accent, #2563eb)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: 'var(--ma-accent, #2563eb)',
+                  }} />
+                </div>
+              ) : (
+                <div style={{
+                  width: 12, height: 12, borderRadius: '50%',
+                  border: '2px solid var(--ma-hint, #999)',
+                }} />
+              )}
+              <span style={{
+                fontSize: 8, marginTop: 3,
+                color: isFuture && !isWon ? 'var(--ma-hint, #999)' : (isWon && isLastStep ? '#22c55e' : 'var(--ma-accent, #2563eb)'),
+                fontWeight: isCurrent || (isWon && isLastStep) ? 600 : 400,
+                textTransform: 'capitalize', whiteSpace: 'nowrap',
+              }}>
+                {isLastStep ? 'Won' : step} {/* TODO: i18n */}
+              </span>
+            </div>
+            {/* Connector line */}
+            {i < DEAL_STEPS.length - 1 && (
+              <div style={{
+                width: 20, height: 2, marginBottom: 14,
+                background: isCompleted ? 'var(--ma-accent, #2563eb)' : 'var(--ma-hint, #ddd)',
+              }} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function DealDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -31,6 +122,8 @@ export default function DealDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
   const { webApp } = useTelegramWebApp();
   const t = useTranslations('miniapp');
   const tStatus = useTranslations('statuses');
@@ -124,6 +217,24 @@ export default function DealDetailPage() {
     }
   }, [webApp, loading, deal, handleCloseDeal, actionLoading, t]);
 
+  async function handleSaveNote() {
+    if (!noteText.trim() || !deal || savingNote) return;
+    setSavingNote(true);
+    try {
+      await apiClient.createNote({
+        entity_type: 'deal',
+        entity_id: deal.id,
+        content: noteText.trim(),
+      });
+      webApp?.HapticFeedback.notificationOccurred('success');
+      setNoteText('');
+    } catch {
+      webApp?.HapticFeedback.notificationOccurred('error');
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
   if (loading) return <Skeleton />;
 
   if (error || !deal) {
@@ -144,6 +255,10 @@ export default function DealDetailPage() {
         <span className={`miniapp-badge miniapp-detail-badge ${STAGE_BADGE[stage] || 'miniapp-badge-default'}`}>
           {tStatus(stage)}
         </span>
+
+        {/* Progress steps */}
+        <DealProgressSteps stage={stage} />
+
         <div className="miniapp-detail-name">{deal.title || t('detail.untitled')}</div>
         <div className="miniapp-detail-sub miniapp-detail-amount">
           {formatAmount(deal.amount, deal.currency)}
@@ -234,6 +349,27 @@ export default function DealDetailPage() {
           </div>
         </>
       )}
+
+      {/* Add note input */}
+      <div className="miniapp-section-header">{t('actions.addNote')}</div>
+      <div className="miniapp-section" style={{ padding: '12px 16px' }}>
+        <textarea
+          className="miniapp-note-input"
+          placeholder={t('actions.addNote')}
+          value={noteText}
+          onChange={(e) => setNoteText(e.target.value)}
+          rows={3}
+        />
+        {noteText.trim() && (
+          <button
+            className="miniapp-note-submit"
+            onClick={handleSaveNote}
+            disabled={savingNote}
+          >
+            {savingNote ? '...' : t('actions.save')}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

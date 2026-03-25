@@ -1,20 +1,39 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { TrendingUp, BarChart3, ChevronRight, X } from 'lucide-react';
+import { TrendingUp, BarChart3, ChevronRight, X, Plus } from 'lucide-react';
 import { Spin } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 import { useTranslations } from 'next-intl';
 import type { LeadResponse, DealResponse } from '@/types/api';
-import { formatAmount, formatPhone, STATUS_BADGE, ALL_STATUSES, STAGE_BADGE, ALL_STAGES } from '../_utils';
+import { formatAmount, formatPhone, formatDate, STATUS_BADGE, ALL_STATUSES, STAGE_BADGE, ALL_STAGES } from '../_utils';
 
 const PAGE_SIZE = 30;
 
 type ViewMode = 'leads' | 'deals';
 
 const SOURCE_OPTIONS = ['phone', 'website', 'referral', 'other'];
+
+function formatRelativeTime(dateStr: string): string {
+  try {
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diffMs = now - then;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'now'; /* TODO: i18n */
+    if (diffMin < 60) return `${diffMin}m ago`; /* TODO: i18n */
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `${diffH}h ago`; /* TODO: i18n */
+    const diffD = Math.floor(diffH / 24);
+    if (diffD < 30) return `${diffD}d ago`; /* TODO: i18n */
+    const diffMo = Math.floor(diffD / 30);
+    return `${diffMo}mo ago`; /* TODO: i18n */
+  } catch {
+    return '';
+  }
+}
 
 function SkeletonList() {
   return (
@@ -40,7 +59,7 @@ interface NewLeadFormProps {
 }
 
 function NewLeadForm({ phone, onSave, onCancel, t }: NewLeadFormProps) {
-  const defaultTitle = t('pipeline.leadFrom', { phone: formatPhone(phone) });
+  const defaultTitle = phone ? t('pipeline.leadFrom', { phone: formatPhone(phone) }) : '';
   const [title, setTitle] = useState(defaultTitle);
   const [source, setSource] = useState('phone');
   const [estimatedValue, setEstimatedValue] = useState('');
@@ -68,7 +87,7 @@ function NewLeadForm({ phone, onSave, onCancel, t }: NewLeadFormProps) {
           <X size={14} />
         </button>
       </div>
-      <div className="miniapp-create-contact-phone">{formatPhone(phone)}</div>
+      {phone && <div className="miniapp-create-contact-phone">{formatPhone(phone)}</div>}
 
       <label style={{ fontSize: 13, color: 'var(--ma-hint)', marginBottom: 4, display: 'block' }}>
         {t('pipeline.leadTitle')} *
@@ -237,6 +256,11 @@ export default function PipelinePage() {
     }
   }
 
+  function handleFabClick() {
+    webApp?.HapticFeedback.impactOccurred('medium');
+    setShowNewLeadForm(true);
+  }
+
   const filterOptions = viewMode === 'leads' ? ALL_STATUSES : ALL_STAGES;
   const badgeMap = viewMode === 'leads' ? STATUS_BADGE : STAGE_BADGE;
 
@@ -245,7 +269,7 @@ export default function PipelinePage() {
       <div className="miniapp-page-title">{t('pipeline.title')}</div>
 
       {/* New lead creation form */}
-      {showNewLeadForm && phoneParam && (
+      {showNewLeadForm && (
         <div className="miniapp-section" style={{ marginBottom: 8 }}>
           <NewLeadForm
             phone={phoneParam}
@@ -330,6 +354,32 @@ export default function PipelinePage() {
                         lead.estimated_value ? formatAmount(lead.estimated_value) : null,
                       ].filter(Boolean).join(' · ')}
                     </div>
+                    {/* Rich metadata */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
+                      {lead.contact_name && (
+                        <span style={{ fontSize: 11, color: 'var(--ma-hint, #999)' }}>
+                          {lead.contact_name}
+                        </span>
+                      )}
+                      {lead.assigned_to_name && (
+                        <span style={{ fontSize: 11, color: 'var(--ma-hint, #999)', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{
+                            width: 14, height: 14, borderRadius: '50%',
+                            background: 'var(--ma-accent, #2563eb)', color: '#fff',
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 8, fontWeight: 600, flexShrink: 0,
+                          }}>
+                            {lead.assigned_to_name.charAt(0).toUpperCase()}
+                          </span>
+                          {lead.assigned_to_name}
+                        </span>
+                      )}
+                      {lead.created_at && (
+                        <span style={{ fontSize: 11, color: 'var(--ma-hint, #999)' }}>
+                          {formatRelativeTime(lead.created_at)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span className={`miniapp-badge ${STATUS_BADGE[lead.status || ''] || 'miniapp-badge-default'}`}>
                     {tStatus(lead.status || 'new')}
@@ -371,6 +421,35 @@ export default function PipelinePage() {
                       <div className="miniapp-list-item-sub">
                         {formatAmount(deal.amount, deal.currency)}
                       </div>
+                      {/* Rich metadata */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
+                        {deal.contact_name && (
+                          <span style={{ fontSize: 11, color: 'var(--ma-hint, #999)' }}>
+                            {deal.contact_name}
+                          </span>
+                        )}
+                        {deal.probability != null && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--ma-hint, #999)' }}>
+                            <span style={{
+                              width: 40, height: 4, borderRadius: 2,
+                              background: 'var(--ma-border, #eee)', overflow: 'hidden',
+                              display: 'inline-block',
+                            }}>
+                              <span style={{
+                                display: 'block', height: '100%', borderRadius: 2,
+                                width: `${Math.min(100, Math.max(0, deal.probability))}%`,
+                                background: deal.probability >= 70 ? '#22c55e' : deal.probability >= 40 ? '#f59e0b' : '#ef4444',
+                              }} />
+                            </span>
+                            {deal.probability}%
+                          </span>
+                        )}
+                        {deal.expected_close_date && (
+                          <span style={{ fontSize: 11, color: 'var(--ma-hint, #999)' }}>
+                            {formatDate(String(deal.expected_close_date))}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span className={`miniapp-badge ${badgeMap[stage] || 'miniapp-badge-default'}`}>
                       {tStatus(stage)}
@@ -387,6 +466,25 @@ export default function PipelinePage() {
             )}
           </div>
         )
+      )}
+
+      {/* FAB — quick create lead (only on leads tab) */}
+      {viewMode === 'leads' && !showNewLeadForm && (
+        <button
+          onClick={handleFabClick}
+          style={{
+            position: 'fixed', bottom: 90, right: 20,
+            width: 52, height: 52, borderRadius: '50%',
+            background: 'var(--ma-accent, #2563eb)', color: '#fff',
+            border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+            zIndex: 50,
+          }}
+          aria-label="Create lead" /* TODO: i18n */
+        >
+          <Plus size={24} />
+        </button>
       )}
     </div>
   );
