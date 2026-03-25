@@ -79,6 +79,7 @@ function profileToUser(profile: UserResponse) {
     avatar_url: profile.avatar_url ?? null,
     is_active: profile.is_active,
     permissions: profile.permissions,
+    sip_extension: profile.sip_extension ?? undefined,
   };
 }
 
