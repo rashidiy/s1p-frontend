@@ -204,6 +204,7 @@
     "noAnswer": "No Answer",
     "congestion": "Congestion",
     "unavailable": "Unavailable",
+    "failed": "Failed",
     "answered": "Answered",
     "status": "Status",
     "unqualified": "Unqualified",

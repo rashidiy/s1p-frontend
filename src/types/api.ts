@@ -34,6 +34,7 @@ export enum CallStatusEnum {
   CANCEL = 'CANCEL',
   CONGESTION = 'CONGESTION',
   CHANUNAVAIL = 'CHANUNAVAIL',
+  FAILED = 'FAILED',
 }
 
 export enum UserRole {

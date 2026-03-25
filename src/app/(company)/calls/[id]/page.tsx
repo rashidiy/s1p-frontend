@@ -61,6 +61,7 @@ const stateColors: Record<string, string> = {
   CANCEL: 'default',
   CONGESTION: 'red',
   CHANUNAVAIL: 'default',
+  FAILED: 'default',
 };
 
 export default function CallDetailPage() {

@@ -204,6 +204,7 @@
     "noAnswer": "Нет ответа",
     "congestion": "Перегрузка",
     "unavailable": "Недоступен",
+    "failed": "Не удалось",
     "answered": "Отвечен",
     "status": "Статус",
     "unqualified": "Неквалифицированный",

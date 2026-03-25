@@ -107,6 +107,7 @@ export const CALL_STATUS_KEYS: Record<string, string> = {
   CANCEL: 'cancelled',
   CONGESTION: 'congestion',
   CHANUNAVAIL: 'unavailable',
+  FAILED: 'failed',
 };
 
 export const CALL_STATUS_COLORS: Record<string, string> = {
@@ -116,6 +117,7 @@ export const CALL_STATUS_COLORS: Record<string, string> = {
   CANCEL: 'bg-gray-100 text-gray-800',
   CONGESTION: 'bg-orange-100 text-orange-800',
   CHANUNAVAIL: 'bg-red-100 text-red-800',
+  FAILED: 'bg-gray-100 text-gray-500',
 };
 
 export const CONTRACT_STATUS_KEYS: Record<string, string> = {
