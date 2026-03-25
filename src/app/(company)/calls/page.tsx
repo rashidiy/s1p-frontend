@@ -6,6 +6,7 @@ import { DatePicker, Input, Button, Tag, Select, Pagination, Checkbox, Modal, me
 import dayjs from 'dayjs';
 import { PhoneOutlined, LoadingOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { PhoneIncoming, PhoneOutgoing } from '@/components/icons/custom-icons';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { apiClient } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/auth';
@@ -124,25 +125,16 @@ export default function CallsPage() {
 
   const isValidPhone = (phone: string) => /^\+\d{7,15}$/.test(phone);
 
-  // Phone formatting helpers — store national digits only, display with spaces
-  const formatNational = (digits: string) => {
-    const d = digits.replace(/\D/g, '').slice(0, 9);
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)} ${d.slice(2)}`;
-    if (d.length <= 7) return `${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5)}`;
-    return `${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5, 7)} ${d.slice(7)}`;
-  };
-  const toNationalDigits = (phone: string) => {
-    const clean = phone.replace(/\D/g, '');
-    if (clean.startsWith('998') && clean.length > 3) return clean.slice(3);
-    return clean;
-  };
-  const toFullPhone = (national: string) => {
-    const digits = national.replace(/\D/g, '');
-    return digits ? `+998${digits}` : '';
-  };
-  const handlePhoneInput = (value: string, setter: (v: string) => void) => {
-    setter(value.replace(/\D/g, '').slice(0, 9));
+  // Phone input: auto-prefix +998 if first char is digit; press + for international
+  const handlePhoneChange = (value: string, setter: (v: string) => void) => {
+    const raw = value.replace(/[^\d+]/g, '');
+    if (!raw) { setter(''); return; }
+    // If starts with digit (no +), auto-prefix +998
+    if (raw[0] !== '+') {
+      setter('+998' + raw.slice(0, 12));
+    } else {
+      setter(raw.slice(0, 16));
+    }
   };
 
   const contactSearchTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -210,16 +202,13 @@ export default function CallsPage() {
   const handleMakeCall = async () => {
     setPhoneError('');
 
-    const fullPhone1 = toFullPhone(phone1);
-    const fullPhone2 = toFullPhone(phone2);
-
     if (callType === 'external') {
-      if (!isValidPhone(fullPhone1) || !isValidPhone(fullPhone2)) {
+      if (!isValidPhone(phone1) || !isValidPhone(phone2)) {
         setPhoneError(t('invalidPhone'));
         return;
       }
     } else {
-      if (!isValidPhone(fullPhone2)) {
+      if (!isValidPhone(phone2)) {
         setPhoneError(t('invalidPhone'));
         return;
       }
@@ -238,17 +227,17 @@ export default function CallsPage() {
     try {
       let result;
       if (callType === 'external') {
-        result = await apiClient.callExternal({ phone_1: fullPhone1, phone_2: fullPhone2, operator_id: operatorSip });
+        result = await apiClient.callExternal({ phone_1: phone1, phone_2: phone2, operator_id: operatorSip });
       } else if (callType === 'number') {
         result = await apiClient.callNumber({
-          phone: fullPhone2,
+          phone: phone2,
           operator_id: operatorSip,
           reverse,
           antiaon,
         });
       } else {
         result = await apiClient.callTree({
-          phone: fullPhone2,
+          phone: phone2,
           operator_id: operatorSip,
           tree: treeId,
           reverse,
@@ -313,9 +302,9 @@ export default function CallsPage() {
 
   const formatPhone = (phone?: string | null) => {
     if (!phone) return null;
-    // +998XXYYYXXYY → +998 XX YYY XX XX
-    const match = phone.match(/^\+998(\d{2})(\d{3})(\d{2})(\d{2})$/);
-    if (match) return `+998 ${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
+    const input = phone.startsWith('+') ? phone : `+${phone}`;
+    const parsed = parsePhoneNumberFromString(input);
+    if (parsed) return parsed.formatInternational();
     return phone;
   };
 
@@ -511,7 +500,7 @@ export default function CallsPage() {
               filterOption={false}
               onSearch={handleContactSearch}
               onChange={(value) => {
-                setPhone2(value ? toNationalDigits(value) : '');
+                setPhone2(value || '');
                 setContactSearchValue('');
                 setContactOptions([]);
               }}
@@ -532,7 +521,7 @@ export default function CallsPage() {
                   <Tag
                     key={num}
                     className="cursor-pointer"
-                    onClick={() => setPhone2(toNationalDigits(num))}
+                    onClick={() => setPhone2(num)}
                   >
                     {formatPhone(num) || num}
                   </Tag>
@@ -545,11 +534,11 @@ export default function CallsPage() {
             <>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('callerPhone')}</label>
-                <Input addonBefore="+998" value={formatNational(phone1)} onChange={(e) => handlePhoneInput(e.target.value, setPhone1)} placeholder="90 123 45 67" />
+                <Input value={formatPhone(phone1) || phone1} onChange={(e) => handlePhoneChange(e.target.value, setPhone1)} placeholder="+998 90 123 45 67" />
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('receiverPhone')}</label>
-                <Input addonBefore="+998" value={formatNational(phone2)} onChange={(e) => handlePhoneInput(e.target.value, setPhone2)} placeholder="90 123 45 67" />
+                <Input value={formatPhone(phone2) || phone2} onChange={(e) => handlePhoneChange(e.target.value, setPhone2)} placeholder="+998 90 123 45 67" />
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('operatorSip')}</label>
@@ -577,7 +566,7 @@ export default function CallsPage() {
             <>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('destinationPhone')}</label>
-                <Input addonBefore="+998" value={formatNational(phone2)} onChange={(e) => handlePhoneInput(e.target.value, setPhone2)} placeholder="90 123 45 67" />
+                <Input value={formatPhone(phone2) || phone2} onChange={(e) => handlePhoneChange(e.target.value, setPhone2)} placeholder="+998 90 123 45 67" />
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('operatorSip')}</label>
@@ -615,7 +604,7 @@ export default function CallsPage() {
             <>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('destinationPhone')}</label>
-                <Input addonBefore="+998" value={formatNational(phone2)} onChange={(e) => handlePhoneInput(e.target.value, setPhone2)} placeholder="90 123 45 67" />
+                <Input value={formatPhone(phone2) || phone2} onChange={(e) => handlePhoneChange(e.target.value, setPhone2)} placeholder="+998 90 123 45 67" />
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium">{t('operatorSip')}</label>
