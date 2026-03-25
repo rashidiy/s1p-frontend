@@ -177,14 +177,11 @@ export default function MiniAppLayout({ children }: { children: React.ReactNode 
     try { sessionStorage.setItem('miniapp_company', JSON.stringify({ id, name })); } catch {}
   };
 
-  // Enable closing confirmation to prevent accidental close
+  // Expand to full height + enable closing confirmation
   useEffect(() => {
     if (webApp) {
-      try {
-        webApp.enableClosingConfirmation();
-      } catch {
-        // older SDK versions may not support this
-      }
+      try { webApp.expand(); } catch {}
+      try { webApp.enableClosingConfirmation(); } catch {}
     }
   }, [webApp]);
 
