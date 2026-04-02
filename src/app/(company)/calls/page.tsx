@@ -17,7 +17,7 @@ import {
   CALL_STATUS_COLORS,
   CALL_DIRECTION_OPTIONS,
 } from '@/lib/constants';
-import type { CallEventResponse, ContactResponse, PaginatedResponse, SipuniOperator } from '@/types/api';
+import type { CallEventResponse, CallWithDetails, ContactResponse, PaginatedResponse, SipuniOperator } from '@/types/api';
 import { EmptyStateCharacter, ErrorCharacter } from '@/components/illustrations';
 
 type CallType = 'external' | 'number' | 'tree';
@@ -47,7 +47,7 @@ export default function CallsPage() {
   ];
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('errors');
-  const [data, setData] = useState<PaginatedResponse<CallEventResponse> | null>(null);
+  const [data, setData] = useState<PaginatedResponse<CallWithDetails> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [page, setPage] = useState(1);
@@ -300,8 +300,12 @@ export default function CallsPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const formatPhone = (phone?: string | null) => {
+  const formatPhone = (phone?: string | null, operatorName?: string | null) => {
     if (!phone) return null;
+    // SIP extensions are short digit-only strings (2-5 digits)
+    if (/^\d{2,5}$/.test(phone)) {
+      return operatorName ? `${phone} ${operatorName}` : phone;
+    }
     const input = phone.startsWith('+') ? phone : `+${phone}`;
     const parsed = parsePhoneNumberFromString(input);
     if (parsed) return parsed.formatInternational();
@@ -414,7 +418,7 @@ export default function CallsPage() {
                   <span className="shrink-0 mt-0.5 sm:mt-0">{getDirectionIcon(call.direction, call.state)}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm sm:text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPhone(call.phone_1) || tCommon('unknown')} &rarr; {formatPhone(call.phone_2) || tCommon('unknown')}</span>
+                      <span className="font-medium text-sm sm:text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPhone(call.phone_1, call.operator_name) || tCommon('unknown')} &rarr; {formatPhone(call.phone_2, call.operator_name) || tCommon('unknown')}</span>
                       {call.direction && <Tag color={call.direction === 'inbound' ? 'green' : 'blue'}>{CALL_DIRECTION_KEYS[call.direction] ? tDirections(CALL_DIRECTION_KEYS[call.direction]) : call.direction}</Tag>}
                       {call.state && <Tag color={call.state === 'ANSWER' ? 'green' : (call.state === 'NOANSWER' || call.state === 'BUSY' || call.state === 'CANCEL') ? 'red' : undefined}>{CALL_STATUS_KEYS[call.state] ? tStatuses(CALL_STATUS_KEYS[call.state]) : call.state}</Tag>}
                     </div>
