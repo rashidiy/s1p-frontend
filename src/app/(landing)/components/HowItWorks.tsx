@@ -37,8 +37,10 @@ function StepIcon2() {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M4 20L12 6L20 20H4Z" />
-        <path d="M7 18L12 9L17 18" strokeWidth="1.5" />
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     </div>
   );
@@ -57,11 +59,10 @@ function StepIcon3() {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M8 20V14L10 11H14L16 14V20H8Z" />
-        <path d="M10 20V16H14V20" />
-        <path d="M11 13H13" />
-        <circle cx="16" cy="8" r="3" fill="white" stroke="none" />
-        <path d="M14.5 8L15.5 9L17.5 7" stroke="#4338CA" strokeWidth="1.5" />
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+        <line x1="3" y1="20" x2="21" y2="20" />
       </svg>
     </div>
   );

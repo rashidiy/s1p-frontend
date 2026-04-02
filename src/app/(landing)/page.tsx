@@ -9,7 +9,6 @@ const HowItWorks = dynamic(() => import('./components/HowItWorks'));
 const ROICalculator = dynamic(() => import('./components/ROICalculator'));
 const FeatureGrid = dynamic(() => import('./components/FeatureGrid'));
 const Pricing = dynamic(() => import('./components/Pricing'));
-const Testimonials = dynamic(() => import('./components/Testimonials'));
 const FAQ = dynamic(() => import('./components/FAQ'));
 const CTAFooter = dynamic(() => import('./components/CTAFooter'));
 
@@ -23,7 +22,6 @@ export default function LandingPage() {
       <ROICalculator />
       <FeatureGrid />
       <Pricing />
-      <Testimonials />
       <FAQ />
       <CTAFooter />
     </main>

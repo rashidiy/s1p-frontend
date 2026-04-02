@@ -23,17 +23,31 @@ function SparkleIcon() {
   );
 }
 
-const MOCK_LEADS = [
-  { name: 'Алексей М.', phone: '+998 90 •••', status: 'new' },
-  { name: 'Дилшод К.', phone: '+998 91 •••', status: 'contacted' },
-  { name: 'Нодира Р.', phone: '+998 93 •••', status: 'qualified' },
+const PIPELINE_STAGES = [
+  {
+    name: 'Новые',
+    color: 'bg-indigo-500',
+    deals: [
+      { name: 'ООО Парус', amount: '4.2M' },
+      { name: 'Гранд Текс', amount: '1.8M' },
+    ],
+  },
+  {
+    name: 'Переговоры',
+    color: 'bg-amber-500',
+    deals: [
+      { name: 'УзАвто Плюс', amount: '7.5M' },
+    ],
+  },
+  {
+    name: 'Закрыто',
+    color: 'bg-emerald-500',
+    deals: [
+      { name: 'Artel Group', amount: '12M' },
+      { name: 'IT Park', amount: '3.1M' },
+    ],
+  },
 ];
-
-const STATUS_COLORS: Record<string, string> = {
-  new: 'bg-indigo-500/20 text-indigo-400',
-  contacted: 'bg-amber-500/20 text-amber-400',
-  qualified: 'bg-emerald-500/20 text-emerald-400',
-};
 
 function PhoneIcon() {
   return (
@@ -74,15 +88,9 @@ const STAT_CARDS = [
   { value: 12, labelKey: 'dashboard.completedTasks', icon: CheckIcon, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', accent: 'text-amber-400' },
 ];
 
-const STATUS_LABEL_KEYS: Record<string, string> = {
-  new: 'statusNew',
-  contacted: 'statusContacted',
-  qualified: 'statusQualified',
-};
 
 function CRMDashboardCard() {
   const tDashboard = useTranslations();
-  const tHero = useTranslations('landing.hero');
 
   return (
     <BlurFade delay={0.4} direction="left" duration={0.8} blur="12px">
@@ -138,36 +146,36 @@ function CRMDashboardCard() {
             })}
           </div>
 
-          {/* Mini leads table */}
+          {/* Mini pipeline */}
           <div className="px-4 pb-4">
             <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
                 <span className="text-[11px] font-body font-medium text-gray-500 uppercase tracking-wider">
-                  {tDashboard('entities.leads')}
+                  {tDashboard('entities.deals')}
                 </span>
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              {MOCK_LEADS.map((lead, i) => (
-                <div
-                  key={lead.name}
-                  className={`flex items-center justify-between px-3 py-2 ${
-                    i < MOCK_LEADS.length - 1 ? 'border-b border-white/[0.03]' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-medium text-gray-400">
-                      {lead.name.charAt(0)}
+              <div className="grid grid-cols-3 gap-2 p-3">
+                {PIPELINE_STAGES.map((stage) => (
+                  <div key={stage.name} className="space-y-1.5">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className={`h-1.5 w-1.5 rounded-full ${stage.color}`} />
+                      <span className="text-[9px] font-body font-medium text-gray-500 uppercase tracking-wider">
+                        {stage.name}
+                      </span>
                     </div>
-                    <div>
-                      <div className="text-xs font-medium text-gray-300 font-body">{lead.name}</div>
-                      <div className="text-[10px] text-gray-600 font-body">{lead.phone}</div>
-                    </div>
+                    {stage.deals.map((deal) => (
+                      <div
+                        key={deal.name}
+                        className="rounded-lg border border-white/[0.05] bg-white/[0.03] px-2 py-1.5"
+                      >
+                        <div className="text-[10px] font-medium text-gray-300 font-body truncate">{deal.name}</div>
+                        <div className="text-[9px] text-gray-500 font-body">{deal.amount} сум</div>
+                      </div>
+                    ))}
                   </div>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_COLORS[lead.status]}`}>
-                    {tHero(STATUS_LABEL_KEYS[lead.status])}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -283,18 +291,20 @@ export default function HeroSection() {
                   </ShimmerButton>
                 </Link>
 
-                {/* Secondary ghost CTA */}
-                <button
-                  type="button"
+                {/* Secondary ghost CTA — Login */}
+                <Link
+                  href="/login"
                   className="group inline-flex items-center gap-2.5 rounded-2xl px-6 py-4 text-[15px] font-medium text-gray-400 transition-all duration-200 hover:bg-white/[0.04] hover:text-white"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.06] transition-all duration-200 group-hover:border-indigo-500/30 group-hover:bg-indigo-500/10">
-                    <svg className="ml-0.5 h-3.5 w-3.5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
+                    <svg className="h-3.5 w-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                      <polyline points="10 17 15 12 10 7" />
+                      <line x1="15" y1="12" x2="3" y2="12" />
                     </svg>
                   </span>
-                  {t('hero.watchDemo')}
-                </button>
+                  {t('hero.login')}
+                </Link>
               </div>
             </BlurFade>
           </div>

@@ -13,16 +13,15 @@ interface RegularFeature {
 
 const regularFeatures: RegularFeature[] = [
   {
-    titleKey: 'features.crm',
-    descKey: 'features.crmDesc',
+    titleKey: 'features.calls',
+    descKey: 'features.callsDesc',
     iconBg: 'bg-blue-500/15',
     iconColor: 'text-blue-400',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
+        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+        <path d="M14.05 2a9 9 0 018 7.94" />
+        <path d="M14.05 6A5 5 0 0118 10" />
       </svg>
     ),
   },
@@ -33,9 +32,9 @@ const regularFeatures: RegularFeature[] = [
     iconColor: 'text-emerald-400',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-        <path d="M14.05 2a9 9 0 018 7.94" />
-        <path d="M14.05 6A5 5 0 0118 10" />
+        <path d="M8 12H16M16 12L13 9M16 12L13 15" />
+        <circle cx="6" cy="12" r="2.5" />
+        <rect x="17" y="9" width="4" height="6" rx="1" />
       </svg>
     ),
   },
@@ -54,6 +53,17 @@ const regularFeatures: RegularFeature[] = [
     ),
   },
   {
+    titleKey: 'features.telegram',
+    descKey: 'features.telegramDesc',
+    iconBg: 'bg-cyan-500/15',
+    iconColor: 'text-cyan-400',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+      </svg>
+    ),
+  },
+  {
     titleKey: 'features.api',
     descKey: 'features.apiDesc',
     iconBg: 'bg-violet-500/15',
@@ -63,19 +73,6 @@ const regularFeatures: RegularFeature[] = [
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
         <line x1="14" y1="4" x2="10" y2="20" />
-      </svg>
-    ),
-  },
-  {
-    titleKey: 'features.i18n',
-    descKey: 'features.i18nDesc',
-    iconBg: 'bg-cyan-500/15',
-    iconColor: 'text-cyan-400',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="2" y1="12" x2="22" y2="12" />
-        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
       </svg>
     ),
   },
@@ -99,34 +96,42 @@ export default function FeatureGrid() {
         </BlurFade>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-4">
-          {/* Hero card: Telegram Bot */}
+          {/* Hero card: Deal Pipeline / Kanban */}
           <BlurFade delay={0.1} inView>
             <div className="md:col-span-1 lg:row-span-2 h-full rounded-2xl bg-gradient-to-br from-indigo-600/30 to-violet-600/30 border border-indigo-500/20 p-8 flex flex-col">
-              {/* Paper plane icon */}
+              {/* Kanban board icon */}
               <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mb-5 flex-shrink-0">
-                <path d="M42 8L6 22L18 27L23 41L29 31L37 37L42 8Z" fill="white" fillOpacity="0.9" />
-                <path d="M18 27L29 20" stroke="rgba(99,102,241,0.6)" strokeWidth="2" strokeLinecap="round" />
+                <rect x="4" y="6" width="12" height="36" rx="3" fill="white" fillOpacity="0.15" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" />
+                <rect x="18" y="6" width="12" height="28" rx="3" fill="white" fillOpacity="0.15" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" />
+                <rect x="32" y="6" width="12" height="20" rx="3" fill="white" fillOpacity="0.15" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" />
+                <rect x="7" y="10" width="6" height="4" rx="1" fill="white" fillOpacity="0.7" />
+                <rect x="7" y="17" width="6" height="4" rx="1" fill="white" fillOpacity="0.5" />
+                <rect x="7" y="24" width="6" height="4" rx="1" fill="white" fillOpacity="0.3" />
+                <rect x="21" y="10" width="6" height="4" rx="1" fill="white" fillOpacity="0.7" />
+                <rect x="21" y="17" width="6" height="4" rx="1" fill="white" fillOpacity="0.5" />
+                <rect x="35" y="10" width="6" height="4" rx="1" fill="#4ADE80" fillOpacity="0.8" />
               </svg>
               <h3 className="text-2xl font-bold text-white font-display mb-3">
-                {t('features.telegramBot')}
+                {t('features.pipeline')}
               </h3>
               <p className="text-indigo-200/80 font-body leading-relaxed text-[15px]">
-                {t('features.telegramBotDesc')}
+                {t('features.pipelineDesc')}
               </p>
 
-              {/* Simplified phone outline */}
-              <div className="mt-auto pt-6 flex justify-center">
-                <div className="relative w-[130px] h-[180px]">
-                  <div className="absolute inset-0 rounded-[18px] border-2 border-white/30">
-                    {/* Notch */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-white/20 rounded-full" />
-                    {/* Notification lines */}
-                    <div className="absolute top-10 left-4 right-4 space-y-3">
-                      <div className="h-2 bg-white/15 rounded-full w-full" />
-                      <div className="h-2 bg-white/10 rounded-full w-4/5" />
-                      <div className="h-2 bg-white/[0.07] rounded-full w-3/5" />
+              {/* Mini pipeline visualization */}
+              <div className="mt-auto pt-6">
+                <div className="flex gap-2">
+                  {[
+                    { label: 'Новые', count: 5, color: 'bg-indigo-500' },
+                    { label: 'Перег.', count: 3, color: 'bg-amber-500' },
+                    { label: 'Закр.', count: 8, color: 'bg-emerald-500' },
+                  ].map((stage) => (
+                    <div key={stage.label} className="flex-1">
+                      <div className="text-[10px] text-white/40 font-body mb-1 text-center">{stage.label}</div>
+                      <div className={`h-1 rounded-full ${stage.color} opacity-60`} />
+                      <div className="text-[11px] text-white/60 font-body mt-1 text-center font-semibold">{stage.count}</div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
