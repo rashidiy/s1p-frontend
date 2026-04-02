@@ -14,14 +14,23 @@ Live at [s1p.uz](https://s1p.uz) · Backend: [s1p-backend](https://github.com/ra
 ### Dashboard
 <img src=".github/screenshots/dashboard.png" alt="Dashboard" width="800">
 
-### Calls
-<img src=".github/screenshots/calls.png" alt="Call History" width="800">
+### Contacts
+<img src=".github/screenshots/contacts.png" alt="Contacts" width="800">
+
+### Leads
+<img src=".github/screenshots/leads.png" alt="Leads" width="800">
 
 ### Deals Pipeline
 <img src=".github/screenshots/deals-pipeline.png" alt="Deals Pipeline" width="800">
 
-### Settings
-<img src=".github/screenshots/settings.png" alt="Settings" width="800">
+### Calls
+<img src=".github/screenshots/calls.png" alt="Calls" width="800">
+
+### Analytics
+<img src=".github/screenshots/analytics.png" alt="Analytics" width="800">
+
+### Team
+<img src=".github/screenshots/team.png" alt="Team" width="800">
 
 </details>
 
