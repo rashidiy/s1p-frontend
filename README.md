@@ -4,6 +4,27 @@ Web interface for the S1P multi-tenant CRM. Three portals in one app: landing pa
 
 Live at [s1p.uz](https://s1p.uz) · Backend: [s1p-backend](https://github.com/rashidiy/s1p-backend)
 
+<p align="center">
+  <img src=".github/screenshots/landing.jpg" alt="S1P Landing Page" width="800">
+</p>
+
+<details>
+<summary>More screenshots</summary>
+
+### Dashboard
+<img src=".github/screenshots/dashboard.jpg" alt="Dashboard" width="800">
+
+### Calls
+<img src=".github/screenshots/calls.jpg" alt="Call History" width="800">
+
+### Deals Pipeline
+<img src=".github/screenshots/deals-pipeline.jpg" alt="Deals Pipeline" width="800">
+
+### Settings
+<img src=".github/screenshots/settings.jpg" alt="Settings" width="800">
+
+</details>
+
 ---
 
 ## Features
