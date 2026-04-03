@@ -1121,13 +1121,13 @@
       "howItWorks": "How it works",
       "pricing": "Pricing",
       "faq": "FAQ",
-      "tryFree": "Start free trial",
+      "tryFree": "Request demo",
       "phone": "+998 90 007 30 30"
     },
     "hero": {
       "title": "Never miss a customer call again",
       "subtitle": "Full-featured CRM with sales pipeline, team analytics, call recordings, and Telegram — built for call centers in Uzbekistan.",
-      "cta": "Start free trial",
+      "cta": "Request demo",
       "login": "Log in",
       "integrationStrip": "Integrates with your telephony",
       "badge": "CRM for call centers",
@@ -1198,7 +1198,7 @@
       "feature5": "Telegram Mini App",
       "feature6": "Public API & webhooks",
       "feature7": "3 interface languages (RU, UZ, EN)",
-      "cta": "Start free — 14 days",
+      "cta": "Request demo",
       "noCard": "No credit card required. Cancel anytime.",
       "annual": "Annual plan: $290/year",
       "annualSaving": "save $58",
@@ -1223,8 +1223,8 @@
     },
     "ctaFooter": {
       "title": "Start managing your calls effectively",
-      "cta": "Start free trial — 14 days",
-      "subtitle": "Setup in 15 minutes. No credit card required."
+      "cta": "Request demo",
+      "subtitle": "We'll show you the system in 15 minutes. Tailored to your needs."
     },
     "footer": {
       "description": "CRM for call centers with telephony and Telegram integration",
@@ -1235,7 +1235,8 @@
       "contact": "Contact us",
       "address": "Tashkent, Uzbekistan",
       "copyright": "© 2026 S1P. All rights reserved."
-    }
+    },
+    "demoMessage": "Hi! I'd like to learn more about S1P CRM and request a demo.\n\nCompany: \nNumber of operators: \nTelephony: Sipuni / Binotel / other"
   },
   "miniapp": {
     "selectCompany": "Select company",

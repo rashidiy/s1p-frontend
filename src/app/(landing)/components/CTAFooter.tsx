@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import Link from 'next/link';
+
 import { type Locale, locales } from '@/i18n/config';
 import { BlurFade } from './magicui/blur-fade';
 import { ShimmerButton } from './magicui/shimmer-button';
@@ -66,7 +66,11 @@ export default function CTAFooter() {
               </h2>
 
               <div className="mt-10 flex justify-center">
-                <Link href="/register">
+                <a
+                  href={`https://t.me/s1p_support?text=${encodeURIComponent(t('demoMessage'))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <ShimmerButton
                     className="px-10 py-4 text-lg font-bold"
                     background="rgba(99, 102, 241, 0.2)"
@@ -75,7 +79,7 @@ export default function CTAFooter() {
                   >
                     {t('ctaFooter.cta')}
                   </ShimmerButton>
-                </Link>
+                </a>
               </div>
 
               <p className="mt-6 text-indigo-300/60 text-sm font-body">

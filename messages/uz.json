@@ -1121,13 +1121,13 @@
       "howItWorks": "Qanday ishlaydi",
       "pricing": "Narxlar",
       "faq": "FAQ",
-      "tryFree": "Bepul sinab ko'rish",
+      "tryFree": "Demo so'rash",
       "phone": "+998 90 007 30 30"
     },
     "hero": {
       "title": "Birorta qo'ng'iroq e'tiborsiz qolmaydi",
       "subtitle": "Sotuv voronkasi, jamoa analitikasi, qo'ng'iroq yozuvlari va Telegram bilan to'liq CRM — O'zbekistondagi qo'ng'iroq markazlari uchun.",
-      "cta": "Bepul sinab ko'rish",
+      "cta": "Demo so'rash",
       "login": "Kirish",
       "integrationStrip": "Telefoniyangiz bilan integratsiya",
       "badge": "Qo'ng'iroq markazlari uchun CRM",
@@ -1198,7 +1198,7 @@
       "feature5": "Telegram Mini App",
       "feature6": "Ommaviy API va vebhuklar",
       "feature7": "3 ta interfeys tili (rus, o'zb, ingl)",
-      "cta": "Bepul boshlash — 14 kun",
+      "cta": "Demo so'rash",
       "noCard": "Karta bog'lash shart emas. Istalgan vaqtda bekor qilish.",
       "annual": "Yillik reja: 2 900 000 so'm/yil",
       "annualSaving": "580 000 so'm tejash",
@@ -1223,8 +1223,8 @@
     },
     "ctaFooter": {
       "title": "Qo'ng'iroqlarni samarali boshqarishni boshlang",
-      "cta": "Bepul sinab ko'rish — 14 kun",
-      "subtitle": "15 daqiqada sozlash. Karta bog'lash shart emas."
+      "cta": "Demo so'rash",
+      "subtitle": "Tizimni 15 daqiqada ko'rsatamiz. Sizga moslashtiramiz."
     },
     "footer": {
       "description": "Telefoniya va Telegram integratsiyasi bilan qo'ng'iroq markazlari uchun CRM",
@@ -1235,7 +1235,8 @@
       "contact": "Biz bilan bog'lanish",
       "address": "Toshkent, O'zbekiston",
       "copyright": "© 2026 S1P. Barcha huquqlar himoyalangan."
-    }
+    },
+    "demoMessage": "Salom! S1P CRM haqida ko'proq bilishni va demo ko'rishni xohlayman.\n\nKompaniya: \nOperatorlar soni: \nTelefoniya: Sipuni / Binotel / boshqa"
   },
   "miniapp": {
     "selectCompany": "Kompaniyani tanlang",

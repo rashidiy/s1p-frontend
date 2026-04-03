@@ -180,7 +180,11 @@ export default function Navbar() {
           </div>
 
           {/* CTA ShimmerButton */}
-          <Link href="/register">
+          <a
+            href={`https://t.me/s1p_support?text=${encodeURIComponent(t('demoMessage'))}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <ShimmerButton
               background="rgba(99, 102, 241, 0.15)"
               shimmerColor="#818CF8"
@@ -189,7 +193,7 @@ export default function Navbar() {
             >
               {t('nav.tryFree')}
             </ShimmerButton>
-          </Link>
+          </a>
         </div>
 
         {/* Mobile Hamburger */}
@@ -276,7 +280,13 @@ export default function Navbar() {
 
               {/* CTA — Mobile */}
               <div className="mt-2 px-4">
-                <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="block">
+                <a
+                  href={`https://t.me/s1p_support?text=${encodeURIComponent(t('demoMessage'))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block"
+                >
                   <ShimmerButton
                     background="rgba(99, 102, 241, 0.15)"
                     shimmerColor="#818CF8"
@@ -285,7 +295,7 @@ export default function Navbar() {
                   >
                     {t('nav.tryFree')}
                   </ShimmerButton>
-                </Link>
+                </a>
               </div>
             </motion.div>
           </>

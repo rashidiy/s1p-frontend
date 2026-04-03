@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+
 import { BlurFade } from './magicui/blur-fade';
 import { BorderBeam } from './magicui/border-beam';
 import { ShimmerButton } from './magicui/shimmer-button';
@@ -88,7 +88,12 @@ export default function Pricing() {
 
               {/* CTA button */}
               <div className="mt-10">
-                <Link href="/register" className="block">
+                <a
+                  href={`https://t.me/s1p_support?text=${encodeURIComponent(t('demoMessage'))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
                   <ShimmerButton
                     className="w-full py-4 text-lg font-semibold"
                     background="rgba(99, 102, 241, 0.2)"
@@ -97,7 +102,7 @@ export default function Pricing() {
                   >
                     {t('pricing.cta')}
                   </ShimmerButton>
-                </Link>
+                </a>
               </div>
 
               {/* No card disclaimer */}
