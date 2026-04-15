@@ -23,30 +23,24 @@ function SparkleIcon() {
   );
 }
 
-const PIPELINE_STAGES = [
-  {
-    name: 'Новые',
-    color: 'bg-indigo-500',
-    deals: [
-      { name: 'ООО Парус', amount: '4.2M' },
-      { name: 'Гранд Текс', amount: '1.8M' },
-    ],
-  },
-  {
-    name: 'Переговоры',
-    color: 'bg-amber-500',
-    deals: [
-      { name: 'УзАвто Плюс', amount: '7.5M' },
-    ],
-  },
-  {
-    name: 'Закрыто',
-    color: 'bg-emerald-500',
-    deals: [
-      { name: 'Artel Group', amount: '12M' },
-      { name: 'IT Park', amount: '3.1M' },
-    ],
-  },
+const RECENT_CALLS = [
+  { phone: '+998 90 123 45 67', time: '2h ago', duration: '3:42', answered: true },
+  { phone: '+998 93 456 78 90', time: '3h ago', duration: '1:15', answered: true },
+  { phone: '+998 91 234 56 78', time: '3h ago', duration: '0:00', answered: false },
+  { phone: '+998 97 890 12 34', time: '5h ago', duration: '5:08', answered: true },
+];
+
+const MY_TASKS = [
+  { title: 'Follow up with Artel Group', priority: 'high', due: 'Today' },
+  { title: 'Prepare proposal for IT Park', priority: 'medium', due: 'Tomorrow' },
+  { title: 'Schedule demo call', priority: 'low', due: 'Apr 8' },
+];
+
+const PERFORMANCE_METRICS = [
+  { value: 78, label: 'Productivity Score', color: 'text-indigo-400' },
+  { value: 847, label: 'Total Activities', color: 'text-white' },
+  { value: '68%', label: 'Call Answer Rate', color: 'text-emerald-400' },
+  { value: '18%', label: 'Lead Conversion', color: 'text-amber-400' },
 ];
 
 function PhoneIcon() {
@@ -82,10 +76,10 @@ function CheckIcon() {
 }
 
 const STAT_CARDS = [
-  { value: 847, labelKey: 'dashboard.totalCalls', icon: PhoneIcon, iconBg: 'bg-indigo-500/15', iconColor: 'text-indigo-400', accent: 'text-indigo-400' },
-  { value: 156, labelKey: 'dashboard.totalLeads', icon: RiseIcon, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', accent: 'text-emerald-400' },
-  { value: 43, labelKey: 'dashboard.totalDeals', icon: ChartIcon, iconBg: 'bg-blue-500/15', iconColor: 'text-blue-400', accent: 'text-blue-400' },
-  { value: 12, labelKey: 'dashboard.completedTasks', icon: CheckIcon, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', accent: 'text-amber-400' },
+  { value: 847, labelKey: 'dashboard.totalCalls', icon: PhoneIcon, iconBg: 'bg-indigo-500/15', iconColor: 'text-indigo-400', accent: 'text-indigo-400', subtitle: '87 answered' },
+  { value: 156, labelKey: 'dashboard.totalLeads', icon: RiseIcon, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', accent: 'text-emerald-400', subtitle: '23 converted' },
+  { value: 43, labelKey: 'dashboard.totalDeals', icon: ChartIcon, iconBg: 'bg-blue-500/15', iconColor: 'text-blue-400', accent: 'text-blue-400', subtitle: '12.8M UZS' },
+  { value: 12, labelKey: 'dashboard.completedTasks', icon: CheckIcon, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', accent: 'text-amber-400', subtitle: 'of 28 total' },
 ];
 
 
@@ -123,56 +117,106 @@ function CRMDashboardCard() {
             </div>
           </div>
 
-          {/* Stats grid — matches real dashboard layout */}
-          <div className="grid grid-cols-2 gap-3 p-4">
+          {/* Welcome section */}
+          <div className="px-4 pt-3 pb-1">
+            <div className="text-[13px] font-display font-semibold text-white/90">Welcome back, Admin</div>
+            <div className="text-[10px] font-body text-gray-500">Here&apos;s what&apos;s happening today</div>
+          </div>
+
+          {/* Stats row — 4 cards in a row, mirrors real dashboard */}
+          <div className="grid grid-cols-4 gap-2 px-4 py-2.5">
             {STAT_CARDS.map((stat) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={stat.labelKey}
-                  className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5"
+                  className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-2.5 py-2 transition-all duration-200 hover:border-white/[0.12] hover:bg-white/[0.06] hover:scale-[1.03] cursor-default"
                 >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${stat.iconBg}`}>
-                      <span className={stat.iconColor}><Icon /></span>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div className={`flex h-5 w-5 items-center justify-center rounded-md ${stat.iconBg}`}>
+                      <span className={`${stat.iconColor} [&>svg]:h-3 [&>svg]:w-3`}><Icon /></span>
                     </div>
-                    <span className="text-[11px] font-body text-gray-500">{tDashboard(stat.labelKey)}</span>
+                    <span className="text-[8px] font-body text-gray-500 leading-tight">{tDashboard(stat.labelKey)}</span>
                   </div>
-                  <div className={`text-xl font-display font-bold ${stat.accent}`}>
+                  <div className={`text-base font-display font-bold ${stat.accent} leading-none mb-0.5`}>
                     <NumberTicker value={stat.value} delay={0.6} className={stat.accent} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[7px] font-body text-gray-600">{stat.subtitle}</span>
+                    <span className="text-[7px] font-body text-indigo-400/60 hover:text-indigo-400 transition-colors cursor-pointer">Details →</span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Mini pipeline */}
-          <div className="px-4 pb-4">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+          {/* Two-column section: Recent Calls + My Tasks */}
+          <div className="grid grid-cols-5 gap-2.5 px-4 py-2">
+            {/* Recent Calls */}
+            <div className="col-span-3 rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
-                <span className="text-[11px] font-body font-medium text-gray-500 uppercase tracking-wider">
-                  {tDashboard('entities.deals')}
-                </span>
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-body font-semibold text-white/70">{tDashboard('dashboard.recentCalls')}</span>
+                <span className="text-[8px] font-body text-indigo-400/60 hover:text-indigo-400 transition-colors cursor-pointer">View all</span>
               </div>
-              <div className="grid grid-cols-3 gap-2 p-3">
-                {PIPELINE_STAGES.map((stage) => (
-                  <div key={stage.name} className="space-y-1.5">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <div className={`h-1.5 w-1.5 rounded-full ${stage.color}`} />
-                      <span className="text-[9px] font-body font-medium text-gray-500 uppercase tracking-wider">
-                        {stage.name}
-                      </span>
-                    </div>
-                    {stage.deals.map((deal) => (
-                      <div
-                        key={deal.name}
-                        className="rounded-lg border border-white/[0.05] bg-white/[0.03] px-2 py-1.5"
-                      >
-                        <div className="text-[10px] font-medium text-gray-300 font-body truncate">{deal.name}</div>
-                        <div className="text-[9px] text-gray-500 font-body">{deal.amount} сум</div>
+              <div className="divide-y divide-white/[0.03]">
+                {RECENT_CALLS.map((call, i) => (
+                  <div key={i} className="flex items-center justify-between px-3 py-1.5 transition-colors duration-150 hover:bg-white/[0.04] cursor-default">
+                    <div className="flex items-center gap-2">
+                      <div className={`flex h-5 w-5 items-center justify-center rounded-full ${call.answered ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                        <svg className={`h-2.5 w-2.5 ${call.answered ? 'text-emerald-400' : 'text-red-400'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                        </svg>
                       </div>
-                    ))}
+                      <div>
+                        <div className="text-[10px] font-body font-medium text-gray-300">{call.phone}</div>
+                        <div className="text-[8px] font-body text-gray-600">{call.time}</div>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-body text-gray-500 tabular-nums">{call.duration}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* My Tasks */}
+            <div className="col-span-2 rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
+                <span className="text-[10px] font-body font-semibold text-white/70">{tDashboard('dashboard.myTasks')}</span>
+                <span className="text-[8px] font-body text-indigo-400/60 hover:text-indigo-400 transition-colors cursor-pointer">View all</span>
+              </div>
+              <div className="divide-y divide-white/[0.03]">
+                {MY_TASKS.map((task, i) => (
+                  <div key={i} className="flex items-start gap-2 px-3 py-1.5 transition-colors duration-150 hover:bg-white/[0.04] cursor-default">
+                    <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${task.priority === 'high' ? 'border-red-500/30 bg-red-500/10' : task.priority === 'medium' ? 'border-amber-500/30 bg-amber-500/10' : 'border-gray-500/30 bg-gray-500/10'}`}>
+                      <svg className="h-2.5 w-2.5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[9px] font-body font-medium text-gray-300 truncate">{task.title}</div>
+                      <div className="text-[7px] font-body text-gray-600">{task.due}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Performance bar */}
+          <div className="px-4 pb-3 pt-1">
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+              <div className="text-[9px] font-body font-medium text-gray-500 uppercase tracking-wider mb-2">{tDashboard('dashboard.performance')}</div>
+              <div className="grid grid-cols-4 gap-2">
+                {PERFORMANCE_METRICS.map((metric, i) => (
+                  <div key={i} className="text-center transition-transform duration-200 hover:scale-[1.08] cursor-default">
+                    <div className={`text-sm font-display font-bold ${metric.color} leading-none`}>
+                      {typeof metric.value === 'number' ? (
+                        <NumberTicker value={metric.value} delay={0.8 + i * 0.1} className={metric.color} />
+                      ) : (
+                        metric.value
+                      )}
+                    </div>
+                    <div className="text-[7px] font-body text-gray-600 mt-0.5">{metric.label}</div>
                   </div>
                 ))}
               </div>
